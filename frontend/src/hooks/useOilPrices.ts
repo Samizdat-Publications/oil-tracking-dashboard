@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchPrices, fetchSummary, fetchDownstream } from '../lib/api';
-import type { PriceSeries, PriceSummary, DownstreamData } from '../types';
+import { fetchPrices, fetchSummary, fetchDownstream, fetchMilestones } from '../lib/api';
+import type { PriceSeries, PriceSummary, DownstreamData, MilestonesResponse } from '../types';
 
 export function useOilPrices(series: string, start?: string, end?: string) {
   return useQuery<PriceSeries>({
@@ -26,6 +26,15 @@ export function useDownstream() {
     queryFn: fetchDownstream,
     staleTime: 10 * 60 * 1000,
     retry: 2,
+  });
+}
+
+export function useMilestones() {
+  return useQuery<MilestonesResponse>({
+    queryKey: ['milestones'],
+    queryFn: fetchMilestones,
+    staleTime: 30 * 60 * 1000, // 30 min — milestones don't change frequently
+    retry: 1,
   });
 }
 

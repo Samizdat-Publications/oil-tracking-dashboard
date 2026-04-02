@@ -1,4 +1,4 @@
-import type { PriceSeries, PriceSummary, SimulationBands, SimulationRequest, DownstreamData } from '../types';
+import type { PriceSeries, PriceSummary, SimulationBands, SimulationRequest, DownstreamData, MilestonesResponse } from '../types';
 
 const BASE = '/api';
 
@@ -43,6 +43,11 @@ export function fetchCorrelations(window?: number): Promise<DownstreamData> {
 /** Fetch WTI + all downstream series for correlation analysis */
 export function fetchDownstream(): Promise<DownstreamData> {
   return fetchJson<DownstreamData>(`${BASE}/prices/downstream`);
+}
+
+/** Fetch war impact milestones (editorial + data-detected) */
+export function fetchMilestones(): Promise<MilestonesResponse> {
+  return fetchJson<MilestonesResponse>(`${BASE}/milestones`);
 }
 
 /** Check if API keys are configured */
