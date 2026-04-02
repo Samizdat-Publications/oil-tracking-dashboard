@@ -12,6 +12,7 @@ import { DataTable } from './components/data-table/DataTable';
 import { CollapsibleSection } from './components/ui/collapsible-section';
 import { EventManager } from './components/events/EventManager';
 import { SetupScreen } from './components/setup/SetupScreen';
+import { KitchenTableTicker } from './components/layout/KitchenTableTicker';
 import { useSimulation } from './hooks/useSimulation';
 import { checkSetup } from './lib/api';
 
@@ -76,7 +77,11 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
   const sim = useSimulation();
 
   return (
-    <EditorialLayout>
+    <>
+      {/* Sticky ticker — outside EditorialLayout for correct fixed positioning */}
+      <KitchenTableTicker />
+
+      <EditorialLayout>
       {/* Section 1: Full-viewport hero with price */}
       <HeroSection onOpenEventManager={() => setEventManagerOpen(true)} />
 
@@ -93,11 +98,11 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
       {/* Section 4: Risk — vol + distribution side-by-side */}
       <RiskSection simulationResult={sim.data} />
 
-      {/* Section 5: Downstream correlations — editorial grid */}
-      <DownstreamSection />
-
-      {/* Section 6: Supply Chain Flow — animated downstream visualization */}
+      {/* Section 5: Supply Chain Flow — animated downstream visualization */}
       <SupplyChainSection />
+
+      {/* Section 6: Downstream correlations — editorial grid */}
+      <DownstreamSection />
 
       {/* Section 7: Raw data — collapsible, narrow */}
       <div className="section-reading py-8 pb-24">
@@ -115,6 +120,7 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
       {/* Commodity detail slide-out (must be at app level for fixed positioning) */}
       <CommodityDetailPanel />
     </EditorialLayout>
+    </>
   );
 }
 
