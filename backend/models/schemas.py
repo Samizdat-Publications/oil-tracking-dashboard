@@ -137,3 +137,51 @@ class GeoEvent(BaseModel):
     label: str
     category: str
     description: str
+
+
+# ---------------------------------------------------------------------------
+# Polymarket prediction models
+# ---------------------------------------------------------------------------
+
+class PolymarketOutcome(BaseModel):
+    label: str
+    probability: float
+    token_id: str | None = None
+
+
+class PolymarketMarket(BaseModel):
+    id: str
+    question: str
+    outcomes: list[PolymarketOutcome]
+    volume: float
+    liquidity: float
+    end_date: str | None = None
+    category: str  # "price_target", "directional", "geopolitical"
+    source_url: str | None = None
+
+
+class PolymarketMarketsResponse(BaseModel):
+    markets: list[PolymarketMarket]
+    updated_at: str
+
+
+class PriceTarget(BaseModel):
+    target: str
+    direction: str  # "above" or "below"
+    probability: float
+    timeframe: str
+    volume: float
+
+
+class MarketSentiment(BaseModel):
+    direction: str  # "bullish", "bearish", "neutral"
+    confidence: float
+    description: str
+
+
+class PolymarketSummaryResponse(BaseModel):
+    price_targets: list[PriceTarget]
+    sentiment: MarketSentiment
+    top_markets_count: int
+    total_volume: float
+    updated_at: str

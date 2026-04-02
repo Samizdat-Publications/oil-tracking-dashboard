@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from services.cache import init_cache, clear_cache
-from routers import prices, simulation, correlations, milestones
+from routers import prices, simulation, correlations, milestones, polymarket
 from models.schemas import (
     HealthResponse,
     SetupStatusResponse,
@@ -52,6 +52,7 @@ app.include_router(prices.router)
 app.include_router(simulation.router)
 app.include_router(correlations.router)
 app.include_router(milestones.router)
+app.include_router(polymarket.router)
 
 
 # ---------------------------------------------------------------------------
