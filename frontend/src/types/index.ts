@@ -120,3 +120,43 @@ export interface Milestone {
 export interface MilestonesResponse {
   milestones: Milestone[];
 }
+
+// Polymarket prediction market types
+export interface PolymarketOutcome {
+  label: string;
+  probability: number;
+  token_id: string | null;
+}
+
+export interface PolymarketMarket {
+  id: string;
+  question: string;
+  outcomes: PolymarketOutcome[];
+  volume: number;
+  liquidity: number;
+  end_date: string | null;
+  category: string;
+  source_url: string | null;
+}
+
+export interface PriceTarget {
+  target: string;
+  direction: 'above' | 'below';
+  probability: number;
+  timeframe: string;
+  volume: number;
+}
+
+export interface MarketSentiment {
+  direction: 'bullish' | 'bearish' | 'neutral';
+  confidence: number;
+  description: string;
+}
+
+export interface PolymarketSummary {
+  price_targets: PriceTarget[];
+  sentiment: MarketSentiment;
+  top_markets_count: number;
+  total_volume: number;
+  updated_at: string;
+}

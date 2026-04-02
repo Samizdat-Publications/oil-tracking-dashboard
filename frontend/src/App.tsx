@@ -14,6 +14,7 @@ import { EventManager } from './components/events/EventManager';
 import { SetupScreen } from './components/setup/SetupScreen';
 import { KitchenTableTicker } from './components/layout/KitchenTableTicker';
 import { WarTimelineSection } from './components/sections/WarTimelineSection';
+import { PredictionMarketsSection } from './components/sections/PredictionMarketsSection';
 import { useSimulation } from './hooks/useSimulation';
 import { checkSetup } from './lib/api';
 
@@ -93,7 +94,10 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
         onRunSimulation={sim.reRun}
       />
 
-      {/* Section 3: Thin stats band */}
+      {/* Section 3: Prediction Markets — crowd odds on oil price targets */}
+      <PredictionMarketsSection />
+
+      {/* Section 4: Thin stats band */}
       <StatsBand simulationResult={sim.data} />
 
       {/* Section 4: Risk — vol + distribution side-by-side */}
