@@ -102,3 +102,21 @@ export interface ScenarioProbabilities {
   currentPrice: number;
   horizonLabel: string;
 }
+
+export interface MilestoneBadge {
+  label: string;
+  change: string;
+}
+
+export interface Milestone {
+  type: 'editorial' | 'data' | 'today';
+  date: string;
+  week: number;
+  headline: string;
+  description: string;
+  badges: MilestoneBadge[];
+}
+
+export interface MilestonesResponse {
+  milestones: Milestone[];
+}
