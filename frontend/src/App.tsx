@@ -13,6 +13,7 @@ import { CollapsibleSection } from './components/ui/collapsible-section';
 import { EventManager } from './components/events/EventManager';
 import { SetupScreen } from './components/setup/SetupScreen';
 import { KitchenTableTicker } from './components/layout/KitchenTableTicker';
+import { WarTimelineSection } from './components/sections/WarTimelineSection';
 import { useSimulation } from './hooks/useSimulation';
 import { checkSetup } from './lib/api';
 
@@ -101,7 +102,10 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
       {/* Section 5: Supply Chain Flow — animated downstream visualization */}
       <SupplyChainSection />
 
-      {/* Section 6: Downstream correlations — editorial grid */}
+      {/* Section 6: War Impact Timeline — week-by-week narrative */}
+      <WarTimelineSection />
+
+      {/* Section 7: Downstream correlations — editorial grid */}
       <DownstreamSection />
 
       {/* Section 7: Raw data — collapsible, narrow */}
