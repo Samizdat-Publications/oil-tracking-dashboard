@@ -1,0 +1,24 @@
+# API keys
+backend/.env
+.env
+
+# Python
+__pycache__/
+*.pyc
+backend/data/cache.db
+
+# Node
+node_modules/
+frontend/dist/
+frontend/dist-ssr/
+
+# Claude Code
+.claude/
+
+# Brainstorm mockups
+.superpowers/
+
+# Editor
+.vscode/
+.idea/
+*.sw?

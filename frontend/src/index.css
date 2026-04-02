@@ -1,0 +1,625 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #04060C;
+  --color-surface: #0A0E18;
+  --color-card: rgba(8, 14, 24, 0.85);
+  --color-card-solid: #0C1220;
+  --color-border: rgba(0, 240, 255, 0.06);
+  --color-border-hover: rgba(0, 240, 255, 0.15);
+  --color-border-active: rgba(0, 240, 255, 0.30);
+  --color-text-primary: #E8ECF4;
+  --color-text-secondary: #4A5568;
+  --color-accent: #00F0FF;
+  --color-accent-hover: #33F5FF;
+  --color-accent-glow: rgba(0, 240, 255, 0.08);
+  --color-green: #00FF88;
+  --color-red: #FF3366;
+  --color-orange: #FF8800;
+  --color-yellow: #FBBF24;
+  --color-purple: #A78BFA;
+  --color-cyan: #00F0FF;
+  --color-teal: #2ECDC1;
+  --font-sans: 'Outfit', system-ui, sans-serif;
+  --font-display: 'Bebas Neue', Impact, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Fira Code', monospace;
+}
+
+/* ═══════════════════════════════════════════════
+   SIGNAL BLACK — Keyframe Animations
+   ═══════════════════════════════════════════════ */
+
+@keyframes signalIn {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideReveal {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glowBreathe {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.02), inset 0 1px 0 rgba(0, 240, 255, 0.03); }
+  50% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.06), inset 0 1px 0 rgba(0, 240, 255, 0.06); }
+}
+
+@keyframes borderPulse {
+  0%, 100% { border-color: rgba(0, 240, 255, 0.06); }
+  50% { border-color: rgba(0, 240, 255, 0.12); }
+}
+
+@keyframes statusPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes meshDrift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes scanLine {
+  0% { transform: translateX(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes countTick {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes flowDown {
+  0% { top: -4px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════
+   Animation Utility Classes
+   ═══════════════════════════════════════════════ */
+
+.animate-signal-in {
+  animation: signalIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
+}
+
+.animate-slide-reveal {
+  animation: slideReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-glow-breathe {
+  animation: glowBreathe 3s ease-in-out infinite;
+}
+
+.animate-border-pulse {
+  animation: borderPulse 4s ease-in-out infinite;
+}
+
+.animate-count-tick {
+  animation: countTick 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-flow-down {
+  animation: flowDown 1.8s linear infinite;
+}
+
+/* Stagger delays — 80ms increments for dramatic cascade */
+.stagger-1 { animation-delay: 0.08s; }
+.stagger-2 { animation-delay: 0.16s; }
+.stagger-3 { animation-delay: 0.24s; }
+.stagger-4 { animation-delay: 0.32s; }
+.stagger-5 { animation-delay: 0.40s; }
+.stagger-6 { animation-delay: 0.48s; }
+.stagger-7 { animation-delay: 0.56s; }
+.stagger-8 { animation-delay: 0.64s; }
+
+/* ═══════════════════════════════════════════════
+   Skeleton Shimmer
+   ═══════════════════════════════════════════════ */
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.04), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   Signal Card — Solid Dark Surface (replaces glass-card)
+   ═══════════════════════════════════════════════ */
+
+.signal-card {
+  background: rgba(8, 14, 24, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.06);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.signal-card:hover {
+  border-color: rgba(0, 240, 255, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 240, 255, 0.04), 0 0 1px rgba(0, 240, 255, 0.1);
+}
+
+/* Scan line effect on cards */
+.signal-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 240, 255, 0.03) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: scanLine 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Keep glass-card as alias for backwards compat during transition */
+.glass-card {
+  background: rgba(8, 14, 24, 0.85);
+  border: 1px solid rgba(0, 240, 255, 0.06);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 240, 255, 0.15);
+  box-shadow: 0 4px 30px rgba(0, 240, 255, 0.04), 0 0 1px rgba(0, 240, 255, 0.1);
+}
+
+/* Glow card for scenario cards */
+.glow-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--glow-color, rgba(0, 240, 255, 0.4)), transparent);
+}
+
+.glow-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 40px;
+  background: radial-gradient(ellipse, var(--glow-color, rgba(0, 240, 255, 0.06)), transparent);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════
+   Global Base
+   ═══════════════════════════════════════════════ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 240, 255, 0.02), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(0, 255, 136, 0.015), transparent);
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════
+   Grain Overlay
+   ═══════════════════════════════════════════════ */
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════
+   Custom Scrollbar
+   ═══════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.12);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.25);
+}
+
+/* ═══════════════════════════════════════════════
+   Plotly Modebar
+   ═══════════════════════════════════════════════ */
+
+.js-plotly-plot .plotly .modebar {
+  background: transparent !important;
+}
+.js-plotly-plot .plotly .modebar-btn path {
+  fill: var(--color-text-secondary) !important;
+}
+.js-plotly-plot .plotly .modebar-btn:hover path {
+  fill: var(--color-accent) !important;
+}
+
+/* ═══════════════════════════════════════════════
+   Typography Utilities
+   ═══════════════════════════════════════════════ */
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.number-display {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.hero-price {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 4.5rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-accent);
+}
+
+/* ═══════════════════════════════════════════════
+   Accent Divider
+   ═══════════════════════════════════════════════ */
+
+.accent-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.12), transparent);
+  margin: 0 2rem;
+}
+
+/* ═══════════════════════════════════════════════
+   LIVE Indicator
+   ═══════════════════════════════════════════════ */
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-green);
+}
+
+.live-dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-green);
+}
+
+.live-dot::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--color-green);
+  animation: statusPing 1.5s ease-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   Stats Ribbon Divider
+   ═══════════════════════════════════════════════ */
+
+.stat-divider {
+  width: 1px;
+  align-self: stretch;
+  background: linear-gradient(180deg, transparent, rgba(0, 240, 255, 0.1), transparent);
+}
+
+/* ═══════════════════════════════════════════════
+   EDITORIAL LAYOUT — Section Width System
+   ═══════════════════════════════════════════════ */
+
+.section-full {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.section-wide {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.section-reading {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.section-narrow {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+/* ═══════════════════════════════════════════════
+   Editorial Bands
+   ═══════════════════════════════════════════════ */
+
+.band-dark {
+  background: #070B14;
+  border-top: 1px solid rgba(0, 240, 255, 0.04);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.04);
+}
+
+.band-darker {
+  background: #030508;
+  border-top: 1px solid rgba(0, 240, 255, 0.03);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.03);
+}
+
+/* ═══════════════════════════════════════════════
+   Pull Stat (standalone large number)
+   ═══════════════════════════════════════════════ */
+
+.pull-stat {
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.pull-stat-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.pull-stat-label {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.pull-stat-change {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  margin-top: 0.125rem;
+}
+
+/* ═══════════════════════════════════════════════
+   Figure Caption (below charts)
+   ═══════════════════════════════════════════════ */
+
+.figure-caption {
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════
+   Section Headers (editorial style)
+   ═══════════════════════════════════════════════ */
+
+.editorial-header {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.editorial-subhead {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+/* ═══════════════════════════════════════════════
+   Scroll Reveal Animation
+   ═══════════════════════════════════════════════ */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children inside revealed sections */
+.scroll-revealed > * {
+  animation: signalIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.scroll-revealed > *:nth-child(1) { animation-delay: 0s; }
+.scroll-revealed > *:nth-child(2) { animation-delay: 0.08s; }
+.scroll-revealed > *:nth-child(3) { animation-delay: 0.16s; }
+.scroll-revealed > *:nth-child(4) { animation-delay: 0.24s; }
+.scroll-revealed > *:nth-child(5) { animation-delay: 0.32s; }
+.scroll-revealed > *:nth-child(6) { animation-delay: 0.40s; }
+
+/* ═══════════════════════════════════════════════
+   Scroll Progress Bar
+   ═══════════════════════════════════════════════ */
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--color-accent);
+  z-index: 100;
+  transform-origin: left;
+  transition: none;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+}
+
+/* ═══════════════════════════════════════════════
+   Hero Section
+   ═══════════════════════════════════════════════ */
+
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-price-display {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+
+.hero-series-label {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+@keyframes scrollHint {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(8px); opacity: 0.8; }
+}
+
+.scroll-hint {
+  animation: scrollHint 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   Section Divider Rule
+   ═══════════════════════════════════════════════ */
+
+.section-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 240, 255, 0.08) 20%, rgba(0, 240, 255, 0.08) 80%, transparent 100%);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   Scenario Card — Tall/Narrow Variant
+   ═══════════════════════════════════════════════ */
+
+.scenario-card-stacked {
+  background: rgba(8, 14, 24, 0.6);
+  border: 1px solid rgba(0, 240, 255, 0.06);
+  border-left: 3px solid var(--glow-color, rgba(0, 240, 255, 0.3));
+  padding: 1rem 1.25rem;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.scenario-card-stacked:hover {
+  border-color: rgba(0, 240, 255, 0.12);
+  background: rgba(8, 14, 24, 0.8);
+}

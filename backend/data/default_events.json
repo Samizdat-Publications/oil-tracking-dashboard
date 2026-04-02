@@ -1,0 +1,18 @@
+[
+  {"id": "opec-embargo-1973", "date": "1973-10-17", "label": "OPEC Oil Embargo", "category": "embargo", "description": "Arab oil embargo following Yom Kippur War"},
+  {"id": "iran-revolution-1979", "date": "1979-01-16", "label": "Iranian Revolution", "category": "revolution", "description": "Iranian Revolution disrupts oil production"},
+  {"id": "iran-iraq-war-1980", "date": "1980-09-22", "label": "Iran-Iraq War", "category": "war", "description": "Iran-Iraq War begins"},
+  {"id": "gulf-war-1990", "date": "1990-08-02", "label": "Gulf War I", "category": "war", "description": "Iraq invades Kuwait"},
+  {"id": "asian-crisis-1997", "date": "1997-07-02", "label": "Asian Financial Crisis", "category": "market", "description": "Asian financial crisis collapses oil demand"},
+  {"id": "sept-11-2001", "date": "2001-09-11", "label": "September 11", "category": "war", "description": "9/11 terrorist attacks"},
+  {"id": "iraq-war-2003", "date": "2003-03-20", "label": "Iraq War", "category": "war", "description": "US invasion of Iraq"},
+  {"id": "financial-crisis-2008", "date": "2008-07-11", "label": "2008 Peak ($145)", "category": "market", "description": "Pre-crisis WTI peak before financial collapse"},
+  {"id": "arab-spring-2011", "date": "2011-02-15", "label": "Arab Spring / Libya", "category": "war", "description": "Libyan Civil War disrupts production"},
+  {"id": "opec-no-cut-2014", "date": "2014-11-27", "label": "OPEC Refuses Cut", "category": "opec", "description": "OPEC declines production cut, prices crash"},
+  {"id": "covid-price-war-2020", "date": "2020-03-06", "label": "COVID + Price War", "category": "pandemic", "description": "Saudi-Russia price war amid COVID lockdowns"},
+  {"id": "negative-wti-2020", "date": "2020-04-20", "label": "WTI Goes Negative", "category": "market", "description": "WTI futures hit -$37.63"},
+  {"id": "ukraine-invasion-2022", "date": "2022-02-24", "label": "Russia Invades Ukraine", "category": "war", "description": "Russian invasion of Ukraine spikes oil prices"},
+  {"id": "ukraine-peak-2022", "date": "2022-06-08", "label": "Post-Ukraine Peak", "category": "war", "description": "WTI peaks near $120 post-Ukraine invasion"},
+  {"id": "hamas-attack-2023", "date": "2023-10-07", "label": "Hamas Attack", "category": "war", "description": "Hamas attack on Israel briefly spikes oil"},
+  {"id": "iran-conflict-2026", "date": "2026-02-15", "label": "Iran Conflict Escalation", "category": "war", "description": "Iran conflict escalation causes major oil spike"}
+]
