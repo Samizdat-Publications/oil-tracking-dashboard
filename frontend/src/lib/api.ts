@@ -1,4 +1,4 @@
-import type { PriceSeries, PriceSummary, SimulationBands, SimulationRequest, DownstreamData, MilestonesResponse, PolymarketWarEconomy } from '../types';
+import type { PriceSeries, PriceSummary, SimulationBands, SimulationRequest, DownstreamData, MilestonesResponse, PolymarketWarEconomy, CrisisComparisonResponse } from '../types';
 
 const BASE = '/api';
 
@@ -53,6 +53,11 @@ export function fetchMilestones(): Promise<MilestonesResponse> {
 /** Fetch Polymarket war-economy prediction markets */
 export function fetchPolymarketSummary(): Promise<PolymarketWarEconomy> {
   return fetchJson<PolymarketWarEconomy>(`${BASE}/polymarket/summary`);
+}
+
+/** Fetch historical crisis comparison data */
+export function fetchCrisisComparison(): Promise<CrisisComparisonResponse> {
+  return fetchJson<CrisisComparisonResponse>(`${BASE}/crisis/comparison`);
 }
 
 /** Check if API keys are configured */

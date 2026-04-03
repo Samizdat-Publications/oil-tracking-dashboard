@@ -163,6 +163,20 @@
   50% { opacity: 0.4; }
 }
 
+/* Crisis comparison animations */
+@keyframes crisisPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.crisis-pulse {
+  animation: crisisPulse 2s ease-in-out infinite;
+}
+
+.crisis-live-badge {
+  animation: todayPulse 2s ease-in-out infinite;
+}
+
 /* ═══════════════════════════════════════════════
    Animation Utility Classes
    ═══════════════════════════════════════════════ */

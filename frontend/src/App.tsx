@@ -15,6 +15,7 @@ import { SetupScreen } from './components/setup/SetupScreen';
 import { KitchenTableTicker } from './components/layout/KitchenTableTicker';
 import { WarTimelineSection } from './components/sections/WarTimelineSection';
 import { PredictionMarketsSection } from './components/sections/PredictionMarketsSection';
+import { CrisisComparisonSection } from './components/sections/CrisisComparisonSection';
 import { useSimulation } from './hooks/useSimulation';
 import { checkSetup } from './lib/api';
 
@@ -109,7 +110,10 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
       {/* Section 6: War Impact Timeline — week-by-week narrative */}
       <WarTimelineSection />
 
-      {/* Section 7: Downstream correlations — editorial grid */}
+      {/* Section 7: Historical Crisis Comparison — how bad is it vs history */}
+      <CrisisComparisonSection />
+
+      {/* Section 8: Downstream correlations — editorial grid */}
       <DownstreamSection />
 
       {/* Section 7: Raw data — collapsible, narrow */}

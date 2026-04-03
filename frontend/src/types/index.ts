@@ -154,3 +154,28 @@ export interface PolymarketWarEconomy {
   market_count: number;
   updated_at: string;
 }
+
+// Crisis comparison types
+export interface CrisisTrajectoryPoint {
+  day: number;
+  pct_change: number;
+}
+
+export interface CrisisData {
+  id: string;
+  name: string;
+  year: number;
+  start_date: string;
+  end_date: string | null;
+  peak_spike_pct: number | null;
+  duration_months: number | null;
+  gas_impact_pct: number | null;
+  context: string;
+  trajectory: CrisisTrajectoryPoint[];
+  is_current: boolean;
+}
+
+export interface CrisisComparisonResponse {
+  crises: CrisisData[];
+  updated_at: string;
+}

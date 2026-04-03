@@ -174,3 +174,31 @@ class PolymarketWarEconomyResponse(BaseModel):
     total_volume: float
     market_count: int
     updated_at: str
+
+
+# ---------------------------------------------------------------------------
+# Crisis comparison models
+# ---------------------------------------------------------------------------
+
+class CrisisTrajectoryPoint(BaseModel):
+    day: int
+    pct_change: float
+
+
+class CrisisData(BaseModel):
+    id: str
+    name: str
+    year: int
+    start_date: str
+    end_date: str | None = None
+    peak_spike_pct: float | None = None
+    duration_months: float | None = None
+    gas_impact_pct: float | None = None
+    context: str
+    trajectory: list[CrisisTrajectoryPoint]
+    is_current: bool
+
+
+class CrisisComparisonResponse(BaseModel):
+    crises: list[CrisisData]
+    updated_at: str

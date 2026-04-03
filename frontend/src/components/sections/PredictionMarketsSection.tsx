@@ -44,8 +44,33 @@ export function PredictionMarketsSection() {
     );
   }
 
-  // Hide if API fails or no data
-  if (isError || !data || !data.categories.length) return null;
+  // Show fallback if API fails or no matching markets found
+  if (isError || !data || !data.categories.length) {
+    return (
+      <section className="py-24 scroll-reveal" ref={ref}>
+        <div className="section-reading">
+          <h2 className="editorial-header">What Markets Are Pricing In</h2>
+          <p className="editorial-subhead">
+            Real-money prediction markets show what traders with skin in the game think happens next.
+          </p>
+          <div className="section-rule" />
+          <div className="mt-6 rounded-lg border p-6 text-center" style={{ background: 'rgba(8,14,24,0.6)', borderColor: 'rgba(0,240,255,0.06)' }}>
+            <p className="text-sm text-text-secondary mb-2">
+              {isError
+                ? 'Unable to reach Polymarket API \u2014 prediction data temporarily unavailable.'
+                : 'No matching prediction markets found at this time.'}
+            </p>
+            <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary">
+              Tracking: recession risk, Fed policy, geopolitical escalation on{' '}
+              <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent-hover transition-colors">
+                Polymarket
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-24 scroll-reveal" ref={ref}>

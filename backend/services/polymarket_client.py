@@ -12,9 +12,13 @@ import re
 import time
 from datetime import datetime
 
+import logging
+
 import httpx
 
 from services.cache import set_cached, _db, _make_key
+
+logger = logging.getLogger(__name__)
 
 GAMMA_BASE = "https://gamma-api.polymarket.com"
 
@@ -138,8 +142,10 @@ async def _fetch_all_active_markets() -> list[dict]:
                 if not batch:
                     break
                 all_markets.extend(batch)
-            except Exception:
+            except Exception as exc:
+                logger.warning("Polymarket fetch failed at offset %d: %s", offset, exc)
                 break
+    logger.info("Fetched %d active markets from Polymarket", len(all_markets))
     return all_markets
 
 
@@ -188,6 +194,7 @@ async def get_war_economy_markets() -> dict:
     # Sort each category by volume descending
     for key in categorized:
         categorized[key].sort(key=lambda x: x["volume"], reverse=True)
+        logger.info("Category '%s': %d markets found", key, len(categorized[key]))
 
     # Build category groups for the response
     groups: list[dict] = []
