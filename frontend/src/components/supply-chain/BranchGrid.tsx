@@ -8,6 +8,7 @@ export interface DownstreamItemData {
   why: string;
   changePct: number | null;
   correlation: number;
+  awaitingPostWar?: boolean;
 }
 
 interface BranchGridProps {
@@ -74,11 +75,15 @@ export function BranchGrid({ items }: BranchGridProps) {
                     </div>
 
                     <div className="text-right shrink-0">
-                      {item.changePct !== null && (
+                      {item.awaitingPostWar ? (
+                        <div className="font-[family-name:var(--font-mono)] text-[9px] text-text-secondary italic">
+                          Awaiting data
+                        </div>
+                      ) : item.changePct !== null ? (
                         <div className={`font-[family-name:var(--font-mono)] text-sm font-bold ${item.changePct >= 0 ? 'text-red' : 'text-green'}`}>
                           {item.changePct >= 0 ? '\u2191' : '\u2193'} {Math.abs(item.changePct).toFixed(1)}%
                         </div>
-                      )}
+                      ) : null}
                       <div className="font-[family-name:var(--font-mono)] text-[9px] text-text-secondary mt-0.5">
                         <CorrelationLabel r={item.correlation} />
                       </div>

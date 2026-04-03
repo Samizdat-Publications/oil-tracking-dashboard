@@ -8,6 +8,7 @@ import {
   alignSeries,
   computeCorrelation,
   getValueBeforeDate,
+  hasDataAfter,
 } from '../../lib/commodity-data';
 
 export function CommodityDetailPanel() {
@@ -36,7 +37,9 @@ export function CommodityDetailPanel() {
     const corr = computeCorrelation(aligned.oilValues, aligned.dsValues);
     const warBaseline = getValueBeforeDate(ds, IRAN_WAR_DATE);
     const latestVal = ds.observations.at(-1)?.value ?? null;
-    const sinceWarPct = warBaseline && latestVal ? ((latestVal - warBaseline) / warBaseline) * 100 : null;
+    const postWarData = hasDataAfter(ds, IRAN_WAR_DATE);
+    const sinceWarPct = warBaseline && latestVal && postWarData ? ((latestVal - warBaseline) / warBaseline) * 100 : null;
+    const awaitingPostWar = !postWarData && warBaseline !== null;
 
     // Format price
     let priceStr = latestVal !== null ? latestVal.toFixed(2) : 'N/A';
@@ -46,7 +49,7 @@ export function CommodityDetailPanel() {
       priceStr = 'Index ' + latestVal.toFixed(1);
     }
 
-    return { ds, aligned, corr, sinceWarPct, latestVal, priceStr };
+    return { ds, aligned, corr, sinceWarPct, awaitingPostWar, latestVal, priceStr };
   }, [info, downstream, commodityKey]);
 
   const corrLabel = panelData ? (Math.abs(panelData.corr) > 0.7 ? 'Strong' : Math.abs(panelData.corr) > 0.4 ? 'Moderate' : 'Weak') : '';
@@ -93,9 +96,13 @@ export function CommodityDetailPanel() {
               </div>
               <div className="text-center p-3 rounded-md bg-accent-glow">
                 <div className="font-[family-name:var(--font-mono)] text-[9px] tracking-[0.1em] uppercase text-text-secondary mb-1">Since Iran War</div>
-                <div className="font-[family-name:var(--font-mono)] text-xl font-bold" style={{ color: panelData.sinceWarPct !== null && panelData.sinceWarPct >= 0 ? '#FF3366' : '#00FF88' }}>
-                  {panelData.sinceWarPct !== null ? `${panelData.sinceWarPct >= 0 ? '\u2191' : '\u2193'}${Math.abs(panelData.sinceWarPct).toFixed(1)}%` : 'N/A'}
-                </div>
+                {panelData.awaitingPostWar ? (
+                  <div className="font-[family-name:var(--font-mono)] text-xs text-text-secondary italic mt-1">Awaiting post-war data</div>
+                ) : (
+                  <div className="font-[family-name:var(--font-mono)] text-xl font-bold" style={{ color: panelData.sinceWarPct !== null && panelData.sinceWarPct >= 0 ? '#FF3366' : '#00FF88' }}>
+                    {panelData.sinceWarPct !== null ? `${panelData.sinceWarPct >= 0 ? '\u2191' : '\u2193'}${Math.abs(panelData.sinceWarPct).toFixed(1)}%` : 'N/A'}
+                  </div>
+                )}
               </div>
               <div className="text-center p-3 rounded-md bg-accent-glow">
                 <div className="font-[family-name:var(--font-mono)] text-[9px] tracking-[0.1em] uppercase text-text-secondary mb-1">Correlation</div>

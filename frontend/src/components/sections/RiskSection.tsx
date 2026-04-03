@@ -13,7 +13,7 @@ export function RiskSection({ simulationResult }: RiskSectionProps) {
   const ref = useScrollReveal();
 
   return (
-    <section className="py-16 scroll-reveal" ref={ref as any}>
+    <section className="py-24 scroll-reveal" ref={ref as any}>
       <div className="section-reading">
         <div className="mb-8">
           <h2 className="editorial-header">Risk Profile</h2>

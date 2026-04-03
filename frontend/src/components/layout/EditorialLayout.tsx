@@ -39,7 +39,7 @@ export function EditorialLayout({ children }: EditorialLayoutProps) {
       />
 
       {/* Page content — NO fixed max-width here, sections control their own widths */}
-      <div className="relative z-10">
+      <div className="relative z-10 flex flex-col gap-16">
         {children}
       </div>
     </div>

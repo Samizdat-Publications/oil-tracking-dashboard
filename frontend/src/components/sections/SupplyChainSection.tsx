@@ -7,6 +7,7 @@ import {
   alignSeries,
   computeCorrelation,
   getValueBeforeDate,
+  hasDataAfter,
 } from '../../lib/commodity-data';
 import { OilSourceNode } from '../supply-chain/OilSourceNode';
 import { FlowConnector } from '../supply-chain/FlowConnector';
@@ -28,7 +29,9 @@ export function SupplyChainSection() {
       const corr = computeCorrelation(aligned.oilValues, aligned.dsValues);
       const warBaseline = getValueBeforeDate(ds, IRAN_WAR_DATE);
       const latestVal = ds.observations.at(-1)?.value ?? null;
-      const changePct = warBaseline && latestVal ? ((latestVal - warBaseline) / warBaseline) * 100 : null;
+      const postWarData = hasDataAfter(ds, IRAN_WAR_DATE);
+      const changePct = warBaseline && latestVal && postWarData ? ((latestVal - warBaseline) / warBaseline) * 100 : null;
+      const awaitingPostWar = !postWarData && warBaseline !== null;
 
       return {
         seriesKey: key,
@@ -37,13 +40,14 @@ export function SupplyChainSection() {
         why: info.why,
         changePct,
         correlation: corr,
+        awaitingPostWar,
       } satisfies DownstreamItemData;
     }).filter((x): x is DownstreamItemData => x !== null);
   }, [downstream]);
 
   if (isLoading) {
     return (
-      <section className="py-16 scroll-reveal" ref={ref as any}>
+      <section className="py-24 scroll-reveal" ref={ref as any}>
         <div className="section-wide">
           <h2 className="editorial-header">The Supply Chain</h2>
           <p className="editorial-subhead mb-4">Loading supply chain data...</p>
@@ -68,7 +72,7 @@ export function SupplyChainSection() {
   if (!items.length || !downstream?.oil) return null;
 
   return (
-    <section className="py-16 scroll-reveal" ref={ref as any}>
+    <section className="py-24 scroll-reveal" ref={ref as any}>
       <div className="section-wide">
         <div className="mb-8">
           <h2 className="editorial-header">The Supply Chain</h2>

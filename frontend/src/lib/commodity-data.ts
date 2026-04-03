@@ -170,3 +170,9 @@ export function getValueBeforeDate(series: PriceSeries, targetDate: string): num
   if (dist > 90 * 24 * 60 * 60 * 1000) return null;
   return best.value;
 }
+
+/** Check if a series has any observations AFTER a target date */
+export function hasDataAfter(series: PriceSeries, targetDate: string): boolean {
+  const target = new Date(targetDate).getTime();
+  return series.observations.some(obs => new Date(obs.date).getTime() > target);
+}

@@ -7,6 +7,7 @@ import {
   computeCorrelation,
   alignSeries,
   getValueBeforeDate,
+  hasDataAfter,
   getContextByDisplayName,
 } from '../../lib/commodity-data';
 
@@ -19,7 +20,8 @@ function CorrelationBadge({ r }: { r: number }) {
   return <span className={`text-[10px] px-2 py-0.5 font-semibold border font-[family-name:var(--font-mono)] ${style}`}>{label} ({formatted})</span>;
 }
 
-function SinceWarBadge({ pctChange }: { pctChange: number | null }) {
+function SinceWarBadge({ pctChange, awaiting }: { pctChange: number | null; awaiting?: boolean }) {
+  if (awaiting) return <span className="text-[10px] text-text-secondary italic">Awaiting post-war data</span>;
   if (pctChange === null) return <span className="text-[10px] text-text-secondary">No data since war</span>;
   const isUp = pctChange >= 0;
   const color = isUp ? '#FF3366' : '#00FF88'; // Red for price increases (bad for consumers), green for decreases
@@ -47,17 +49,19 @@ export function DownstreamSection() {
       // Compute "since Iran War" change — baseline is last value BEFORE the war
       const warValue = getValueBeforeDate(ds, IRAN_WAR_DATE);
       const latestValue = ds.observations.length > 0 ? ds.observations[ds.observations.length - 1].value : null;
-      const sinceWarPct = warValue && latestValue ? ((latestValue - warValue) / warValue) * 100 : null;
+      const postWarData = hasDataAfter(ds, IRAN_WAR_DATE);
+      const sinceWarPct = warValue && latestValue && postWarData ? ((latestValue - warValue) / warValue) * 100 : null;
+      const awaitingPostWar = !postWarData && warValue !== null;
 
       const context = getContextByDisplayName(ds.name) || { icon: '\u{1F4C8}', why: 'Tracks the relationship between crude oil and this indicator.' };
 
-      return { series: ds, aligned, correlation: corr, sinceWarPct, context };
+      return { series: ds, aligned, correlation: corr, sinceWarPct, awaitingPostWar, context };
     }).sort((a, b) => Math.abs(b.correlation) - Math.abs(a.correlation));
   }, [downstream]);
 
   if (isLoading) {
     return (
-      <section className="py-16 scroll-reveal" ref={ref as any}>
+      <section className="py-24 scroll-reveal" ref={ref as any}>
         <div className="section-wide">
           <h2 className="editorial-header">The Ripple Effect</h2>
           <p className="editorial-subhead">Loading downstream data...</p>
@@ -72,7 +76,7 @@ export function DownstreamSection() {
   const rest = panels.slice(1);
 
   return (
-    <section className="py-16 scroll-reveal" ref={ref as any}>
+    <section className="py-24 scroll-reveal" ref={ref as any}>
       <div className="section-wide">
         <div className="mb-8">
           <h2 className="editorial-header">The Ripple Effect</h2>
@@ -90,7 +94,7 @@ export function DownstreamSection() {
             <CorrelationBadge r={featured.correlation} />
           </div>
           <p className="text-sm text-text-secondary mb-2 max-w-[700px]">{featured.context.why}</p>
-          <SinceWarBadge pctChange={featured.sinceWarPct} />
+          <SinceWarBadge pctChange={featured.sinceWarPct} awaiting={featured.awaitingPostWar} />
           <div className="mt-3">
             <Plot
               data={[
@@ -121,7 +125,7 @@ export function DownstreamSection() {
         {/* Grid of remaining commodities */}
         {rest.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {rest.map(({ series: ds, aligned, correlation, sinceWarPct, context }) => (
+            {rest.map(({ series: ds, aligned, correlation, sinceWarPct, awaitingPostWar, context }) => (
               <div key={ds.series_id} className="border-t border-border pt-3">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-base">{context.icon}</span>
@@ -129,7 +133,7 @@ export function DownstreamSection() {
                   <CorrelationBadge r={correlation} />
                 </div>
                 <p className="text-[10px] text-text-secondary mb-1 line-clamp-2">{context.why}</p>
-                <SinceWarBadge pctChange={sinceWarPct} />
+                <SinceWarBadge pctChange={sinceWarPct} awaiting={awaitingPostWar} />
                 <div className="mt-2">
                   <Plot
                     data={[
