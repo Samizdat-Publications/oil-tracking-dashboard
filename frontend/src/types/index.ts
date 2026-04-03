@@ -121,42 +121,36 @@ export interface MilestonesResponse {
   milestones: Milestone[];
 }
 
-// Polymarket prediction market types
-export interface PolymarketOutcome {
-  label: string;
-  probability: number;
-  token_id: string | null;
-}
-
-export interface PolymarketMarket {
+// Polymarket war-economy prediction types
+export interface PolymarketMarketItem {
   id: string;
   question: string;
-  outcomes: PolymarketOutcome[];
+  yes_probability: number;
   volume: number;
-  liquidity: number;
   end_date: string | null;
-  category: string;
   source_url: string | null;
 }
 
-export interface PriceTarget {
-  target: string;
-  direction: 'above' | 'below';
+export interface FedCutPoint {
+  cuts: number;
   probability: number;
-  timeframe: string;
-  volume: number;
 }
 
-export interface MarketSentiment {
-  direction: 'bullish' | 'bearish' | 'neutral';
-  confidence: number;
+export interface PolymarketCategory {
+  key: string;
+  name: string;
+  icon: string;
   description: string;
+  markets: PolymarketMarketItem[];
+  highlight: PolymarketMarketItem | null;
+  fed_distribution: FedCutPoint[] | null;
+  market_count: number;
+  total_volume: number;
 }
 
-export interface PolymarketSummary {
-  price_targets: PriceTarget[];
-  sentiment: MarketSentiment;
-  top_markets_count: number;
+export interface PolymarketWarEconomy {
+  categories: PolymarketCategory[];
   total_volume: number;
+  market_count: number;
   updated_at: string;
 }

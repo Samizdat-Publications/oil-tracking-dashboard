@@ -1,9 +1,7 @@
-import type { MarketSentiment } from '../../types';
+import type { PolymarketCategory } from '../../types';
 
-interface MarketSentimentCardProps {
-  sentiment: MarketSentiment;
-  totalVolume: number;
-  marketCount: number;
+interface CategoryCardProps {
+  category: PolymarketCategory;
 }
 
 function formatVolume(v: number): string {
@@ -12,76 +10,133 @@ function formatVolume(v: number): string {
   return `$${v.toFixed(0)}`;
 }
 
-const DIRECTION_CONFIG = {
-  bullish: {
-    icon: '\u2191', // ↑
-    label: 'Bullish',
-    color: '#00FF88',
-    bg: 'rgba(0, 255, 136, 0.06)',
-    border: 'rgba(0, 255, 136, 0.15)',
-  },
-  bearish: {
-    icon: '\u2193', // ↓
-    label: 'Bearish',
-    color: '#FF3366',
-    bg: 'rgba(255, 51, 102, 0.06)',
-    border: 'rgba(255, 51, 102, 0.15)',
-  },
-  neutral: {
-    icon: '\u2194', // ↔
-    label: 'Neutral',
-    color: '#8B95A5',
-    bg: 'rgba(139, 149, 165, 0.06)',
-    border: 'rgba(139, 149, 165, 0.15)',
-  },
-};
+function formatPct(p: number): string {
+  return `${(p * 100).toFixed(1)}%`;
+}
 
-export function MarketSentimentCard({ sentiment, totalVolume, marketCount }: MarketSentimentCardProps) {
-  const config = DIRECTION_CONFIG[sentiment.direction] || DIRECTION_CONFIG.neutral;
+/** Color based on probability — high risk = red, medium = orange, low = green */
+function riskColor(p: number): string {
+  if (p >= 0.5) return '#FF3366';
+  if (p >= 0.25) return '#FF8800';
+  return '#00FF88';
+}
+
+export function CategoryCard({ category }: CategoryCardProps) {
+  const highlight = category.highlight;
+  const highlightProb = highlight?.yes_probability ?? 0;
+  const color = riskColor(highlightProb);
 
   return (
     <div
-      className="rounded-lg p-5 mb-6"
-      style={{ background: config.bg, border: `1px solid ${config.border}` }}
+      className="rounded-lg border p-4"
+      style={{ background: 'rgba(8,14,24,0.6)', borderColor: 'rgba(0,240,255,0.06)' }}
     >
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        {/* Direction indicator */}
-        <div className="flex items-center gap-3">
-          <div
-            className="flex items-center justify-center w-12 h-12 rounded-lg text-2xl font-bold"
-            style={{ color: config.color, background: 'rgba(0,0,0,0.3)' }}
-          >
-            {config.icon}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span
-                className="font-[family-name:var(--font-display)] text-lg tracking-wider uppercase"
-                style={{ color: config.color }}
-              >
-                {config.label}
-              </span>
-              <span className="font-[family-name:var(--font-mono)] text-xs text-text-secondary">
-                {(sentiment.confidence * 100).toFixed(0)}% confidence
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-lg">{category.icon}</span>
+        <span className="font-[family-name:var(--font-display)] text-sm tracking-wider uppercase text-text-primary">
+          {category.name}
+        </span>
+        <span className="ml-auto font-[family-name:var(--font-mono)] text-[10px] text-text-secondary">
+          {formatVolume(category.total_volume)} volume
+        </span>
+      </div>
+
+      {/* Description */}
+      <p className="text-xs text-text-secondary mb-3">{category.description}</p>
+
+      {/* Fed distribution special rendering */}
+      {category.fed_distribution && category.fed_distribution.length > 0 ? (
+        <FedDistribution distribution={category.fed_distribution} />
+      ) : null}
+
+      {/* Market list */}
+      <div className="space-y-2">
+        {category.markets.map((m) => {
+          const pct = m.yes_probability * 100;
+          const mColor = riskColor(m.yes_probability);
+          return (
+            <div key={m.id}>
+              <div className="flex items-baseline justify-between gap-2 mb-1">
+                <span className="text-xs text-text-primary leading-tight flex-1">
+                  {m.source_url ? (
+                    <a
+                      href={m.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-accent transition-colors"
+                    >
+                      {m.question}
+                    </a>
+                  ) : (
+                    m.question
+                  )}
+                </span>
+                <span
+                  className="font-[family-name:var(--font-mono)] text-sm font-semibold shrink-0"
+                  style={{ color: mColor }}
+                >
+                  {formatPct(m.yes_probability)}
+                </span>
+              </div>
+              {/* Probability bar */}
+              <div className="w-full h-1.5 rounded-full" style={{ background: '#0A0E18' }}>
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${Math.max(pct, 1)}%`,
+                    background: mColor,
+                    boxShadow: pct >= 50 ? `0 0 6px ${mColor}40` : 'none',
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Visual distribution of Fed rate cut probabilities */
+function FedDistribution({ distribution }: { distribution: { cuts: number; probability: number }[] }) {
+  if (!distribution.length) return null;
+
+  // Find the most likely outcome
+  const peak = distribution.reduce((a, b) => (b.probability > a.probability ? b : a));
+
+  return (
+    <div className="mb-3 p-3 rounded" style={{ background: 'rgba(0,240,255,0.03)' }}>
+      <div className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary uppercase tracking-wider mb-2">
+        Rate Cut Probability Distribution
+      </div>
+      <div className="flex items-end gap-1" style={{ height: 48 }}>
+        {distribution.map((d) => {
+          const barHeight = Math.max(d.probability * 100 * 1.5, 3);
+          const isPeak = d.cuts === peak.cuts;
+          return (
+            <div key={d.cuts} className="flex flex-col items-center flex-1 gap-0.5">
+              <div
+                className="w-full rounded-t transition-all duration-500"
+                style={{
+                  height: `${barHeight}%`,
+                  minHeight: 3,
+                  background: isPeak ? '#00F0FF' : 'rgba(0,240,255,0.2)',
+                  boxShadow: isPeak ? '0 0 8px rgba(0,240,255,0.3)' : 'none',
+                }}
+              />
+              <span className="font-[family-name:var(--font-mono)] text-[9px] text-text-secondary">
+                {d.cuts}
               </span>
             </div>
-            <p className="text-sm text-text-secondary mt-0.5">
-              {sentiment.description}
-            </p>
-          </div>
-        </div>
-
-        {/* Volume badges */}
-        <div className="flex gap-4 text-xs font-[family-name:var(--font-mono)]">
-          <div className="text-center">
-            <div className="text-text-secondary uppercase tracking-wider text-[10px]">Volume</div>
-            <div className="text-text-primary font-medium">{formatVolume(totalVolume)}</div>
-          </div>
-          <div className="text-center">
-            <div className="text-text-secondary uppercase tracking-wider text-[10px]">Markets</div>
-            <div className="text-text-primary font-medium">{marketCount}</div>
-          </div>
-        </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between mt-1">
+        <span className="font-[family-name:var(--font-mono)] text-[9px] text-text-secondary">cuts</span>
+        <span className="font-[family-name:var(--font-mono)] text-[9px] text-accent">
+          Most likely: {peak.cuts} cut{peak.cuts !== 1 ? 's' : ''} ({(peak.probability * 100).toFixed(0)}%)
+        </span>
       </div>
     </div>
   );

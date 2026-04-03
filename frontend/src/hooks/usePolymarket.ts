@@ -1,21 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchPolymarketMarkets, fetchPolymarketSummary } from '../lib/api';
-import type { PolymarketMarket, PolymarketSummary } from '../types';
-
-export function usePolymarketMarkets() {
-  return useQuery<{ markets: PolymarketMarket[]; updated_at: string }>({
-    queryKey: ['polymarket', 'markets'],
-    queryFn: fetchPolymarketMarkets,
-    staleTime: 5 * 60 * 1000, // 5 min — prediction markets move faster
-    retry: 2,
-  });
-}
+import { fetchPolymarketSummary } from '../lib/api';
+import type { PolymarketWarEconomy } from '../types';
 
 export function usePolymarketSummary() {
-  return useQuery<PolymarketSummary>({
+  return useQuery<PolymarketWarEconomy>({
     queryKey: ['polymarket', 'summary'],
     queryFn: fetchPolymarketSummary,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 min — prediction markets move faster
     retry: 2,
   });
 }

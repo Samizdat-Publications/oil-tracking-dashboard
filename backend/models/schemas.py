@@ -140,48 +140,37 @@ class GeoEvent(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Polymarket prediction models
+# Polymarket prediction models — war-economy markets
 # ---------------------------------------------------------------------------
 
-class PolymarketOutcome(BaseModel):
-    label: str
-    probability: float
-    token_id: str | None = None
-
-
-class PolymarketMarket(BaseModel):
+class PolymarketMarketItem(BaseModel):
     id: str
     question: str
-    outcomes: list[PolymarketOutcome]
+    yes_probability: float
     volume: float
-    liquidity: float
     end_date: str | None = None
-    category: str  # "price_target", "directional", "geopolitical"
     source_url: str | None = None
 
 
-class PolymarketMarketsResponse(BaseModel):
-    markets: list[PolymarketMarket]
-    updated_at: str
-
-
-class PriceTarget(BaseModel):
-    target: str
-    direction: str  # "above" or "below"
+class FedCutPoint(BaseModel):
+    cuts: int
     probability: float
-    timeframe: str
-    volume: float
 
 
-class MarketSentiment(BaseModel):
-    direction: str  # "bullish", "bearish", "neutral"
-    confidence: float
+class PolymarketCategory(BaseModel):
+    key: str
+    name: str
+    icon: str
     description: str
-
-
-class PolymarketSummaryResponse(BaseModel):
-    price_targets: list[PriceTarget]
-    sentiment: MarketSentiment
-    top_markets_count: int
+    markets: list[PolymarketMarketItem]
+    highlight: PolymarketMarketItem | None = None
+    fed_distribution: list[FedCutPoint] | None = None
+    market_count: int
     total_volume: float
+
+
+class PolymarketWarEconomyResponse(BaseModel):
+    categories: list[PolymarketCategory]
+    total_volume: float
+    market_count: int
     updated_at: str

@@ -1,7 +1,6 @@
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import { usePolymarketSummary } from '../../hooks/usePolymarket';
-import { MarketSentimentCard } from '../predictions/MarketSentimentCard';
-import { PriceTargetBar } from '../predictions/PriceTargetBar';
+import { CategoryCard } from '../predictions/MarketSentimentCard';
 
 function timeAgo(isoDate: string): string {
   const diff = Date.now() - new Date(isoDate).getTime();
@@ -10,6 +9,12 @@ function timeAgo(isoDate: string): string {
   if (mins < 60) return `${mins}m ago`;
   const hours = Math.floor(mins / 60);
   return `${hours}h ago`;
+}
+
+function formatVolume(v: number): string {
+  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `$${(v / 1_000).toFixed(0)}K`;
+  return `$${v.toFixed(0)}`;
 }
 
 export function PredictionMarketsSection() {
@@ -21,13 +26,15 @@ export function PredictionMarketsSection() {
     return (
       <section className="py-24 scroll-reveal" ref={ref}>
         <div className="section-reading">
-          <h2 className="editorial-header">What Traders Think</h2>
+          <h2 className="editorial-header">What Markets Are Pricing In</h2>
           <p className="editorial-subhead mb-4">Loading prediction market data...</p>
           <div className="section-rule" />
-          <div className="mt-6 space-y-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i}>
-                <div className="h-3 w-40 bg-surface rounded animate-pulse mb-1.5" />
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-lg border border-border p-4" style={{ background: 'rgba(8,14,24,0.6)' }}>
+                <div className="h-4 w-32 bg-surface rounded animate-pulse mb-3" />
+                <div className="h-3 w-full bg-surface rounded animate-pulse mb-2" />
+                <div className="h-3 w-3/4 bg-surface rounded animate-pulse mb-2" />
                 <div className="h-2 w-full bg-surface rounded animate-pulse" />
               </div>
             ))}
@@ -37,55 +44,37 @@ export function PredictionMarketsSection() {
     );
   }
 
-  // Hide section entirely if API fails or returns no useful data.
-  // Polymarket may not always have active oil-price markets — the section
-  // auto-appears when markets exist and hides gracefully when they don't.
-  if (isError || !data) return null;
-
-  const hasTargets = data.price_targets.length > 0;
-  const hasMarkets = data.top_markets_count > 0;
-
-  // Nothing to show — hide section
-  if (!hasTargets && !hasMarkets) return null;
+  // Hide if API fails or no data
+  if (isError || !data || !data.categories.length) return null;
 
   return (
     <section className="py-24 scroll-reveal" ref={ref}>
       <div className="section-reading">
-        <h2 className="editorial-header">What Traders Think</h2>
+        <h2 className="editorial-header">What Markets Are Pricing In</h2>
         <p className="editorial-subhead">
-          Real-money prediction markets show where traders are putting their bets on oil prices.
-          Powered by Polymarket {'\u2014'} the world's largest prediction market.
+          Real-money prediction markets show what traders with skin in the game think happens next {'\u2014'}{' '}
+          from recession odds to Fed policy to geopolitical escalation.
         </p>
         <div className="section-rule" />
 
-        {/* Sentiment Card */}
-        <div className="mt-6">
-          <MarketSentimentCard
-            sentiment={data.sentiment}
-            totalVolume={data.total_volume}
-            marketCount={data.top_markets_count}
-          />
+        {/* Summary stats bar */}
+        <div className="mt-4 mb-6 flex items-center gap-6 text-xs font-[family-name:var(--font-mono)]">
+          <div>
+            <span className="text-text-secondary uppercase tracking-wider text-[10px]">Markets tracked </span>
+            <span className="text-text-primary font-medium">{data.market_count}</span>
+          </div>
+          <div>
+            <span className="text-text-secondary uppercase tracking-wider text-[10px]">Total volume </span>
+            <span className="text-text-primary font-medium">{formatVolume(data.total_volume)}</span>
+          </div>
         </div>
 
-        {/* Price Target Bars */}
-        {hasTargets ? (
-          <div className="mt-4">
-            <h3 className="font-[family-name:var(--font-display)] text-sm tracking-wider uppercase text-text-secondary mb-4">
-              Price Target Odds
-            </h3>
-            <div className="p-4 rounded-lg border border-border" style={{ background: 'rgba(8,14,24,0.6)' }}>
-              {data.price_targets.map((pt, i) => (
-                <PriceTargetBar key={`${pt.target}-${pt.direction}-${i}`} target={pt} />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="mt-4 p-4 rounded-lg border border-border" style={{ background: 'rgba(8,14,24,0.6)' }}>
-            <p className="text-sm text-text-secondary italic">
-              No active oil price target markets found on Polymarket.
-            </p>
-          </div>
-        )}
+        {/* Category cards */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {data.categories.map((cat) => (
+            <CategoryCard key={cat.key} category={cat} />
+          ))}
+        </div>
 
         {/* Source Attribution */}
         <div className="mt-4 flex items-center justify-between text-[10px] font-[family-name:var(--font-mono)] text-text-secondary">
@@ -101,7 +90,6 @@ export function PredictionMarketsSection() {
             </a>
             {' '}{'\u2022'} Updated {timeAgo(data.updated_at)}
           </span>
-          <span>{data.top_markets_count} active markets tracked</span>
         </div>
       </div>
     </section>
