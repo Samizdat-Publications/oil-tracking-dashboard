@@ -37,27 +37,16 @@ export function PredictionMarketsSection() {
     );
   }
 
-  // Error state — show message, don't hide section
-  if (isError || !data) {
-    return (
-      <section className="py-24 scroll-reveal" ref={ref}>
-        <div className="section-reading">
-          <h2 className="editorial-header">What Traders Think</h2>
-          <p className="editorial-subhead">
-            Real-money prediction markets show where traders are putting their bets on oil prices.
-          </p>
-          <div className="section-rule" />
-          <div className="mt-6 p-4 rounded-lg border border-border" style={{ background: 'rgba(8,14,24,0.6)' }}>
-            <p className="text-sm text-text-secondary italic">
-              {'\u{1F4CA}'} Prediction market data unavailable. Polymarket API may be temporarily unreachable.
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // Hide section entirely if API fails or returns no useful data.
+  // Polymarket may not always have active oil-price markets — the section
+  // auto-appears when markets exist and hides gracefully when they don't.
+  if (isError || !data) return null;
 
   const hasTargets = data.price_targets.length > 0;
+  const hasMarkets = data.top_markets_count > 0;
+
+  // Nothing to show — hide section
+  if (!hasTargets && !hasMarkets) return null;
 
   return (
     <section className="py-24 scroll-reveal" ref={ref}>
