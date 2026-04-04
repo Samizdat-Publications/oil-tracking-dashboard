@@ -72,7 +72,7 @@ backend/           FastAPI + Python
 6. **RiskSection** — Volatility chart + simulated price distribution (VaR/CVaR).
 7. **SupplyChainSection** — Animated oil -> downstream flow with detail panels.
 8. **WarTimelineSection** — Vertical timeline (editorial + auto-detected milestones).
-9. **CrisisComparisonSection** — "How Bad Is It?" 7 oil crises compared with animated bars.
+9. **CrisisComparisonSection** — "How Bad Is It?" 7 oil crises since 1973, animated bars, metric toggle, expandable trajectory charts.
 10. **DownstreamSection** — "Ripple Effect" correlation charts for 13 commodities.
 11. **Raw Data** — Collapsible DataTable.
 
