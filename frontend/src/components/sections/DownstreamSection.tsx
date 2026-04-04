@@ -70,7 +70,19 @@ export function DownstreamSection() {
     );
   }
 
-  if (!panels.length) return null;
+  if (!panels.length) {
+    return (
+      <section className="py-12 scroll-reveal" ref={ref as any}>
+        <div className="section-wide">
+          <h2 className="editorial-header">The Ripple Effect</h2>
+          <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+            Unable to load downstream correlation data.
+          </p>
+          <div className="section-rule mt-4" />
+        </div>
+      </section>
+    );
+  }
 
   const featured = panels[0];
   const rest = panels.slice(1);

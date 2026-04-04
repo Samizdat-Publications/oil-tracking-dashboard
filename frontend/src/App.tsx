@@ -16,6 +16,7 @@ import { KitchenTableTicker } from './components/layout/KitchenTableTicker';
 import { WarTimelineSection } from './components/sections/WarTimelineSection';
 import { PredictionMarketsSection } from './components/sections/PredictionMarketsSection';
 import { CrisisComparisonSection } from './components/sections/CrisisComparisonSection';
+import { SectionErrorBoundary } from './components/ui/SectionErrorBoundary';
 import { useSimulation } from './hooks/useSimulation';
 import { checkSetup } from './lib/api';
 
@@ -86,37 +87,55 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
 
       <EditorialLayout>
       {/* Section 1: Full-viewport hero with price */}
-      <HeroSection onOpenEventManager={() => setEventManagerOpen(true)} />
+      <SectionErrorBoundary name="Hero">
+        <HeroSection onOpenEventManager={() => setEventManagerOpen(true)} />
+      </SectionErrorBoundary>
 
       {/* Section 2: Forecast — chart + scenarios + sim controls */}
-      <ForecastSection
-        simulationResult={sim.data}
-        isSimulating={sim.isPending}
-        onRunSimulation={sim.reRun}
-      />
+      <SectionErrorBoundary name="Forecast">
+        <ForecastSection
+          simulationResult={sim.data}
+          isSimulating={sim.isPending}
+          onRunSimulation={sim.reRun}
+        />
+      </SectionErrorBoundary>
 
       {/* Section 3: Prediction Markets — crowd odds on oil price targets */}
-      <PredictionMarketsSection />
+      <SectionErrorBoundary name="Prediction Markets">
+        <PredictionMarketsSection />
+      </SectionErrorBoundary>
 
       {/* Section 4: Thin stats band */}
-      <StatsBand simulationResult={sim.data} />
+      <SectionErrorBoundary name="Stats Band">
+        <StatsBand simulationResult={sim.data} />
+      </SectionErrorBoundary>
 
-      {/* Section 4: Risk — vol + distribution side-by-side */}
-      <RiskSection simulationResult={sim.data} />
+      {/* Section 5: Risk — vol + distribution side-by-side */}
+      <SectionErrorBoundary name="Risk Analysis">
+        <RiskSection simulationResult={sim.data} />
+      </SectionErrorBoundary>
 
-      {/* Section 5: Supply Chain Flow — animated downstream visualization */}
-      <SupplyChainSection />
+      {/* Section 6: Supply Chain Flow — animated downstream visualization */}
+      <SectionErrorBoundary name="Supply Chain">
+        <SupplyChainSection />
+      </SectionErrorBoundary>
 
-      {/* Section 6: War Impact Timeline — week-by-week narrative */}
-      <WarTimelineSection />
+      {/* Section 7: War Impact Timeline — week-by-week narrative */}
+      <SectionErrorBoundary name="War Timeline">
+        <WarTimelineSection />
+      </SectionErrorBoundary>
 
-      {/* Section 7: Historical Crisis Comparison — how bad is it vs history */}
-      <CrisisComparisonSection />
+      {/* Section 8: Historical Crisis Comparison — how bad is it vs history */}
+      <SectionErrorBoundary name="Crisis Comparison">
+        <CrisisComparisonSection />
+      </SectionErrorBoundary>
 
-      {/* Section 8: Downstream correlations — editorial grid */}
-      <DownstreamSection />
+      {/* Section 9: Downstream correlations — editorial grid */}
+      <SectionErrorBoundary name="Downstream Correlations">
+        <DownstreamSection />
+      </SectionErrorBoundary>
 
-      {/* Section 7: Raw data — collapsible, narrow */}
+      {/* Section 10: Raw data — collapsible, narrow */}
       <div className="section-reading py-8 pb-24">
         <CollapsibleSection title="Raw Data" defaultOpen={false}>
           <DataTable />

@@ -38,8 +38,19 @@ export function CrisisComparisonSection() {
     );
   }
 
-  // Hide on error
-  if (isError || !data || !data.crises.length) return null;
+  if (isError || !data || !data.crises.length) {
+    return (
+      <section className="py-12 scroll-reveal" ref={ref}>
+        <div className="section-reading">
+          <h2 className="editorial-header">How Bad Is It?</h2>
+          <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+            {isError ? 'Unable to load crisis comparison data.' : 'No historical crisis data available yet.'}
+          </p>
+          <div className="section-rule mt-4" />
+        </div>
+      </section>
+    );
+  }
 
   const { crises } = data;
   const maxAbs = getMaxAbsValue(crises, metric);

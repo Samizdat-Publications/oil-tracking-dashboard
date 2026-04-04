@@ -6,7 +6,19 @@ export function WarTimelineSection() {
   const { data, isLoading, isError } = useMilestones();
   const ref = useScrollReveal();
 
-  if (isError) return null;
+  if (isError) {
+    return (
+      <section className="py-12 scroll-reveal" ref={ref}>
+        <div className="section-reading">
+          <h2 className="editorial-header">The War's Ripple</h2>
+          <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+            Unable to load timeline data.
+          </p>
+          <div className="section-rule mt-4" />
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -35,7 +47,19 @@ export function WarTimelineSection() {
   }
 
   const milestones = data?.milestones ?? [];
-  if (!milestones.length) return null;
+  if (!milestones.length) {
+    return (
+      <section className="py-12 scroll-reveal" ref={ref}>
+        <div className="section-reading">
+          <h2 className="editorial-header">The War's Ripple</h2>
+          <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+            No milestone data available yet.
+          </p>
+          <div className="section-rule mt-4" />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-24 scroll-reveal" ref={ref}>

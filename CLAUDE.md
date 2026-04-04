@@ -42,7 +42,9 @@ frontend/          React 19 + TypeScript + Vite + Tailwind v4
       hero/        Hero section with fan chart
       charts/      HeroFanChart (Plotly), VolatilityChart, DistributionChart
       sections/    StatsBand, ForecastSection, PredictionMarketsSection, RiskSection,
-                   SupplyChainSection, WarTimelineSection, DownstreamSection
+                   SupplyChainSection, WarTimelineSection, DownstreamSection,
+                   CrisisComparisonSection
+      ui/          SectionErrorBoundary (per-section error boundary), collapsible-section
       predictions/ MarketSentimentCard (CategoryCard + FedDistribution)
       supply-chain/ OilSourceNode, FlowConnector, BranchGrid, CommodityDetailPanel
       timeline/    TimelineMilestone (per-card IntersectionObserver)
@@ -54,7 +56,7 @@ frontend/          React 19 + TypeScript + Vite + Tailwind v4
 
 backend/           FastAPI + Python
     main.py        App entry, CORS, lifespan
-    routers/       prices, simulation, correlations, milestones, polymarket
+    routers/       prices, simulation, correlations, milestones, polymarket, crisis
     services/      fred_client, monte_carlo, polymarket_client, statistics, cache
     models/        Pydantic schemas
     data/          cache.db (SQLite), war_milestones.json, default_events.json
@@ -70,8 +72,9 @@ backend/           FastAPI + Python
 6. **RiskSection** — Volatility chart + simulated price distribution (VaR/CVaR).
 7. **SupplyChainSection** — Animated oil -> downstream flow with detail panels.
 8. **WarTimelineSection** — Vertical timeline (editorial + auto-detected milestones).
-9. **DownstreamSection** — "Ripple Effect" correlation charts for 13 commodities.
-10. **Raw Data** — Collapsible DataTable.
+9. **CrisisComparisonSection** — "How Bad Is It?" 7 oil crises compared with animated bars.
+10. **DownstreamSection** — "Ripple Effect" correlation charts for 13 commodities.
+11. **Raw Data** — Collapsible DataTable.
 
 ## Data Flow
 
@@ -96,7 +99,9 @@ Defined in `lib/commodity-data.ts`, keyed by backend FRED series ID:
 
 **Shared commodity data:** `lib/commodity-data.ts` has `COMMODITY_DATA`, `COMMODITY_CATEGORIES`, `IRAN_WAR_DATE`, and utility functions (`alignSeries`, `computeCorrelation`, `getValueBeforeDate`, `hasDataAfter`).
 
-**Section pattern:** All sections use `useScrollReveal()` hook, `scroll-reveal` class, `section-wide` container, `editorial-header` + `editorial-subhead` + `section-rule`.
+**Section pattern:** All sections use `useScrollReveal()` hook, `scroll-reveal` class, `section-wide` container, `editorial-header` + `editorial-subhead` + `section-rule`. All wrapped in `<SectionErrorBoundary>` in App.tsx.
+
+**Error handling:** Each section shows a visible error/empty state (never returns `null`). `SectionErrorBoundary` catches render crashes per-section. `fetchJson()` has 30s timeout via AbortController.
 
 **Ticker positioning:** Rendered BEFORE `<EditorialLayout>` in App.tsx. Body has `padding-top: 36px`. Fixed-position overlays must be at App level (CSS transforms create containing blocks).
 
@@ -134,3 +139,4 @@ Source of truth: `services/fred_client.py`. Key mapping: `wti` → `DCOILWTICO`,
 | `/api/correlations` | GET | Rolling correlations |
 | `/api/milestones` | GET | Editorial + auto-detected war milestones |
 | `/api/polymarket/summary` | GET | War-economy prediction markets |
+| `/api/crisis/comparison` | GET | Historical crisis comparison (7 crises) |
