@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from services.cache import init_cache, clear_cache
+from services.fred_client import SERIES_IDS, get_series
 from routers import prices, simulation, correlations, milestones, polymarket, crisis
 from models.schemas import (
     HealthResponse,
@@ -25,10 +26,33 @@ ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
 EVENTS_PATH = os.path.join(os.path.dirname(__file__), "data", "default_events.json")
 
 
+async def _prewarm_cache():
+    """Pre-warm FRED cache for critical series so first page load is fast."""
+    import asyncio
+    from datetime import date, timedelta
+
+    start = (date.today() - timedelta(days=365 * 20)).isoformat()
+    end = date.today().isoformat()
+
+    # Warm the most important series: WTI, Brent, gasoline, diesel + all downstream
+    keys_to_warm = list(SERIES_IDS.keys())
+
+    async def _warm_one(key: str):
+        try:
+            await get_series(SERIES_IDS[key], start, end)
+        except Exception:
+            pass
+
+    await asyncio.gather(*[_warm_one(k) for k in keys_to_warm])
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup / shutdown lifecycle."""
     await init_cache()
+    # Fire-and-forget cache warming so server is ready immediately
+    import asyncio
+    asyncio.create_task(_prewarm_cache())
     yield
 
 

@@ -6,10 +6,10 @@ interface TimelineMilestoneProps {
   index: number;
 }
 
-const DOT_STYLES: Record<string, { bg: string; shadow: string }> = {
-  editorial: { bg: '#FF3366', shadow: '0 0 8px rgba(255,51,102,0.4)' },
-  data: { bg: '#00F0FF', shadow: '0 0 8px rgba(0,240,255,0.3)' },
-  today: { bg: '#00FF88', shadow: '0 0 8px rgba(0,255,136,0.4)' },
+const DOT_COLORS: Record<string, string> = {
+  editorial: '#FF3366',
+  data: '#00F0FF',
+  today: '#00FF88',
 };
 
 export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) {
@@ -19,11 +19,9 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
     const el = ref.current;
     if (!el) return;
 
-    // Track reveal timing to stagger cards entering viewport together
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Use a shared timestamp to batch cards entering within 200ms of each other
           const now = Date.now();
           const lastReveal = Number(document.documentElement.dataset.lastMilestoneReveal || '0');
           const batchIndex = (now - lastReveal < 200)
@@ -44,68 +42,113 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
     return () => observer.disconnect();
   }, [index]);
 
-  const dot = DOT_STYLES[milestone.type] || DOT_STYLES.data;
+  const color = DOT_COLORS[milestone.type] || DOT_COLORS.data;
   const isToday = milestone.type === 'today';
+  const isEditorial = milestone.type === 'editorial';
 
-  // Format date label
-  const dateLabel = milestone.type === 'today'
+  const dateLabel = isToday
     ? `Today \u2022 ${new Date(milestone.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
     : milestone.week > 0
       ? `Week ${milestone.week} \u2022 ${new Date(milestone.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
       : new Date(milestone.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
-    <div ref={ref} className="timeline-milestone relative pl-12 mb-8" style={{ minHeight: 60 }}>
-      {/* Dot */}
-      {isToday ? (
-        <div
-          className="absolute left-0 top-1"
-          style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid ${dot.bg}`, background: '#04060C', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-        >
+    <div
+      ref={ref}
+      className="timeline-milestone grid gap-x-4 mb-0 py-4"
+      style={{
+        gridTemplateColumns: '20px 1fr',
+        minHeight: isEditorial ? 80 : 60,
+      }}
+    >
+      {/* Column 1: Dot (centered in 20px column) */}
+      <div className="flex justify-center pt-1 relative">
+        {isToday ? (
           <div
-            style={{ width: 8, height: 8, borderRadius: '50%', background: dot.bg, animation: 'todayPulse 2s ease-in-out infinite' }}
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: '50%',
+              border: `2px solid ${color}`,
+              background: '#04060C',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: color,
+                animation: 'todayPulse 2s ease-in-out infinite',
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              width: isEditorial ? 12 : 10,
+              height: isEditorial ? 12 : 10,
+              borderRadius: '50%',
+              background: color,
+              boxShadow: `0 0 8px ${color}40`,
+              flexShrink: 0,
+              marginTop: 2,
+            }}
           />
-        </div>
-      ) : (
-        <div
-          className="absolute left-[3px] top-1"
-          style={{ width: 12, height: 12, borderRadius: '50%', background: dot.bg, border: '2px solid #04060C', boxShadow: dot.shadow }}
-        />
-      )}
-
-      {/* Content */}
-      <div
-        className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.1em] uppercase mb-1"
-        style={{ color: '#00F0FF' }}
-      >
-        {dateLabel}
-        {milestone.type === 'editorial' && (
-          <span className="ml-2 text-red">{'\u2022'} Event</span>
         )}
       </div>
 
-      <div className="text-[15px] font-semibold text-text-primary mb-1">
-        {milestone.headline}
-      </div>
-
-      <div className="text-[13px] text-text-secondary">
-        {milestone.description}
-      </div>
-
-      {/* Badges */}
-      {milestone.badges.length > 0 && (
-        <div className="flex gap-2 mt-2 flex-wrap">
-          {milestone.badges.map((badge, i) => (
-            <span
-              key={i}
-              className="font-[family-name:var(--font-mono)] text-[10px] px-2 py-0.5 border rounded-sm"
-              style={{ borderColor: 'rgba(255,51,102,0.3)', color: '#FF3366' }}
-            >
-              {badge.label} {badge.change}
-            </span>
-          ))}
+      {/* Column 2: Content */}
+      <div>
+        {/* Date label */}
+        <div
+          className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.12em] uppercase mb-1"
+          style={{ color }}
+        >
+          {dateLabel}
+          {isEditorial && (
+            <span className="ml-2" style={{ color: '#FF3366' }}>{'\u2022'} Event</span>
+          )}
         </div>
-      )}
+
+        {/* Headline */}
+        <div
+          className="font-semibold text-text-primary mb-1"
+          style={{ fontSize: isEditorial ? 16 : 14 }}
+        >
+          {milestone.headline}
+        </div>
+
+        {/* Description */}
+        {milestone.description && (
+          <div className="text-[13px] text-text-secondary leading-relaxed">
+            {milestone.description}
+          </div>
+        )}
+
+        {/* Badges */}
+        {milestone.badges.length > 0 && (
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {milestone.badges.map((badge, i) => (
+              <span
+                key={i}
+                className="font-[family-name:var(--font-mono)] text-[10px] px-2 py-0.5 rounded-sm"
+                style={{
+                  background: `${color}15`,
+                  border: `1px solid ${color}30`,
+                  color,
+                }}
+              >
+                {badge.label} {badge.change}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -17,15 +17,15 @@ export const METRIC_UNITS: Record<CrisisMetric, string> = {
   gas_impact: '%',
 };
 
-/** Color for each crisis bar */
+/** Color for each crisis bar — each crisis gets a unique color */
 export const CRISIS_COLORS: Record<string, string> = {
-  '1973_embargo': '#FF3366',
-  '1979_revolution': '#FF3366',
-  '1990_gulf_war': '#FF8800',
-  '2008_superspike': '#FF8800',
-  '2014_opec_war': '#00FF88', // collapse = green (prices went down)
-  '2022_russia_ukraine': '#FF8800',
-  '2026_iran': '#00F0FF', // current = accent cyan
+  '1973_embargo': '#FF3366',     // hot pink
+  '1979_revolution': '#FF6B35',  // burnt orange
+  '1990_gulf_war': '#FFAA00',    // amber/gold
+  '2008_superspike': '#FF44FF',  // magenta
+  '2014_opec_war': '#00FF88',    // green (prices fell)
+  '2022_russia_ukraine': '#FF8800', // orange
+  '2026_iran': '#00F0FF',        // cyan (current war)
 };
 
 /** Get the value for the selected metric */

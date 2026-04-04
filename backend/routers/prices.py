@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import date, timedelta
 
 from fastapi import APIRouter, HTTPException, Query
@@ -90,20 +91,20 @@ async def get_downstream():
         observations=[PricePoint(date=o["date"], value=o["value"]) for o in wti_obs],
     )
 
-    downstream: list[PriceSeries] = []
-    for key in DOWNSTREAM_SERIES:
+    # Fetch all downstream series in parallel for ~4x speedup
+    async def _fetch_one(key: str) -> PriceSeries | None:
         try:
             obs = await get_series(SERIES_IDS[key], start, end)
-            downstream.append(
-                PriceSeries(
-                    series_id=SERIES_IDS[key],
-                    name=SERIES_NAMES[key],
-                    observations=[PricePoint(date=o["date"], value=o["value"]) for o in obs],
-                )
+            return PriceSeries(
+                series_id=SERIES_IDS[key],
+                name=SERIES_NAMES[key],
+                observations=[PricePoint(date=o["date"], value=o["value"]) for o in obs],
             )
         except Exception:
-            # Skip series that fail - don't blow up the whole response
-            continue
+            return None
+
+    results = await asyncio.gather(*[_fetch_one(key) for key in DOWNSTREAM_SERIES])
+    downstream: list[PriceSeries] = [r for r in results if r is not None]
 
     return DownstreamResponse(oil=oil, series=downstream)
 

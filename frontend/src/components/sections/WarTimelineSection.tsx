@@ -28,16 +28,18 @@ export function WarTimelineSection() {
           <p className="editorial-subhead mb-4">Loading timeline...</p>
           <div className="section-rule" />
           {/* Skeleton */}
-          <div className="relative mt-8 pl-12">
-            <div
-              className="absolute left-[8px] top-0 bottom-0 w-[2px]"
-              style={{ background: 'linear-gradient(180deg, rgba(0,240,255,0.2), rgba(0,240,255,0.05))' }}
-            />
+          <div className="relative mt-8">
+            <div className="absolute top-0 bottom-0 w-[2px]" style={{ left: 9, background: 'rgba(0,240,255,0.15)' }} />
             {[1, 2, 3].map((i) => (
-              <div key={i} className="mb-8">
-                <div className="h-3 w-32 bg-surface rounded animate-pulse mb-2" />
-                <div className="h-4 w-64 bg-surface rounded animate-pulse mb-1" />
-                <div className="h-3 w-48 bg-surface rounded animate-pulse" />
+              <div key={i} className="grid gap-x-4 mb-0 py-4" style={{ gridTemplateColumns: '20px 1fr' }}>
+                <div className="flex justify-center pt-1">
+                  <div className="w-[10px] h-[10px] rounded-full bg-surface animate-pulse" />
+                </div>
+                <div>
+                  <div className="h-3 w-32 bg-surface rounded animate-pulse mb-2" />
+                  <div className="h-4 w-64 bg-surface rounded animate-pulse mb-1" />
+                  <div className="h-3 w-48 bg-surface rounded animate-pulse" />
+                </div>
               </div>
             ))}
           </div>
@@ -72,10 +74,14 @@ export function WarTimelineSection() {
 
         {/* Timeline */}
         <div className="relative mt-8">
-          {/* Vertical line */}
+          {/* Vertical line — centered in the 20px dot column (10px from left) */}
           <div
-            className="absolute left-[8px] top-0 bottom-0 w-[2px]"
-            style={{ background: 'linear-gradient(180deg, #00F0FF, rgba(0,240,255,0.1))' }}
+            className="absolute top-0 bottom-0 w-[2px]"
+            style={{
+              left: 9,
+              background: 'linear-gradient(180deg, #FF3366 0%, #00F0FF 30%, #00F0FF 80%, #00FF88 100%)',
+              opacity: 0.4,
+            }}
           />
 
           {/* Milestone cards */}

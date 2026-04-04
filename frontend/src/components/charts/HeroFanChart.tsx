@@ -174,7 +174,25 @@ export function HeroFanChart({ simulationResult, isSimulating, activeScenario, d
   }, [priceData, simulationResult, visibleEvents, showSMA, activeScenario, showEras, dateFrom, dateTo]);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-[500px]"><div className="text-text-secondary animate-pulse font-[family-name:var(--font-mono)] text-sm">Loading price data...</div></div>;
+    return (
+      <div className="h-[500px] relative overflow-hidden">
+        {/* Chart skeleton — mimics a chart shape */}
+        <div className="absolute inset-0 flex flex-col justify-end px-8 pb-12">
+          {/* Fake chart line */}
+          <svg className="w-full h-[300px] animate-pulse opacity-20" viewBox="0 0 800 300" preserveAspectRatio="none">
+            <path d="M0,250 C100,240 150,220 200,200 C250,180 300,160 350,170 C400,180 450,140 500,120 C550,100 600,80 650,90 C700,100 750,60 800,50" fill="none" stroke="#00F0FF" strokeWidth="2" />
+            <path d="M0,250 C100,240 150,220 200,200 C250,180 300,160 350,170 C400,180 450,140 500,120 C550,100 600,80 650,90 C700,100 750,60 800,50 L800,300 L0,300 Z" fill="url(#skelGrad)" />
+            <defs><linearGradient id="skelGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00F0FF" stopOpacity="0.08" /><stop offset="100%" stopColor="#00F0FF" stopOpacity="0" /></linearGradient></defs>
+          </svg>
+          {/* Axis lines */}
+          <div className="absolute bottom-12 left-8 right-8 h-px bg-border opacity-30" />
+          <div className="absolute top-8 bottom-12 left-8 w-px bg-border opacity-30" />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-text-secondary animate-pulse font-[family-name:var(--font-mono)] text-sm">Loading price data...</div>
+        </div>
+      </div>
+    );
   }
 
   if (isSimulating && !simulationResult) {

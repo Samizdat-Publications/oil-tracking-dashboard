@@ -71,19 +71,21 @@ def _load_editorial() -> list[Milestone]:
 
 
 async def _fetch_all_series() -> dict[str, list[dict]]:
-    """Fetch all milestone-relevant series from FRED (or cache). Called once per request."""
+    """Fetch all milestone-relevant series from FRED (or cache) in parallel."""
+    import asyncio
     start = (datetime.strptime(IRAN_WAR_DATE, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
     end = date.today().isoformat()
-    all_data: dict[str, list[dict]] = {}
-    for key in SERIES_FOR_MILESTONES:
-        series_id = SERIES_IDS.get(key)
-        if not series_id:
-            continue
+
+    keys = [k for k in SERIES_FOR_MILESTONES if k in SERIES_IDS]
+
+    async def _fetch_one(key: str):
         try:
-            all_data[key] = await get_series(series_id, start, end)
+            return key, await get_series(SERIES_IDS[key], start, end)
         except Exception:
-            pass
-    return all_data
+            return key, None
+
+    results = await asyncio.gather(*[_fetch_one(k) for k in keys])
+    return {k: v for k, v in results if v is not None}
 
 
 def _detect_data_milestones(all_series_data: dict[str, list[dict]]) -> list[Milestone]:
@@ -157,10 +159,33 @@ def _detect_data_milestones(all_series_data: dict[str, list[dict]]) -> list[Mile
 
             prev_week_close = week_close
 
-    # Deduplicate milestones on same date — keep unique by headline
+    # Consolidate: per series per week, keep only the most significant milestone
+    # Priority: weekly surge > highest threshold crossing
+    # This prevents 5 milestones on the same date for WTI ($80, $90, +35%)
+    from collections import defaultdict
+    by_series_week: dict[tuple[str, int], list[Milestone]] = defaultdict(list)
+    for m in milestones:
+        # Extract series name from first badge label (or headline)
+        series_name = m.badges[0].label if m.badges else "unknown"
+        by_series_week[(series_name, m.week)].append(m)
+
+    consolidated: list[Milestone] = []
+    for (series_name, week_num), group in by_series_week.items():
+        # Separate surge milestones from threshold crossings
+        surges = [m for m in group if "surges" in m.headline or "drops" in m.headline]
+        crossings = [m for m in group if "crosses" in m.headline]
+
+        # Keep the surge OR the highest crossing, not both (pick the most interesting)
+        if surges:
+            consolidated.append(surges[0])
+        elif crossings:
+            # Only keep highest threshold crossing if no surge this week
+            consolidated.append(crossings[-1])
+
+    # Deduplicate by headline
     seen_headlines: set[str] = set()
     unique: list[Milestone] = []
-    for m in milestones:
+    for m in consolidated:
         if m.headline not in seen_headlines:
             seen_headlines.add(m.headline)
             unique.append(m)
