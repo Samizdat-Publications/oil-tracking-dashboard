@@ -88,18 +88,14 @@ export function HeroSection({ onOpenEventManager }: HeroSectionProps) {
       </div>
 
       {/* Center: The Price */}
-      <div className="text-center animate-fade-in">
+      <div className="text-center">
         <div className="hero-series-label mb-3">
           {SERIES_LABELS[selectedSeries] || selectedSeries.toUpperCase()}
         </div>
 
-        {isLoading ? (
-          <div className="hero-price-display text-text-secondary animate-pulse">---</div>
-        ) : (
-          <div className="hero-price-display">
-            ${price != null ? animatedPrice : '--'}
-          </div>
-        )}
+        <div className={`hero-price-display${isLoading ? ' text-text-secondary animate-pulse' : ''}`}>
+          {isLoading ? '---' : `$${price != null ? animatedPrice : '--'}`}
+        </div>
 
         {change != null && !isLoading && (
           <div className="mt-3 flex items-center justify-center gap-4">

@@ -1,24 +1,26 @@
-import { useState, useEffect, Component, type ReactNode, type ErrorInfo } from 'react';
+import { useState, useEffect, lazy, Suspense, Component, type ReactNode, type ErrorInfo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { EditorialLayout } from './components/layout/EditorialLayout';
 import { HeroSection } from './components/hero/HeroSection';
-import { ForecastSection } from './components/sections/ForecastSection';
-import { StatsBand } from './components/sections/StatsBand';
-import { RiskSection } from './components/sections/RiskSection';
-import { DownstreamSection } from './components/sections/DownstreamSection';
-import { SupplyChainSection } from './components/sections/SupplyChainSection';
-import { CommodityDetailPanel } from './components/supply-chain/CommodityDetailPanel';
-import { DataTable } from './components/data-table/DataTable';
-import { CollapsibleSection } from './components/ui/collapsible-section';
-import { EventManager } from './components/events/EventManager';
 import { SetupScreen } from './components/setup/SetupScreen';
 import { KitchenTableTicker } from './components/layout/KitchenTableTicker';
-import { WarTimelineSection } from './components/sections/WarTimelineSection';
-import { PredictionMarketsSection } from './components/sections/PredictionMarketsSection';
-import { CrisisComparisonSection } from './components/sections/CrisisComparisonSection';
 import { SectionErrorBoundary } from './components/ui/SectionErrorBoundary';
 import { useSimulation } from './hooks/useSimulation';
 import { checkSetup } from './lib/api';
+
+// Lazy load below-fold sections to reduce initial bundle and speed up LCP
+const ForecastSection = lazy(() => import('./components/sections/ForecastSection').then(m => ({ default: m.ForecastSection })));
+const StatsBand = lazy(() => import('./components/sections/StatsBand').then(m => ({ default: m.StatsBand })));
+const RiskSection = lazy(() => import('./components/sections/RiskSection').then(m => ({ default: m.RiskSection })));
+const DownstreamSection = lazy(() => import('./components/sections/DownstreamSection').then(m => ({ default: m.DownstreamSection })));
+const SupplyChainSection = lazy(() => import('./components/sections/SupplyChainSection').then(m => ({ default: m.SupplyChainSection })));
+const CommodityDetailPanel = lazy(() => import('./components/supply-chain/CommodityDetailPanel').then(m => ({ default: m.CommodityDetailPanel })));
+const DataTable = lazy(() => import('./components/data-table/DataTable').then(m => ({ default: m.DataTable })));
+const CollapsibleSection = lazy(() => import('./components/ui/collapsible-section').then(m => ({ default: m.CollapsibleSection })));
+const EventManager = lazy(() => import('./components/events/EventManager').then(m => ({ default: m.EventManager })));
+const WarTimelineSection = lazy(() => import('./components/sections/WarTimelineSection').then(m => ({ default: m.WarTimelineSection })));
+const PredictionMarketsSection = lazy(() => import('./components/sections/PredictionMarketsSection').then(m => ({ default: m.PredictionMarketsSection })));
+const CrisisComparisonSection = lazy(() => import('./components/sections/CrisisComparisonSection').then(m => ({ default: m.CrisisComparisonSection })));
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null as Error | null };
@@ -55,20 +57,12 @@ function DashboardApp() {
       .catch(() => setConfigured(false));
   }, []);
 
-  if (configured === null) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-accent animate-pulse font-[family-name:var(--font-mono)] text-sm tracking-widest uppercase">
-          Initializing...
-        </div>
-      </div>
-    );
-  }
-
-  if (!configured) {
+  // Show setup screen only if check completed and setup is needed
+  if (configured === false) {
     return <SetupScreen onComplete={() => setConfigured(true)} />;
   }
 
+  // Render dashboard immediately — don't block on setup check
   return <DashboardContent eventManagerOpen={eventManagerOpen} setEventManagerOpen={setEventManagerOpen} />;
 }
 
@@ -91,65 +85,68 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
         <HeroSection onOpenEventManager={() => setEventManagerOpen(true)} />
       </SectionErrorBoundary>
 
-      {/* Section 2: Forecast — chart + scenarios + sim controls */}
-      <SectionErrorBoundary name="Forecast">
-        <ForecastSection
-          simulationResult={sim.data}
-          isSimulating={sim.isPending}
-          onRunSimulation={sim.reRun}
-        />
-      </SectionErrorBoundary>
+      {/* Below-fold sections: lazy loaded for faster LCP */}
+      <Suspense fallback={null}>
+        {/* Section 2: Forecast — chart + scenarios + sim controls */}
+        <SectionErrorBoundary name="Forecast">
+          <ForecastSection
+            simulationResult={sim.data}
+            isSimulating={sim.isPending}
+            onRunSimulation={sim.reRun}
+          />
+        </SectionErrorBoundary>
 
-      {/* Section 3: Prediction Markets — crowd odds on oil price targets */}
-      <SectionErrorBoundary name="Prediction Markets">
-        <PredictionMarketsSection />
-      </SectionErrorBoundary>
+        {/* Section 3: Prediction Markets — crowd odds on oil price targets */}
+        <SectionErrorBoundary name="Prediction Markets">
+          <PredictionMarketsSection />
+        </SectionErrorBoundary>
 
-      {/* Section 4: Thin stats band */}
-      <SectionErrorBoundary name="Stats Band">
-        <StatsBand simulationResult={sim.data} />
-      </SectionErrorBoundary>
+        {/* Section 4: Thin stats band */}
+        <SectionErrorBoundary name="Stats Band">
+          <StatsBand simulationResult={sim.data} />
+        </SectionErrorBoundary>
 
-      {/* Section 5: Risk — vol + distribution side-by-side */}
-      <SectionErrorBoundary name="Risk Analysis">
-        <RiskSection simulationResult={sim.data} />
-      </SectionErrorBoundary>
+        {/* Section 5: Risk — vol + distribution side-by-side */}
+        <SectionErrorBoundary name="Risk Analysis">
+          <RiskSection simulationResult={sim.data} />
+        </SectionErrorBoundary>
 
-      {/* Section 6: Supply Chain Flow — animated downstream visualization */}
-      <SectionErrorBoundary name="Supply Chain">
-        <SupplyChainSection />
-      </SectionErrorBoundary>
+        {/* Section 6: Supply Chain Flow — animated downstream visualization */}
+        <SectionErrorBoundary name="Supply Chain">
+          <SupplyChainSection />
+        </SectionErrorBoundary>
 
-      {/* Section 7: War Impact Timeline — week-by-week narrative */}
-      <SectionErrorBoundary name="War Timeline">
-        <WarTimelineSection />
-      </SectionErrorBoundary>
+        {/* Section 7: War Impact Timeline — week-by-week narrative */}
+        <SectionErrorBoundary name="War Timeline">
+          <WarTimelineSection />
+        </SectionErrorBoundary>
 
-      {/* Section 8: Historical Crisis Comparison — how bad is it vs history */}
-      <SectionErrorBoundary name="Crisis Comparison">
-        <CrisisComparisonSection />
-      </SectionErrorBoundary>
+        {/* Section 8: Historical Crisis Comparison — how bad is it vs history */}
+        <SectionErrorBoundary name="Crisis Comparison">
+          <CrisisComparisonSection />
+        </SectionErrorBoundary>
 
-      {/* Section 9: Downstream correlations — editorial grid */}
-      <SectionErrorBoundary name="Downstream Correlations">
-        <DownstreamSection />
-      </SectionErrorBoundary>
+        {/* Section 9: Downstream correlations — editorial grid */}
+        <SectionErrorBoundary name="Downstream Correlations">
+          <DownstreamSection />
+        </SectionErrorBoundary>
 
-      {/* Section 10: Raw data — collapsible, narrow */}
-      <div className="section-reading py-8 pb-24">
-        <CollapsibleSection title="Raw Data" defaultOpen={false}>
-          <DataTable />
-        </CollapsibleSection>
-      </div>
+        {/* Section 10: Raw data — collapsible, narrow */}
+        <div className="section-reading py-8 pb-24">
+          <CollapsibleSection title="Raw Data" defaultOpen={false}>
+            <DataTable />
+          </CollapsibleSection>
+        </div>
 
-      {/* Footer spacer */}
-      <div className="h-16" />
+        {/* Footer spacer */}
+        <div className="h-16" />
 
-      {/* Event manager dialog */}
-      <EventManager open={eventManagerOpen} onOpenChange={setEventManagerOpen} />
+        {/* Event manager dialog */}
+        <EventManager open={eventManagerOpen} onOpenChange={setEventManagerOpen} />
 
-      {/* Commodity detail slide-out (must be at app level for fixed positioning) */}
-      <CommodityDetailPanel />
+        {/* Commodity detail slide-out (must be at app level for fixed positioning) */}
+        <CommodityDetailPanel />
+      </Suspense>
     </EditorialLayout>
     </>
   );
