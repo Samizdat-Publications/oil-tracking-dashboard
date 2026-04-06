@@ -29,11 +29,11 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
   render() {
     if (this.state.error) {
       return (
-        <div style={{ padding: 40, color: '#FF3366', background: '#04060C', minHeight: '100vh', fontFamily: "'IBM Plex Mono', monospace" }}>
-          <h1 style={{ color: '#E8ECF4', marginBottom: 16, fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, letterSpacing: '0.08em' }}>DASHBOARD ERROR</h1>
-          <pre style={{ whiteSpace: 'pre-wrap', fontSize: 14, color: '#FF3366' }}>{this.state.error.message}</pre>
+        <div style={{ padding: 40, color: '#CC2936', background: '#04060C', minHeight: '100vh', fontFamily: "'JetBrains Mono', monospace" }}>
+          <h1 style={{ color: '#E8ECF4', marginBottom: 16, fontFamily: "'Instrument Serif', Georgia, serif", fontSize: 36 }}>Dashboard Error</h1>
+          <pre style={{ whiteSpace: 'pre-wrap', fontSize: 14, color: '#CC2936' }}>{this.state.error.message}</pre>
           <pre style={{ whiteSpace: 'pre-wrap', fontSize: 12, color: '#4A5568', marginTop: 16 }}>{this.state.error.stack}</pre>
-          <button onClick={() => this.setState({ error: null })} style={{ marginTop: 20, padding: '8px 16px', background: '#00F0FF', color: '#04060C', border: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.05em' }}>
+          <button onClick={() => this.setState({ error: null })} style={{ marginTop: 20, padding: '8px 16px', background: '#D4A012', color: '#04060C', border: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
             RETRY
           </button>
         </div>
@@ -105,6 +105,14 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
         <SectionErrorBoundary name="Stats Band">
           <StatsBand simulationResult={sim.data} />
         </SectionErrorBoundary>
+
+        {/* Editorial pull quote — breaks visual monotony */}
+        <div className="section-narrow py-12">
+          <div className="pull-quote">
+            Every dollar increase in crude oil costs American households an estimated $1.4 billion per year in higher energy and consumer goods prices.
+            <span className="pull-quote-source">U.S. Energy Information Administration</span>
+          </div>
+        </div>
 
         {/* Section 5: Risk — vol + distribution side-by-side */}
         <SectionErrorBoundary name="Risk Analysis">

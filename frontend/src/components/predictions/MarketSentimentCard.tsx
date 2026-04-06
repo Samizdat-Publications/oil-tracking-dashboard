@@ -16,9 +16,9 @@ function formatPct(p: number): string {
 
 /** Color based on probability — high risk = red, medium = orange, low = green */
 function riskColor(p: number): string {
-  if (p >= 0.5) return '#FF3366';
+  if (p >= 0.5) return '#CC2936';
   if (p >= 0.25) return '#FF8800';
-  return '#00FF88';
+  return '#5DB075';
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {
@@ -29,7 +29,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
   return (
     <div
       className="rounded-lg border p-4"
-      style={{ background: 'rgba(8,14,24,0.6)', borderColor: 'rgba(0,240,255,0.06)' }}
+      style={{ background: 'rgba(8,14,24,0.6)', borderColor: 'rgba(212,160,18,0.06)' }}
     >
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">

@@ -88,7 +88,7 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
       key: 'bull',
       label: 'Bull Scenario',
       value: probabilities ? `${probabilities.bullPct.toFixed(1)}%` : '--',
-      color: '#00FF88',
+      color: '#5DB075',
       sub: `> $${SCENARIO_THRESHOLDS.bull}`,
       desc: 'War expands / Hormuz stays closed',
     },
@@ -104,16 +104,16 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
       key: 'bear',
       label: 'Bear Scenario',
       value: probabilities ? `${probabilities.bearPct.toFixed(1)}%` : '--',
-      color: '#FF3366',
+      color: '#CC2936',
       sub: `< $${SCENARIO_THRESHOLDS.bear}`,
       desc: 'Ceasefire / OPEC+ oversupply',
     },
   ];
 
   const SMA_CONFIGS = [
-    { key: 'sma20' as const, color: '#00FF88', label: 'SMA 20' },
+    { key: 'sma20' as const, color: '#5DB075', label: 'SMA 20' },
     { key: 'sma50' as const, color: '#2ECDC1', label: 'SMA 50' },
-    { key: 'sma200' as const, color: '#FF3366', label: 'SMA 200' },
+    { key: 'sma200' as const, color: '#CC2936', label: 'SMA 200' },
   ];
 
   return (
@@ -121,6 +121,7 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
       <div className="section-wide">
         {/* Row 1: Title */}
         <div className="mb-6">
+          <span className="section-number">01 / Forecast</span>
           <h2 className="editorial-header">Where Is It Going?</h2>
           <p className="editorial-subhead">Monte Carlo simulation with confidence bands</p>
         </div>
@@ -160,7 +161,7 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
                 {s.sub && (
                   <div
                     className="number-display text-[11px] mt-1"
-                    style={{ color: s.key === 'median' && delta != null ? (delta >= 0 ? '#00FF88' : '#FF3366') : '#4A5568' }}
+                    style={{ color: s.key === 'median' && delta != null ? (delta >= 0 ? '#5DB075' : '#CC2936') : '#4A5568' }}
                   >
                     {s.sub}
                   </div>

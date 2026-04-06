@@ -25,7 +25,7 @@ function PullStat({ label, value, change, pctChange }: {
       {change != null && (
         <div
           className="pull-stat-change"
-          style={{ color: isPositive ? '#00FF88' : '#FF3366' }}
+          style={{ color: isPositive ? '#5DB075' : '#CC2936' }}
         >
           {change >= 0 ? '+' : ''}{formatCurrency(change)} ({formatPercent(pctChange ?? 0)})
         </div>

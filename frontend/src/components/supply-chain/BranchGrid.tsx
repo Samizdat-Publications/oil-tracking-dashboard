@@ -35,7 +35,7 @@ export function BranchGrid({ items }: BranchGridProps) {
         style={{
           left: 'calc(16.67%)',
           right: 'calc(16.67%)',
-          background: 'linear-gradient(90deg, rgba(0,240,255,0.05), rgba(0,240,255,0.15), rgba(0,240,255,0.05))',
+          background: 'linear-gradient(90deg, rgba(0,240,255,0.05), rgba(212,160,18,0.15), rgba(0,240,255,0.05))',
         }}
       />
 

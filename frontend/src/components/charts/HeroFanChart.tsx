@@ -15,9 +15,9 @@ interface HeroFanChartProps {
 }
 
 const SMA_CONFIGS = [
-  { key: 'sma20' as const, window: 20, color: '#00FF88', label: 'SMA 20' },
+  { key: 'sma20' as const, window: 20, color: '#5DB075', label: 'SMA 20' },
   { key: 'sma50' as const, window: 50, color: '#2ECDC1', label: 'SMA 50' },
-  { key: 'sma200' as const, window: 200, color: '#FF3366', label: 'SMA 200' },
+  { key: 'sma200' as const, window: 200, color: '#CC2936', label: 'SMA 200' },
 ];
 
 function getBandColors(activeScenario: string | null | undefined) {
@@ -160,11 +160,11 @@ export function HeroFanChart({ simulationResult, isSimulating, activeScenario, d
 
     const chartLayout: any = {
       paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
-      font: { color: '#E8ECF4', family: 'Outfit, sans-serif', size: 12 },
-      xaxis: { type: 'date', rangeslider: { visible: true, bgcolor: '#0A0E18', bordercolor: 'rgba(0,240,255,0.06)' }, gridcolor: 'rgba(0,240,255,0.04)', linecolor: 'rgba(0,240,255,0.04)', zerolinecolor: 'rgba(0,240,255,0.04)' },
-      yaxis: { title: { text: 'Price (USD/bbl)', font: { size: 11, color: '#4A5568' } }, tickprefix: '$', gridcolor: 'rgba(0,240,255,0.04)', linecolor: 'rgba(0,240,255,0.04)', zerolinecolor: 'rgba(0,240,255,0.04)' },
+      font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 12 },
+      xaxis: { type: 'date', rangeslider: { visible: true, bgcolor: '#0A0E18', bordercolor: 'rgba(212,160,18,0.06)' }, gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', zerolinecolor: 'rgba(212,160,18,0.04)' },
+      yaxis: { title: { text: 'Price (USD/bbl)', font: { size: 11, color: '#4A5568' } }, tickprefix: '$', gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', zerolinecolor: 'rgba(212,160,18,0.04)' },
       hovermode: 'x unified',
-      hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(0,240,255,0.15)', font: { color: '#E8ECF4', family: 'Outfit, sans-serif' } },
+      hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif' } },
       legend: { orientation: 'h', y: 1.12, x: 0.5, xanchor: 'center', font: { size: 10, color: '#4A5568' }, bgcolor: 'transparent' },
       margin: { l: 65, r: 25, t: 60, b: 40 },
       shapes, annotations,

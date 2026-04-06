@@ -46,13 +46,13 @@ export function HeroPriceZone() {
           <div className="pb-2">
             <div
               className="number-display text-lg font-semibold"
-              style={{ color: isPositive ? '#00FF88' : '#FF3366' }}
+              style={{ color: isPositive ? '#5DB075' : '#CC2936' }}
             >
               {isPositive ? '\u2191' : '\u2193'} {formatCurrency(Math.abs(change))}
             </div>
             <div
               className="number-display text-xs"
-              style={{ color: isPositive ? '#00FF88' : '#FF3366' }}
+              style={{ color: isPositive ? '#5DB075' : '#CC2936' }}
             >
               {formatPercent(pctChange ?? 0)} today
             </div>

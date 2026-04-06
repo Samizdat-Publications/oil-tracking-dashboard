@@ -70,7 +70,7 @@ function CorrelationBadge({ r }: { r: number }) {
 
   if (absR > 0.7) {
     return (
-      <span className="text-[10px] px-2 py-0.5 font-semibold border border-[#00FF88]/30 bg-[#00FF88]/10 text-[#00FF88] font-[family-name:var(--font-mono)]">
+      <span className="text-[10px] px-2 py-0.5 font-semibold border border-[#5DB075]/30 bg-[#5DB075]/10 text-[#5DB075] font-[family-name:var(--font-mono)]">
         Strong ({formatted})
       </span>
     );
@@ -157,7 +157,7 @@ export function DownstreamImpactGrid() {
               type: 'scatter' as const,
               mode: 'lines' as const,
               name: ds.name,
-              line: { color: '#00FF88', width: 1.5 },
+              line: { color: '#5DB075', width: 1.5 },
               yaxis: 'y2' as const,
               hovertemplate: `${ds.name}: %{y:.2f}<extra></extra>`,
             },
@@ -166,23 +166,23 @@ export function DownstreamImpactGrid() {
           const layout: any = {
             paper_bgcolor: '#060A14',
             plot_bgcolor: '#0A0E18',
-            font: { color: '#E8ECF4', family: 'Outfit, sans-serif', size: 10 },
+            font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 10 },
             xaxis: {
-              gridcolor: 'rgba(0,240,255,0.04)',
-              linecolor: 'rgba(0,240,255,0.04)',
+              gridcolor: 'rgba(212,160,18,0.04)',
+              linecolor: 'rgba(212,160,18,0.04)',
               type: 'date' as const,
             },
             yaxis: {
-              gridcolor: 'rgba(0,240,255,0.04)',
-              linecolor: 'rgba(0,240,255,0.04)',
+              gridcolor: 'rgba(212,160,18,0.04)',
+              linecolor: 'rgba(212,160,18,0.04)',
               title: { text: 'Oil ($)', font: { size: 9, color: '#33F5FF' } },
               tickprefix: '$',
               side: 'left' as const,
             },
             yaxis2: {
               gridcolor: 'transparent',
-              linecolor: 'rgba(0,240,255,0.04)',
-              title: { text: ds.name, font: { size: 9, color: '#00FF88' } },
+              linecolor: 'rgba(212,160,18,0.04)',
+              title: { text: ds.name, font: { size: 9, color: '#5DB075' } },
               side: 'right' as const,
               overlaying: 'y' as const,
             },
@@ -190,7 +190,7 @@ export function DownstreamImpactGrid() {
             hovermode: 'x unified' as const,
             hoverlabel: {
               bgcolor: '#0C1220',
-              bordercolor: 'rgba(0,240,255,0.15)',
+              bordercolor: 'rgba(212,160,18,0.15)',
               font: { color: '#E8ECF4', size: 10 },
             },
             showlegend: false,

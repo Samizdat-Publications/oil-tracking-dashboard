@@ -53,7 +53,7 @@ export function CommodityDetailPanel() {
   }, [info, downstream, commodityKey]);
 
   const corrLabel = panelData ? (Math.abs(panelData.corr) > 0.7 ? 'Strong' : Math.abs(panelData.corr) > 0.4 ? 'Moderate' : 'Weak') : '';
-  const corrColor = panelData ? (Math.abs(panelData.corr) > 0.7 ? '#00FF88' : Math.abs(panelData.corr) > 0.4 ? '#00F0FF' : '#4A5568') : '#4A5568';
+  const corrColor = panelData ? (Math.abs(panelData.corr) > 0.7 ? '#5DB075' : Math.abs(panelData.corr) > 0.4 ? '#00F0FF' : '#4A5568') : '#4A5568';
 
   return (
     <>
@@ -99,7 +99,7 @@ export function CommodityDetailPanel() {
                 {panelData.awaitingPostWar ? (
                   <div className="font-[family-name:var(--font-mono)] text-xs text-text-secondary italic mt-1">Awaiting post-war data</div>
                 ) : (
-                  <div className="font-[family-name:var(--font-mono)] text-xl font-bold" style={{ color: panelData.sinceWarPct !== null && panelData.sinceWarPct >= 0 ? '#FF3366' : '#00FF88' }}>
+                  <div className="font-[family-name:var(--font-mono)] text-xl font-bold" style={{ color: panelData.sinceWarPct !== null && panelData.sinceWarPct >= 0 ? '#CC2936' : '#5DB075' }}>
                     {panelData.sinceWarPct !== null ? `${panelData.sinceWarPct >= 0 ? '\u2191' : '\u2193'}${Math.abs(panelData.sinceWarPct).toFixed(1)}%` : 'N/A'}
                   </div>
                 )}
@@ -129,22 +129,22 @@ export function CommodityDetailPanel() {
                     {
                       x: panelData.aligned.dates, y: panelData.aligned.dsValues,
                       type: 'scatter', mode: 'lines', name: info.displayName,
-                      line: { color: '#00FF88', width: 2 }, yaxis: 'y2',
+                      line: { color: '#5DB075', width: 2 }, yaxis: 'y2',
                       hovertemplate: `${info.displayName}: %{y:.2f}<extra></extra>`,
                     },
                   ]}
                   layout={{
                     paper_bgcolor: '#060A14', plot_bgcolor: '#0A0E18',
-                    font: { color: '#E8ECF4', family: 'Outfit, sans-serif', size: 10 },
-                    xaxis: { gridcolor: 'rgba(0,240,255,0.04)', linecolor: 'rgba(0,240,255,0.04)', type: 'date' as const },
-                    yaxis: { gridcolor: 'rgba(0,240,255,0.04)', linecolor: 'rgba(0,240,255,0.04)', title: { text: 'Oil ($)', font: { size: 9, color: '#33F5FF' } }, tickprefix: '$', side: 'left' as const },
-                    yaxis2: { gridcolor: 'transparent', linecolor: 'rgba(0,240,255,0.04)', title: { text: info.displayName, font: { size: 9, color: '#00FF88' } }, side: 'right' as const, overlaying: 'y' as const },
+                    font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 10 },
+                    xaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', type: 'date' as const },
+                    yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', title: { text: 'Oil ($)', font: { size: 9, color: '#33F5FF' } }, tickprefix: '$', side: 'left' as const },
+                    yaxis2: { gridcolor: 'transparent', linecolor: 'rgba(212,160,18,0.04)', title: { text: info.displayName, font: { size: 9, color: '#5DB075' } }, side: 'right' as const, overlaying: 'y' as const },
                     margin: { l: 50, r: 50, t: 10, b: 30 },
                     hovermode: 'x unified' as const,
-                    hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(0,240,255,0.15)', font: { color: '#E8ECF4', size: 10 } },
+                    hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', size: 10 } },
                     showlegend: false,
-                    shapes: [{ type: 'line' as const, x0: IRAN_WAR_DATE, x1: IRAN_WAR_DATE, y0: 0, y1: 1, yref: 'paper' as const, line: { color: '#FF3366', width: 1.5, dash: 'dash' as const } }],
-                    annotations: [{ x: IRAN_WAR_DATE, y: 1.03, yref: 'paper' as const, text: 'Iran War', showarrow: false, font: { size: 9, color: '#FF3366' } }],
+                    shapes: [{ type: 'line' as const, x0: IRAN_WAR_DATE, x1: IRAN_WAR_DATE, y0: 0, y1: 1, yref: 'paper' as const, line: { color: '#CC2936', width: 1.5, dash: 'dash' as const } }],
+                    annotations: [{ x: IRAN_WAR_DATE, y: 1.03, yref: 'paper' as const, text: 'Iran War', showarrow: false, font: { size: 9, color: '#CC2936' } }],
                   }}
                   config={{ displayModeBar: false, responsive: true }}
                   style={{ width: '100%', height: '220px' }}

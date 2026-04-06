@@ -20,6 +20,7 @@ export function CrisisComparisonSection() {
     return (
       <section className="py-24 scroll-reveal" ref={ref}>
         <div className="section-reading">
+          <span className="section-number">06 / History</span>
           <h2 className="editorial-header">How Bad Is It?</h2>
           <p className="editorial-subhead mb-4">Loading historical crisis data...</p>
           <div className="section-rule" />
@@ -42,6 +43,7 @@ export function CrisisComparisonSection() {
     return (
       <section className="py-12 scroll-reveal" ref={ref}>
         <div className="section-reading">
+          <span className="section-number">06 / History</span>
           <h2 className="editorial-header">How Bad Is It?</h2>
           <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             {isError ? 'Unable to load crisis comparison data.' : 'No historical crisis data available yet.'}
@@ -91,8 +93,8 @@ export function CrisisComparisonSection() {
               onClick={() => setMetric(m)}
               className="px-3 py-1.5 rounded text-xs font-[family-name:var(--font-mono)] transition-all duration-200"
               style={{
-                background: metric === m ? 'rgba(0, 240, 255, 0.12)' : 'transparent',
-                border: `1px solid ${metric === m ? 'rgba(0, 240, 255, 0.3)' : 'rgba(0, 240, 255, 0.08)'}`,
+                background: metric === m ? 'rgba(212, 160, 18, 0.12)' : 'transparent',
+                border: `1px solid ${metric === m ? 'rgba(212, 160, 18, 0.3)' : 'rgba(212, 160, 18, 0.08)'}`,
                 color: metric === m ? '#00F0FF' : '#8A8F98',
               }}
             >

@@ -37,7 +37,7 @@ export function OilSourceNode({ oilData }: OilSourceNodeProps) {
 
   return (
     <div className="relative flex items-center gap-5 p-5 rounded-[10px] border border-border-active overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, rgba(0,240,255,0.06), rgba(0,240,255,0.02))' }}
+      style={{ background: 'linear-gradient(135deg, rgba(212,160,18,0.06), rgba(0,240,255,0.02))' }}
     >
       {/* Top accent line */}
       <div className="absolute top-0 left-0 right-0 h-[2px]"

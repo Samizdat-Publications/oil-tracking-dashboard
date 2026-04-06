@@ -112,7 +112,7 @@ export function KitchenTableTicker() {
         {isLoading ? (
           <span
             className="inline-block h-3 w-16 rounded skeleton-shimmer"
-            style={{ background: 'rgba(0,240,255,0.06)' }}
+            style={{ background: 'rgba(212,160,18,0.06)' }}
           />
         ) : (
           <>
@@ -128,7 +128,7 @@ export function KitchenTableTicker() {
             ) : item.changeLabel ? (
               <span
                 className="font-[family-name:var(--font-mono)] text-xs font-semibold"
-                style={{ color: item.changeValue !== null && item.changeValue >= 0 ? '#FF3366' : '#00FF88' }}
+                style={{ color: item.changeValue !== null && item.changeValue >= 0 ? '#CC2936' : '#5DB075' }}
               >
                 {item.changeLabel}
               </span>

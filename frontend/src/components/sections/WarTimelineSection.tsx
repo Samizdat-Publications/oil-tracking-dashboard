@@ -10,6 +10,7 @@ export function WarTimelineSection() {
     return (
       <section className="py-12 scroll-reveal" ref={ref}>
         <div className="section-reading">
+          <span className="section-number">05 / Timeline</span>
           <h2 className="editorial-header">The War's Ripple</h2>
           <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             Unable to load timeline data.
@@ -24,12 +25,13 @@ export function WarTimelineSection() {
     return (
       <section className="py-24 scroll-reveal" ref={ref}>
         <div className="section-reading">
+          <span className="section-number">05 / Timeline</span>
           <h2 className="editorial-header">The War's Ripple</h2>
           <p className="editorial-subhead mb-4">Loading timeline...</p>
           <div className="section-rule" />
           {/* Skeleton */}
           <div className="relative mt-8">
-            <div className="absolute top-0 bottom-0 w-[2px]" style={{ left: 9, background: 'rgba(0,240,255,0.15)' }} />
+            <div className="absolute top-0 bottom-0 w-[2px]" style={{ left: 9, background: 'rgba(212,160,18,0.15)' }} />
             {[1, 2, 3].map((i) => (
               <div key={i} className="grid gap-x-4 mb-0 py-4" style={{ gridTemplateColumns: '20px 1fr' }}>
                 <div className="flex justify-center pt-1">
@@ -53,6 +55,7 @@ export function WarTimelineSection() {
     return (
       <section className="py-12 scroll-reveal" ref={ref}>
         <div className="section-reading">
+          <span className="section-number">05 / Timeline</span>
           <h2 className="editorial-header">The War's Ripple</h2>
           <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             No milestone data available yet.
@@ -79,7 +82,7 @@ export function WarTimelineSection() {
             className="absolute top-0 bottom-0 w-[2px]"
             style={{
               left: 9,
-              background: 'linear-gradient(180deg, #FF3366 0%, #00F0FF 30%, #00F0FF 80%, #00FF88 100%)',
+              background: 'linear-gradient(180deg, #CC2936 0%, #00F0FF 30%, #00F0FF 80%, #5DB075 100%)',
               opacity: 0.4,
             }}
           />

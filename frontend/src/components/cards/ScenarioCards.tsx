@@ -59,14 +59,14 @@ export function ScenarioCards({ simulationResult, isSimulating, currentPrice }: 
       color: '#00F0FF',
       value: probabilities ? formatCurrency(probabilities.medianPrice) : '--',
       sub: delta != null ? (
-        <span className="number-display text-[10px]" style={{ color: delta >= 0 ? '#00FF88' : '#FF3366' }}>
+        <span className="number-display text-[10px]" style={{ color: delta >= 0 ? '#5DB075' : '#CC2936' }}>
           {delta >= 0 ? '\u2191' : '\u2193'}{formatPercent(currentPrice ? (delta / currentPrice) * 100 : 0)}
         </span>
       ) : null,
     },
     {
       label: 'Bull',
-      color: '#00FF88',
+      color: '#5DB075',
       value: probabilities ? `${probabilities.bullPct.toFixed(1)}%` : '--',
       sub: <span className="text-[10px] text-text-secondary">&gt;${SCENARIO_THRESHOLDS.bull}</span>,
     },
@@ -78,7 +78,7 @@ export function ScenarioCards({ simulationResult, isSimulating, currentPrice }: 
     },
     {
       label: 'Bear',
-      color: '#FF3366',
+      color: '#CC2936',
       value: probabilities ? `${probabilities.bearPct.toFixed(1)}%` : '--',
       sub: <span className="text-[10px] text-text-secondary">&lt;${SCENARIO_THRESHOLDS.bear}</span>,
     },
