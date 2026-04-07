@@ -75,7 +75,7 @@ export function DownstreamSection() {
       <section className="py-12 scroll-reveal" ref={ref as any}>
         <div className="section-wide">
           <h2 className="editorial-header">The Ripple Effect</h2>
-          <p className="text-sm font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+          <p className="text-base font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             Unable to load downstream correlation data.
           </p>
           <div className="section-rule mt-4" />
@@ -105,7 +105,7 @@ export function DownstreamSection() {
             </h3>
             <CorrelationBadge r={featured.correlation} />
           </div>
-          <p className="text-sm text-text-secondary mb-2 max-w-[700px]">{featured.context.why}</p>
+          <p className="text-base text-text-secondary mb-2 max-w-[700px]">{featured.context.why}</p>
           <SinceWarBadge pctChange={featured.sinceWarPct} awaiting={featured.awaitingPostWar} />
           <div className="mt-3">
             <Plot
@@ -144,7 +144,7 @@ export function DownstreamSection() {
                   <span className="text-sm font-semibold text-text-primary flex-1">{ds.name}</span>
                   <CorrelationBadge r={correlation} />
                 </div>
-                <p className="text-[11px] text-text-secondary mb-1 line-clamp-2">{context.why}</p>
+                <p className="text-xs text-text-secondary mb-1 line-clamp-2">{context.why}</p>
                 <SinceWarBadge pctChange={sinceWarPct} awaiting={awaitingPostWar} />
                 <div className="mt-2">
                   <Plot

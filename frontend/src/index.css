@@ -538,7 +538,7 @@ body::after {
 
 .pull-stat-label {
   font-family: var(--font-display);
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
@@ -547,7 +547,7 @@ body::after {
 
 .pull-stat-change {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   margin-top: 0.125rem;
 }
 
@@ -556,7 +556,7 @@ body::after {
    ═══════════════════════════════════════════════ */
 
 .figure-caption {
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
   color: var(--color-text-secondary);
   font-style: italic;
   margin-top: 0.5rem;
@@ -577,7 +577,7 @@ body::after {
 }
 
 .editorial-subhead {
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: 1.6;
   color: var(--color-text-secondary);
   margin-top: 0.25rem;

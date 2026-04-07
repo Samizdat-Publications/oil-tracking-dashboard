@@ -63,8 +63,8 @@ CATEGORIES: list[dict] = [
         "key": "oil_targets",
         "name": "Oil Price Targets",
         "icon": "\U0001F6E2\uFE0F",
-        "keywords": ["wti", "crude oil", "oil price", "brent"],
-        "exclude": ["up or down"],
+        "keywords": ["wti", "crude oil", "oil price", "brent crude"],
+        "exclude": ["up or down", "premier league", "epl", "football", "soccer", "relegat", "standings"],
         "description": "Where traders think oil prices are headed.",
     },
     {
@@ -72,7 +72,7 @@ CATEGORIES: list[dict] = [
         "name": "Gas & Energy Prices",
         "icon": "\u26FD",
         "keywords": ["gas price", "gasoline", "gas hit", "natural gas", "energy price"],
-        "exclude": [],
+        "exclude": ["gas station", "gas mask"],
         "description": "What you\u2019ll pay at the pump and on your utility bill.",
     },
     {
@@ -80,7 +80,7 @@ CATEGORIES: list[dict] = [
         "name": "Inflation & Cost of Living",
         "icon": "\U0001F4C8",
         "keywords": ["inflation", "cpi", "consumer price"],
-        "exclude": [],
+        "exclude": ["grade inflation", "inflation target"],
         "description": "How fast everyday prices are rising.",
     },
     {
@@ -96,15 +96,15 @@ CATEGORIES: list[dict] = [
         "name": "Tariffs & Trade",
         "icon": "\U0001F6A2",
         "keywords": ["tariff", "trade war", "sanctions", "trade deal"],
-        "exclude": [],
+        "exclude": ["republican", "democrat", "primary", "election"],
         "description": "Trade policy adds fuel to the inflation fire.",
     },
     {
         "key": "supply_chain",
         "name": "Food & Commodities",
         "icon": "\U0001F33E",
-        "keywords": ["wheat", "corn", "food price", "commodity", "supply chain", "shipping", "grain", "soybean", "agriculture"],
-        "exclude": [],
+        "keywords": ["wheat", "corn", "food price", "commodity price", "supply chain", "shipping", "grain", "soybean", "agriculture"],
+        "exclude": ["republican", "democrat", "primary", "election", "endorse", "trump", "senate", "congress", "governor"],
         "description": "From farm gate to dinner plate \u2014 commodity price bets.",
     },
 ]
@@ -127,9 +127,23 @@ def _parse_outcome_prices(raw: str | list | None) -> list[float]:
     return []
 
 
+GLOBAL_EXCLUDE = [
+    "premier league", "epl", "champions league", "la liga", "serie a",
+    "bundesliga", "nfl", "nba", "mlb", "nhl", "super bowl",
+    "academy award", "oscar", "grammy", "emmy", "golden globe",
+    "bachelor", "bachelorette", "reality tv", "love island",
+    "brentford", "relegat", "standings",
+]
+
+
 def _categorize_market(question: str) -> list[str]:
     """Return list of matching category keys (multi-category matching)."""
     q = question.lower()
+
+    # Global exclusion: reject sports/entertainment/gaming markets
+    if any(ex in q for ex in GLOBAL_EXCLUDE):
+        return []
+
     matches: list[str] = []
     for cat in CATEGORIES:
         if any(ex in q for ex in cat["exclude"]):

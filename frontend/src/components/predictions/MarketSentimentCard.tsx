@@ -37,13 +37,13 @@ export function CategoryCard({ category }: CategoryCardProps) {
         <span className="font-[family-name:var(--font-display)] text-sm tracking-wider uppercase text-text-primary">
           {category.name}
         </span>
-        <span className="ml-auto font-[family-name:var(--font-mono)] text-[11px] text-text-secondary">
+        <span className="ml-auto font-[family-name:var(--font-mono)] text-xs text-text-secondary">
           {formatVolume(category.total_volume)} volume
         </span>
       </div>
 
       {/* Description */}
-      <p className="text-sm text-text-secondary mb-3">{category.description}</p>
+      <p className="text-base text-text-secondary mb-3">{category.description}</p>
 
       {/* Fed distribution special rendering */}
       {category.fed_distribution && category.fed_distribution.length > 0 ? (
@@ -63,7 +63,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
           return (
             <div key={m.id}>
               <div className="flex items-baseline justify-between gap-2 mb-1">
-                <span className="text-sm text-text-primary leading-tight flex-1">
+                <span className="text-base text-text-primary leading-tight flex-1">
                   {m.source_url ? (
                     <a
                       href={m.source_url}
@@ -111,7 +111,7 @@ function OilPriceDistribution({ distribution }: { distribution: { price: number;
 
   return (
     <div className="mb-3 p-3 rounded" style={{ background: 'rgba(255,136,0,0.03)' }}>
-      <div className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary uppercase tracking-wider mb-2">
+      <div className="font-[family-name:var(--font-mono)] text-xs text-text-secondary uppercase tracking-wider mb-2">
         Price Target Probability
       </div>
       <div className="flex items-end gap-1" style={{ height: 48 }}>
@@ -155,7 +155,7 @@ function FedDistribution({ distribution }: { distribution: { cuts: number; proba
 
   return (
     <div className="mb-3 p-3 rounded" style={{ background: 'rgba(0,240,255,0.03)' }}>
-      <div className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary uppercase tracking-wider mb-2">
+      <div className="font-[family-name:var(--font-mono)] text-xs text-text-secondary uppercase tracking-wider mb-2">
         Rate Cut Probability Distribution
       </div>
       <div className="flex items-end gap-1" style={{ height: 48 }}>

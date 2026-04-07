@@ -43,7 +43,7 @@ export function CrisisComparisonSection() {
       <section className="py-12 scroll-reveal" ref={ref}>
         <div className="section-reading">
           <h2 className="editorial-header">How Bad Is It?</h2>
-          <p className="text-sm font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+          <p className="text-base font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             {isError ? 'Unable to load crisis comparison data.' : 'No historical crisis data available yet.'}
           </p>
           <div className="section-rule mt-4" />
@@ -89,7 +89,7 @@ export function CrisisComparisonSection() {
             <button
               key={m}
               onClick={() => setMetric(m)}
-              className="px-3 py-1.5 rounded text-sm font-[family-name:var(--font-mono)] transition-all duration-200"
+              className="px-3 py-1.5 rounded text-base font-[family-name:var(--font-mono)] transition-all duration-200"
               style={{
                 background: metric === m ? 'rgba(0, 240, 255, 0.12)' : 'transparent',
                 border: `1px solid ${metric === m ? 'rgba(0, 240, 255, 0.3)' : 'rgba(0, 240, 255, 0.08)'}`,
@@ -102,7 +102,7 @@ export function CrisisComparisonSection() {
         </div>
 
         {/* Hint */}
-        <div className="mt-3 text-center text-[11px] font-[family-name:var(--font-mono)] text-text-secondary">
+        <div className="mt-3 text-center text-xs font-[family-name:var(--font-mono)] text-text-secondary">
           Click a crisis row to compare its price trajectory against the current war
         </div>
       </div>
