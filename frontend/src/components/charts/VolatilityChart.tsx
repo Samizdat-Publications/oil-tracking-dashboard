@@ -37,9 +37,9 @@ export function VolatilityChart({ wtiData, isLoading }: VolatilityChartProps) {
     const maxVol = Math.max(...volValues);
     const colors = volValues.map((v) => {
       const ratio = maxVol > 0 ? v / maxVol : 0;
-      if (ratio > 0.66) return '#FF3366';
+      if (ratio > 0.66) return '#CC2936';
       if (ratio > 0.33) return '#00F0FF';
-      return '#00FF88';
+      return '#5DB075';
     });
     const labels = ['5d (1W)', '20d (1M)', '60d (3M)', '252d (1Y)'];
 
@@ -55,11 +55,11 @@ export function VolatilityChart({ wtiData, isLoading }: VolatilityChartProps) {
       }] as any[],
       layout: {
         paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
-        font: { color: '#E8ECF4', family: 'Outfit, sans-serif', size: 12 },
-        xaxis: { gridcolor: 'rgba(0,240,255,0.04)', linecolor: 'rgba(0,240,255,0.04)' },
-        yaxis: { gridcolor: 'rgba(0,240,255,0.04)', linecolor: 'rgba(0,240,255,0.04)', title: { text: 'Annualized Vol (%)', font: { size: 11, color: '#4A5568' } }, ticksuffix: '%' },
+        font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 12 },
+        xaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)' },
+        yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', title: { text: 'Annualized Vol (%)', font: { size: 11, color: '#4A5568' } }, ticksuffix: '%' },
         margin: { l: 60, r: 20, t: 10, b: 50 },
-        hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(0,240,255,0.15)', font: { color: '#E8ECF4' } },
+        hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4' } },
         showlegend: false, bargap: 0.3,
       },
     };

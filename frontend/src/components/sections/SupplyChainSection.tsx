@@ -49,6 +49,7 @@ export function SupplyChainSection() {
     return (
       <section className="py-24 scroll-reveal" ref={ref as any}>
         <div className="section-wide">
+          <span className="section-number">04 / Supply Chain</span>
           <h2 className="editorial-header">The Supply Chain</h2>
           <p className="editorial-subhead mb-4">Loading supply chain data...</p>
           {/* Skeleton matching the flow layout */}
@@ -73,6 +74,7 @@ export function SupplyChainSection() {
     return (
       <section className="py-12 scroll-reveal" ref={ref as any}>
         <div className="section-wide">
+          <span className="section-number">04 / Supply Chain</span>
           <h2 className="editorial-header">The Supply Chain</h2>
           <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             Unable to load supply chain data.
@@ -87,6 +89,7 @@ export function SupplyChainSection() {
     <section className="py-24 scroll-reveal" ref={ref as any}>
       <div className="section-wide">
         <div className="mb-8">
+          <span className="section-number">04 / Supply Chain</span>
           <h2 className="editorial-header">The Supply Chain</h2>
           <p className="editorial-subhead mb-4">Follow the money from the oil barrel to your kitchen table. Click any item to explore.</p>
           <div className="section-rule" />

@@ -99,7 +99,9 @@ Defined in `lib/commodity-data.ts`, keyed by backend FRED series ID:
 
 **Shared commodity data:** `lib/commodity-data.ts` has `COMMODITY_DATA`, `COMMODITY_CATEGORIES`, `IRAN_WAR_DATE`, and utility functions (`alignSeries`, `computeCorrelation`, `getValueBeforeDate`, `hasDataAfter`).
 
-**Section pattern:** All sections use `useScrollReveal()` hook, `scroll-reveal` class, `section-wide` container, `editorial-header` + `editorial-subhead` + `section-rule`. All wrapped in `<SectionErrorBoundary>` in App.tsx.
+**Section pattern:** All sections use `useScrollReveal()` hook, `scroll-reveal` class, `section-wide` container, `section-number` + `editorial-header` + `editorial-subhead` + `section-rule`. All wrapped in `<SectionErrorBoundary>` in App.tsx. Below-fold sections are lazy-loaded via `React.lazy()` + `<Suspense>`.
+
+**Code splitting:** HeroSection, KitchenTableTicker, and EditorialLayout are eagerly imported. All other sections (ForecastSection, PredictionMarketsSection, StatsBand, RiskSection, SupplyChainSection, WarTimelineSection, CrisisComparisonSection, DownstreamSection, DataTable, EventManager, CommodityDetailPanel, CollapsibleSection) are lazy-loaded.
 
 **Error handling:** Each section shows a visible error/empty state (never returns `null`). `SectionErrorBoundary` catches render crashes per-section. `fetchJson()` has 30s timeout via AbortController.
 
@@ -107,13 +109,46 @@ Defined in `lib/commodity-data.ts`, keyed by backend FRED series ID:
 
 **Simulation engine:** `services/monte_carlo.py` — GBM and jump-diffusion models. Parameter estimation from historical returns with jump detection (>3σ). 7 percentile bands over 126 trading days.
 
-## Design System
+## Design System — "War Room Broadsheet"
 
-Dark theme only. Colors as Tailwind v4 CSS custom properties in `index.css`:
+Dark theme, editorial newspaper aesthetic. Two-temperature color system: warm editorial + cool data.
+
+**Color Tiers** (Tailwind v4 CSS custom properties in `index.css`):
 - Background: `#04060C`, Surface: `#0A0E18`, Card: `#0C1220`
-- Accent: `#00F0FF` (cyan), Green: `#00FF88`, Red: `#FF3366`
-- Fonts: Outfit (body), Bebas Neue (display headings), IBM Plex Mono (data/labels)
-- Referenced via: `text-accent`, `bg-surface`, `font-[family-name:var(--font-mono)]`
+- Editorial accent (gold): `#D4A012` — headlines, rules, section markers, borders (`--color-accent`)
+- Data accent (cyan): `#00F0FF` — charts, numerical values, interactive controls (`--color-data`)
+- War/alert red: `#CC2936` — LIVE indicator, war events, bearish scenarios
+- Stabilizing green: `#5DB075` — positive indicators, bullish scenarios
+- Borders/chrome use warm gold tint: `rgba(212, 160, 18, x%)`
+
+**Typography**:
+- Display: **Instrument Serif** (editorial headlines — serif on dark = distinctive)
+- Body: **Plus Jakarta Sans** (warm geometric sans)
+- Data: **JetBrains Mono** (technical monospace for numbers/labels)
+- Referenced via: `font-[family-name:var(--font-display)]`, `var(--font-mono)`, etc.
+
+**Editorial Elements**:
+- Section numbers: `<span className="section-number">01 / Forecast</span>` before headers
+- Pull quotes: `<div className="pull-quote">` with gold left border (Instrument Serif italic)
+- Dateline in hero: wire-service format (`APR 5, 2026 — WTI CRUDE OIL`)
+- Editorial lede: auto-generated sentence below price in hero
+- Source attributions: `<p className="source-attribution">` (italic serif)
+- Section rules: left-aligned gold gradient (asymmetric, not centered)
+- LIVE indicator: red pulse (war urgency), not green (generic status)
+
+**Textures**:
+- Grain overlay: 0.035 opacity (visible analog texture)
+- No scan-line effects (removed — was gratuitous)
+- Background: warm gold/red radial gradients (not cyan/green)
+- Crosshatch utility: `.crosshatch-bg` for military-map texture on risk sections
+
+## Performance
+
+**LCP optimized to ~2.3s** (down from 3.8s):
+- `checkSetup()` no longer blocks initial render — dashboard renders immediately
+- 12 below-fold sections lazy-loaded via `React.lazy()` + `<Suspense>` in App.tsx
+- Font preloads removed (font swap handles it; new fonts from Google Fonts with `display=swap`)
+- Changing `@theme` in `index.css` requires Vite dev server restart (Tailwind v4 caching)
 
 ## Conventions
 

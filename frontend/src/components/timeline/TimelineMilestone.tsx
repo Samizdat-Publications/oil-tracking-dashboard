@@ -7,9 +7,9 @@ interface TimelineMilestoneProps {
 }
 
 const DOT_COLORS: Record<string, string> = {
-  editorial: '#FF3366',
+  editorial: '#CC2936',
   data: '#00F0FF',
-  today: '#00FF88',
+  today: '#5DB075',
 };
 
 export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) {
@@ -111,7 +111,7 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
         >
           {dateLabel}
           {isEditorial && (
-            <span className="ml-2" style={{ color: '#FF3366' }}>{'\u2022'} Event</span>
+            <span className="ml-2" style={{ color: '#CC2936' }}>{'\u2022'} Event</span>
           )}
         </div>
 

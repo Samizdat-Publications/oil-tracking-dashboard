@@ -8,7 +8,7 @@ import { SectionErrorBoundary } from './components/ui/SectionErrorBoundary';
 import { useSimulation } from './hooks/useSimulation';
 import { checkSetup } from './lib/api';
 
-// Lazy-load below-fold sections — keeps initial bundle small
+// Lazy-load below-fold sections — keeps initial bundle small, speeds up LCP
 const ForecastSection = lazy(() => import('./components/sections/ForecastSection').then(m => ({ default: m.ForecastSection })));
 const PredictionMarketsSection = lazy(() => import('./components/sections/PredictionMarketsSection').then(m => ({ default: m.PredictionMarketsSection })));
 const StatsBand = lazy(() => import('./components/sections/StatsBand').then(m => ({ default: m.StatsBand })));
@@ -29,11 +29,11 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
   render() {
     if (this.state.error) {
       return (
-        <div style={{ padding: 40, color: '#FF3366', background: '#04060C', minHeight: '100vh', fontFamily: "'IBM Plex Mono', monospace" }}>
-          <h1 style={{ color: '#E8ECF4', marginBottom: 16, fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, letterSpacing: '0.08em' }}>DASHBOARD ERROR</h1>
-          <pre style={{ whiteSpace: 'pre-wrap', fontSize: 14, color: '#FF3366' }}>{this.state.error.message}</pre>
+        <div style={{ padding: 40, color: '#CC2936', background: '#04060C', minHeight: '100vh', fontFamily: "'JetBrains Mono', monospace" }}>
+          <h1 style={{ color: '#E8ECF4', marginBottom: 16, fontFamily: "'Instrument Serif', Georgia, serif", fontSize: 36 }}>Dashboard Error</h1>
+          <pre style={{ whiteSpace: 'pre-wrap', fontSize: 14, color: '#CC2936' }}>{this.state.error.message}</pre>
           <pre style={{ whiteSpace: 'pre-wrap', fontSize: 12, color: '#4A5568', marginTop: 16 }}>{this.state.error.stack}</pre>
-          <button onClick={() => this.setState({ error: null })} style={{ marginTop: 20, padding: '8px 16px', background: '#00F0FF', color: '#04060C', border: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.05em' }}>
+          <button onClick={() => this.setState({ error: null })} style={{ marginTop: 20, padding: '8px 16px', background: '#D4A012', color: '#04060C', border: 'none', cursor: 'pointer', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.05em' }}>
             RETRY
           </button>
         </div>
@@ -75,6 +75,7 @@ function DashboardApp() {
     return <SetupScreen onComplete={() => setConfigured(true)} />;
   }
 
+  // Render dashboard immediately — don't block on setup check
   return <DashboardContent eventManagerOpen={eventManagerOpen} setEventManagerOpen={setEventManagerOpen} />;
 }
 
@@ -99,7 +100,7 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
 
       {/* Below-fold sections: lazy-loaded for faster initial paint */}
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 2: Forecast */}
+        {/* Section 2: Forecast — chart + scenarios + sim controls */}
         <SectionErrorBoundary name="Forecast">
           <ForecastSection
             simulationResult={sim.data}
@@ -110,49 +111,57 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 3: Prediction Markets */}
+        {/* Section 3: Prediction Markets — crowd odds on oil price targets */}
         <SectionErrorBoundary name="Prediction Markets">
           <PredictionMarketsSection />
         </SectionErrorBoundary>
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 4: Stats Band */}
+        {/* Section 4: Thin stats band */}
         <SectionErrorBoundary name="Stats Band">
           <StatsBand simulationResult={sim.data} />
         </SectionErrorBoundary>
       </Suspense>
 
+      {/* Editorial pull quote — breaks visual monotony */}
+      <div className="section-narrow py-12">
+        <div className="pull-quote">
+          Every dollar increase in crude oil costs American households an estimated $1.4 billion per year in higher energy and consumer goods prices.
+          <span className="pull-quote-source">U.S. Energy Information Administration</span>
+        </div>
+      </div>
+
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 5: Risk */}
+        {/* Section 5: Risk — vol + distribution side-by-side */}
         <SectionErrorBoundary name="Risk Analysis">
           <RiskSection simulationResult={sim.data} />
         </SectionErrorBoundary>
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 6: Supply Chain */}
+        {/* Section 6: Supply Chain Flow — animated downstream visualization */}
         <SectionErrorBoundary name="Supply Chain">
           <SupplyChainSection />
         </SectionErrorBoundary>
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 7: War Timeline */}
+        {/* Section 7: War Impact Timeline — week-by-week narrative */}
         <SectionErrorBoundary name="War Timeline">
           <WarTimelineSection />
         </SectionErrorBoundary>
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 8: Crisis Comparison */}
+        {/* Section 8: Historical Crisis Comparison — how bad is it vs history */}
         <SectionErrorBoundary name="Crisis Comparison">
           <CrisisComparisonSection />
         </SectionErrorBoundary>
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 9: Downstream Correlations */}
+        {/* Section 9: Downstream correlations — editorial grid */}
         <SectionErrorBoundary name="Downstream Correlations">
           <DownstreamSection />
         </SectionErrorBoundary>
@@ -167,6 +176,13 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
         </div>
       </Suspense>
 
+        {/* Section 10: Raw data — collapsible, narrow */}
+        <div className="section-reading py-8 pb-24">
+          <CollapsibleSection title="Raw Data" defaultOpen={false}>
+            <DataTable />
+          </CollapsibleSection>
+        </div>
+
       {/* Footer spacer */}
       <div className="h-16" />
 
@@ -175,7 +191,7 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
         <EventManager open={eventManagerOpen} onOpenChange={setEventManagerOpen} />
       </Suspense>
 
-      {/* Commodity detail slide-out */}
+      {/* Commodity detail slide-out (must be at app level for fixed positioning) */}
       <Suspense fallback={null}>
         <CommodityDetailPanel />
       </Suspense>

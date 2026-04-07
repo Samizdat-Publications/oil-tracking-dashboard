@@ -16,6 +16,7 @@ export function RiskSection({ simulationResult }: RiskSectionProps) {
     <section className="py-24 scroll-reveal" ref={ref as any}>
       <div className="section-reading">
         <div className="mb-8">
+          <span className="section-number">03 / Risk</span>
           <h2 className="editorial-header">Risk Profile</h2>
           <p className="editorial-subhead">Volatility analysis and price distribution</p>
         </div>

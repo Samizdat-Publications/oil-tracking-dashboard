@@ -26,7 +26,7 @@ function StatItem({ label, value, change, pctChange }: StatItemProps) {
       {change != null && (
         <div
           className="number-display text-[11px] mt-0.5"
-          style={{ color: isPositive ? '#00FF88' : '#FF3366' }}
+          style={{ color: isPositive ? '#5DB075' : '#CC2936' }}
         >
           {change >= 0 ? '+' : ''}{formatCurrency(change)} ({formatPercent(pctChange ?? 0)})
         </div>

@@ -28,16 +28,16 @@ export const BAND_COLORS = {
   p5_p95: 'rgba(0, 240, 255, 0.10)',
   p25_p75: 'rgba(0, 240, 255, 0.22)',
   p50: '#00F0FF',
-  historical: '#33F5FF',
+  historical: '#00F0FF',
 };
 
 export const EVENT_CATEGORY_COLORS: Record<string, string> = {
-  war: '#FF3366',
-  embargo: '#FF8800',
-  revolution: '#FBBF24',
+  war: '#CC2936',
+  embargo: '#E08A3C',
+  revolution: '#D4A012',
   pandemic: '#A78BFA',
   market: '#00F0FF',
-  opec: '#00FF88',
+  opec: '#5DB075',
   custom: '#2ECDC1',
 };
 
@@ -50,19 +50,19 @@ export const SERIES_LABELS: Record<string, string> = {
 export const SCENARIO_THRESHOLDS = { bull: 100, bear: 80 };
 
 export const SCENARIO_LABELS = {
-  bull: { label: 'Bull Scenario', description: 'War expands / Hormuz stays closed', color: '#00FF88' },
+  bull: { label: 'Bull Scenario', description: 'War expands / Hormuz stays closed', color: '#5DB075' },
   base: { label: 'Base Scenario', description: 'Status quo / gradual normalization', color: '#00F0FF' },
-  bear: { label: 'Bear Scenario', description: 'Ceasefire / OPEC+ oversupply', color: '#FF3366' },
+  bear: { label: 'Bear Scenario', description: 'Ceasefire / OPEC+ oversupply', color: '#CC2936' },
 };
 
 export const PLOTLY_DARK_LAYOUT = {
   paper_bgcolor: '#060A14',
   plot_bgcolor: '#0A0E18',
-  font: { color: '#E8ECF4', family: 'Outfit, sans-serif', size: 12 },
-  xaxis: { gridcolor: 'rgba(0,240,255,0.04)', linecolor: 'rgba(0,240,255,0.04)', zerolinecolor: 'rgba(0,240,255,0.04)' },
-  yaxis: { gridcolor: 'rgba(0,240,255,0.04)', linecolor: 'rgba(0,240,255,0.04)', zerolinecolor: 'rgba(0,240,255,0.04)' },
+  font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 12 },
+  xaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', zerolinecolor: 'rgba(212,160,18,0.04)' },
+  yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', zerolinecolor: 'rgba(212,160,18,0.04)' },
   margin: { l: 60, r: 20, t: 40, b: 40 },
-  hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(0,240,255,0.15)', font: { color: '#E8ECF4', family: 'Outfit, sans-serif' } },
+  hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif' } },
 };
 
 export const PLOTLY_CONFIG = {

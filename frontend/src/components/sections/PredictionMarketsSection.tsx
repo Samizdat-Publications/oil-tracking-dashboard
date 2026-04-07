@@ -26,6 +26,7 @@ export function PredictionMarketsSection() {
     return (
       <section className="py-24 scroll-reveal" ref={ref}>
         <div className="section-reading">
+          <span className="section-number">02 / Markets</span>
           <h2 className="editorial-header">What Markets Are Pricing In</h2>
           <p className="editorial-subhead mb-4">Loading prediction market data...</p>
           <div className="section-rule" />
@@ -49,12 +50,13 @@ export function PredictionMarketsSection() {
     return (
       <section className="py-24 scroll-reveal" ref={ref}>
         <div className="section-reading">
+          <span className="section-number">02 / Markets</span>
           <h2 className="editorial-header">What Markets Are Pricing In</h2>
           <p className="editorial-subhead">
             Real-money prediction markets show what traders with skin in the game think happens next.
           </p>
           <div className="section-rule" />
-          <div className="mt-6 rounded-lg border p-6 text-center" style={{ background: 'rgba(8,14,24,0.6)', borderColor: 'rgba(0,240,255,0.06)' }}>
+          <div className="mt-6 rounded-lg border p-6 text-center" style={{ background: 'rgba(8,14,24,0.6)', borderColor: 'rgba(212,160,18,0.06)' }}>
             <p className="text-sm text-text-secondary mb-2">
               {isError
                 ? 'Unable to reach Polymarket API \u2014 prediction data temporarily unavailable.'

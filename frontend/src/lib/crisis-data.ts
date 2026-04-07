@@ -19,11 +19,11 @@ export const METRIC_UNITS: Record<CrisisMetric, string> = {
 
 /** Color for each crisis bar — each crisis gets a unique color */
 export const CRISIS_COLORS: Record<string, string> = {
-  '1973_embargo': '#FF3366',     // hot pink
+  '1973_embargo': '#CC2936',     // hot pink
   '1979_revolution': '#FF6B35',  // burnt orange
   '1990_gulf_war': '#FFAA00',    // amber/gold
   '2008_superspike': '#FF44FF',  // magenta
-  '2014_opec_war': '#00FF88',    // green (prices fell)
+  '2014_opec_war': '#5DB075',    // green (prices fell)
   '2022_russia_ukraine': '#FF8800', // orange
   '2026_iran': '#00F0FF',        // cyan (current war)
 };
