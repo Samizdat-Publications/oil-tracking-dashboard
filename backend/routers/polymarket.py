@@ -18,3 +18,10 @@ async def get_summary():
     """
     result = await get_war_economy_markets()
     return PolymarketWarEconomyResponse(**result)
+
+
+@router.post("/refresh", response_model=PolymarketWarEconomyResponse)
+async def refresh_polymarket():
+    """Force a fresh fetch from Polymarket API and save to disk."""
+    result = await get_war_economy_markets(force_refresh=True)
+    return PolymarketWarEconomyResponse(**result)
