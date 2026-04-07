@@ -30,7 +30,7 @@ export class SectionErrorBoundary extends Component<Props, State> {
         <section className="py-12">
           <div className="section-reading">
             <div className="rounded-lg border border-red/20 bg-red/5 px-6 py-8 text-center">
-              <p className="font-[family-name:var(--font-mono)] text-xs tracking-widest uppercase text-red mb-2">
+              <p className="font-[family-name:var(--font-mono)] text-sm tracking-widest uppercase text-red mb-2">
                 {this.props.name}
               </p>
               <p className="text-sm text-text-secondary mb-4">
@@ -38,7 +38,7 @@ export class SectionErrorBoundary extends Component<Props, State> {
               </p>
               <button
                 onClick={() => this.setState({ error: null })}
-                className="px-4 py-1.5 text-xs font-[family-name:var(--font-mono)] tracking-wider uppercase rounded border border-accent/30 text-accent hover:bg-accent/10 transition-colors"
+                className="px-4 py-1.5 text-sm font-[family-name:var(--font-mono)] tracking-wider uppercase rounded border border-accent/30 text-accent hover:bg-accent/10 transition-colors"
               >
                 Retry
               </button>

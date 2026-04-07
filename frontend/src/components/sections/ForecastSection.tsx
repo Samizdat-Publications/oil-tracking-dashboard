@@ -147,7 +147,7 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
                   boxShadow: isActive ? `0 -4px 20px ${s.color}15, inset 0 1px 0 ${s.color}20` : 'none',
                 }}
               >
-                <div className="font-[family-name:var(--font-display)] text-[10px] tracking-[0.12em] uppercase text-text-secondary mb-1">
+                <div className="font-[family-name:var(--font-display)] text-[11px] tracking-[0.12em] uppercase text-text-secondary mb-1">
                   {s.label}
                 </div>
                 <div
@@ -156,7 +156,7 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
                 >
                   {s.value}
                 </div>
-                <div className="text-[10px] text-text-secondary">{s.desc}</div>
+                <div className="text-[11px] text-text-secondary">{s.desc}</div>
                 {s.sub && (
                   <div
                     className="number-display text-[11px] mt-1"
@@ -176,7 +176,7 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
             {SMA_CONFIGS.map((cfg) => (
               <button
                 key={cfg.key}
-                className={`px-3 py-1 text-[10px] font-semibold transition-all duration-200 font-[family-name:var(--font-mono)] ${
+                className={`px-3 py-1 text-[11px] font-semibold transition-all duration-200 font-[family-name:var(--font-mono)] ${
                   showSMA[cfg.key]
                     ? 'text-background border border-transparent'
                     : 'border border-border text-text-secondary hover:text-text-primary hover:border-border-hover'
@@ -188,7 +188,7 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
               </button>
             ))}
             <button
-              className={`px-3 py-1 text-[10px] font-semibold transition-all duration-200 font-[family-name:var(--font-mono)] ${
+              className={`px-3 py-1 text-[11px] font-semibold transition-all duration-200 font-[family-name:var(--font-mono)] ${
                 showEras
                   ? 'bg-purple text-background border border-transparent'
                   : 'border border-border text-text-secondary hover:text-text-primary hover:border-border-hover'
@@ -199,23 +199,23 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-text-secondary font-[family-name:var(--font-mono)]">RANGE:</span>
+            <span className="text-[11px] text-text-secondary font-[family-name:var(--font-mono)]">RANGE:</span>
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="h-7 bg-surface border border-border text-text-primary text-[10px] px-2 focus:outline-none focus:ring-1 focus:ring-accent/30 font-[family-name:var(--font-mono)]"
+              className="h-7 bg-surface border border-border text-text-primary text-[11px] px-2 focus:outline-none focus:ring-1 focus:ring-accent/30 font-[family-name:var(--font-mono)]"
             />
-            <span className="text-text-secondary text-[10px]">{'\u2014'}</span>
+            <span className="text-text-secondary text-[11px]">{'\u2014'}</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="h-7 bg-surface border border-border text-text-primary text-[10px] px-2 focus:outline-none focus:ring-1 focus:ring-accent/30 font-[family-name:var(--font-mono)]"
+              className="h-7 bg-surface border border-border text-text-primary text-[11px] px-2 focus:outline-none focus:ring-1 focus:ring-accent/30 font-[family-name:var(--font-mono)]"
             />
             {(dateFrom || dateTo) && (
               <button
-                className="text-[10px] text-accent hover:text-accent-hover font-[family-name:var(--font-mono)]"
+                className="text-[11px] text-accent hover:text-accent-hover font-[family-name:var(--font-mono)]"
                 onClick={() => { setDateFrom(''); setDateTo(''); }}
               >
                 CLEAR
@@ -238,14 +238,14 @@ export function ForecastSection({ simulationResult, isSimulating, onRunSimulatio
         {/* Row 5: Event toggle strip */}
         <div className="mt-3 mb-4">
           <div className="flex items-center gap-1 flex-wrap">
-            <span className="text-[9px] text-text-secondary font-[family-name:var(--font-display)] tracking-[0.12em] uppercase mr-2">Events:</span>
+            <span className="text-[10px] text-text-secondary font-[family-name:var(--font-display)] tracking-[0.12em] uppercase mr-2">Events:</span>
             {events.map((event) => {
               const color = EVENT_CATEGORY_COLORS[event.category] || '#4A5568';
               return (
                 <button
                   key={event.id}
                   onClick={() => toggleEvent(event.id)}
-                  className={`flex items-center gap-1 px-2 py-0.5 text-[9px] transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                  className={`flex items-center gap-1 px-2 py-0.5 text-[10px] transition-all duration-200 cursor-pointer whitespace-nowrap ${
                     event.visible
                       ? 'text-text-primary'
                       : 'text-text-secondary/40 hover:text-text-secondary/70'

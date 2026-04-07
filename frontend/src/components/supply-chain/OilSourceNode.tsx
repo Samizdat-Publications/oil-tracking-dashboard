@@ -47,7 +47,7 @@ export function OilSourceNode({ oilData }: OilSourceNodeProps) {
       <span className="text-[44px] shrink-0">{'\u{1F6E2}\uFE0F'}</span>
 
       <div className="flex-1">
-        <div className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.15em] uppercase text-accent mb-0.5">
+        <div className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.15em] uppercase text-accent mb-0.5">
           Source
         </div>
         <div className="font-[family-name:var(--font-display)] text-2xl tracking-[0.05em] text-text-primary">

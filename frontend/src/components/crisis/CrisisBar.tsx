@@ -63,15 +63,15 @@ export function CrisisBar({ crisis, metric, maxAbsValue, currentTrajectory, dela
         }}
       >
         {/* Year */}
-        <div className="w-10 shrink-0 font-[family-name:var(--font-mono)] text-xs" style={{ color: barColor }}>
+        <div className="w-10 shrink-0 font-[family-name:var(--font-mono)] text-sm" style={{ color: barColor }}>
           {crisis.year}
         </div>
 
         {/* Crisis name */}
         <div className="w-40 shrink-0">
-          <div className="text-xs text-text-primary font-medium leading-tight">{crisis.name}</div>
+          <div className="text-sm text-text-primary font-medium leading-tight">{crisis.name}</div>
           {crisis.is_current && (
-            <div className="text-[10px] font-[family-name:var(--font-mono)] text-accent mt-0.5 tracking-wider uppercase crisis-live-badge">
+            <div className="text-[11px] font-[family-name:var(--font-mono)] text-accent mt-0.5 tracking-wider uppercase crisis-live-badge">
               {'\u25CF'} LIVE
             </div>
           )}
@@ -127,7 +127,7 @@ export function CrisisBar({ crisis, metric, maxAbsValue, currentTrajectory, dela
               {isNegative ? '' : '+'}{value.toFixed(metric === 'duration' ? 1 : 0)}{unit}
             </>
           ) : (
-            <span className="text-text-secondary text-xs">{'\u2014'}</span>
+            <span className="text-text-secondary text-sm">{'\u2014'}</span>
           )}
         </div>
 
@@ -157,7 +157,7 @@ export function CrisisBar({ crisis, metric, maxAbsValue, currentTrajectory, dela
           style={{ background: 'rgba(0, 240, 255, 0.03)', border: '1px solid rgba(0, 240, 255, 0.06)' }}
         >
           {/* Context blurb */}
-          <p className="text-xs text-text-secondary mb-3 leading-relaxed">
+          <p className="text-sm text-text-secondary mb-3 leading-relaxed">
             {crisis.context}
           </p>
 

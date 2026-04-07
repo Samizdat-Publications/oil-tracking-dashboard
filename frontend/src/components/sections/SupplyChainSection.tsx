@@ -74,7 +74,7 @@ export function SupplyChainSection() {
       <section className="py-12 scroll-reveal" ref={ref as any}>
         <div className="section-wide">
           <h2 className="editorial-header">The Supply Chain</h2>
-          <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+          <p className="text-sm font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             Unable to load supply chain data.
           </p>
           <div className="section-rule mt-4" />
