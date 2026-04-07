@@ -48,7 +48,7 @@ export function BranchGrid({ items }: BranchGridProps) {
             {/* Category header */}
             <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border">
               <span className="text-lg">{cat.icon}</span>
-              <span className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.12em] uppercase text-accent">
+              <span className="font-[family-name:var(--font-mono)] text-xs tracking-[0.12em] uppercase text-accent">
                 {cat.name}
               </span>
             </div>
@@ -70,8 +70,8 @@ export function BranchGrid({ items }: BranchGridProps) {
                     <span className="text-[22px] shrink-0">{item.icon}</span>
 
                     <div className="flex-1 min-w-0">
-                      <div className="text-[13px] font-semibold text-text-primary">{item.displayName}</div>
-                      <div className="text-[11px] text-text-secondary truncate">{item.why}</div>
+                      <div className="text-base font-semibold text-text-primary">{item.displayName}</div>
+                      <div className="text-sm text-text-secondary truncate">{item.why}</div>
                     </div>
 
                     <div className="text-right shrink-0">

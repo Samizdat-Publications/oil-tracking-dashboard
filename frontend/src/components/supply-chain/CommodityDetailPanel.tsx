@@ -85,17 +85,17 @@ export function CommodityDetailPanel() {
               <div className="font-[family-name:var(--font-display)] text-[28px] tracking-[0.05em] text-text-primary">
                 {info.displayName}
               </div>
-              <div className="text-sm text-text-secondary mt-1.5 leading-relaxed">{info.why}</div>
+              <div className="text-base text-text-secondary mt-1.5 leading-relaxed">{info.why}</div>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3 p-4 border-b border-border">
               <div className="text-center p-3 rounded-md bg-accent-glow">
-                <div className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.1em] uppercase text-text-secondary mb-1">Current Price</div>
+                <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Current Price</div>
                 <div className="font-[family-name:var(--font-mono)] text-xl font-bold text-text-primary">{panelData.priceStr}</div>
               </div>
               <div className="text-center p-3 rounded-md bg-accent-glow">
-                <div className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.1em] uppercase text-text-secondary mb-1">Since Iran War</div>
+                <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Since Iran War</div>
                 {panelData.awaitingPostWar ? (
                   <div className="font-[family-name:var(--font-mono)] text-sm text-text-secondary italic mt-1">Awaiting post-war data</div>
                 ) : (
@@ -105,7 +105,7 @@ export function CommodityDetailPanel() {
                 )}
               </div>
               <div className="text-center p-3 rounded-md bg-accent-glow">
-                <div className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.1em] uppercase text-text-secondary mb-1">Correlation</div>
+                <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Correlation</div>
                 <div className="font-[family-name:var(--font-mono)] text-base font-bold" style={{ color: corrColor }}>
                   {corrLabel} {panelData.corr.toFixed(2)}
                 </div>
@@ -114,7 +114,7 @@ export function CommodityDetailPanel() {
 
             {/* Chart */}
             <div className="p-4 border-b border-border">
-              <div className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.12em] uppercase text-accent mb-2">
+              <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.12em] uppercase text-accent mb-2">
                 Price History vs Oil
               </div>
               {panelData.aligned.dates.length >= 3 ? (
@@ -159,10 +159,10 @@ export function CommodityDetailPanel() {
 
             {/* Context */}
             <div className="p-5">
-              <div className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.12em] uppercase text-accent mb-2">
+              <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.12em] uppercase text-accent mb-2">
                 Why Oil Matters Here
               </div>
-              <div className="text-sm text-[#8B95A5] leading-relaxed">{info.detail}</div>
+              <div className="text-base text-[#8B95A5] leading-relaxed">{info.detail}</div>
             </div>
           </>
         )}

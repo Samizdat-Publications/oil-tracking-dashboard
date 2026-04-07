@@ -25,7 +25,7 @@ export function PredictionMarketsSection() {
   if (isLoading) {
     return (
       <section className="py-24 scroll-reveal" ref={ref}>
-        <div className="section-reading">
+        <div className="section-wide">
           <span className="section-number">02 / Markets</span>
           <h2 className="editorial-header">What Markets Are Pricing In</h2>
           <p className="editorial-subhead mb-4">Loading prediction market data...</p>
@@ -56,20 +56,20 @@ export function PredictionMarketsSection() {
   if (isError || !data || !data.categories.length) {
     return (
       <section className="py-24 scroll-reveal" ref={ref}>
-        <div className="section-reading">
+        <div className="section-wide">
           <span className="section-number">02 / Markets</span>
           <h2 className="editorial-header">What Markets Are Pricing In</h2>
           <p className="editorial-subhead">
             Real-money prediction markets show what traders with skin in the game think happens next.
           </p>
           <div className="section-rule" />
-          <div className="mt-6 rounded-lg border p-6 text-center" style={{ background: 'rgba(8,14,24,0.6)', borderColor: 'rgba(212,160,18,0.06)' }}>
-            <p className="text-sm text-text-secondary mb-2">
+          <div className="mt-6 rounded-lg border p-6 text-center" style={{ background: 'rgba(8,14,24,0.6)', borderColor: 'rgba(0,240,255,0.06)' }}>
+            <p className="text-base text-text-secondary mb-2">
               {isError
                 ? 'Unable to reach Polymarket API \u2014 prediction data temporarily unavailable.'
                 : 'No matching prediction markets found at this time.'}
             </p>
-            <p className="text-sm font-[family-name:var(--font-mono)] text-text-secondary">
+            <p className="text-base font-[family-name:var(--font-mono)] text-text-secondary">
               Tracking oil prices, gas costs, inflation, recession risk, Fed policy, Iran war, tariffs, and commodities on{' '}
               <a href="https://polymarket.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent-hover transition-colors">
                 Polymarket
@@ -83,7 +83,7 @@ export function PredictionMarketsSection() {
 
   return (
     <section className="py-24 scroll-reveal" ref={ref}>
-      <div className="section-reading">
+      <div className="section-wide">
         <h2 className="editorial-header">What Markets Are Pricing In</h2>
         <p className="editorial-subhead">
           Real-money prediction markets show what traders with skin in the game think happens next {'\u2014'}{' '}
@@ -92,13 +92,13 @@ export function PredictionMarketsSection() {
         <div className="section-rule" />
 
         {/* Summary stats bar */}
-        <div className="mt-4 mb-6 flex items-center gap-6 text-sm font-[family-name:var(--font-mono)]">
+        <div className="mt-4 mb-6 flex items-center gap-6 text-base font-[family-name:var(--font-mono)]">
           <div>
-            <span className="text-text-secondary uppercase tracking-wider text-[11px]">Markets tracked </span>
+            <span className="text-text-secondary uppercase tracking-wider text-xs">Markets tracked </span>
             <span className="text-text-primary font-medium">{data.market_count}</span>
           </div>
           <div>
-            <span className="text-text-secondary uppercase tracking-wider text-[11px]">Total volume </span>
+            <span className="text-text-secondary uppercase tracking-wider text-xs">Total volume </span>
             <span className="text-text-primary font-medium">{formatVolume(data.total_volume)}</span>
           </div>
         </div>
@@ -115,7 +115,7 @@ export function PredictionMarketsSection() {
           if (!groupCats.length) return null;
           return (
             <div key={group.label} className="mb-8">
-              <div className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary uppercase tracking-[0.2em] mb-3">
+              <div className="font-[family-name:var(--font-mono)] text-xs text-text-secondary uppercase tracking-[0.2em] mb-3">
                 {group.label}
               </div>
               <div className="grid gap-4 md:grid-cols-3">
@@ -128,7 +128,7 @@ export function PredictionMarketsSection() {
         })}
 
         {/* Source Attribution */}
-        <div className="mt-4 flex items-center justify-between text-[11px] font-[family-name:var(--font-mono)] text-text-secondary">
+        <div className="mt-4 flex items-center justify-between text-xs font-[family-name:var(--font-mono)] text-text-secondary">
           <span>
             Data from{' '}
             <a

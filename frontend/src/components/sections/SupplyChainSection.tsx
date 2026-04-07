@@ -76,7 +76,7 @@ export function SupplyChainSection() {
         <div className="section-wide">
           <span className="section-number">04 / Supply Chain</span>
           <h2 className="editorial-header">The Supply Chain</h2>
-          <p className="text-sm font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+          <p className="text-base font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             Unable to load supply chain data.
           </p>
           <div className="section-rule mt-4" />
