@@ -1,5 +1,7 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import { usePolymarketSummary } from '../../hooks/usePolymarket';
+import { refreshPolymarket } from '../../lib/api';
 import { CategoryCard } from '../predictions/MarketSentimentCard';
 
 function timeAgo(isoDate: string): string {
@@ -20,6 +22,13 @@ function formatVolume(v: number): string {
 export function PredictionMarketsSection() {
   const { data, isLoading, isError } = usePolymarketSummary();
   const ref = useScrollReveal();
+  const queryClient = useQueryClient();
+  const refreshMutation = useMutation({
+    mutationFn: refreshPolymarket,
+    onSuccess: (freshData) => {
+      queryClient.setQueryData(['polymarket', 'summary'], freshData);
+    },
+  });
 
   // Loading skeleton
   if (isLoading) {
@@ -99,6 +108,30 @@ export function PredictionMarketsSection() {
             <span className="text-text-secondary uppercase tracking-wider text-xs">Total volume </span>
             <span className="text-text-primary font-medium">{formatVolume(data.total_volume)}</span>
           </div>
+          <button
+            onClick={() => refreshMutation.mutate()}
+            disabled={refreshMutation.isPending}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded border text-xs font-[family-name:var(--font-mono)] uppercase tracking-wider transition-all cursor-pointer"
+            style={{
+              borderColor: refreshMutation.isPending ? 'rgba(0,240,255,0.1)' : 'rgba(0,240,255,0.2)',
+              color: refreshMutation.isPending ? 'var(--color-text-secondary)' : 'var(--color-accent)',
+              background: 'rgba(0,240,255,0.03)',
+            }}
+          >
+            {refreshMutation.isPending ? (
+              <>
+                <span className="inline-block w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
+                Refreshing{'\u2026'}
+              </>
+            ) : (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16" />
+                </svg>
+                Refresh Markets
+              </>
+            )}
+          </button>
         </div>
 
         {/* Category cards grouped by theme */}

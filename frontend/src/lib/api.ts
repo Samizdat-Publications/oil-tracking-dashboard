@@ -82,6 +82,29 @@ export function fetchPolymarketSummary(): Promise<PolymarketWarEconomy> {
   return fetchJson<PolymarketWarEconomy>(`${BASE}/polymarket/summary`);
 }
 
+/** Trigger a fresh Polymarket data refresh from the API */
+export function refreshPolymarket(): Promise<PolymarketWarEconomy> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60_000);
+  return fetch(`${BASE}/polymarket/refresh`, {
+    method: 'POST',
+    signal: controller.signal,
+  }).then(async (res) => {
+    clearTimeout(timeout);
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`API error ${res.status}: ${text}`);
+    }
+    return res.json() as Promise<PolymarketWarEconomy>;
+  }).catch((err) => {
+    clearTimeout(timeout);
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error('Polymarket refresh timed out after 60s');
+    }
+    throw err;
+  });
+}
+
 /** Fetch historical crisis comparison data */
 export function fetchCrisisComparison(): Promise<CrisisComparisonResponse> {
   return fetchJson<CrisisComparisonResponse>(`${BASE}/crisis/comparison`);

@@ -9,6 +9,7 @@ the downstream consequences of the Iran war's oil shock.
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from datetime import datetime
@@ -22,6 +23,11 @@ from services.cache import set_cached, _db, _make_key
 logger = logging.getLogger(__name__)
 
 GAMMA_BASE = "https://gamma-api.polymarket.com"
+
+# Persistent JSON file for instant loading (survives restarts, no TTL)
+PERSISTENT_DATA_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "data", "polymarket_latest.json"
+)
 
 # 10-minute TTL for Polymarket data (vs 24h for FRED)
 POLYMARKET_CACHE_TTL = 600
@@ -63,8 +69,8 @@ CATEGORIES: list[dict] = [
         "key": "oil_targets",
         "name": "Oil Price Targets",
         "icon": "\U0001F6E2\uFE0F",
-        "keywords": ["wti", "crude oil", "oil price", "brent crude"],
-        "exclude": ["up or down", "premier league", "epl", "football", "soccer", "relegat", "standings"],
+        "keywords": ["wti", "crude oil", "oil price", "brent crude", "crude oil (cl)"],
+        "exclude": ["up or down", "oilers", "premier league", "epl", "football", "soccer", "relegat", "standings"],
         "description": "Where traders think oil prices are headed.",
     },
     {
@@ -72,7 +78,7 @@ CATEGORIES: list[dict] = [
         "name": "Gas & Energy Prices",
         "icon": "\u26FD",
         "keywords": ["gas price", "gasoline", "gas hit", "natural gas", "energy price"],
-        "exclude": ["gas station", "gas mask"],
+        "exclude": ["gas station", "gas mask", "ethereum", "gwei", "eth gas"],
         "description": "What you\u2019ll pay at the pump and on your utility bill.",
     },
     {
@@ -87,8 +93,8 @@ CATEGORIES: list[dict] = [
         "key": "iran_war",
         "name": "Iran War & Oil Supply",
         "icon": "\u2694\uFE0F",
-        "keywords": ["iran war", "iran ceasefire", "strait of hormuz", "iran conflict", "iran peace", "iran attack", "hormuz"],
-        "exclude": ["rescue"],
+        "keywords": ["iran war", "iran ceasefire", "strait of hormuz", "iran conflict", "iran peace", "iran attack", "hormuz", "invade iran", "iranian regime", "iran nuclear", "iran nuke", "us-iran"],
+        "exclude": ["rescue", "fifa", "world cup"],
         "description": "War trajectory shapes the global oil supply picture.",
     },
     {
@@ -129,10 +135,12 @@ def _parse_outcome_prices(raw: str | list | None) -> list[float]:
 
 GLOBAL_EXCLUDE = [
     "premier league", "epl", "champions league", "la liga", "serie a",
-    "bundesliga", "nfl", "nba", "mlb", "nhl", "super bowl",
+    "bundesliga", "nfl", "nba", "mlb", "nhl", "super bowl", "stanley cup",
+    "eastern conference", "western conference", "pacific division",
     "academy award", "oscar", "grammy", "emmy", "golden globe",
     "bachelor", "bachelorette", "reality tv", "love island",
-    "brentford", "relegat", "standings",
+    "brentford", "relegat", "standings", "oilers", "senators",
+    "gta vi", "before gta",
 ]
 
 
@@ -190,39 +198,134 @@ async def _set_cached_polymarket(cache_key: str, value: list | dict) -> None:
     await set_cached(cache_key, "polymarket", "data", data)
 
 
+# Curated event slugs for economic/commodity markets.
+# The Gamma API's generic /markets endpoint mostly returns sports/entertainment.
+# These specific events contain the oil, inflation, Iran, tariff, and Fed markets.
+# Updated periodically as new events are created on Polymarket.
+ECONOMIC_EVENT_SLUGS = [
+    # Oil / Crude
+    "what-price-will-wti-hit-in-april-2026",
+    "will-wti-hit-week-of-april-6-2026",
+    "what-will-crude-oil-settle-at-in-june-2026",
+    "what-will-crude-oil-settle-at-in-may-2026",
+    # Recession / Economy
+    "us-recession-by-end-of-2026",
+    "canada-recession-before-2027",
+    # Fed Rate
+    "how-many-fed-rate-cuts-in-2026",
+    "what-will-fed-rate-hit-before-2027",
+    "fed-emergency-rate-cut-before-2027",
+    # Inflation
+    "how-high-will-inflation-get-in-2026",
+    # Iran
+    "will-the-us-invade-iran-before-2027",
+    "will-the-iranian-regime-fall-by-the-end-of-2026",
+    "us-iran-nuclear-deal-before-2027",
+    "iran-nuclear-test-before-2027",
+    "iran-nuke-before-2027",
+    "will-iran-withdraw-from-the-npt-before-2027",
+    # Trade
+    "us-trade-deals-before-2027",
+]
+
+
 async def _fetch_all_active_markets() -> list[dict]:
-    """Fetch active markets from Polymarket (up to 1000)."""
+    """Fetch active markets from Polymarket using two strategies:
+
+    1. Targeted: Fetch specific known economic event slugs (fast, accurate)
+    2. General: Scan /markets endpoint pages for additional matches
+
+    Both run in parallel for speed. Results are deduplicated by market ID.
+    """
+    import asyncio
+
+    seen_ids: set[str] = set()
     all_markets: list[dict] = []
-    async with httpx.AsyncClient(timeout=20) as client:
-        for offset in range(0, 2000, 100):
+
+    async with httpx.AsyncClient(timeout=30) as client:
+
+        async def _fetch_event_by_slug(slug: str) -> list[dict]:
+            """Fetch all markets from a specific event by slug."""
+            try:
+                resp = await client.get(
+                    f"{GAMMA_BASE}/events",
+                    params={"closed": "false", "slug": slug},
+                )
+                resp.raise_for_status()
+                events = resp.json()
+                markets = []
+                for event in (events if isinstance(events, list) else [events]):
+                    for m in (event.get("markets") or []):
+                        markets.append(m)
+                return markets
+            except Exception as exc:
+                logger.debug("Event slug '%s' not found or failed: %s", slug, exc)
+                return []
+
+        async def _fetch_markets_page(offset: int) -> list[dict]:
             try:
                 resp = await client.get(
                     f"{GAMMA_BASE}/markets",
                     params={"closed": "false", "limit": "100", "offset": str(offset)},
                 )
                 resp.raise_for_status()
-                batch = resp.json()
-                if not batch:
-                    break
-                all_markets.extend(batch)
+                return resp.json() or []
             except Exception as exc:
-                logger.warning("Polymarket fetch failed at offset %d: %s", offset, exc)
-                break
-    logger.info("Fetched %d active markets from Polymarket", len(all_markets))
+                logger.warning("Polymarket markets fetch failed at offset %d: %s", offset, exc)
+                return []
+
+        # Fetch targeted economic events in small batches (avoid rate limits)
+        # Plus 3 general market pages for recession/geopolitical matches
+        all_results: list[list[dict]] = []
+
+        # Batch 1: targeted economic event slugs (5 at a time)
+        for i in range(0, len(ECONOMIC_EVENT_SLUGS), 5):
+            batch_slugs = ECONOMIC_EVENT_SLUGS[i:i + 5]
+            batch_results = await asyncio.gather(*[_fetch_event_by_slug(s) for s in batch_slugs])
+            all_results.extend(batch_results)
+
+        # Batch 2: general market pages for broader matches
+        market_results = await asyncio.gather(*[_fetch_markets_page(o) for o in range(0, 300, 100)])
+        all_results.extend(market_results)
+
+        for batch in all_results:
+            for m in batch:
+                mid = m.get("id", "")
+                if mid and mid not in seen_ids:
+                    seen_ids.add(mid)
+                    all_markets.append(m)
+
+    logger.info("Fetched %d unique active markets from Polymarket", len(all_markets))
     return all_markets
 
 
-async def get_war_economy_markets() -> dict:
+async def get_war_economy_markets(force_refresh: bool = False) -> dict:
     """Fetch and categorize war-economy prediction markets.
 
     Returns grouped markets across recession risk, Fed policy,
     and geopolitical escalation categories.
-    """
-    # Check cache
-    cached = await _get_cached_polymarket("polymarket:war_economy")
-    if cached is not None and len(cached) > 0:
-        return cached[0] if isinstance(cached, list) else cached
 
+    Args:
+        force_refresh: If True, skip all caches and fetch fresh from API.
+    """
+    if not force_refresh:
+        # 1. Check SQLite cache (10-min TTL)
+        cached = await _get_cached_polymarket("polymarket:war_economy")
+        if cached is not None and len(cached) > 0:
+            return cached[0] if isinstance(cached, list) else cached
+
+        # 2. Fall back to persistent JSON file (survives restarts, no TTL)
+        if os.path.exists(PERSISTENT_DATA_PATH):
+            try:
+                with open(PERSISTENT_DATA_PATH, "r") as f:
+                    stored = json.load(f)
+                if stored and stored.get("categories"):
+                    logger.info("Loaded Polymarket data from persistent file")
+                    return stored
+            except Exception as exc:
+                logger.warning("Failed to read persistent Polymarket data: %s", exc)
+
+    # 3. Fresh API fetch (slow)
     raw_markets = await _fetch_all_active_markets()
 
     # Categorize and normalize
@@ -308,7 +411,15 @@ async def get_war_economy_markets() -> dict:
         "updated_at": datetime.utcnow().isoformat() + "Z",
     }
 
-    # Cache
+    # Persist to disk for instant loading on next startup
+    try:
+        with open(PERSISTENT_DATA_PATH, "w") as f:
+            json.dump(result, f)
+        logger.info("Saved Polymarket data to %s", PERSISTENT_DATA_PATH)
+    except Exception as exc:
+        logger.warning("Failed to save Polymarket data: %s", exc)
+
+    # Cache in SQLite (10-min TTL)
     await _set_cached_polymarket("polymarket:war_economy", result)
     return result
 
