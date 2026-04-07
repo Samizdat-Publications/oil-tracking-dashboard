@@ -48,7 +48,7 @@ export function BranchGrid({ items }: BranchGridProps) {
             {/* Category header */}
             <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border">
               <span className="text-lg">{cat.icon}</span>
-              <span className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.12em] uppercase text-accent">
+              <span className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.12em] uppercase text-accent">
                 {cat.name}
               </span>
             </div>
@@ -71,12 +71,12 @@ export function BranchGrid({ items }: BranchGridProps) {
 
                     <div className="flex-1 min-w-0">
                       <div className="text-[13px] font-semibold text-text-primary">{item.displayName}</div>
-                      <div className="text-[10px] text-text-secondary truncate">{item.why}</div>
+                      <div className="text-[11px] text-text-secondary truncate">{item.why}</div>
                     </div>
 
                     <div className="text-right shrink-0">
                       {item.awaitingPostWar ? (
-                        <div className="font-[family-name:var(--font-mono)] text-[9px] text-text-secondary italic">
+                        <div className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary italic">
                           Awaiting data
                         </div>
                       ) : item.changePct !== null ? (
@@ -84,7 +84,7 @@ export function BranchGrid({ items }: BranchGridProps) {
                           {item.changePct >= 0 ? '\u2191' : '\u2193'} {Math.abs(item.changePct).toFixed(1)}%
                         </div>
                       ) : null}
-                      <div className="font-[family-name:var(--font-mono)] text-[9px] text-text-secondary mt-0.5">
+                      <div className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary mt-0.5">
                         <CorrelationLabel r={item.correlation} />
                       </div>
                     </div>

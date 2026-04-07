@@ -136,6 +136,11 @@ export interface FedCutPoint {
   probability: number;
 }
 
+export interface OilPricePoint {
+  price: number;
+  probability: number;
+}
+
 export interface PolymarketCategory {
   key: string;
   name: string;
@@ -144,6 +149,7 @@ export interface PolymarketCategory {
   markets: PolymarketMarketItem[];
   highlight: PolymarketMarketItem | null;
   fed_distribution: FedCutPoint[] | null;
+  oil_price_distribution: OilPricePoint[] | null;
   market_count: number;
   total_volume: number;
 }

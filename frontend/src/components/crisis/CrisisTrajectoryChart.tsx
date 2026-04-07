@@ -156,7 +156,7 @@ export function CrisisTrajectoryChart({
 
   if (!hasData) {
     return (
-      <div className="h-40 flex items-center justify-center text-text-secondary text-xs font-[family-name:var(--font-mono)]">
+      <div className="h-40 flex items-center justify-center text-text-secondary text-sm font-[family-name:var(--font-mono)]">
         Trajectory data unavailable
       </div>
     );

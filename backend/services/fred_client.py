@@ -18,12 +18,12 @@ SERIES_IDS: dict[str, str] = {
     "wti": "DCOILWTICO",
     "brent": "DCOILBRENTEU",
     "diesel": "GASDESW",
-    "fertilizer": "PNFERTINDEXM",
-    "food_index": "PPFGSUSDM",
+    "fertilizer": "WPU0652",
+    "food_index": "PFOODINDEXM",
     "cpi_energy": "CPIENGSL",
-    "cotton": "PCOTTINDEXM",
-    "aluminum": "PALUMINDEXM",
-    "plastics": "PPLASINDEXM",
+    "cotton": "PCOTTINDUSDM",
+    "aluminum": "PALUMUSDM",
+    "plastics": "WPU066",
     "airline_fares": "CUSR0000SETB01",
     "gasoline": "GASREGW",            # US Regular All Formulations Gas Price ($/gallon)
     "food_at_home": "CUSR0000SAF11",  # CPI: Food at Home

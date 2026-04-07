@@ -41,12 +41,12 @@ export function SimulationControls({ onRunSimulation, isSimulating, simulationRe
       <CardContent className="space-y-4">
         {/* Model */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary">Model</label>
+          <label className="text-sm font-medium text-text-secondary">Model</label>
           <Select
             value={simulationParams.model}
             onValueChange={(v) => setSimulationParams({ model: v as 'gbm' | 'jump_diffusion' })}
           >
-            <SelectTrigger className="h-8 text-xs">
+            <SelectTrigger className="h-8 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -58,12 +58,12 @@ export function SimulationControls({ onRunSimulation, isSimulating, simulationRe
 
         {/* Lookback */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary">Lookback Window</label>
+          <label className="text-sm font-medium text-text-secondary">Lookback Window</label>
           <Select
             value={String(simulationParams.lookback_years)}
             onValueChange={(v) => setSimulationParams({ lookback_years: parseInt(v) })}
           >
-            <SelectTrigger className="h-8 text-xs">
+            <SelectTrigger className="h-8 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -76,12 +76,12 @@ export function SimulationControls({ onRunSimulation, isSimulating, simulationRe
 
         {/* Horizon */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary">Forecast Horizon</label>
+          <label className="text-sm font-medium text-text-secondary">Forecast Horizon</label>
           <Select
             value={String(simulationParams.horizon_days)}
             onValueChange={(v) => setSimulationParams({ horizon_days: parseInt(v) })}
           >
-            <SelectTrigger className="h-8 text-xs">
+            <SelectTrigger className="h-8 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -96,8 +96,8 @@ export function SimulationControls({ onRunSimulation, isSimulating, simulationRe
         {/* Simulation Paths */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-medium text-text-secondary">Simulation Paths</label>
-            <span className="text-xs font-mono text-accent">{simulationParams.n_paths.toLocaleString()}</span>
+            <label className="text-sm font-medium text-text-secondary">Simulation Paths</label>
+            <span className="text-sm font-mono text-accent">{simulationParams.n_paths.toLocaleString()}</span>
           </div>
           <Slider
             value={[simulationParams.n_paths]}
@@ -106,7 +106,7 @@ export function SimulationControls({ onRunSimulation, isSimulating, simulationRe
             max={50000}
             step={1000}
           />
-          <div className="flex justify-between text-[10px] text-text-secondary">
+          <div className="flex justify-between text-[11px] text-text-secondary">
             <span>1,000</span>
             <span>50,000</span>
           </div>
@@ -114,39 +114,39 @@ export function SimulationControls({ onRunSimulation, isSimulating, simulationRe
 
         {/* Optional: Seed */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary">Random Seed (optional)</label>
+          <label className="text-sm font-medium text-text-secondary">Random Seed (optional)</label>
           <input
             type="number"
             value={seed}
             onChange={(e) => setSeed(e.target.value)}
             placeholder="e.g. 42"
-            className="flex h-8 w-full rounded-lg border border-border bg-surface px-3 py-1 text-xs text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent"
+            className="flex h-8 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
         {/* Optional: Mu override */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary">Mu Override (optional)</label>
+          <label className="text-sm font-medium text-text-secondary">Mu Override (optional)</label>
           <input
             type="number"
             step="0.01"
             value={muOverride}
             onChange={(e) => setMuOverride(e.target.value)}
             placeholder="Annual drift"
-            className="flex h-8 w-full rounded-lg border border-border bg-surface px-3 py-1 text-xs text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent"
+            className="flex h-8 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
         {/* Optional: Sigma override */}
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-text-secondary">Sigma Override (optional)</label>
+          <label className="text-sm font-medium text-text-secondary">Sigma Override (optional)</label>
           <input
             type="number"
             step="0.01"
             value={sigmaOverride}
             onChange={(e) => setSigmaOverride(e.target.value)}
             placeholder="Annual volatility"
-            className="flex h-8 w-full rounded-lg border border-border bg-surface px-3 py-1 text-xs text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent"
+            className="flex h-8 w-full rounded-lg border border-border bg-surface px-3 py-1 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-2 focus:ring-accent"
           />
         </div>
 
@@ -159,8 +159,8 @@ export function SimulationControls({ onRunSimulation, isSimulating, simulationRe
         {/* Estimated Params */}
         {simulationResult?.params && (
           <div className="mt-3 rounded-lg bg-surface p-3 space-y-1">
-            <p className="text-xs font-semibold text-text-primary mb-2">Estimated Parameters</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+            <p className="text-sm font-semibold text-text-primary mb-2">Estimated Parameters</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
               <span className="text-text-secondary">Mu (drift):</span>
               <span className="font-mono text-text-primary">{simulationResult.params.mu.toFixed(4)}</span>
               <span className="text-text-secondary">Sigma (vol):</span>

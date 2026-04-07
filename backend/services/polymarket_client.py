@@ -1,8 +1,9 @@
 """Async Polymarket API client with caching.
 
-Fetches war-economy prediction markets: recession risk, Fed policy,
-and geopolitical escalation — the downstream consequences of the
-Iran war's oil shock.
+Fetches war-economy prediction markets across 9 categories: recession risk,
+Fed policy, geopolitical escalation, oil price targets, gas & energy prices,
+inflation, Iran war & oil supply, tariffs & trade, and food & commodities —
+the downstream consequences of the Iran war's oil shock.
 """
 
 from __future__ import annotations
@@ -58,6 +59,54 @@ CATEGORIES: list[dict] = [
         "exclude": ["gta vi", "before gta"],
         "description": "More conflict = more oil supply disruption risk.",
     },
+    {
+        "key": "oil_targets",
+        "name": "Oil Price Targets",
+        "icon": "\U0001F6E2\uFE0F",
+        "keywords": ["wti", "crude oil", "oil price", "brent"],
+        "exclude": ["up or down"],
+        "description": "Where traders think oil prices are headed.",
+    },
+    {
+        "key": "gas_energy",
+        "name": "Gas & Energy Prices",
+        "icon": "\u26FD",
+        "keywords": ["gas price", "gasoline", "gas hit", "natural gas", "energy price"],
+        "exclude": [],
+        "description": "What you\u2019ll pay at the pump and on your utility bill.",
+    },
+    {
+        "key": "inflation",
+        "name": "Inflation & Cost of Living",
+        "icon": "\U0001F4C8",
+        "keywords": ["inflation", "cpi", "consumer price"],
+        "exclude": [],
+        "description": "How fast everyday prices are rising.",
+    },
+    {
+        "key": "iran_war",
+        "name": "Iran War & Oil Supply",
+        "icon": "\u2694\uFE0F",
+        "keywords": ["iran war", "iran ceasefire", "strait of hormuz", "iran conflict", "iran peace", "iran attack", "hormuz"],
+        "exclude": ["rescue"],
+        "description": "War trajectory shapes the global oil supply picture.",
+    },
+    {
+        "key": "tariffs",
+        "name": "Tariffs & Trade",
+        "icon": "\U0001F6A2",
+        "keywords": ["tariff", "trade war", "sanctions", "trade deal"],
+        "exclude": [],
+        "description": "Trade policy adds fuel to the inflation fire.",
+    },
+    {
+        "key": "supply_chain",
+        "name": "Food & Commodities",
+        "icon": "\U0001F33E",
+        "keywords": ["wheat", "corn", "food price", "commodity", "supply chain", "shipping", "grain", "soybean", "agriculture"],
+        "exclude": [],
+        "description": "From farm gate to dinner plate \u2014 commodity price bets.",
+    },
 ]
 
 
@@ -78,16 +127,16 @@ def _parse_outcome_prices(raw: str | list | None) -> list[float]:
     return []
 
 
-def _categorize_market(question: str) -> str | None:
-    """Return category key if market matches, or None."""
+def _categorize_market(question: str) -> list[str]:
+    """Return list of matching category keys (multi-category matching)."""
     q = question.lower()
+    matches: list[str] = []
     for cat in CATEGORIES:
-        # Check exclusions first
         if any(ex in q for ex in cat["exclude"]):
             continue
         if any(kw in q for kw in cat["keywords"]):
-            return cat["key"]
-    return None
+            matches.append(cat["key"])
+    return matches
 
 
 def _get_yes_probability(market: dict) -> float:
@@ -131,7 +180,7 @@ async def _fetch_all_active_markets() -> list[dict]:
     """Fetch active markets from Polymarket (up to 1000)."""
     all_markets: list[dict] = []
     async with httpx.AsyncClient(timeout=20) as client:
-        for offset in range(0, 1000, 100):
+        for offset in range(0, 2000, 100):
             try:
                 resp = await client.get(
                     f"{GAMMA_BASE}/markets",
@@ -167,8 +216,8 @@ async def get_war_economy_markets() -> dict:
 
     for m in raw_markets:
         question = m.get("question", "")
-        cat_key = _categorize_market(question)
-        if cat_key is None:
+        cat_keys = _categorize_market(question)
+        if not cat_keys:
             continue
 
         yes_prob = _get_yes_probability(m)
@@ -182,14 +231,17 @@ async def get_war_economy_markets() -> dict:
             except (TypeError, IndexError):
                 pass
 
-        categorized[cat_key].append({
+        normalized = {
             "id": m.get("id", ""),
             "question": question,
             "yes_probability": round(yes_prob, 4),
             "volume": volume,
             "end_date": end_date,
             "source_url": f"https://polymarket.com/event/{slug}" if slug else None,
-        })
+        }
+
+        for cat_key in cat_keys:
+            categorized[cat_key].append(normalized)
 
     # Sort each category by volume descending
     for key in categorized:
@@ -211,6 +263,10 @@ async def get_war_economy_markets() -> dict:
         if cat["key"] == "fed":
             fed_distribution = _build_fed_distribution(markets)
 
+        oil_price_distribution = None
+        if cat["key"] == "oil_targets":
+            oil_price_distribution = _build_oil_price_distribution(markets)
+
         cat_volume = sum(m["volume"] for m in markets)
         total_volume += cat_volume
         total_count += len(markets)
@@ -226,6 +282,7 @@ async def get_war_economy_markets() -> dict:
             "markets": markets[:6],  # top 6 per category
             "highlight": highlight,
             "fed_distribution": fed_distribution,
+            "oil_price_distribution": oil_price_distribution,
             "market_count": len(markets),
             "total_volume": round(cat_volume, 2),
         })
@@ -269,5 +326,32 @@ def _build_fed_distribution(markets: list[dict]) -> list[dict]:
     # Sort by number of cuts
     return [
         {"cuts": k, "probability": round(v, 4)}
+        for k, v in sorted(distribution.items())
+    ]
+
+
+def _build_oil_price_distribution(markets: list[dict]) -> list[dict]:
+    """Build probability distribution for oil price target markets.
+
+    Extracts dollar price targets from questions like "Will WTI hit $120?"
+    and builds [{price: 100, probability: 0.95}, {price: 120, probability: 0.65}, ...]
+    """
+    price_pattern = re.compile(r'\$(\d+)', re.IGNORECASE)
+
+    distribution: dict[int, float] = {}
+
+    for m in markets:
+        q = m["question"]
+        prob = m["yes_probability"]
+
+        match = price_pattern.search(q)
+        if match:
+            price = int(match.group(1))
+            # Keep highest probability for each price level
+            if price not in distribution or prob > distribution[price]:
+                distribution[price] = prob
+
+    return [
+        {"price": k, "probability": round(v, 4)}
         for k, v in sorted(distribution.items())
     ]

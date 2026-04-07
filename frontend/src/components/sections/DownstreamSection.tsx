@@ -17,12 +17,12 @@ function CorrelationBadge({ r }: { r: number }) {
   const formatted = `${sign}${r.toFixed(2)}`;
   const style = absR > 0.7 ? 'border-[#5DB075]/30 bg-[#5DB075]/10 text-[#5DB075]' : absR > 0.4 ? 'border-[#00F0FF]/30 bg-[#00F0FF]/10 text-[#00F0FF]' : 'border-[#4A5568]/30 bg-[#4A5568]/10 text-[#4A5568]';
   const label = absR > 0.7 ? 'Strong' : absR > 0.4 ? 'Moderate' : 'Weak';
-  return <span className={`text-[10px] px-2 py-0.5 font-semibold border font-[family-name:var(--font-mono)] ${style}`}>{label} ({formatted})</span>;
+  return <span className={`text-[11px] px-2 py-0.5 font-semibold border font-[family-name:var(--font-mono)] ${style}`}>{label} ({formatted})</span>;
 }
 
 function SinceWarBadge({ pctChange, awaiting }: { pctChange: number | null; awaiting?: boolean }) {
-  if (awaiting) return <span className="text-[10px] text-text-secondary italic">Awaiting post-war data</span>;
-  if (pctChange === null) return <span className="text-[10px] text-text-secondary">No data since war</span>;
+  if (awaiting) return <span className="text-[11px] text-text-secondary italic">Awaiting post-war data</span>;
+  if (pctChange === null) return <span className="text-[11px] text-text-secondary">No data since war</span>;
   const isUp = pctChange >= 0;
   const color = isUp ? '#CC2936' : '#5DB075'; // Red for price increases (bad for consumers), green for decreases
   const arrow = isUp ? '\u2191' : '\u2193';
@@ -31,7 +31,7 @@ function SinceWarBadge({ pctChange, awaiting }: { pctChange: number | null; awai
       <span className="number-display text-sm font-semibold" style={{ color }}>
         {arrow} {Math.abs(pctChange).toFixed(1)}%
       </span>
-      <span className="text-[9px] text-text-secondary ml-1">since Iran War</span>
+      <span className="text-[10px] text-text-secondary ml-1">since Iran War</span>
     </div>
   );
 }
@@ -77,7 +77,7 @@ export function DownstreamSection() {
         <div className="section-wide">
           <span className="section-number">07 / Downstream</span>
           <h2 className="editorial-header">The Ripple Effect</h2>
-          <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+          <p className="text-sm font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             Unable to load downstream correlation data.
           </p>
           <div className="section-rule mt-4" />
@@ -147,7 +147,7 @@ export function DownstreamSection() {
                   <span className="text-sm font-semibold text-text-primary flex-1">{ds.name}</span>
                   <CorrelationBadge r={correlation} />
                 </div>
-                <p className="text-[10px] text-text-secondary mb-1 line-clamp-2">{context.why}</p>
+                <p className="text-[11px] text-text-secondary mb-1 line-clamp-2">{context.why}</p>
                 <SinceWarBadge pctChange={sinceWarPct} awaiting={awaitingPostWar} />
                 <div className="mt-2">
                   <Plot

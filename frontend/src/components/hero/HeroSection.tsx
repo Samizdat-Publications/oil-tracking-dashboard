@@ -65,7 +65,7 @@ export function HeroSection({ onOpenEventManager }: HeroSectionProps) {
           <div className="flex items-center gap-0 border border-border overflow-hidden">
             <button
               onClick={() => setSelectedSeries('wti')}
-              className={`px-4 py-1.5 text-[10px] font-medium transition-all duration-200 font-[family-name:var(--font-mono)] tracking-wider ${
+              className={`px-4 py-1.5 text-[11px] font-medium transition-all duration-200 font-[family-name:var(--font-mono)] tracking-wider ${
                 selectedSeries === 'wti'
                   ? 'bg-accent text-background'
                   : 'text-text-secondary hover:text-text-primary'
@@ -75,7 +75,7 @@ export function HeroSection({ onOpenEventManager }: HeroSectionProps) {
             </button>
             <button
               onClick={() => setSelectedSeries('brent')}
-              className={`px-4 py-1.5 text-[10px] font-medium transition-all duration-200 font-[family-name:var(--font-mono)] tracking-wider ${
+              className={`px-4 py-1.5 text-[11px] font-medium transition-all duration-200 font-[family-name:var(--font-mono)] tracking-wider ${
                 selectedSeries === 'brent'
                   ? 'bg-accent text-background'
                   : 'text-text-secondary hover:text-text-primary'
@@ -90,7 +90,7 @@ export function HeroSection({ onOpenEventManager }: HeroSectionProps) {
               <button
                 key={range}
                 onClick={() => setDateRange(range)}
-                className={`px-2 py-1.5 text-[10px] font-medium transition-all duration-200 font-[family-name:var(--font-mono)] ${
+                className={`px-2 py-1.5 text-[11px] font-medium transition-all duration-200 font-[family-name:var(--font-mono)] ${
                   dateRangePreset === range
                     ? 'bg-accent/15 text-accent'
                     : 'text-text-secondary hover:text-text-primary'

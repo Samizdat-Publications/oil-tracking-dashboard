@@ -157,6 +157,11 @@ class FedCutPoint(BaseModel):
     probability: float
 
 
+class OilPricePoint(BaseModel):
+    price: int
+    probability: float
+
+
 class PolymarketCategory(BaseModel):
     key: str
     name: str
@@ -165,6 +170,7 @@ class PolymarketCategory(BaseModel):
     markets: list[PolymarketMarketItem]
     highlight: PolymarketMarketItem | None = None
     fed_distribution: list[FedCutPoint] | None = None
+    oil_price_distribution: list[OilPricePoint] | None = None
     market_count: int
     total_volume: float
 

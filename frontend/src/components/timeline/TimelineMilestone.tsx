@@ -106,7 +106,7 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
       <div>
         {/* Date label */}
         <div
-          className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.12em] uppercase mb-1"
+          className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.12em] uppercase mb-1"
           style={{ color }}
         >
           {dateLabel}
@@ -136,7 +136,7 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
             {milestone.badges.map((badge, i) => (
               <span
                 key={i}
-                className="font-[family-name:var(--font-mono)] text-[10px] px-2 py-0.5 rounded-sm"
+                className="font-[family-name:var(--font-mono)] text-[11px] px-2 py-0.5 rounded-sm"
                 style={{
                   background: `${color}15`,
                   border: `1px solid ${color}30`,

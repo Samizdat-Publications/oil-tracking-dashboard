@@ -121,7 +121,7 @@ export function DataTable() {
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-accent/10">
                 {([
@@ -167,7 +167,7 @@ export function DataTable() {
         </div>
 
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-          <span className="text-xs text-text-secondary font-[family-name:var(--font-mono)]">
+          <span className="text-sm text-text-secondary font-[family-name:var(--font-mono)]">
             Showing {page * PAGE_SIZE + 1}-{Math.min((page + 1) * PAGE_SIZE, sorted.length)} of {sorted.length} rows
           </span>
           <div className="flex items-center gap-1">
@@ -180,7 +180,7 @@ export function DataTable() {
             >
               <ChevronLeft className="h-3.5 w-3.5" />
             </Button>
-            <span className="text-xs text-text-secondary px-2 font-[family-name:var(--font-mono)]">
+            <span className="text-sm text-text-secondary px-2 font-[family-name:var(--font-mono)]">
               Page {page + 1} / {totalPages}
             </span>
             <Button

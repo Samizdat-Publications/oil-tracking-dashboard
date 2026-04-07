@@ -12,7 +12,7 @@ export function WarTimelineSection() {
         <div className="section-reading">
           <span className="section-number">05 / Timeline</span>
           <h2 className="editorial-header">The War's Ripple</h2>
-          <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+          <p className="text-sm font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             Unable to load timeline data.
           </p>
           <div className="section-rule mt-4" />
@@ -57,7 +57,7 @@ export function WarTimelineSection() {
         <div className="section-reading">
           <span className="section-number">05 / Timeline</span>
           <h2 className="editorial-header">The War's Ripple</h2>
-          <p className="text-xs font-[family-name:var(--font-mono)] text-text-secondary mt-2">
+          <p className="text-sm font-[family-name:var(--font-mono)] text-text-secondary mt-2">
             No milestone data available yet.
           </p>
           <div className="section-rule mt-4" />
