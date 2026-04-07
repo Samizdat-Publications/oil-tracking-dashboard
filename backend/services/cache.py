@@ -77,3 +77,11 @@ async def clear_cache() -> None:
         return
     await _db.execute("DELETE FROM cache")
     await _db.commit()
+
+
+async def close_cache() -> None:
+    """Close the database connection."""
+    global _db
+    if _db is not None:
+        await _db.close()
+        _db = None

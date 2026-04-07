@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
-from services.cache import init_cache, clear_cache
+from services.cache import init_cache, clear_cache, close_cache
 from services.fred_client import SERIES_IDS, get_series
 from routers import prices, simulation, correlations, milestones, polymarket, crisis
 from models.schemas import (
@@ -21,6 +23,8 @@ from models.schemas import (
     ConfigureResponse,
     GeoEvent,
 )
+
+logger = logging.getLogger("oildash")
 
 ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
 EVENTS_PATH = os.path.join(os.path.dirname(__file__), "data", "default_events.json")
@@ -40,8 +44,8 @@ async def _prewarm_cache():
     async def _warm_one(key: str):
         try:
             await get_series(SERIES_IDS[key], start, end)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Cache warm failed for {key}: {e}")
 
     await asyncio.gather(*[_warm_one(k) for k in keys_to_warm])
 
@@ -54,6 +58,7 @@ async def lifespan(app: FastAPI):
     import asyncio
     asyncio.create_task(_prewarm_cache())
     yield
+    await close_cache()
 
 
 app = FastAPI(
@@ -62,14 +67,27 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — allow all origins for development
+# CORS — restrict origins via env var (defaults to local dev servers)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ---------------------------------------------------------------------------
+# HTTP request logging middleware
+# ---------------------------------------------------------------------------
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    logger.info(f"{request.method} {request.url.path} -> {response.status_code} ({duration:.2f}s)")
+    return response
 
 # Include routers
 app.include_router(prices.router)
@@ -97,7 +115,20 @@ async def setup_status():
     return SetupStatusResponse(fred_api_key_set=bool(key))
 
 
-@app.post("/api/setup/configure", response_model=ConfigureResponse)
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "").strip()
+
+
+async def _verify_localhost(request: Request):
+    """Only allow configuration from localhost or with admin secret."""
+    host = request.client.host if request.client else ""
+    is_local = host in ("127.0.0.1", "::1", "localhost")
+    if not is_local:
+        auth = request.headers.get("Authorization", "")
+        if not ADMIN_SECRET or auth != f"Bearer {ADMIN_SECRET}":
+            raise HTTPException(status_code=403, detail="Configuration only allowed from localhost")
+
+
+@app.post("/api/setup/configure", response_model=ConfigureResponse, dependencies=[Depends(_verify_localhost)])
 async def setup_configure(body: ConfigureRequest):
     """Save FRED API key to the .env file."""
     api_key = body.fred_api_key.strip()
@@ -133,8 +164,10 @@ async def setup_configure(body: ConfigureRequest):
     # Clear cache so fresh data is fetched with new key
     await clear_cache()
 
-    # Reload env
+    # Reload env and API key
     load_dotenv(ENV_PATH, override=True)
+    from services.fred_client import reload_api_key
+    reload_api_key()
 
     return ConfigureResponse(success=True, message="FRED API key saved successfully.")
 

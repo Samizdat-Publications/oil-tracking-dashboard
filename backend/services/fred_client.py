@@ -74,11 +74,20 @@ DOWNSTREAM_SERIES = [
 
 BASE_URL = "https://api.stlouisfed.org/fred/series/observations"
 
+# Load .env once at module level
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
+_cached_api_key: str | None = os.getenv("FRED_API_KEY", "").strip() or None
+
 
 def _get_api_key() -> str:
-    load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
-    key = os.getenv("FRED_API_KEY", "")
-    return key
+    return _cached_api_key or ""
+
+
+def reload_api_key() -> None:
+    """Reload the API key from .env (called after configure)."""
+    global _cached_api_key
+    load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"), override=True)
+    _cached_api_key = os.getenv("FRED_API_KEY", "").strip() or None
 
 
 async def get_series(

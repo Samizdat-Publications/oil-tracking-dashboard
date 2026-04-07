@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import date, timedelta
 
 from fastapi import APIRouter, HTTPException, Query
@@ -36,16 +37,11 @@ async def get_correlations(
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Failed to fetch WTI: {exc}")
 
-    results: list[CorrelationSeries] = []
-    for key in DOWNSTREAM_SERIES:
+    async def _fetch_downstream(key: str):
         try:
             ds_obs = await get_series(SERIES_IDS[key], start, end)
-        except Exception:
-            continue
-
-        corr_data = rolling_correlation(wti_obs, ds_obs, window=window)
-        results.append(
-            CorrelationSeries(
+            corr_data = rolling_correlation(wti_obs, ds_obs, window=window)
+            return CorrelationSeries(
                 downstream_series=key,
                 downstream_name=SERIES_NAMES[key],
                 data=[
@@ -53,7 +49,11 @@ async def get_correlations(
                     for pt in corr_data
                 ],
             )
-        )
+        except Exception:
+            return None
+
+    raw_results = await asyncio.gather(*[_fetch_downstream(key) for key in DOWNSTREAM_SERIES])
+    results = [r for r in raw_results if r is not None]
 
     return CorrelationsResponse(
         oil_series="wti",

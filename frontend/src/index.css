@@ -134,7 +134,7 @@
   gap: 40px;
   white-space: nowrap;
   animation: tickerScroll 35s linear infinite;
-  will-change: transform;
+  contain: layout style paint;
 }
 
 /* Timeline milestone scroll-reveal */
@@ -691,4 +691,29 @@ body::after {
 .scenario-card-stacked:hover {
   border-color: rgba(0, 240, 255, 0.12);
   background: rgba(8, 14, 24, 0.8);
+}
+
+/* ═══════════════════════════════════════════════
+   Accessibility: Respect reduced motion preferences
+   ═══════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .timeline-milestone {
+    opacity: 1;
+  }
+  .crisis-pulse,
+  .crisis-live-badge {
+    animation: none;
+  }
+  .skeleton-shimmer {
+    animation: none;
+  }
 }

@@ -4,7 +4,7 @@ const BASE = '/api';
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30_000);
+  const timeout = setTimeout(() => controller.abort(), 10_000);
   try {
     const res = await fetch(url, { ...init, signal: controller.signal });
     if (!res.ok) {
@@ -14,7 +14,7 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
     return res.json() as Promise<T>;
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') {
-      throw new Error(`Request timeout: ${url} took longer than 30s`);
+      throw new Error(`Request timeout: ${url} took longer than 10s`);
     }
     throw err;
   } finally {
@@ -38,10 +38,26 @@ export function fetchSummary(): Promise<PriceSummary> {
 
 /** Run Monte Carlo simulation */
 export function fetchSimulation(params: SimulationRequest): Promise<SimulationBands> {
-  return fetchJson<SimulationBands>(`${BASE}/simulation`, {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000); // simulation can take longer
+  return fetch(`${BASE}/simulation`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
+    signal: controller.signal,
+  }).then(async (res) => {
+    clearTimeout(timeout);
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`API error ${res.status}: ${text}`);
+    }
+    return res.json() as Promise<SimulationBands>;
+  }).catch((err) => {
+    clearTimeout(timeout);
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error('Simulation request timed out after 30s');
+    }
+    throw err;
   });
 }
 

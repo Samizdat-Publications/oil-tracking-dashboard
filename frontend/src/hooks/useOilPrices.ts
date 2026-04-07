@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { fetchPrices, fetchSummary, fetchDownstream, fetchMilestones } from '../lib/api';
 import type { PriceSeries, PriceSummary, DownstreamData, MilestonesResponse } from '../types';
 
@@ -16,6 +16,8 @@ export function usePriceSummary() {
     queryKey: ['summary'],
     queryFn: fetchSummary,
     staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
     retry: 2,
   });
 }
@@ -24,7 +26,9 @@ export function useDownstream() {
   return useQuery<DownstreamData>({
     queryKey: ['downstream'],
     queryFn: fetchDownstream,
-    staleTime: 10 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
     retry: 2,
   });
 }

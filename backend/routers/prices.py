@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from datetime import date, timedelta
 
 from fastapi import APIRouter, HTTPException, Query
@@ -125,6 +126,12 @@ async def get_price_series(
             status_code=404,
             detail=f"Unknown series '{series}'. Valid: {', '.join(SERIES_IDS.keys())}",
         )
+
+    date_re = re.compile(r'^\d{4}-\d{2}-\d{2}$')
+    if start is not None and not date_re.match(start):
+        raise HTTPException(status_code=400, detail="Invalid start date format. Use YYYY-MM-DD.")
+    if end is not None and not date_re.match(end):
+        raise HTTPException(status_code=400, detail="Invalid end date format. Use YYYY-MM-DD.")
 
     if start is None:
         start = (date.today() - timedelta(days=365 * 20)).isoformat()

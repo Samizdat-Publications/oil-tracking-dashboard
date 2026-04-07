@@ -1,11 +1,19 @@
 import { useRef, useEffect, useCallback, memo, type CSSProperties } from 'react';
 import React from 'react';
 
-// Lazy-load Plotly to avoid SSR/import issues
+// Lazy-load Plotly — deferred until first chart mount (not module parse time)
 let PlotlyLib: any = null;
-const plotlyReady = import('plotly.js-dist-min').then((mod) => {
-  PlotlyLib = mod.default || mod;
-});
+let plotlyPromise: Promise<void> | null = null;
+
+function ensurePlotly(): Promise<void> {
+  if (PlotlyLib) return Promise.resolve();
+  if (!plotlyPromise) {
+    plotlyPromise = import('plotly.js-dist-min').then((mod) => {
+      PlotlyLib = mod.default || mod;
+    });
+  }
+  return plotlyPromise;
+}
 
 interface PlotProps {
   data: any[];
@@ -21,7 +29,7 @@ function PlotComponent({ data, layout, config, style, useResizeHandler }: PlotPr
 
   const doPlot = useCallback(async () => {
     if (!containerRef.current) return;
-    await plotlyReady;
+    await ensurePlotly();
     if (!PlotlyLib || !containerRef.current) return;
 
     if (plotted.current) {
