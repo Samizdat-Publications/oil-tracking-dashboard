@@ -158,6 +158,9 @@ Dark theme, editorial newspaper aesthetic. Two-temperature color system: warm ed
 - Fixed-position overlays at App level, not inside `scroll-reveal` sections.
 - Geopolitical events in `lib/constants.ts` (20 events, 1973-2026) with category-based colors.
 - **Update memory files at every git commit** — user frequently starts new sessions.
+- **Do NOT use git worktrees** — OneDrive sync locks `.git/worktrees/` metadata and causes persistent permission issues. Work directly on main branch.
+- **cache.db is critical** — if deleted, must re-configure FRED API key via `/api/setup/configure` or restart backend with `.env` present. Without it, all data endpoints return null.
+- **Always run dev servers from main repo**, not worktrees. Vite HMR only picks up changes in the directory it was started from.
 
 ## FRED API Series IDs
 
