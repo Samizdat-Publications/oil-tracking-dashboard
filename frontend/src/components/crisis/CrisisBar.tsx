@@ -63,15 +63,15 @@ export function CrisisBar({ crisis, metric, maxAbsValue, currentTrajectory, dela
         }}
       >
         {/* Year */}
-        <div className="w-10 shrink-0 font-[family-name:var(--font-mono)] text-sm" style={{ color: barColor }}>
+        <div className="w-10 shrink-0 font-[family-name:var(--font-mono)] text-base" style={{ color: barColor }}>
           {crisis.year}
         </div>
 
         {/* Crisis name */}
         <div className="w-40 shrink-0">
-          <div className="text-base text-text-primary font-medium leading-tight">{crisis.name}</div>
+          <div className="text-lg text-text-primary font-medium leading-tight">{crisis.name}</div>
           {crisis.is_current && (
-            <div className="text-xs font-[family-name:var(--font-mono)] text-accent mt-0.5 tracking-wider uppercase crisis-live-badge">
+            <div className="text-sm font-[family-name:var(--font-mono)] text-accent mt-0.5 tracking-wider uppercase crisis-live-badge">
               {'\u25CF'} LIVE
             </div>
           )}
@@ -116,7 +116,7 @@ export function CrisisBar({ crisis, metric, maxAbsValue, currentTrajectory, dela
 
         {/* Value label */}
         <div
-          className="w-16 shrink-0 text-right font-[family-name:var(--font-mono)] text-sm font-semibold transition-opacity duration-500"
+          className="w-16 shrink-0 text-right font-[family-name:var(--font-mono)] text-base font-semibold transition-opacity duration-500"
           style={{
             color: barColor,
             opacity: revealed ? 1 : 0,
@@ -127,7 +127,7 @@ export function CrisisBar({ crisis, metric, maxAbsValue, currentTrajectory, dela
               {isNegative ? '' : '+'}{value.toFixed(metric === 'duration' ? 1 : 0)}{unit}
             </>
           ) : (
-            <span className="text-text-secondary text-sm">{'\u2014'}</span>
+            <span className="text-text-secondary text-base">{'\u2014'}</span>
           )}
         </div>
 

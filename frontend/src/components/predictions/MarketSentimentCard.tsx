@@ -34,10 +34,10 @@ export function CategoryCard({ category }: CategoryCardProps) {
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <span className="text-lg">{category.icon}</span>
-        <span className="font-[family-name:var(--font-display)] text-sm tracking-wider uppercase text-text-primary">
+        <span className="font-[family-name:var(--font-display)] text-base tracking-wider uppercase text-text-primary">
           {category.name}
         </span>
-        <span className="ml-auto font-[family-name:var(--font-mono)] text-xs text-text-secondary">
+        <span className="ml-auto font-[family-name:var(--font-mono)] text-sm text-text-secondary">
           {formatVolume(category.total_volume)} volume
         </span>
       </div>
@@ -78,7 +78,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
                   )}
                 </span>
                 <span
-                  className="font-[family-name:var(--font-mono)] text-sm font-semibold shrink-0"
+                  className="font-[family-name:var(--font-mono)] text-base font-semibold shrink-0"
                   style={{ color: mColor }}
                 >
                   {formatPct(m.yes_probability)}
@@ -129,7 +129,7 @@ function OilPriceDistribution({ distribution }: { distribution: { price: number;
                   boxShadow: isPeak ? '0 0 8px rgba(255,136,0,0.3)' : 'none',
                 }}
               />
-              <span className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary">
+              <span className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary">
                 ${d.price}
               </span>
             </div>
@@ -137,8 +137,8 @@ function OilPriceDistribution({ distribution }: { distribution: { price: number;
         })}
       </div>
       <div className="flex justify-between mt-1">
-        <span className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary">price target</span>
-        <span className="font-[family-name:var(--font-mono)] text-[10px]" style={{ color: '#FF8800' }}>
+        <span className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary">price target</span>
+        <span className="font-[family-name:var(--font-mono)] text-[11px]" style={{ color: '#FF8800' }}>
           Most likely ceiling: ${peak.price} ({(peak.probability * 100).toFixed(0)}%)
         </span>
       </div>
@@ -173,7 +173,7 @@ function FedDistribution({ distribution }: { distribution: { cuts: number; proba
                   boxShadow: isPeak ? '0 0 8px rgba(0,240,255,0.3)' : 'none',
                 }}
               />
-              <span className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary">
+              <span className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary">
                 {d.cuts}
               </span>
             </div>
@@ -181,8 +181,8 @@ function FedDistribution({ distribution }: { distribution: { cuts: number; proba
         })}
       </div>
       <div className="flex justify-between mt-1">
-        <span className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary">cuts</span>
-        <span className="font-[family-name:var(--font-mono)] text-[10px] text-accent">
+        <span className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary">cuts</span>
+        <span className="font-[family-name:var(--font-mono)] text-[11px] text-accent">
           Most likely: {peak.cuts} cut{peak.cuts !== 1 ? 's' : ''} ({(peak.probability * 100).toFixed(0)}%)
         </span>
       </div>

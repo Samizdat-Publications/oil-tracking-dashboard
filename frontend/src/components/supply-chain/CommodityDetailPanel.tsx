@@ -64,107 +64,119 @@ export function CommodityDetailPanel() {
         onClick={closePanel}
       />
 
-      {/* Panel */}
+      {/* Modal wrapper */}
       <div
-        className={`fixed top-0 bottom-0 w-[520px] z-[101] bg-surface border-l border-border overflow-y-auto transition-[right] duration-[350ms] ${isOpen ? 'right-0' : '-right-[520px]'}`}
-        style={{ transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: '-20px 0 60px rgba(0,0,0,0.5)' }}
+        className={`fixed inset-0 z-[101] flex items-center justify-center p-8 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
       >
-        {/* Close button */}
-        <button
-          onClick={closePanel}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded bg-accent-glow border border-border-hover text-text-secondary hover:text-text-primary hover:bg-[rgba(0,240,255,0.12)] transition-all z-10"
-        >
-          {'\u2715'}
-        </button>
+        {isOpen && (
+          <div
+            className="glassmorphism-modal is-open rounded-2xl max-w-[620px] w-full max-h-[85vh] overflow-y-auto relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Gold accent bar */}
+            <div
+              className="h-[2px] rounded-t-2xl"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(212,160,18,0.5), rgba(0,240,255,0.2), transparent)' }}
+            />
 
-        {info && panelData && (
-          <>
-            {/* Header */}
-            <div className="p-6 pb-4 border-b border-border">
-              <span className="text-4xl block mb-2">{info.icon}</span>
-              <div className="font-[family-name:var(--font-display)] text-[28px] tracking-[0.05em] text-text-primary">
-                {info.displayName}
-              </div>
-              <div className="text-base text-text-secondary mt-1.5 leading-relaxed">{info.why}</div>
-            </div>
+            {/* Close button */}
+            <button
+              onClick={closePanel}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[rgba(212,160,18,0.08)] border border-[rgba(212,160,18,0.15)] text-text-secondary hover:text-text-primary hover:bg-[rgba(212,160,18,0.15)] transition-all z-10"
+            >
+              {'\u2715'}
+            </button>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 p-4 border-b border-border">
-              <div className="text-center p-3 rounded-md bg-accent-glow">
-                <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Current Price</div>
-                <div className="font-[family-name:var(--font-mono)] text-xl font-bold text-text-primary">{panelData.priceStr}</div>
-              </div>
-              <div className="text-center p-3 rounded-md bg-accent-glow">
-                <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Since Iran War</div>
-                {panelData.awaitingPostWar ? (
-                  <div className="font-[family-name:var(--font-mono)] text-sm text-text-secondary italic mt-1">Awaiting post-war data</div>
-                ) : (
-                  <div className="font-[family-name:var(--font-mono)] text-xl font-bold" style={{ color: panelData.sinceWarPct !== null && panelData.sinceWarPct >= 0 ? '#CC2936' : '#5DB075' }}>
-                    {panelData.sinceWarPct !== null ? `${panelData.sinceWarPct >= 0 ? '\u2191' : '\u2193'}${Math.abs(panelData.sinceWarPct).toFixed(1)}%` : 'N/A'}
+            {info && panelData && (
+              <>
+                {/* Header */}
+                <div className="p-6 pb-4 border-b border-[rgba(212,160,18,0.08)]">
+                  <span className="text-4xl block mb-2">{info.icon}</span>
+                  <div className="font-[family-name:var(--font-display)] text-[28px] tracking-[0.05em] text-text-primary">
+                    {info.displayName}
                   </div>
-                )}
-              </div>
-              <div className="text-center p-3 rounded-md bg-accent-glow">
-                <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Correlation</div>
-                <div className="font-[family-name:var(--font-mono)] text-base font-bold" style={{ color: corrColor }}>
-                  {corrLabel} {panelData.corr.toFixed(2)}
+                  <div className="text-base text-text-secondary mt-1.5 leading-relaxed">{info.why}</div>
                 </div>
-              </div>
-            </div>
 
-            {/* Chart */}
-            <div className="p-4 border-b border-border">
-              <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.12em] uppercase text-accent mb-2">
-                Price History vs Oil
-              </div>
-              {panelData.aligned.dates.length >= 3 ? (
-                <Plot
-                  data={[
-                    {
-                      x: panelData.aligned.dates, y: panelData.aligned.oilValues,
-                      type: 'scatter', mode: 'lines', name: 'Oil',
-                      line: { color: '#33F5FF', width: 2 }, yaxis: 'y',
-                      hovertemplate: 'Oil: $%{y:.2f}<extra></extra>',
-                    },
-                    {
-                      x: panelData.aligned.dates, y: panelData.aligned.dsValues,
-                      type: 'scatter', mode: 'lines', name: info.displayName,
-                      line: { color: '#5DB075', width: 2 }, yaxis: 'y2',
-                      hovertemplate: `${info.displayName}: %{y:.2f}<extra></extra>`,
-                    },
-                  ]}
-                  layout={{
-                    paper_bgcolor: '#060A14', plot_bgcolor: '#0A0E18',
-                    font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 10 },
-                    xaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', type: 'date' as const },
-                    yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', title: { text: 'Oil ($)', font: { size: 9, color: '#33F5FF' } }, tickprefix: '$', side: 'left' as const },
-                    yaxis2: { gridcolor: 'transparent', linecolor: 'rgba(212,160,18,0.04)', title: { text: info.displayName, font: { size: 9, color: '#5DB075' } }, side: 'right' as const, overlaying: 'y' as const },
-                    margin: { l: 50, r: 50, t: 10, b: 30 },
-                    hovermode: 'x unified' as const,
-                    hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', size: 10 } },
-                    showlegend: false,
-                    shapes: [{ type: 'line' as const, x0: IRAN_WAR_DATE, x1: IRAN_WAR_DATE, y0: 0, y1: 1, yref: 'paper' as const, line: { color: '#CC2936', width: 1.5, dash: 'dash' as const } }],
-                    annotations: [{ x: IRAN_WAR_DATE, y: 1.03, yref: 'paper' as const, text: 'Iran War', showarrow: false, font: { size: 9, color: '#CC2936' } }],
-                  }}
-                  config={{ displayModeBar: false, responsive: true }}
-                  style={{ width: '100%', height: '220px' }}
-                  useResizeHandler
-                />
-              ) : (
-                <div className="h-[220px] flex items-center justify-center text-text-secondary text-sm font-[family-name:var(--font-mono)]">
-                  Insufficient data for chart
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-3 p-4 border-b border-[rgba(212,160,18,0.08)]">
+                  <div className="text-center p-3 rounded-md" style={{ background: 'rgba(212,160,18,0.06)' }}>
+                    <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Current Price</div>
+                    <div className="font-[family-name:var(--font-mono)] text-xl font-bold text-text-primary">{panelData.priceStr}</div>
+                  </div>
+                  <div className="text-center p-3 rounded-md" style={{ background: 'rgba(212,160,18,0.06)' }}>
+                    <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Since Iran War</div>
+                    {panelData.awaitingPostWar ? (
+                      <div className="font-[family-name:var(--font-mono)] text-sm text-text-secondary italic mt-1">Awaiting post-war data</div>
+                    ) : (
+                      <div className="font-[family-name:var(--font-mono)] text-xl font-bold" style={{ color: panelData.sinceWarPct !== null && panelData.sinceWarPct >= 0 ? '#CC2936' : '#5DB075' }}>
+                        {panelData.sinceWarPct !== null ? `${panelData.sinceWarPct >= 0 ? '\u2191' : '\u2193'}${Math.abs(panelData.sinceWarPct).toFixed(1)}%` : 'N/A'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-center p-3 rounded-md" style={{ background: 'rgba(212,160,18,0.06)' }}>
+                    <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.1em] uppercase text-text-secondary mb-1">Correlation</div>
+                    <div className="font-[family-name:var(--font-mono)] text-base font-bold" style={{ color: corrColor }}>
+                      {corrLabel} {panelData.corr.toFixed(2)}
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
 
-            {/* Context */}
-            <div className="p-5">
-              <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.12em] uppercase text-accent mb-2">
-                Why Oil Matters Here
-              </div>
-              <div className="text-base text-[#8B95A5] leading-relaxed">{info.detail}</div>
-            </div>
-          </>
+                {/* Chart */}
+                <div className="p-4 border-b border-[rgba(212,160,18,0.08)]">
+                  <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.12em] uppercase text-accent mb-2">
+                    Price History vs Oil
+                  </div>
+                  {panelData.aligned.dates.length >= 3 ? (
+                    <Plot
+                      data={[
+                        {
+                          x: panelData.aligned.dates, y: panelData.aligned.oilValues,
+                          type: 'scatter', mode: 'lines', name: 'Oil',
+                          line: { color: '#33F5FF', width: 2 }, yaxis: 'y',
+                          hovertemplate: 'Oil: $%{y:.2f}<extra></extra>',
+                        },
+                        {
+                          x: panelData.aligned.dates, y: panelData.aligned.dsValues,
+                          type: 'scatter', mode: 'lines', name: info.displayName,
+                          line: { color: '#5DB075', width: 2 }, yaxis: 'y2',
+                          hovertemplate: `${info.displayName}: %{y:.2f}<extra></extra>`,
+                        },
+                      ]}
+                      layout={{
+                        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(10,14,24,0.4)',
+                        font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 11 },
+                        xaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', type: 'date' as const },
+                        yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', title: { text: 'Oil ($)', font: { size: 11, color: '#33F5FF' } }, tickprefix: '$', side: 'left' as const },
+                        yaxis2: { gridcolor: 'transparent', linecolor: 'rgba(212,160,18,0.04)', title: { text: info.displayName, font: { size: 11, color: '#5DB075' } }, side: 'right' as const, overlaying: 'y' as const },
+                        margin: { l: 50, r: 50, t: 10, b: 30 },
+                        hovermode: 'x unified' as const,
+                        hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', size: 11 } },
+                        showlegend: false,
+                        shapes: [{ type: 'line' as const, x0: IRAN_WAR_DATE, x1: IRAN_WAR_DATE, y0: 0, y1: 1, yref: 'paper' as const, line: { color: '#CC2936', width: 1.5, dash: 'dash' as const } }],
+                        annotations: [{ x: IRAN_WAR_DATE, y: 1.03, yref: 'paper' as const, text: 'Iran War', showarrow: false, font: { size: 11, color: '#CC2936' } }],
+                      }}
+                      config={{ displayModeBar: false, responsive: true }}
+                      style={{ width: '100%', height: '220px' }}
+                      useResizeHandler
+                    />
+                  ) : (
+                    <div className="h-[220px] flex items-center justify-center text-text-secondary text-sm font-[family-name:var(--font-mono)]">
+                      Insufficient data for chart
+                    </div>
+                  )}
+                </div>
+
+                {/* Context */}
+                <div className="p-5">
+                  <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.12em] uppercase text-accent mb-2">
+                    Why Oil Matters Here
+                  </div>
+                  <div className="text-base text-[#8B95A5] leading-relaxed">{info.detail}</div>
+                </div>
+              </>
+            )}
+          </div>
         )}
       </div>
     </>

@@ -104,30 +104,30 @@ export function KitchenTableTicker() {
   // Render items — always scrolling, prices shimmer while loading
   const renderItems = (keyPrefix: string) =>
     items.map((item, i) => (
-      <span key={`${keyPrefix}-${i}`} className="flex items-center gap-1.5 shrink-0">
-        <span className="text-sm">{item.icon}</span>
-        <span className="font-[family-name:var(--font-mono)] text-xs text-text-secondary">
+      <span key={`${keyPrefix}-${i}`} className="flex items-center gap-2 shrink-0">
+        <span className="text-base">{item.icon}</span>
+        <span className="font-[family-name:var(--font-mono)] text-sm text-text-secondary">
           {item.name}
         </span>
         {isLoading ? (
           <span
-            className="inline-block h-3 w-16 rounded skeleton-shimmer"
+            className="inline-block h-4 w-20 rounded skeleton-shimmer"
             style={{ background: 'rgba(212,160,18,0.06)' }}
           />
         ) : (
           <>
             {item.price && (
-              <strong className="font-[family-name:var(--font-mono)] text-xs text-text-primary">
+              <strong className="font-[family-name:var(--font-mono)] text-sm text-text-primary">
                 {item.price}
               </strong>
             )}
             {item.awaiting ? (
-              <span className="font-[family-name:var(--font-mono)] text-xs text-text-secondary italic">
+              <span className="font-[family-name:var(--font-mono)] text-sm text-text-secondary italic">
                 awaiting data
               </span>
             ) : item.changeLabel ? (
               <span
-                className="font-[family-name:var(--font-mono)] text-xs font-semibold"
+                className="font-[family-name:var(--font-mono)] text-sm font-semibold"
                 style={{ color: item.changeValue !== null && item.changeValue >= 0 ? '#CC2936' : '#5DB075' }}
               >
                 {item.changeLabel}
@@ -136,7 +136,7 @@ export function KitchenTableTicker() {
           </>
         )}
         {i < items.length - 1 && (
-          <span className="text-border-hover mx-3">|</span>
+          <span className="text-border-hover mx-4">|</span>
         )}
       </span>
     ));

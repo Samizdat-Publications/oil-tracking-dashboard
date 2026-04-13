@@ -39,22 +39,22 @@ export function BranchGrid({ items }: BranchGridProps) {
         }}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {COMMODITY_CATEGORIES.map((cat) => (
           <div key={cat.key} className="relative pt-6">
             {/* Vertical stub from horizontal line */}
             <div className="absolute top-0 left-1/2 w-[1px] h-6 bg-border-hover hidden md:block" />
 
             {/* Category header */}
-            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border">
-              <span className="text-lg">{cat.icon}</span>
-              <span className="font-[family-name:var(--font-mono)] text-xs tracking-[0.12em] uppercase text-accent">
+            <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border">
+              <span className="text-xl">{cat.icon}</span>
+              <span className="font-[family-name:var(--font-mono)] text-sm tracking-[0.12em] uppercase text-accent">
                 {cat.name}
               </span>
             </div>
 
             {/* Items */}
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-3">
               {cat.series.map((seriesKey) => {
                 const item = itemMap.get(seriesKey);
                 if (!item) return null;
@@ -62,7 +62,7 @@ export function BranchGrid({ items }: BranchGridProps) {
                   <button
                     key={seriesKey}
                     onClick={() => openPanel(seriesKey)}
-                    className="group flex items-center gap-3 px-3 py-2.5 rounded-md bg-card-solid border border-border text-left transition-all duration-200 hover:border-border-hover hover:bg-[#0E1528] hover:translate-x-1 relative overflow-hidden"
+                    className="group flex items-center gap-3 px-4 py-3.5 rounded-md bg-card-solid border border-border text-left transition-all duration-200 hover:border-border-hover hover:bg-[#0E1528] hover:translate-x-1 relative overflow-hidden"
                   >
                     {/* Left accent on hover */}
                     <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-transparent transition-all duration-200 group-hover:bg-accent group-hover:shadow-[0_0_8px_rgba(0,240,255,0.3)]" />
@@ -71,12 +71,12 @@ export function BranchGrid({ items }: BranchGridProps) {
 
                     <div className="flex-1 min-w-0">
                       <div className="text-base font-semibold text-text-primary">{item.displayName}</div>
-                      <div className="text-sm text-text-secondary truncate">{item.why}</div>
+                      <div className="text-base text-text-secondary truncate">{item.why}</div>
                     </div>
 
                     <div className="text-right shrink-0">
                       {item.awaitingPostWar ? (
-                        <div className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary italic">
+                        <div className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary italic">
                           Awaiting data
                         </div>
                       ) : item.changePct !== null ? (
@@ -84,7 +84,7 @@ export function BranchGrid({ items }: BranchGridProps) {
                           {item.changePct >= 0 ? '\u2191' : '\u2193'} {Math.abs(item.changePct).toFixed(1)}%
                         </div>
                       ) : null}
-                      <div className="font-[family-name:var(--font-mono)] text-[10px] text-text-secondary mt-0.5">
+                      <div className="font-[family-name:var(--font-mono)] text-[11px] text-text-secondary mt-0.5">
                         <CorrelationLabel r={item.correlation} />
                       </div>
                     </div>

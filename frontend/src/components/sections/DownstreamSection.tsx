@@ -17,12 +17,12 @@ function CorrelationBadge({ r }: { r: number }) {
   const formatted = `${sign}${r.toFixed(2)}`;
   const style = absR > 0.7 ? 'border-[#5DB075]/30 bg-[#5DB075]/10 text-[#5DB075]' : absR > 0.4 ? 'border-[#00F0FF]/30 bg-[#00F0FF]/10 text-[#00F0FF]' : 'border-[#4A5568]/30 bg-[#4A5568]/10 text-[#4A5568]';
   const label = absR > 0.7 ? 'Strong' : absR > 0.4 ? 'Moderate' : 'Weak';
-  return <span className={`text-[11px] px-2 py-0.5 font-semibold border font-[family-name:var(--font-mono)] ${style}`}>{label} ({formatted})</span>;
+  return <span className={`text-xs px-2 py-0.5 font-semibold border font-[family-name:var(--font-mono)] ${style}`}>{label} ({formatted})</span>;
 }
 
 function SinceWarBadge({ pctChange, awaiting }: { pctChange: number | null; awaiting?: boolean }) {
-  if (awaiting) return <span className="text-[11px] text-text-secondary italic">Awaiting post-war data</span>;
-  if (pctChange === null) return <span className="text-[11px] text-text-secondary">No data since war</span>;
+  if (awaiting) return <span className="text-xs text-text-secondary italic">Awaiting post-war data</span>;
+  if (pctChange === null) return <span className="text-xs text-text-secondary">No data since war</span>;
   const isUp = pctChange >= 0;
   const color = isUp ? '#CC2936' : '#5DB075'; // Red for price increases (bad for consumers), green for decreases
   const arrow = isUp ? '\u2191' : '\u2193';
@@ -31,7 +31,7 @@ function SinceWarBadge({ pctChange, awaiting }: { pctChange: number | null; awai
       <span className="number-display text-sm font-semibold" style={{ color }}>
         {arrow} {Math.abs(pctChange).toFixed(1)}%
       </span>
-      <span className="text-[10px] text-text-secondary ml-1">since Iran War</span>
+      <span className="text-[11px] text-text-secondary ml-1">since Iran War</span>
     </div>
   );
 }
@@ -118,17 +118,17 @@ export function DownstreamSection() {
               ]}
               layout={{
                 paper_bgcolor: '#060A14', plot_bgcolor: '#0A0E18',
-                font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 10 },
+                font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 11 },
                 xaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', type: 'date' as const },
-                yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', title: { text: 'Oil ($)', font: { size: 9, color: '#33F5FF' } }, tickprefix: '$', side: 'left' as const },
-                yaxis2: { gridcolor: 'transparent', linecolor: 'rgba(212,160,18,0.04)', title: { text: featured.series.name, font: { size: 9, color: '#5DB075' } }, side: 'right' as const, overlaying: 'y' as const },
+                yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', title: { text: 'Oil ($)', font: { size: 11, color: '#33F5FF' } }, tickprefix: '$', side: 'left' as const },
+                yaxis2: { gridcolor: 'transparent', linecolor: 'rgba(212,160,18,0.04)', title: { text: featured.series.name, font: { size: 11, color: '#5DB075' } }, side: 'right' as const, overlaying: 'y' as const },
                 margin: { l: 50, r: 50, t: 10, b: 30 },
                 hovermode: 'x unified' as const,
-                hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', size: 10 } },
+                hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', size: 11 } },
                 showlegend: false,
                 // Add Iran War vertical line
                 shapes: [{ type: 'line' as const, x0: IRAN_WAR_DATE, x1: IRAN_WAR_DATE, y0: 0, y1: 1, yref: 'paper' as const, line: { color: '#CC2936', width: 1.5, dash: 'dash' as const } }],
-                annotations: [{ x: IRAN_WAR_DATE, y: 1.03, yref: 'paper' as const, text: 'Iran War', showarrow: false, font: { size: 9, color: '#CC2936' } }],
+                annotations: [{ x: IRAN_WAR_DATE, y: 1.03, yref: 'paper' as const, text: 'Iran War', showarrow: false, font: { size: 11, color: '#CC2936' } }],
               }}
               config={{ displayModeBar: false, responsive: true }}
               style={{ width: '100%', height: '300px' }}
@@ -144,10 +144,10 @@ export function DownstreamSection() {
               <div key={ds.series_id} className="border-t border-border pt-3">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-base">{context.icon}</span>
-                  <span className="text-sm font-semibold text-text-primary flex-1">{ds.name}</span>
+                  <span className="text-base font-semibold text-text-primary flex-1">{ds.name}</span>
                   <CorrelationBadge r={correlation} />
                 </div>
-                <p className="text-xs text-text-secondary mb-1 line-clamp-2">{context.why}</p>
+                <p className="text-sm text-text-secondary mb-1 line-clamp-2">{context.why}</p>
                 <SinceWarBadge pctChange={sinceWarPct} awaiting={awaitingPostWar} />
                 <div className="mt-2">
                   <Plot
@@ -157,13 +157,13 @@ export function DownstreamSection() {
                     ]}
                     layout={{
                       paper_bgcolor: '#060A14', plot_bgcolor: '#0A0E18',
-                      font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 10 },
+                      font: { color: '#E8ECF4', family: 'Plus Jakarta Sans, sans-serif', size: 11 },
                       xaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', type: 'date' as const },
-                      yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', title: { text: 'Oil ($)', font: { size: 9, color: '#33F5FF' } }, tickprefix: '$', side: 'left' as const },
-                      yaxis2: { gridcolor: 'transparent', linecolor: 'rgba(212,160,18,0.04)', title: { text: ds.name, font: { size: 9, color: '#5DB075' } }, side: 'right' as const, overlaying: 'y' as const },
+                      yaxis: { gridcolor: 'rgba(212,160,18,0.04)', linecolor: 'rgba(212,160,18,0.04)', title: { text: 'Oil ($)', font: { size: 11, color: '#33F5FF' } }, tickprefix: '$', side: 'left' as const },
+                      yaxis2: { gridcolor: 'transparent', linecolor: 'rgba(212,160,18,0.04)', title: { text: ds.name, font: { size: 11, color: '#5DB075' } }, side: 'right' as const, overlaying: 'y' as const },
                       margin: { l: 50, r: 50, t: 10, b: 30 },
                       hovermode: 'x unified' as const,
-                      hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', size: 10 } },
+                      hoverlabel: { bgcolor: '#0C1220', bordercolor: 'rgba(212,160,18,0.15)', font: { color: '#E8ECF4', size: 11 } },
                       showlegend: false,
                       shapes: [{ type: 'line' as const, x0: IRAN_WAR_DATE, x1: IRAN_WAR_DATE, y0: 0, y1: 1, yref: 'paper' as const, line: { color: '#CC2936', width: 1, dash: 'dash' as const } }],
                     }}

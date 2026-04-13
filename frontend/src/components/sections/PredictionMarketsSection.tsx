@@ -103,17 +103,17 @@ export function PredictionMarketsSection() {
         {/* Summary stats bar */}
         <div className="mt-4 mb-6 flex items-center gap-6 text-base font-[family-name:var(--font-mono)]">
           <div>
-            <span className="text-text-secondary uppercase tracking-wider text-xs">Markets tracked </span>
+            <span className="text-text-secondary uppercase tracking-wider text-sm">Markets tracked </span>
             <span className="text-text-primary font-medium">{data.market_count}</span>
           </div>
           <div>
-            <span className="text-text-secondary uppercase tracking-wider text-xs">Total volume </span>
+            <span className="text-text-secondary uppercase tracking-wider text-sm">Total volume </span>
             <span className="text-text-primary font-medium">{formatVolume(data.total_volume)}</span>
           </div>
           <button
             onClick={() => refreshMutation.mutate()}
             disabled={refreshMutation.isPending}
-            className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded border text-xs font-[family-name:var(--font-mono)] uppercase tracking-wider transition-all cursor-pointer"
+            className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded border text-sm font-[family-name:var(--font-mono)] uppercase tracking-wider transition-all cursor-pointer"
             style={{
               borderColor: refreshMutation.isPending ? 'rgba(0,240,255,0.1)' : 'rgba(0,240,255,0.2)',
               color: refreshMutation.isPending ? 'var(--color-text-secondary)' : 'var(--color-accent)',
@@ -149,7 +149,7 @@ export function PredictionMarketsSection() {
             if (!groupCats.length) return null;
             return (
               <div key={group.label}>
-                <div className="font-[family-name:var(--font-mono)] text-xs text-text-secondary uppercase tracking-[0.2em] mb-3">
+                <div className="font-[family-name:var(--font-mono)] text-sm text-text-secondary uppercase tracking-[0.2em] mb-3">
                   {group.label}
                 </div>
                 <div className="space-y-4">
@@ -163,7 +163,7 @@ export function PredictionMarketsSection() {
         </div>
 
         {/* Source Attribution */}
-        <div className="mt-4 flex items-center justify-between text-xs font-[family-name:var(--font-mono)] text-text-secondary">
+        <div className="mt-4 flex items-center justify-between text-sm font-[family-name:var(--font-mono)] text-text-secondary">
           <span>
             Data from{' '}
             <a

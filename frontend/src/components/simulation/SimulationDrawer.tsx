@@ -41,8 +41,8 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
           className="flex items-center justify-between px-5 py-3 cursor-pointer select-none hover:bg-white/[0.02] transition-colors duration-200"
           onClick={toggle}
         >
-          <span className="font-[family-name:var(--font-display)] text-sm tracking-[0.15em] uppercase text-text-primary">Simulation Controls</span>
-          <span className="text-[11px] text-text-secondary number-display hidden sm:block">{summaryText}</span>
+          <span className="font-[family-name:var(--font-display)] text-base tracking-[0.15em] uppercase text-text-primary">Simulation Controls</span>
+          <span className="text-xs text-text-secondary number-display hidden sm:block">{summaryText}</span>
           <div className="flex items-center gap-2">
             <button
               className="bg-accent hover:bg-accent-hover text-background text-sm font-semibold px-4 py-1.5 transition-all font-[family-name:var(--font-mono)] tracking-wider uppercase"
@@ -69,7 +69,7 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
           <div className="border-t border-border grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 p-5">
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Model</label>
+                <label className="text-xs uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Model</label>
                 <Select value={params.model} onValueChange={(v) => setParams({ model: v as 'gbm' | 'jump_diffusion' })}>
                   <SelectTrigger className="h-9 rounded-none bg-surface border border-border text-text-primary text-sm px-3 focus:outline-none focus:ring-1 focus:ring-accent/30 w-full">
                     <SelectValue />
@@ -81,7 +81,7 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
                 </Select>
               </div>
               <div>
-                <label className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Lookback</label>
+                <label className="text-xs uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Lookback</label>
                 <Select
                   value={String(params.lookback_years)}
                   onValueChange={(v) => setParams({ lookback_years: Number(v) })}
@@ -100,7 +100,7 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
 
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Horizon</label>
+                <label className="text-xs uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Horizon</label>
                 <Select
                   value={String(params.horizon_days)}
                   onValueChange={(v) => setParams({ horizon_days: Number(v) })}
@@ -118,7 +118,7 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
                 </Select>
               </div>
               <div>
-                <label className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">
+                <label className="text-xs uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">
                   Paths: {params.n_paths.toLocaleString()}
                 </label>
                 <Slider
@@ -134,7 +134,7 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
 
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Seed (optional)</label>
+                <label className="text-xs uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Seed (optional)</label>
                 <input
                   type="number"
                   className="h-9 rounded-none bg-surface border border-border text-text-primary text-sm px-3 focus:outline-none focus:ring-1 focus:ring-accent/30 w-full font-[family-name:var(--font-mono)]"
@@ -144,7 +144,7 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
                 />
               </div>
               <div>
-                <label className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Mu override</label>
+                <label className="text-xs uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Mu override</label>
                 <input
                   type="number"
                   step="0.01"
@@ -155,7 +155,7 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
                 />
               </div>
               <div>
-                <label className="text-[11px] uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Sigma override</label>
+                <label className="text-xs uppercase tracking-[0.15em] text-text-secondary mb-1.5 block font-[family-name:var(--font-display)]">Sigma override</label>
                 <input
                   type="number"
                   step="0.01"
@@ -177,7 +177,7 @@ export function SimulationDrawer({ onRunSimulation, isSimulating, simulationResu
               </button>
 
               {simulationResult?.params && (
-                <div className="mt-3 text-[11px] text-text-secondary number-display space-y-1">
+                <div className="mt-3 text-xs text-text-secondary number-display space-y-1">
                   <div>Drift (\u03BC): {simulationResult.params.mu.toFixed(4)}</div>
                   <div>Volatility (\u03C3): {simulationResult.params.sigma.toFixed(4)}</div>
                   {simulationResult.params.lambda_jump != null && (

@@ -47,7 +47,7 @@ export function OilSourceNode({ oilData }: OilSourceNodeProps) {
       <span className="text-[44px] shrink-0">{'\u{1F6E2}\uFE0F'}</span>
 
       <div className="flex-1">
-        <div className="font-[family-name:var(--font-mono)] text-sm tracking-[0.15em] uppercase text-accent mb-0.5">
+        <div className="font-[family-name:var(--font-mono)] text-base tracking-[0.15em] uppercase text-accent mb-0.5">
           Source
         </div>
         <div className="font-[family-name:var(--font-display)] text-2xl tracking-[0.05em] text-text-primary">
@@ -58,12 +58,12 @@ export function OilSourceNode({ oilData }: OilSourceNodeProps) {
             ${latest.value.toFixed(2)}
           </span>
           {sinceWarPct !== null && (
-            <span className={`font-[family-name:var(--font-mono)] text-sm font-semibold ${sinceWarPct >= 0 ? 'text-red' : 'text-green'}`}>
+            <span className={`font-[family-name:var(--font-mono)] text-base font-semibold ${sinceWarPct >= 0 ? 'text-red' : 'text-green'}`}>
               {sinceWarPct >= 0 ? '\u2191' : '\u2193'} {sinceWarPct >= 0 ? '+' : ''}{sinceWarPct.toFixed(1)}% since Iran War
             </span>
           )}
         </div>
-        <div className="font-[family-name:var(--font-mono)] text-sm text-text-secondary mt-0.5">
+        <div className="font-[family-name:var(--font-mono)] text-base text-text-secondary mt-0.5">
           {new Date(latest.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </div>
       </div>
@@ -71,7 +71,7 @@ export function OilSourceNode({ oilData }: OilSourceNodeProps) {
       {/* Sparkline */}
       {sparkPoints && (
         <div className="w-[140px] h-12 rounded-md border border-border bg-[rgba(0,240,255,0.03)] relative shrink-0">
-          <span className="absolute top-1 right-1.5 font-[family-name:var(--font-mono)] text-[8px] text-text-secondary uppercase tracking-[0.1em]">
+          <span className="absolute top-1 right-1.5 font-[family-name:var(--font-mono)] text-[9px] text-text-secondary uppercase tracking-[0.1em]">
             1Y
           </span>
           <svg viewBox="0 0 120 30" className="absolute bottom-1.5 left-2 right-2 h-7 w-[calc(100%-16px)]">

@@ -104,7 +104,7 @@ export function CrisisComparisonSection() {
         </div>
 
         {/* Hint */}
-        <div className="mt-3 text-center text-xs font-[family-name:var(--font-mono)] text-text-secondary">
+        <div className="mt-3 text-center text-sm font-[family-name:var(--font-mono)] text-text-secondary">
           Click a crisis row to compare its price trajectory against the current war
         </div>
       </div>
