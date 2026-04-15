@@ -4,6 +4,7 @@ import type { Milestone } from '../../types';
 interface TimelineMilestoneProps {
   milestone: Milestone;
   index: number;
+  side: 'left' | 'right' | 'full';
 }
 
 const DOT_COLORS: Record<string, string> = {
@@ -12,7 +13,13 @@ const DOT_COLORS: Record<string, string> = {
   today: '#5DB075',
 };
 
-export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) {
+const STAMP_LABELS: Record<string, string> = {
+  editorial: 'DISPATCH',
+  data: 'SIGNAL',
+  today: 'SITREP',
+};
+
+export function TimelineMilestone({ milestone, index, side }: TimelineMilestoneProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,6 +50,7 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
   }, [index]);
 
   const color = DOT_COLORS[milestone.type] || DOT_COLORS.data;
+  const stamp = STAMP_LABELS[milestone.type] || 'SIGNAL';
   const isToday = milestone.type === 'today';
   const isEditorial = milestone.type === 'editorial';
 
@@ -52,22 +60,77 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
       ? `Week ${milestone.week} \u2022 ${new Date(milestone.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
       : new Date(milestone.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
+  const nodeSize = isToday ? 20 : isEditorial ? 18 : 14;
+
+  const cardContent = (
+    <div className={`war-room-card war-room-card--${milestone.type} p-4 relative`}>
+      <div className="war-room-accent-strip" style={{ background: color }} />
+
+      <div className="flex items-center gap-2 mb-2 mt-1 flex-wrap">
+        <span className="war-room-stamp" style={{ color, borderColor: `${color}50` }}>
+          {stamp}
+        </span>
+        <span className="font-[family-name:var(--font-mono)] text-[10px] tracking-[0.12em] uppercase text-text-secondary">
+          {dateLabel}
+        </span>
+        {isToday && (
+          <span className="live-indicator ml-auto">
+            <span className="live-dot" />
+            LIVE
+          </span>
+        )}
+      </div>
+
+      <h3
+        className="font-[family-name:var(--font-display)] text-text-primary mb-1 leading-snug"
+        style={{ fontSize: isEditorial ? 18 : 15 }}
+      >
+        {milestone.headline}
+      </h3>
+
+      {milestone.description && (
+        <p className="text-[13px] text-text-secondary leading-relaxed mt-1">
+          {milestone.description}
+        </p>
+      )}
+
+      {milestone.badges.length > 0 && (
+        <div className="flex gap-2 mt-3 flex-wrap">
+          {milestone.badges.map((badge, i) => (
+            <span
+              key={i}
+              className="font-[family-name:var(--font-mono)] text-[11px] px-2.5 py-1 rounded-sm"
+              style={{
+                background: `${color}15`,
+                border: `1px solid ${color}30`,
+                color,
+              }}
+            >
+              {badge.label} {badge.change}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div
       ref={ref}
-      className="timeline-milestone grid gap-x-4 mb-0 py-4"
-      style={{
-        gridTemplateColumns: '20px 1fr',
-        minHeight: isEditorial ? 80 : 60,
-      }}
+      className={`timeline-milestone war-room-row war-room-row--${side} py-3`}
     >
-      {/* Column 1: Dot (centered in 20px column) */}
-      <div className="flex justify-center pt-1 relative">
+      {/* Left cell — visible on desktop only (CSS handles hiding) */}
+      <div className="war-room-left-cell">
+        {side === 'left' ? cardContent : null}
+      </div>
+
+      {/* Node cell — spine dot + connector */}
+      <div className="war-room-node-cell flex justify-center relative" style={{ paddingTop: 16 }}>
         {isToday ? (
           <div
             style={{
-              width: 16,
-              height: 16,
+              width: nodeSize,
+              height: nodeSize,
               borderRadius: '50%',
               border: `2px solid ${color}`,
               background: '#04060C',
@@ -75,7 +138,9 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
-            }}
+              '--node-color': color,
+              animation: 'nodeGlow 3s ease-in-out infinite',
+            } as React.CSSProperties}
           >
             <div
               style={{
@@ -90,64 +155,33 @@ export function TimelineMilestone({ milestone, index }: TimelineMilestoneProps) 
         ) : (
           <div
             style={{
-              width: isEditorial ? 12 : 10,
-              height: isEditorial ? 12 : 10,
+              width: nodeSize,
+              height: nodeSize,
               borderRadius: '50%',
               background: color,
-              boxShadow: `0 0 8px ${color}40`,
               flexShrink: 0,
-              marginTop: 2,
+              '--node-color': color,
+              animation: 'nodeGlow 3s ease-in-out infinite',
+            } as React.CSSProperties}
+          />
+        )}
+
+        {/* Horizontal connector — desktop only */}
+        {side !== 'full' && (
+          <div
+            className="war-room-connector-line"
+            style={{
+              [side === 'left' ? 'right' : 'left']: '100%',
+              width: 20,
+              background: `linear-gradient(${side === 'left' ? '270deg' : '90deg'}, ${color}40, transparent)`,
             }}
           />
         )}
       </div>
 
-      {/* Column 2: Content */}
-      <div>
-        {/* Date label */}
-        <div
-          className="font-[family-name:var(--font-mono)] text-[11px] tracking-[0.12em] uppercase mb-1"
-          style={{ color }}
-        >
-          {dateLabel}
-          {isEditorial && (
-            <span className="ml-2" style={{ color: '#CC2936' }}>{'\u2022'} Event</span>
-          )}
-        </div>
-
-        {/* Headline */}
-        <div
-          className="font-semibold text-text-primary mb-1"
-          style={{ fontSize: isEditorial ? 16 : 14 }}
-        >
-          {milestone.headline}
-        </div>
-
-        {/* Description */}
-        {milestone.description && (
-          <div className="text-[13px] text-text-secondary leading-relaxed">
-            {milestone.description}
-          </div>
-        )}
-
-        {/* Badges */}
-        {milestone.badges.length > 0 && (
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {milestone.badges.map((badge, i) => (
-              <span
-                key={i}
-                className="font-[family-name:var(--font-mono)] text-[11px] px-2 py-0.5 rounded-sm"
-                style={{
-                  background: `${color}15`,
-                  border: `1px solid ${color}30`,
-                  color,
-                }}
-              >
-                {badge.label} {badge.change}
-              </span>
-            ))}
-          </div>
-        )}
+      {/* Right cell — always visible on mobile; on desktop shown for right/full, hidden for left */}
+      <div className="war-room-right-cell">
+        {cardContent}
       </div>
     </div>
   );

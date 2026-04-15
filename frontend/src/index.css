@@ -150,12 +150,220 @@
   }
 }
 
+/* Pin-drop reveal — card appears pinned to the board */
+@keyframes pinDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  60% {
+    transform: translateY(2px) scale(1.01);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Spine node glow pulse */
+@keyframes nodeGlow {
+  0%, 100% { box-shadow: 0 0 6px var(--node-color), 0 0 12px color-mix(in srgb, var(--node-color) 20%, transparent); }
+  50% { box-shadow: 0 0 10px var(--node-color), 0 0 20px color-mix(in srgb, var(--node-color) 35%, transparent); }
+}
+
+/* Phase marker stamp entrance */
+@keyframes phaseStamp {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 .timeline-milestone {
   opacity: 0;
 }
 
 .timeline-milestone.revealed {
-  animation: milestoneReveal 0.5s ease-out forwards;
+  animation: pinDrop 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ═══════════════════════════════════════════════
+   War Room Tactical Situation Board
+   ═══════════════════════════════════════════════ */
+
+/* Row grid — each milestone is its own row.
+   Mobile: 2-col (node + card). Desktop: 3-col (left, node, right). */
+.war-room-row {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: start;
+}
+
+.war-room-node-cell {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* Mobile: left-area hidden, card always in col 2 */
+.war-room-left-cell {
+  display: none;
+}
+
+.war-room-right-cell {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Desktop: 3-column alternating layout */
+@media (min-width: 1024px) {
+  .war-room-row {
+    grid-template-columns: 1fr 48px 1fr;
+  }
+
+  .war-room-node-cell {
+    grid-column: 2;
+  }
+
+  .war-room-left-cell {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .war-room-right-cell {
+    grid-column: 3;
+  }
+
+  /* Left-side card: right-align text toward spine */
+  .war-room-row--left .war-room-left-cell {
+    text-align: right;
+  }
+
+  /* Left-side card: hide right cell on desktop (content is in left cell) */
+  .war-room-row--left .war-room-right-cell {
+    display: none;
+  }
+
+  /* Full-width: card spans all columns, hide left cell */
+  .war-room-row--full .war-room-left-cell {
+    display: none;
+  }
+  .war-room-row--full .war-room-right-cell {
+    grid-column: 1 / -1;
+  }
+  .war-room-row--full .war-room-node-cell {
+    display: none;
+  }
+}
+
+/* Intelligence document card — base */
+.war-room-card {
+  background: rgba(16, 22, 38, 0.95);
+  border: 1px solid rgba(212, 160, 18, 0.12);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.war-room-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 1px rgba(212, 160, 18, 0.2);
+  border-color: rgba(212, 160, 18, 0.18);
+}
+
+/* Dispatch — editorial / geopolitical event */
+.war-room-card--editorial {
+  border-color: rgba(204, 41, 54, 0.15);
+  border-left: 3px solid #CC2936;
+}
+.war-room-card--editorial:hover {
+  border-color: rgba(204, 41, 54, 0.3);
+  box-shadow: 0 8px 30px rgba(204, 41, 54, 0.08), 0 0 1px rgba(204, 41, 54, 0.2);
+}
+
+/* Signal — auto-detected market data */
+.war-room-card--data {
+  border-color: rgba(0, 240, 255, 0.15);
+  border-left: 3px solid #00F0FF;
+  box-shadow: 0 2px 12px rgba(0, 240, 255, 0.04), 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+.war-room-card--data:hover {
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 240, 255, 0.08), 0 0 1px rgba(0, 240, 255, 0.2);
+}
+
+/* SITREP — today / live status */
+.war-room-card--today {
+  border-color: rgba(93, 176, 117, 0.20);
+  border-left: 3px solid #5DB075;
+  background: rgba(93, 176, 117, 0.04);
+}
+.war-room-card--today:hover {
+  border-color: rgba(93, 176, 117, 0.35);
+  box-shadow: 0 8px 30px rgba(93, 176, 117, 0.08);
+}
+
+/* Accent strip — top edge of each card */
+.war-room-accent-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+/* Stamp header — DISPATCH / SIGNAL / SITREP */
+.war-room-stamp {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border: 1px solid;
+  display: inline-block;
+  opacity: 0.8;
+}
+
+/* Phase marker — PRE-CONFLICT / OPEN CONFLICT / ESCALATION */
+.war-room-phase {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  padding: 4px 10px;
+  border: 1px solid rgba(212, 160, 18, 0.12);
+  background: rgba(212, 160, 18, 0.04);
+  white-space: nowrap;
+  animation: phaseStamp 0.4s ease-out both;
+}
+
+/* Horizontal connector from spine to card — desktop only */
+.war-room-connector-line {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .war-room-connector-line {
+    display: block;
+    position: absolute;
+    height: 1px;
+    top: 50%;
+  }
+}
+
+/* Left-side editorial card: accent border faces the spine */
+@media (min-width: 1024px) {
+  .war-room-row--left .war-room-left-cell .war-room-card--editorial {
+    border-left: 1px solid rgba(204, 41, 54, 0.15);
+    border-right: 3px solid #CC2936;
+  }
+  .war-room-row--left .war-room-left-cell .war-room-card--editorial:hover {
+    border-color: rgba(204, 41, 54, 0.3);
+    border-right-color: #CC2936;
+  }
 }
 
 /* Today marker pulse — red for urgency */
@@ -832,6 +1040,16 @@ body::after {
   }
   .timeline-milestone {
     opacity: 1;
+    animation: none;
+  }
+  .war-room-card {
+    transition: none;
+  }
+  .war-room-card:hover {
+    transform: none;
+  }
+  .war-room-phase {
+    animation: none;
   }
   .crisis-pulse,
   .crisis-live-badge {

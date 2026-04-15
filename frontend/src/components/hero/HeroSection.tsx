@@ -1,9 +1,10 @@
 import { ChevronDown, Settings } from 'lucide-react';
-import { usePriceSummary } from '../../hooks/useOilPrices';
+import { usePriceSummary, useOilPrices } from '../../hooks/useOilPrices';
 import { useDashboardStore, type DateRangePreset } from '../../stores/dashboardStore';
 import { useCountUp } from '../../hooks/useCountUp';
 import { SERIES_LABELS } from '../../lib/constants';
 import { formatCurrency, formatPercent } from '../../lib/utils';
+import { IRAN_WAR_DATE, getValueBeforeDate, hasDataAfter } from '../../lib/commodity-data';
 
 const DATE_RANGES: DateRangePreset[] = ['1M', '3M', '6M', '1Y', '2Y', '5Y', 'ALL'];
 
@@ -34,6 +35,7 @@ export function HeroSection({ onOpenEventManager }: HeroSectionProps) {
   const setDateRange = useDashboardStore((s) => s.setDateRange);
 
   const { data: summary, isLoading } = usePriceSummary();
+  const { data: seriesData } = useOilPrices(selectedSeries);
   const item = summary?.data?.find((d) => d.series === selectedSeries);
   const brentItem = summary?.data?.find((d) => d.series === 'brent');
   const price = item?.current_price ?? null;
@@ -41,6 +43,12 @@ export function HeroSection({ onOpenEventManager }: HeroSectionProps) {
   const pctChange = item?.pct_change ?? null;
   const animatedPrice = useCountUp(price ?? 0, 1000, 2);
   const isPositive = change != null && change >= 0;
+
+  // Compute "since war" change from full series data
+  const warBaseline = seriesData ? getValueBeforeDate(seriesData, IRAN_WAR_DATE) : null;
+  const postWar = seriesData ? hasDataAfter(seriesData, IRAN_WAR_DATE) : false;
+  const warChange = warBaseline !== null && postWar && price !== null ? price - warBaseline : null;
+  const warPctChange = warBaseline !== null && warBaseline !== 0 && warChange !== null ? warChange / warBaseline : null;
 
   const now = new Date();
   const dateline = now.toLocaleDateString('en-US', {
@@ -124,19 +132,39 @@ export function HeroSection({ onOpenEventManager }: HeroSectionProps) {
 
         {/* Change indicators */}
         {change != null && !isLoading && (
-          <div className="mt-3 flex items-center justify-center gap-4">
-            <span
-              className="number-display text-lg font-medium"
-              style={{ color: isPositive ? '#5DB075' : '#CC2936' }}
-            >
-              {isPositive ? '\u2191' : '\u2193'} {formatCurrency(Math.abs(change))}
-            </span>
-            <span
-              className="number-display text-sm"
-              style={{ color: isPositive ? '#5DB075' : '#CC2936' }}
-            >
-              {formatPercent(pctChange ?? 0)} today
-            </span>
+          <div className="mt-3 flex flex-col items-center gap-2">
+            <div className="flex items-center justify-center gap-4">
+              <span
+                className="number-display text-lg font-medium"
+                style={{ color: isPositive ? '#5DB075' : '#CC2936' }}
+              >
+                {isPositive ? '\u2191' : '\u2193'} {formatCurrency(Math.abs(change))}
+              </span>
+              <span
+                className="number-display text-sm"
+                style={{ color: isPositive ? '#5DB075' : '#CC2936' }}
+              >
+                {formatPercent(pctChange ?? 0)} today
+              </span>
+            </div>
+            {warChange !== null && (
+              <div className="flex items-center justify-center gap-3">
+                <span
+                  className="number-display text-sm font-medium"
+                  style={{ color: warChange >= 0 ? '#CC2936' : '#5DB075' }}
+                >
+                  {warChange >= 0 ? '+' : ''}{formatCurrency(warChange)} since war
+                </span>
+                {warPctChange !== null && (
+                  <span
+                    className="number-display text-xs"
+                    style={{ color: warChange >= 0 ? '#CC2936' : '#5DB075' }}
+                  >
+                    ({formatPercent(warPctChange * 100)})
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         )}
 
