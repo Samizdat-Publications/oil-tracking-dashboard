@@ -82,8 +82,8 @@ export function CrisisTrajectoryChart({
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Draw line helper
-    function drawLine(points: CrisisTrajectoryPoint[], color: string, lineWidth: number, dashed = false) {
+    // Draw line helper — arrow keeps the outer `ctx` narrowing
+    const drawLine = (points: CrisisTrajectoryPoint[], color: string, lineWidth: number, dashed = false) => {
       if (points.length < 2) return;
       ctx.strokeStyle = color;
       ctx.lineWidth = lineWidth;
@@ -97,7 +97,7 @@ export function CrisisTrajectoryChart({
       }
       ctx.stroke();
       if (dashed) ctx.setLineDash([]);
-    }
+    };
 
     // Historical line (dashed)
     drawLine(historicalTrajectory, historicalColor, 2, true);

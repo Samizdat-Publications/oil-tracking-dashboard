@@ -46,13 +46,20 @@ function Odometer({
   const startRef = useRef<number | null>(null);
   const fromRef = useRef(0);
   const targetRef = useRef(value);
+  // Mirror displayed into a ref so the animation effect can read the latest
+  // value without making `displayed` a dependency (which would restart the
+  // animation every frame and cause an infinite loop).
+  const displayedRef = useRef(displayed);
+  useEffect(() => {
+    displayedRef.current = displayed;
+  }, [displayed]);
 
   useEffect(() => {
     if (reducedMotion()) {
       setDisplayed(value);
       return;
     }
-    fromRef.current = displayed;
+    fromRef.current = displayedRef.current;
     targetRef.current = value;
     startRef.current = null;
     const animate = (t: number) => {
@@ -66,7 +73,6 @@ function Odometer({
     return () => {
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, duration]);
 
   const str = displayed.toFixed(decimals);
@@ -342,7 +348,7 @@ function HeroChart({ series }: { series: PriceSeries | undefined }) {
   const W = 620;
   const H = 360;
   const { path, areaPath, warX, minV, maxV, endY } = useMemo(() => {
-    if (!points.length) {
+    if (points.length < 2) {
       return { path: '', areaPath: '', warX: W * 0.5, minV: 56, maxV: 139, endY: H / 2 };
     }
     const minV = Math.min(...points.map((p) => p.value));

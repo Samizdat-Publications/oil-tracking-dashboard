@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from services.cache import init_cache, clear_cache, close_cache
 from services.fred_client import SERIES_IDS, get_series
 from routers import prices, simulation, correlations, milestones, polymarket, crisis
+from dependencies import verify_localhost
 from models.schemas import (
     HealthResponse,
     SetupStatusResponse,
@@ -28,6 +29,19 @@ logger = logging.getLogger("oildash")
 
 ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
 EVENTS_PATH = os.path.join(os.path.dirname(__file__), "data", "default_events.json")
+
+# Series that the Kitchen Table Ticker surfaces above the fold. These are warmed
+# synchronously at startup so the first user gets a hot cache for the ticker.
+TICKER_SERIES_KEYS = [
+    "gasoline",
+    "diesel",
+    "natural_gas",
+    "airline_fares",
+    "eggs_meat",
+    "food_at_home",
+    "cpi_energy",
+    "cpi_all",
+]
 
 
 async def _prewarm_cache():
@@ -53,9 +67,37 @@ async def _prewarm_cache():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup / shutdown lifecycle."""
-    await init_cache()
-    # Fire-and-forget cache warming so server is ready immediately
     import asyncio
+    from datetime import date, timedelta
+
+    await init_cache()
+
+    if not os.getenv("ADMIN_SECRET", "").strip():
+        logger.warning(
+            "ADMIN_SECRET is not set — remote administrative endpoints "
+            "(/api/setup/configure, /api/polymarket/refresh) are restricted to localhost only."
+        )
+
+    # Await ONLY the series used above the fold so the first user sees a hot
+    # cache. Everything else is warmed in the background after yield.
+    critical_keys = ["wti", "brent"] + TICKER_SERIES_KEYS
+    start = (date.today() - timedelta(days=365 * 20)).isoformat()
+    end = date.today().isoformat()
+
+    async def _warm(key: str):
+        try:
+            await get_series(SERIES_IDS[key], start, end)
+        except Exception as e:
+            logger.warning("Critical cache warm failed for %s: %s", key, e)
+
+    try:
+        await asyncio.wait_for(
+            asyncio.gather(*[_warm(k) for k in critical_keys if k in SERIES_IDS]),
+            timeout=10.0,
+        )
+    except asyncio.TimeoutError:
+        logger.warning("Critical cache warm exceeded 10s; continuing startup")
+
     asyncio.create_task(_prewarm_cache())
     yield
     await close_cache()
@@ -67,11 +109,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — restrict origins via env var (defaults to local dev servers)
+# CORS — restrict origins via env var (defaults to local dev servers).
+# allow_credentials=False: the API is cookieless; disabling credentials narrows
+# the blast radius if someone later misconfigures ALLOWED_ORIGINS to "*".
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(","),
-    allow_credentials=True,
+    allow_origins=[o.strip() for o in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:5173,http://localhost:3000",
+    ).split(",") if o.strip()],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -115,20 +162,7 @@ async def setup_status():
     return SetupStatusResponse(fred_api_key_set=bool(key))
 
 
-ADMIN_SECRET = os.getenv("ADMIN_SECRET", "").strip()
-
-
-async def _verify_localhost(request: Request):
-    """Only allow configuration from localhost or with admin secret."""
-    host = request.client.host if request.client else ""
-    is_local = host in ("127.0.0.1", "::1", "localhost")
-    if not is_local:
-        auth = request.headers.get("Authorization", "")
-        if not ADMIN_SECRET or auth != f"Bearer {ADMIN_SECRET}":
-            raise HTTPException(status_code=403, detail="Configuration only allowed from localhost")
-
-
-@app.post("/api/setup/configure", response_model=ConfigureResponse, dependencies=[Depends(_verify_localhost)])
+@app.post("/api/setup/configure", response_model=ConfigureResponse, dependencies=[Depends(verify_localhost)])
 async def setup_configure(body: ConfigureRequest):
     """Save FRED API key to the .env file."""
     api_key = body.fred_api_key.strip()

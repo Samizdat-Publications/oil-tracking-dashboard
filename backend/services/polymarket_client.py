@@ -411,13 +411,18 @@ async def get_war_economy_markets(force_refresh: bool = False) -> dict:
         "updated_at": datetime.utcnow().isoformat() + "Z",
     }
 
-    # Persist to disk for instant loading on next startup
+    # Persist to disk for instant loading on next startup — but only after
+    # validating against the response schema so a malformed upstream (or an
+    # internal bug) can't poison the file we read back at startup.
     try:
+        from models.schemas import PolymarketWarEconomyResponse
+
+        validated = PolymarketWarEconomyResponse.model_validate(result)
         with open(PERSISTENT_DATA_PATH, "w") as f:
-            json.dump(result, f)
+            json.dump(validated.model_dump(), f)
         logger.info("Saved Polymarket data to %s", PERSISTENT_DATA_PATH)
     except Exception as exc:
-        logger.warning("Failed to save Polymarket data: %s", exc)
+        logger.warning("Skipped persisting Polymarket data (validation or I/O failed): %s", exc)
 
     # Cache in SQLite (10-min TTL)
     await _set_cached_polymarket("polymarket:war_economy", result)

@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import date, timedelta
 
 from fastapi import APIRouter, HTTPException
+
+logger = logging.getLogger("oildash")
 
 from services.fred_client import SERIES_IDS, get_series
 from services.monte_carlo import estimate_params, run_simulation
@@ -33,10 +36,12 @@ async def simulate(req: SimulationRequest):
 
     try:
         obs = await get_series(series_id, start, end)
-    except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc))
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"FRED API error: {exc}")
+    except RuntimeError:
+        logger.exception("API key / configuration error during simulation for %s", key)
+        raise HTTPException(status_code=503, detail="Data source not configured")
+    except Exception:
+        logger.exception("FRED fetch failed during simulation for %s", key)
+        raise HTTPException(status_code=502, detail="Upstream data fetch failed")
 
     if len(obs) < 30:
         raise HTTPException(
@@ -47,11 +52,14 @@ async def simulate(req: SimulationRequest):
     prices = [o["value"] for o in obs]
     current_price = prices[-1]
 
-    # Estimate parameters
+    # Estimate parameters — ValueError is a data-quality signal safe to surface.
     try:
         params = estimate_params(prices)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
+    except Exception:
+        logger.exception("estimate_params crashed for %s", key)
+        raise HTTPException(status_code=500, detail="Parameter estimation failed")
 
     mu = req.mu_override if req.mu_override is not None else params["mu"]
     sigma = req.sigma_override if req.sigma_override is not None else params["sigma"]

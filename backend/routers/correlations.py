@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from datetime import date, timedelta
 
 from fastapi import APIRouter, HTTPException, Query
+
+logger = logging.getLogger("oildash")
 
 from services.fred_client import (
     SERIES_IDS,
@@ -34,8 +37,9 @@ async def get_correlations(
     # Fetch WTI
     try:
         wti_obs = await get_series(SERIES_IDS["wti"], start, end)
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Failed to fetch WTI: {exc}")
+    except Exception:
+        logger.exception("Failed to fetch WTI for /api/correlations")
+        raise HTTPException(status_code=502, detail="Upstream data fetch failed")
 
     async def _fetch_downstream(key: str):
         try:

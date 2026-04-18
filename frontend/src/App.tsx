@@ -1,14 +1,17 @@
 import { useState, useEffect, lazy, Suspense, Component, type ReactNode, type ErrorInfo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { EditorialLayout } from './components/layout/EditorialLayout';
-
-const BroadsheetPage = lazy(() => import('./pages/BroadsheetPage').then(m => ({ default: m.BroadsheetPage })));
-import { HeroSection } from './components/hero/HeroSection';
-import { SetupScreen } from './components/setup/SetupScreen';
-import { KitchenTableTicker } from './components/layout/KitchenTableTicker';
 import { SectionErrorBoundary } from './components/ui/SectionErrorBoundary';
 import { useSimulation } from './hooks/useSimulation';
+import { useInViewOnce } from './hooks/useInViewOnce';
 import { checkSetup } from './lib/api';
+
+const BroadsheetPage = lazy(() => import('./pages/BroadsheetPage').then(m => ({ default: m.BroadsheetPage })));
+
+// Dashboard-only chunks — kept out of the broadsheet bundle by lazy-loading.
+const EditorialLayout = lazy(() => import('./components/layout/EditorialLayout').then(m => ({ default: m.EditorialLayout })));
+const HeroSection = lazy(() => import('./components/hero/HeroSection').then(m => ({ default: m.HeroSection })));
+const SetupScreen = lazy(() => import('./components/setup/SetupScreen').then(m => ({ default: m.SetupScreen })));
+const KitchenTableTicker = lazy(() => import('./components/layout/KitchenTableTicker').then(m => ({ default: m.KitchenTableTicker })));
 
 // Lazy-load below-fold sections — keeps initial bundle small, speeds up LCP
 const ForecastSection = lazy(() => import('./components/sections/ForecastSection').then(m => ({ default: m.ForecastSection })));
@@ -74,7 +77,11 @@ function DashboardApp() {
 
   // If setup check completed and NOT configured, show setup screen
   if (setupChecked && !configured) {
-    return <SetupScreen onComplete={() => setConfigured(true)} />;
+    return (
+      <Suspense fallback={<div style={{ background: '#04060C', minHeight: '100vh' }} />}>
+        <SetupScreen onComplete={() => setConfigured(true)} />
+      </Suspense>
+    );
   }
 
   // Render dashboard immediately — don't block on setup check
@@ -87,18 +94,28 @@ interface DashboardContentProps {
 }
 
 function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardContentProps) {
-  const sim = useSimulation();
+  // Defer the Monte Carlo until the user scrolls toward the forecast area —
+  // keeps the CPU-heavy POST off the hero/ticker critical path on first load.
+  const [simSentinelRef, simReady] = useInViewOnce<HTMLDivElement>();
+  const sim = useSimulation(simReady);
 
   return (
-    <>
+    <Suspense fallback={<div style={{ background: '#04060C', minHeight: '100vh' }} />}>
       {/* Sticky ticker — outside EditorialLayout for correct fixed positioning */}
       <KitchenTableTicker />
 
       <EditorialLayout>
       {/* Section 1: Full-viewport hero with price */}
       <SectionErrorBoundary name="Hero">
-        <HeroSection onOpenEventManager={() => setEventManagerOpen(true)} />
+        <Suspense fallback={<SectionSkeleton />}>
+          <HeroSection onOpenEventManager={() => setEventManagerOpen(true)} />
+        </Suspense>
       </SectionErrorBoundary>
+
+      {/* Sentinel: when this enters view, simulation fetch kicks off. Placed
+          ~200px above ForecastSection via the hook's rootMargin so data is
+          ready by the time the section is visible. */}
+      <div ref={simSentinelRef} aria-hidden className="h-px" />
 
       {/* Below-fold sections: lazy-loaded for faster initial paint */}
       <Suspense fallback={<SectionSkeleton />}>
@@ -170,20 +187,13 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
       </Suspense>
 
       <Suspense fallback={<SectionSkeleton />}>
-        {/* Section 10: Raw Data */}
-        <div className="section-reading py-8 pb-24">
-          <CollapsibleSection title="Raw Data" defaultOpen={false}>
-            <DataTable />
-          </CollapsibleSection>
-        </div>
-      </Suspense>
-
         {/* Section 10: Raw data — collapsible, narrow */}
         <div className="section-reading py-8 pb-24">
           <CollapsibleSection title="Raw Data" defaultOpen={false}>
             <DataTable />
           </CollapsibleSection>
         </div>
+      </Suspense>
 
       {/* Footer spacer */}
       <div className="h-16" />
@@ -198,7 +208,7 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
         <CommodityDetailPanel />
       </Suspense>
     </EditorialLayout>
-    </>
+    </Suspense>
   );
 }
 

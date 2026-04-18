@@ -1,4 +1,4 @@
-import type { PriceSeries, PriceSummary, SimulationBands, SimulationRequest, DownstreamData, MilestonesResponse, PolymarketWarEconomy, CrisisComparisonResponse } from '../types';
+import type { PriceSeries, PriceSummary, SimulationBands, SimulationRequest, DownstreamData, MilestonesResponse, PolymarketWarEconomy, CrisisComparisonResponse, TickerResponse } from '../types';
 
 const BASE = '/api';
 
@@ -70,6 +70,11 @@ export function fetchCorrelations(window?: number): Promise<DownstreamData> {
 /** Fetch WTI + all downstream series for correlation analysis */
 export function fetchDownstream(): Promise<DownstreamData> {
   return fetchJson<DownstreamData>(`${BASE}/prices/downstream`);
+}
+
+/** Lightweight ticker payload (~18 numbers) for above-fold Kitchen Table ticker */
+export function fetchTicker(): Promise<TickerResponse> {
+  return fetchJson<TickerResponse>(`${BASE}/prices/ticker`);
 }
 
 /** Fetch war impact milestones (editorial + data-detected) */

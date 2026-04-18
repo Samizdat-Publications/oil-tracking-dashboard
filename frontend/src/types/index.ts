@@ -90,6 +90,20 @@ export interface DownstreamData {
   series: PriceSeries[];
 }
 
+export interface TickerItem {
+  key: string;
+  name: string;
+  latest_value: number | null;
+  latest_date: string | null;
+  war_baseline: number | null;
+  has_post_war_data: boolean;
+}
+
+export interface TickerResponse {
+  items: TickerItem[];
+  iran_war_date: string;
+}
+
 export interface VolatilityData {
   [window: string]: number;
 }

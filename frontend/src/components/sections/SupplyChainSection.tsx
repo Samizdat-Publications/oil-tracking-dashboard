@@ -21,7 +21,7 @@ export function SupplyChainSection() {
   const items: DownstreamItemData[] = useMemo(() => {
     if (!downstream?.oil?.observations?.length || !downstream?.series?.length) return [];
 
-    return Object.entries(COMMODITY_DATA).map(([key, info]) => {
+    const mapped: (DownstreamItemData | null)[] = Object.entries(COMMODITY_DATA).map(([key, info]) => {
       const ds = downstream.series.find((s) => s.name === info.displayName);
       if (!ds || !ds.observations.length) return null;
 
@@ -33,7 +33,7 @@ export function SupplyChainSection() {
       const changePct = warBaseline && latestVal && postWarData ? ((latestVal - warBaseline) / warBaseline) * 100 : null;
       const awaitingPostWar = !postWarData && warBaseline !== null;
 
-      return {
+      const item: DownstreamItemData = {
         seriesKey: key,
         displayName: info.displayName,
         icon: info.icon,
@@ -41,8 +41,10 @@ export function SupplyChainSection() {
         changePct,
         correlation: corr,
         awaitingPostWar,
-      } satisfies DownstreamItemData;
-    }).filter((x): x is DownstreamItemData => x !== null);
+      };
+      return item;
+    });
+    return mapped.filter((x): x is DownstreamItemData => x !== null);
   }, [downstream]);
 
   if (isLoading) {

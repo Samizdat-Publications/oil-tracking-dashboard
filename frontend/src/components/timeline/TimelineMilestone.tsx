@@ -3,7 +3,8 @@ import type { Milestone } from '../../types';
 
 interface TimelineMilestoneProps {
   milestone: Milestone;
-  index: number;
+  /** Kept for the key prop in the parent list — not read inside. */
+  index?: number;
   side: 'left' | 'right' | 'full';
 }
 
@@ -19,7 +20,7 @@ const STAMP_LABELS: Record<string, string> = {
   today: 'SITREP',
 };
 
-export function TimelineMilestone({ milestone, index, side }: TimelineMilestoneProps) {
+export function TimelineMilestone({ milestone, side }: TimelineMilestoneProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,26 +29,26 @@ export function TimelineMilestone({ milestone, index, side }: TimelineMilestoneP
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          const now = Date.now();
-          const lastReveal = Number(document.documentElement.dataset.lastMilestoneReveal || '0');
-          const batchIndex = (now - lastReveal < 200)
-            ? Number(document.documentElement.dataset.milestoneBatchIdx || '0') + 1
-            : 0;
-          document.documentElement.dataset.lastMilestoneReveal = String(now);
-          document.documentElement.dataset.milestoneBatchIdx = String(batchIndex);
+        if (!entry.isIntersecting) return;
+        const now = Date.now();
+        const lastReveal = Number(document.documentElement.dataset.lastMilestoneReveal || '0');
+        const batchIndex = (now - lastReveal < 200)
+          ? Number(document.documentElement.dataset.milestoneBatchIdx || '0') + 1
+          : 0;
+        document.documentElement.dataset.lastMilestoneReveal = String(now);
+        document.documentElement.dataset.milestoneBatchIdx = String(batchIndex);
 
-          el.style.animationDelay = `${batchIndex * 0.1}s`;
-          el.classList.add('revealed');
-          observer.unobserve(el);
-        }
+        el.style.animationDelay = `${batchIndex * 0.1}s`;
+        el.classList.add('revealed');
+        // Single disconnect is enough — observer only watches this one element.
+        observer.disconnect();
       },
       { threshold: 0.2, rootMargin: '0px 0px -50px 0px' }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [index]);
+  }, []);
 
   const color = DOT_COLORS[milestone.type] || DOT_COLORS.data;
   const stamp = STAMP_LABELS[milestone.type] || 'SIGNAL';

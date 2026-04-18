@@ -1,6 +1,17 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { fetchPrices, fetchSummary, fetchDownstream, fetchMilestones } from '../lib/api';
-import type { PriceSeries, PriceSummary, DownstreamData, MilestonesResponse } from '../types';
+import { fetchPrices, fetchSummary, fetchDownstream, fetchMilestones, fetchTicker } from '../lib/api';
+import type { PriceSeries, PriceSummary, DownstreamData, MilestonesResponse, TickerResponse } from '../types';
+
+export function useTicker() {
+  return useQuery<TickerResponse>({
+    queryKey: ['ticker'],
+    queryFn: fetchTicker,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    retry: 2,
+  });
+}
 
 export function useOilPrices(series: string, start?: string, end?: string) {
   return useQuery<PriceSeries>({

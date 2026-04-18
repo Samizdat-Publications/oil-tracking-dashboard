@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+import math
+
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
 
@@ -40,6 +42,27 @@ class DownstreamResponse(BaseModel):
     series: list[PriceSeries]
 
 
+class TickerItem(BaseModel):
+    """Compact payload for the above-fold Kitchen Table ticker.
+
+    Just the numbers the ticker actually renders — no full time series. This
+    keeps the critical-path request tiny so hero LCP isn't gated on the
+    20-year downstream endpoint.
+    """
+
+    key: str
+    name: str
+    latest_value: float | None = None
+    latest_date: str | None = None
+    war_baseline: float | None = None
+    has_post_war_data: bool = False
+
+
+class TickerResponse(BaseModel):
+    items: list[TickerItem]
+    iran_war_date: str
+
+
 # ---------------------------------------------------------------------------
 # Simulation models
 # ---------------------------------------------------------------------------
@@ -50,9 +73,27 @@ class SimulationRequest(BaseModel):
     n_paths: int = Field(default=5000, ge=1000, le=50000)
     horizon_days: int = Field(default=126, ge=21, le=252)
     model: str = Field(default="jump_diffusion", description="gbm or jump_diffusion")
-    seed: int | None = None
-    mu_override: float | None = None
-    sigma_override: float | None = None
+    seed: int | None = Field(default=None, ge=0, le=2**31 - 1)
+    # Annualized drift (mu) and volatility (sigma) overrides. Bounded to realistic
+    # ranges so an attacker can't feed nan/inf or extreme values that hang numpy.
+    mu_override: float | None = Field(default=None, ge=-5.0, le=5.0)
+    sigma_override: float | None = Field(default=None, ge=0.0, le=10.0)
+
+    @field_validator("mu_override", "sigma_override")
+    @classmethod
+    def _finite_float(cls, v: float | None) -> float | None:
+        if v is not None and not math.isfinite(v):
+            raise ValueError("must be a finite number")
+        return v
+
+    @field_validator("series", "model")
+    @classmethod
+    def _allowed_string(cls, v: str, info) -> str:
+        allowed = {"series": {"wti", "brent"}, "model": {"gbm", "jump_diffusion"}}[info.field_name]
+        key = v.lower()
+        if key not in allowed:
+            raise ValueError(f"must be one of {sorted(allowed)}")
+        return key
 
 
 class SimulationParams(BaseModel):

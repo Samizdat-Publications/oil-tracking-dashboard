@@ -1,18 +1,13 @@
 import { useMemo } from 'react';
-import { useDownstream } from '../../hooks/useOilPrices';
-import {
-  COMMODITY_DATA,
-  IRAN_WAR_DATE,
-  getValueBeforeDate,
-  hasDataAfter,
-} from '../../lib/commodity-data';
+import { useTicker } from '../../hooks/useOilPrices';
+import type { TickerItem as TickerApiItem } from '../../types';
 
 /** Series keys that have real dollar prices (not CPI index values) */
 const DOLLAR_PRICED = new Set(['gasoline', 'diesel', 'natural_gas']);
 
-/** Ticker item definitions — known at build time, no API needed */
+/** Ticker item definitions — icon/label mapping in display order. */
 const TICKER_ITEMS: { key: string; icon: string; name: string }[] = [
-  { key: '_oil', icon: '\u{1F6E2}\uFE0F', name: 'Crude Oil' },
+  { key: 'wti', icon: '\u{1F6E2}\uFE0F', name: 'Crude Oil' },
   { key: 'gasoline', icon: '\u26FD', name: 'Gasoline' },
   { key: 'diesel', icon: '\u{1F69A}', name: 'Diesel' },
   { key: 'natural_gas', icon: '\u{1F525}', name: 'Natural Gas' },
@@ -23,7 +18,7 @@ const TICKER_ITEMS: { key: string; icon: string; name: string }[] = [
   { key: 'cpi_all', icon: '\u{1F4B0}', name: 'CPI All Items' },
 ];
 
-interface TickerItem {
+interface DisplayItem {
   icon: string;
   name: string;
   price: string | null;
@@ -32,76 +27,46 @@ interface TickerItem {
   awaiting: boolean;
 }
 
-/** Compute price data for a single ticker item from downstream API response */
-function computePriceData(
-  key: string,
-  downstream: { oil: import('../../types').PriceSeries; series: import('../../types').PriceSeries[] } | undefined,
-): Pick<TickerItem, 'price' | 'changeLabel' | 'changeValue' | 'awaiting'> {
+function computeDisplay(key: string, api: TickerApiItem | undefined): Omit<DisplayItem, 'icon' | 'name'> {
   const none = { price: null, changeLabel: null, changeValue: null, awaiting: false };
-  if (!downstream) return none;
+  if (!api || api.latest_value === null) return none;
 
-  if (key === '_oil') {
-    const oil = downstream.oil;
-    if (!oil?.observations?.length) return none;
-    const latest = oil.observations.at(-1)!;
-    const warBaseline = getValueBeforeDate(oil, IRAN_WAR_DATE);
-    const postWar = hasDataAfter(oil, IRAN_WAR_DATE);
-    const dollarChange = warBaseline && postWar ? latest.value - warBaseline : null;
-    return {
-      price: `$${latest.value.toFixed(2)}`,
-      changeLabel: dollarChange !== null
-        ? `${dollarChange >= 0 ? '+' : ''}$${Math.abs(dollarChange).toFixed(2)} since war`
-        : null,
-      changeValue: dollarChange,
-      awaiting: !postWar && warBaseline !== null,
-    };
+  const isDollar = DOLLAR_PRICED.has(key) || key === 'wti';
+  const price = isDollar ? `$${api.latest_value.toFixed(2)}` : null;
+
+  if (api.war_baseline === null) {
+    return { price, changeLabel: null, changeValue: null, awaiting: false };
   }
 
-  const info = COMMODITY_DATA[key];
-  if (!info) return none;
-  const ds = downstream.series.find((s) => s.name === info.displayName);
-  if (!ds?.observations?.length) return none;
-
-  const latest = ds.observations.at(-1)!;
-  const warBaseline = getValueBeforeDate(ds, IRAN_WAR_DATE);
-  const postWar = hasDataAfter(ds, IRAN_WAR_DATE);
-  const isDollar = DOLLAR_PRICED.has(key);
-
-  let price: string | null = null;
-  let changeLabel: string | null = null;
-  let changeValue: number | null = null;
-
-  if (isDollar) price = `$${latest.value.toFixed(2)}`;
-
-  if (warBaseline && postWar) {
-    const diff = latest.value - warBaseline;
-    changeValue = diff;
-    changeLabel = isDollar
-      ? `${diff >= 0 ? '+' : ''}$${Math.abs(diff).toFixed(2)} since war`
-      : `${diff >= 0 ? '+' : ''}${Math.abs(diff).toFixed(1)} pts since war`;
+  if (!api.has_post_war_data) {
+    return { price, changeLabel: null, changeValue: null, awaiting: true };
   }
 
-  return { price, changeLabel, changeValue, awaiting: !postWar && warBaseline !== null };
+  const diff = api.latest_value - api.war_baseline;
+  const changeLabel = isDollar
+    ? `${diff >= 0 ? '+' : ''}$${Math.abs(diff).toFixed(2)} since war`
+    : `${diff >= 0 ? '+' : ''}${Math.abs(diff).toFixed(1)} pts since war`;
+
+  return { price, changeLabel, changeValue: diff, awaiting: false };
 }
 
 export function KitchenTableTicker() {
-  const { data: downstream, isError } = useDownstream();
+  const { data: ticker, isError } = useTicker();
 
-  // Build ticker items — names/icons are always available, prices fill in when data loads
-  const items: TickerItem[] = useMemo(() => {
+  const items: DisplayItem[] = useMemo(() => {
+    const byKey = new Map<string, TickerApiItem>();
+    for (const it of ticker?.items ?? []) byKey.set(it.key, it);
     return TICKER_ITEMS.map(({ key, icon, name }) => ({
       icon,
       name,
-      ...computePriceData(key, downstream),
+      ...computeDisplay(key, byKey.get(key)),
     }));
-  }, [downstream]);
+  }, [ticker]);
 
-  // Don't render if API failed
   if (isError) return null;
 
-  const isLoading = !downstream;
+  const isLoading = !ticker;
 
-  // Render items — always scrolling, prices shimmer while loading
   const renderItems = (keyPrefix: string) =>
     items.map((item, i) => (
       <span key={`${keyPrefix}-${i}`} className="flex items-center gap-2 shrink-0">
@@ -135,9 +100,7 @@ export function KitchenTableTicker() {
             ) : null}
           </>
         )}
-        {i < items.length - 1 && (
-          <span className="text-border-hover mx-4">|</span>
-        )}
+        {i < items.length - 1 && <span className="text-border-hover mx-4">|</span>}
       </span>
     ));
 

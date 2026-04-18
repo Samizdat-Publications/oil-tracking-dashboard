@@ -22,10 +22,6 @@ function riskColor(p: number): string {
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {
-  const highlight = category.highlight;
-  const highlightProb = highlight?.yes_probability ?? 0;
-  const color = riskColor(highlightProb);
-
   return (
     <div
       className="rounded-lg border p-4"
