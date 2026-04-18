@@ -2,6 +2,14 @@ import type { PriceSeries } from '../types';
 
 export const IRAN_WAR_DATE = '2026-02-28';
 
+/**
+ * Last clean print before insider-trading run-up. All "since the war" math
+ * is computed against this date — by Feb 27, the spot price had already
+ * priced in escalation, so Feb 28 is not a true baseline. UI copy still
+ * reads "since the first strike" by editorial choice.
+ */
+export const WAR_BASELINE_DATE = '2026-02-14';
+
 export interface CommodityInfo {
   icon: string;
   why: string;

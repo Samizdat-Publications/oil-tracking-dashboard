@@ -1,6 +1,8 @@
 import { useState, useEffect, lazy, Suspense, Component, type ReactNode, type ErrorInfo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { EditorialLayout } from './components/layout/EditorialLayout';
+
+const BroadsheetPage = lazy(() => import('./pages/BroadsheetPage').then(m => ({ default: m.BroadsheetPage })));
 import { HeroSection } from './components/hero/HeroSection';
 import { SetupScreen } from './components/setup/SetupScreen';
 import { KitchenTableTicker } from './components/layout/KitchenTableTicker';
@@ -201,10 +203,18 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
 }
 
 function App() {
+  const isBroadsheet = typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('view') === 'broadsheet';
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <DashboardApp />
+        {isBroadsheet ? (
+          <Suspense fallback={<div style={{ background: '#04060C', minHeight: '100vh' }} />}>
+            <BroadsheetPage />
+          </Suspense>
+        ) : (
+          <DashboardApp />
+        )}
       </QueryClientProvider>
     </ErrorBoundary>
   );
