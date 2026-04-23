@@ -1,6 +1,11 @@
 import type { PriceSeries, PriceSummary, SimulationBands, SimulationRequest, DownstreamData, MilestonesResponse, PolymarketWarEconomy, CrisisComparisonResponse, TickerResponse } from '../types';
 
-const BASE = '/api';
+// In dev, Vite proxies /api to the local FastAPI (see vite.config.ts).
+// In production (Cloudflare Pages), set VITE_API_URL to the Fly.io backend URL
+// at build time, e.g. VITE_API_URL=https://oil-dashboard-api.fly.dev
+// Trailing slashes are trimmed so either form works.
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+const BASE = `${API_ORIGIN}/api`;
 
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const controller = new AbortController();

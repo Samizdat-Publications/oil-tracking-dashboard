@@ -9,7 +9,13 @@ import os
 
 import aiosqlite
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cache.db")
+# Where to persist the cache. Defaults to backend/data/cache.db for local dev;
+# on Fly.io (or any container host) set CACHE_DB_PATH to a path on the mounted
+# volume, e.g. CACHE_DB_PATH=/data/cache.db so the cache survives restarts.
+DB_PATH = os.getenv(
+    "CACHE_DB_PATH",
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "cache.db"),
+)
 
 # 24-hour TTL in seconds
 CACHE_TTL = 86400

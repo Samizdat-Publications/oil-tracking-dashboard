@@ -1,0 +1,63 @@
+# Fly.io deployment config for the oil-dashboard FastAPI backend.
+#
+# Run `fly` commands from the `backend/` directory (this file's location) so
+# the build context is scoped to the Python app and the frontend isn't shipped
+# into the image.
+#
+# First-time setup:
+#   cd backend
+#   fly launch --copy-config --no-deploy
+#        → creates an app and fills in the `app` name below. Decline the
+#          offer to set up Postgres / Redis.
+#   fly volumes create oil_cache --region iad --size 1
+#        → 1GB is plenty; holds SQLite cache + polymarket JSON.
+#   fly secrets set \
+#        FRED_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+#        ADMIN_SECRET=$(openssl rand -hex 32) \
+#        ALLOWED_ORIGINS=https://<your-pages-site>.pages.dev
+#        → ADMIN_SECRET lets you hit /api/setup/configure etc. from outside
+#          localhost via a Bearer token. Leave unset to disable remote admin.
+#   fly deploy
+#
+# See DEPLOY.md at the repo root for the full playbook including Cloudflare
+# Pages wiring.
+
+app = ""  # filled in by `fly launch`
+primary_region = "iad"  # US East is fine for FRED latency; change if you prefer
+
+[build]
+  dockerfile = "Dockerfile"
+
+# Mount the persistent volume at /data. The Dockerfile sets CACHE_DB_PATH and
+# POLYMARKET_DATA_PATH to /data/* so restarts keep the warm cache.
+[[mounts]]
+  source = "oil_cache"
+  destination = "/data"
+
+[env]
+  # Non-secret runtime config. Secrets (FRED_API_KEY, ADMIN_SECRET,
+  # ALLOWED_ORIGINS) go through `fly secrets set` — never commit them here.
+  PORT = "8000"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  # Cost-savings: let the VM stop when idle and auto-start on the first request.
+  # If you want zero cold starts, set min_machines_running = 1 and expect the
+  # base cost to rise from ~$0 to ~$2/mo for the 256MB shared VM.
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/api/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
+  cpus = 1

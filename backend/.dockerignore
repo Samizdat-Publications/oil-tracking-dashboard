@@ -1,0 +1,22 @@
+# Keep the build context small and avoid leaking local state into the image.
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.venv
+venv
+
+# Local dev data — cache.db is rebuilt on first request; .env holds the FRED key
+# which on Fly is injected via `fly secrets set` (never baked into the image).
+data/cache.db
+data/cache.db-journal
+data/polymarket_latest.json
+.env
+.env.*
+!.env.example
+
+# Editor / OS cruft
+.idea
+.vscode
+.DS_Store
+Thumbs.db

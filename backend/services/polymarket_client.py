@@ -24,9 +24,12 @@ logger = logging.getLogger(__name__)
 
 GAMMA_BASE = "https://gamma-api.polymarket.com"
 
-# Persistent JSON file for instant loading (survives restarts, no TTL)
-PERSISTENT_DATA_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "data", "polymarket_latest.json"
+# Persistent JSON file for instant loading (survives restarts, no TTL).
+# On Fly, set POLYMARKET_DATA_PATH to a path on the mounted volume so the file
+# survives deploys — e.g. POLYMARKET_DATA_PATH=/data/polymarket_latest.json.
+PERSISTENT_DATA_PATH = os.getenv(
+    "POLYMARKET_DATA_PATH",
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "polymarket_latest.json"),
 )
 
 # 10-minute TTL for Polymarket data (vs 24h for FRED)
