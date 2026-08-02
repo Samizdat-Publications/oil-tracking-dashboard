@@ -1,11 +1,14 @@
 import { useState, useEffect, lazy, Suspense, Component, type ReactNode, type ErrorInfo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SectionErrorBoundary } from './components/ui/SectionErrorBoundary';
+import { ViewToggle } from './components/ui/ViewToggle';
 import { useSimulation } from './hooks/useSimulation';
 import { useInViewOnce } from './hooks/useInViewOnce';
 import { checkSetup } from './lib/api';
 
+const ReceiptPage = lazy(() => import('./pages/ReceiptPage'));
 const BroadsheetPage = lazy(() => import('./pages/BroadsheetPage').then(m => ({ default: m.BroadsheetPage })));
+const ChartLabPage = lazy(() => import('./pages/ChartLabPage').then(m => ({ default: m.ChartLabPage })));
 
 // Dashboard-only chunks — kept out of the broadsheet bundle by lazy-loading.
 const EditorialLayout = lazy(() => import('./components/layout/EditorialLayout').then(m => ({ default: m.EditorialLayout })));
@@ -213,17 +216,37 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
 }
 
 function App() {
-  const isBroadsheet = typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).get('view') === 'broadsheet';
+  // V3 ("The Receipt") is the default. The earlier views stay reachable so
+  // nothing that was linked previously breaks:
+  //   /                  -> V3
+  //   ?view=broadsheet   -> V2 broadsheet
+  //   ?view=dashboard    -> V1 classic dashboard
+  //   ?view=chart-lab    -> design sandbox
+  // Kept as a URL flag rather than store state so a hard reload from the
+  // ViewToggle cleanly resets the other view's Plotly/observer state.
+  const view = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('view')
+    : null;
+  const isDashboard = view === 'dashboard';
+  const isChartLab = view === 'chart-lab';
+  const isBroadsheet = view === 'broadsheet';
+
+  const fallback = <div style={{ background: '#06080F', minHeight: '100vh' }} />;
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        {isBroadsheet ? (
-          <Suspense fallback={<div style={{ background: '#04060C', minHeight: '100vh' }} />}>
-            <BroadsheetPage />
-          </Suspense>
+        {isChartLab ? (
+          <Suspense fallback={fallback}><ChartLabPage /></Suspense>
+        ) : isDashboard ? (
+          <>
+            <ViewToggle current="dashboard" />
+            <DashboardApp />
+          </>
+        ) : isBroadsheet ? (
+          <Suspense fallback={fallback}><BroadsheetPage /></Suspense>
         ) : (
-          <DashboardApp />
+          <Suspense fallback={fallback}><ReceiptPage /></Suspense>
         )}
       </QueryClientProvider>
     </ErrorBoundary>

@@ -1,0 +1,41 @@
+/* Floating view toggle — works on both broadsheet and dashboard views.
+   Uses hard-coded colors rather than CSS vars so it renders identically in
+   both contexts (broadsheet.css vars are scoped to .broadsheet). */
+.view-toggle {
+  position: fixed;
+  top: 50px;
+  right: 18px;
+  z-index: 300;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(6, 10, 20, 0.85);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(212, 160, 18, 0.28);
+  color: #D4A012;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.view-toggle:hover {
+  color: #E8B82E;
+  border-color: #E8B82E;
+  background: rgba(212, 160, 18, 0.08);
+}
+.view-toggle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00F0FF;
+  box-shadow: 0 0 8px #00F0FF;
+}
+/* On the dashboard view, sit below the 36px sticky ticker */
+.view-toggle.view-toggle-dashboard {
+  top: 46px;
+}

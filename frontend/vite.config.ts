@@ -18,7 +18,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        // Defaults to the usual backend port. Override when 8000 is already
+        // taken by another process:  BACKEND_PORT=8010 npx vite
+        target: `http://localhost:${process.env.BACKEND_PORT ?? 8000}`,
         changeOrigin: true,
       },
     },

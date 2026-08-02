@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oil Dashboard — Next Feature Ideas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #04060C;
+    color: #E8E8E8;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 0.08em;
+    color: #00F0FF;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: #8A8F98;
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+    max-width: 700px;
+  }
+
+  .ideas-grid {
+    display: grid;
+    gap: 24px;
+  }
+
+  .idea-card {
+    background: rgba(10, 14, 24, 0.8);
+    border: 1px solid rgba(0, 240, 255, 0.08);
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+  }
+  .idea-card:hover {
+    border-color: rgba(0, 240, 255, 0.25);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.05);
+  }
+  .idea-card.selected {
+    border-color: #00F0FF;
+    box-shadow: 0 0 24px rgba(0, 240, 255, 0.15);
+  }
+  .idea-card.selected .idea-number { background: #00F0FF; color: #04060C; }
+
+  .idea-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px 12px;
+  }
+  .idea-number {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 240, 255, 0.12);
+    color: #00F0FF;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    transition: background 0.3s, color 0.3s;
+  }
+  .idea-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+    color: #fff;
+  }
+  .idea-tagline {
+    color: #00FF88;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .idea-body {
+    padding: 0 24px 8px;
+  }
+  .idea-desc {
+    color: #8A8F98;
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
+
+  /* Mockup area */
+  .mockup-frame {
+    background: #04060C;
+    border: 1px solid rgba(0, 240, 255, 0.06);
+    border-radius: 8px;
+    margin: 0 24px 20px;
+    overflow: hidden;
+  }
+  .mockup-bar {
+    background: rgba(0, 240, 255, 0.04);
+    padding: 6px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: #555;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mockup-bar .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .mockup-bar .dot.r { background: #FF3366; }
+  .mockup-bar .dot.y { background: #FF8800; }
+  .mockup-bar .dot.g { background: #00FF88; }
+  .mockup-content {
+    padding: 16px;
+    min-height: 120px;
+  }
+
+  /* === IDEA 1: Personal Impact Calculator === */
+  .calc-mockup {
+    display: flex;
+    gap: 16px;
+  }
+  .calc-input {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .calc-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .calc-field .icon { font-size: 1.2rem; width: 24px; text-align: center; }
+  .calc-field label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: #8A8F98;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: 100px;
+  }
+  .calc-field .slider-track {
+    flex: 1;
+    height: 4px;
+    background: #0A0E18;
+    border-radius: 2px;
+    position: relative;
+  }
+  .calc-field .slider-fill {
+    height: 100%;
+    background: #00F0FF;
+    border-radius: 2px;
+  }
+  .calc-field .slider-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: #00F0FF;
+    width: 50px;
+    text-align: right;
+  }
+  .calc-output {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 51, 102, 0.06);
+    border: 1px solid rgba(255, 51, 102, 0.15);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .calc-output .big-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    color: #FF3366;
+    line-height: 1;
+  }
+  .calc-output .big-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: #8A8F98;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+  .calc-output .breakdown {
+    margin-top: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: #8A8F98;
+    text-align: center;
+  }
+  .calc-output .breakdown span { color: #FF8800; }
+
+  /* === IDEA 2: Historical Comparison === */
+  .history-mockup {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .history-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .history-event {
+    width: 140px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+  }
+  .history-event .year { color: #00F0FF; }
+  .history-event .name { color: #E8E8E8; font-size: 0.65rem; }
+  .history-bar-bg {
+    flex: 1;
+    height: 20px;
+    background: #0A0E18;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .history-bar {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: #fff;
+    font-weight: 500;
+  }
+  .history-bar.oil { background: linear-gradient(90deg, #FF3366, #FF336680); }
+  .history-bar.gas { background: linear-gradient(90deg, #FF8800, #FF880080); }
+  .history-bar.current { background: linear-gradient(90deg, #00F0FF, #00F0FF80); animation: pulseBar 2s infinite; }
+
+  @keyframes pulseBar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .history-impact {
+    width: 60px;
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .history-impact.high { color: #FF3366; }
+  .history-impact.med { color: #FF8800; }
+  .history-impact.low { color: #00FF88; }
+
+  /* === IDEA 3: Grocery Receipt === */
+  .receipt-mockup {
+    max-width: 260px;
+    margin: 0 auto;
+    background: #F5F0E8;
+    color: #1A1A1A;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    padding: 20px 16px;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .receipt-header {
+    text-align: center;
+    border-bottom: 1px dashed #999;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+  .receipt-header .store {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .receipt-header .date { font-size: 0.6rem; color: #666; }
+  .receipt-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    font-size: 0.68rem;
+  }
+  .receipt-line .item { color: #1A1A1A; }
+  .receipt-line .price { font-weight: 500; }
+  .receipt-line .war-tax {
+    color: #CC0033;
+    font-size: 0.58rem;
+    font-weight: 600;
+  }
+  .receipt-divider {
+    border-top: 1px dashed #999;
+    margin: 6px 0;
+  }
+  .receipt-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 4px 0;
+  }
+  .receipt-war-total {
+    display: flex;
+    justify-content: space-between;
+    color: #CC0033;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 2px 0;
+    border: 1px solid #CC0033;
+    border-radius: 3px;
+    padding: 4px 6px;
+    margin-top: 4px;
+  }
+  .receipt-footer {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 0.55rem;
+    color: #888;
+  }
+
+  /* === IDEA 4: Alert/Threshold === */
+  .alert-mockup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .alert-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+  }
+  .alert-item.red {
+    background: rgba(255, 51, 102, 0.08);
+    border-left: 3px solid #FF3366;
+  }
+  .alert-item.orange {
+    background: rgba(255, 136, 0, 0.08);
+    border-left: 3px solid #FF8800;
+  }
+  .alert-item.cyan {
+    background: rgba(0, 240, 255, 0.08);
+    border-left: 3px solid #00F0FF;
+  }
+  .alert-icon { font-size: 1.1rem; }
+  .alert-text { flex: 1; }
+  .alert-text .headline { color: #E8E8E8; font-weight: 500; }
+  .alert-text .detail {
+    color: #8A8F98;
+    font-size: 0.65rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .alert-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: #555;
+  }
+
+  /* Vote buttons */
+  .vote-bar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 24px 20px;
+  }
+  .vote-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.2s;
+  }
+  .vote-love {
+    background: rgba(0, 255, 136, 0.08);
+    border-color: rgba(0, 255, 136, 0.3);
+    color: #00FF88;
+  }
+  .vote-love:hover { background: rgba(0, 255, 136, 0.15); }
+  .vote-maybe {
+    background: rgba(255, 136, 0, 0.08);
+    border-color: rgba(255, 136, 0, 0.3);
+    color: #FF8800;
+  }
+  .vote-maybe:hover { background: rgba(255, 136, 0, 0.15); }
+  .vote-skip {
+    background: rgba(138, 143, 152, 0.08);
+    border-color: rgba(138, 143, 152, 0.2);
+    color: #8A8F98;
+  }
+  .vote-skip:hover { background: rgba(138, 143, 152, 0.15); }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.15), transparent);
+    margin: 32px 0;
+  }
+
+  /* Selection indicator */
+  .selection-status {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 240, 255, 0.12);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: #00F0FF;
+    display: none;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .selection-status.visible { display: flex; gap: 12px; align-items: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>What Should We Build Next?</h1>
+  <p class="subtitle">
+    Four ideas to make the oil-to-everyday-goods connection even more visceral and personal.
+    Click the cards you like — tell me in the terminal which ones excite you.
+  </p>
+
+  <div class="ideas-grid">
+
+    <!-- IDEA 1: Personal Impact Calculator -->
+    <div class="idea-card" onclick="toggleCard(this, 1)">
+      <div class="idea-header">
+        <div class="idea-number">1</div>
+        <div>
+          <div class="idea-tagline">Interactive</div>
+          <div class="idea-title">Personal Impact Calculator</div>
+        </div>
+      </div>
+      <div class="idea-body">
+        <p class="idea-desc">
+          "How much is this war costing <em>you</em>?" — users input their driving habits, household size, and commute type.
+          The calculator shows their personal monthly cost increase in real-time using live FRED data.
+          This turns abstract oil price data into a concrete dollar amount that hits home.
+        </p>
+      </div>
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <span>Personal Impact Calculator</span>
+        </div>
+        <div class="mockup-content">
+          <div class="calc-mockup">
+            <div class="calc-input">
+              <div class="calc-field">
+                <div class="icon">\u26FD</div>
+                <label>Miles/week</label>
+                <div class="slider-track"><div class="slider-fill" style="width:60%"></div></div>
+                <div class="slider-value">210 mi</div>
+              </div>
+              <div class="calc-field">
+                <div class="icon">\uD83D\uDE97</div>
+                <label>MPG</label>
+                <div class="slider-track"><div class="slider-fill" style="width:35%"></div></div>
+                <div class="slider-value">24 mpg</div>
+              </div>
+              <div class="calc-field">
+                <div class="icon">\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC67</div>
+                <label>Household</label>
+                <div class="slider-track"><div class="slider-fill" style="width:50%"></div></div>
+                <div class="slider-value">3 people</div>
+              </div>
+              <div class="calc-field">
+                <div class="icon">\u2708\uFE0F</div>
+                <label>Flights/yr</label>
+                <div class="slider-track"><div class="slider-fill" style="width:25%"></div></div>
+                <div class="slider-value">2</div>
+              </div>
+            </div>
+            <div class="calc-output">
+              <div class="big-number">+$187</div>
+              <div class="big-label">Extra per month since war</div>
+              <div class="breakdown">
+                Gas <span>+$68</span> &bull; Groceries <span>+$52</span><br>
+                Energy <span>+$41</span> &bull; Other <span>+$26</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="vote-bar">
+        <div class="vote-btn vote-love" onclick="event.stopPropagation();">\u2764\uFE0F Love it</div>
+        <div class="vote-btn vote-maybe" onclick="event.stopPropagation();">\uD83E\uDD14 Maybe</div>
+        <div class="vote-btn vote-skip" onclick="event.stopPropagation();">Skip</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- IDEA 2: Historical Crisis Comparison -->
+    <div class="idea-card" onclick="toggleCard(this, 2)">
+      <div class="idea-header">
+        <div class="idea-number">2</div>
+        <div>
+          <div class="idea-tagline">Context</div>
+          <div class="idea-title">"How Bad Is It?" Historical Crisis Comparison</div>
+        </div>
+      </div>
+      <div class="idea-body">
+        <p class="idea-desc">
+          Side-by-side comparison of the current Iran War shock against every major oil crisis since 1973.
+          Animated horizontal bars race to show price spikes, with the current crisis pulsing in real-time.
+          Instantly answers: "Is this worse than the '70s embargo? The Gulf War? COVID?"
+        </p>
+      </div>
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <span>Crisis Comparison — Peak Oil Price Spike</span>
+        </div>
+        <div class="mockup-content">
+          <div class="history-mockup">
+            <div class="history-row">
+              <div class="history-event"><span class="year">1973</span><br><span class="name">Arab Oil Embargo</span></div>
+              <div class="history-bar-bg"><div class="history-bar oil" style="width:85%">+267%</div></div>
+              <div class="history-impact high">\u26A0\uFE0F</div>
+            </div>
+            <div class="history-row">
+              <div class="history-event"><span class="year">1979</span><br><span class="name">Iranian Revolution</span></div>
+              <div class="history-bar-bg"><div class="history-bar oil" style="width:72%">+150%</div></div>
+              <div class="history-impact high">\u26A0\uFE0F</div>
+            </div>
+            <div class="history-row">
+              <div class="history-event"><span class="year">1990</span><br><span class="name">Gulf War</span></div>
+              <div class="history-bar-bg"><div class="history-bar oil" style="width:55%">+92%</div></div>
+              <div class="history-impact med">\u26A0\uFE0F</div>
+            </div>
+            <div class="history-row">
+              <div class="history-event"><span class="year">2008</span><br><span class="name">Price Super-Spike</span></div>
+              <div class="history-bar-bg"><div class="history-bar oil" style="width:68%">+134%</div></div>
+              <div class="history-impact high">\u26A0\uFE0F</div>
+            </div>
+            <div class="history-row">
+              <div class="history-event"><span class="year">2022</span><br><span class="name">Russia-Ukraine</span></div>
+              <div class="history-bar-bg"><div class="history-bar gas" style="width:45%">+64%</div></div>
+              <div class="history-impact med">\u26A0\uFE0F</div>
+            </div>
+            <div class="history-row">
+              <div class="history-event"><span class="year">2026</span><br><span class="name">Iran War (NOW)</span></div>
+              <div class="history-bar-bg"><div class="history-bar current" style="width:50%">+78% \u25C0 LIVE</div></div>
+              <div class="history-impact" style="color:#00F0FF;">\uD83D\uDD34</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="vote-bar">
+        <div class="vote-btn vote-love" onclick="event.stopPropagation();">\u2764\uFE0F Love it</div>
+        <div class="vote-btn vote-maybe" onclick="event.stopPropagation();">\uD83E\uDD14 Maybe</div>
+        <div class="vote-btn vote-skip" onclick="event.stopPropagation();">Skip</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- IDEA 3: Grocery Receipt Breakdown -->
+    <div class="idea-card" onclick="toggleCard(this, 3)">
+      <div class="idea-header">
+        <div class="idea-number">3</div>
+        <div>
+          <div class="idea-tagline">Visceral</div>
+          <div class="idea-title">"War Tax" Grocery Receipt</div>
+        </div>
+      </div>
+      <div class="idea-body">
+        <p class="idea-desc">
+          A fake grocery receipt showing a typical weekly shop — but each item has a red "war tax" surcharge
+          calculated from real FRED data. The bottom shows the total hidden cost of oil on your groceries.
+          People share receipts. This is designed to be screenshot-and-share viral.
+        </p>
+      </div>
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <span>"War Tax" Receipt — Data from FRED API</span>
+        </div>
+        <div class="mockup-content" style="background: #1A1A1A; padding: 24px;">
+          <div class="receipt-mockup">
+            <div class="receipt-header">
+              <div class="store">YOUR LOCAL GROCERY</div>
+              <div class="date">Canton, OH — April 3, 2026</div>
+            </div>
+            <div class="receipt-line">
+              <span class="item">Eggs (1 dozen)</span>
+              <span class="price">$4.29</span>
+            </div>
+            <div class="receipt-line">
+              <span></span>
+              <span class="war-tax">\u25B2 +$0.87 war premium</span>
+            </div>
+            <div class="receipt-line">
+              <span class="item">Ground Beef (1 lb)</span>
+              <span class="price">$6.49</span>
+            </div>
+            <div class="receipt-line">
+              <span></span>
+              <span class="war-tax">\u25B2 +$0.62 war premium</span>
+            </div>
+            <div class="receipt-line">
+              <span class="item">Bread (white)</span>
+              <span class="price">$3.89</span>
+            </div>
+            <div class="receipt-line">
+              <span></span>
+              <span class="war-tax">\u25B2 +$0.34 war premium</span>
+            </div>
+            <div class="receipt-line">
+              <span class="item">Milk (1 gal)</span>
+              <span class="price">$4.19</span>
+            </div>
+            <div class="receipt-line">
+              <span></span>
+              <span class="war-tax">\u25B2 +$0.41 war premium</span>
+            </div>
+            <div class="receipt-line">
+              <span class="item">Chicken Breast (1 lb)</span>
+              <span class="price">$5.99</span>
+            </div>
+            <div class="receipt-line">
+              <span></span>
+              <span class="war-tax">\u25B2 +$0.53 war premium</span>
+            </div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-total">
+              <span>SUBTOTAL</span>
+              <span>$24.85</span>
+            </div>
+            <div class="receipt-war-total">
+              <span>\u26A0 WAR PREMIUM</span>
+              <span>+$2.77</span>
+            </div>
+            <div class="receipt-footer">
+              * War premium = price increase since Iran War<br>
+              began Feb 28, 2026. Data: FRED/BLS.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="vote-bar">
+        <div class="vote-btn vote-love" onclick="event.stopPropagation();">\u2764\uFE0F Love it</div>
+        <div class="vote-btn vote-maybe" onclick="event.stopPropagation();">\uD83E\uDD14 Maybe</div>
+        <div class="vote-btn vote-skip" onclick="event.stopPropagation();">Skip</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- IDEA 4: Breaking Point Alerts -->
+    <div class="idea-card" onclick="toggleCard(this, 4)">
+      <div class="idea-header">
+        <div class="idea-number">4</div>
+        <div>
+          <div class="idea-tagline">News-like</div>
+          <div class="idea-title">"Breaking Point" Alert Feed</div>
+        </div>
+      </div>
+      <div class="idea-body">
+        <p class="idea-desc">
+          Auto-generated alert cards whenever a downstream commodity crosses a significant threshold —
+          "Diesel just hit a 2-year high," "Groceries up 8% since war began," "Gas broke $4/gallon."
+          Styled like breaking news alerts. Uses the same FRED data but highlights the moments that matter.
+        </p>
+      </div>
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <span>Breaking Point Alerts</span>
+        </div>
+        <div class="mockup-content">
+          <div class="alert-mockup">
+            <div class="alert-item red">
+              <div class="alert-icon">\uD83D\uDEA8</div>
+              <div class="alert-text">
+                <div class="headline">Diesel hits highest price since June 2022</div>
+                <div class="detail">$4.87/gal — up 23% since Iran War began</div>
+              </div>
+              <div class="alert-time">2h ago</div>
+            </div>
+            <div class="alert-item orange">
+              <div class="alert-icon">\u26A0\uFE0F</div>
+              <div class="alert-text">
+                <div class="headline">Grocery prices crossed +5% war threshold</div>
+                <div class="detail">Food-at-home CPI now 5.2% above Feb 28 baseline</div>
+              </div>
+              <div class="alert-time">1d ago</div>
+            </div>
+            <div class="alert-item cyan">
+              <div class="alert-icon">\uD83D\uDCC8</div>
+              <div class="alert-text">
+                <div class="headline">Natural gas breaks $4/MMBtu resistance</div>
+                <div class="detail">First time above $4 since Jan 2023 — heating bills rising</div>
+              </div>
+              <div class="alert-time">3d ago</div>
+            </div>
+            <div class="alert-item red">
+              <div class="alert-icon">\u2708\uFE0F</div>
+              <div class="alert-text">
+                <div class="headline">Airline fare CPI spikes 12% month-over-month</div>
+                <div class="detail">Jet fuel costs passed through to ticket prices</div>
+              </div>
+              <div class="alert-time">5d ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="vote-bar">
+        <div class="vote-btn vote-love" onclick="event.stopPropagation();">\u2764\uFE0F Love it</div>
+        <div class="vote-btn vote-maybe" onclick="event.stopPropagation();">\uD83E\uDD14 Maybe</div>
+        <div class="vote-btn vote-skip" onclick="event.stopPropagation();">Skip</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <div style="text-align: center; padding: 20px 0 40px;">
+    <p style="color: #8A8F98; font-size: 0.85rem; max-width: 500px; margin: 0 auto;">
+      Click the cards that excite you, or tell me in the terminal which ones you want to build (or combine).
+      We can also riff on entirely different ideas.
+    </p>
+  </div>
+</div>
+
+<div class="selection-status" id="selectionBar">
+  Selected: <span id="selectionList"></span>
+</div>
+
+<script>
+  const selected = new Set();
+
+  function toggleCard(card, id) {
+    card.classList.toggle('selected');
+    if (selected.has(id)) {
+      selected.delete(id);
+    } else {
+      selected.add(id);
+    }
+    updateBar();
+  }
+
+  function updateBar() {
+    const bar = document.getElementById('selectionBar');
+    const list = document.getElementById('selectionList');
+    if (selected.size > 0) {
+      bar.classList.add('visible');
+      const names = {
+        1: 'Personal Calculator',
+        2: 'Crisis Comparison',
+        3: 'War Tax Receipt',
+        4: 'Breaking Alerts'
+      };
+      list.textContent = [...selected].sort().map(id => names[id]).join(' + ');
+    } else {
+      bar.classList.remove('visible');
+    }
+  }
+</script>
+</body>
+</html>

@@ -46,8 +46,15 @@ def _make_key(series_id: str, start_date: str, end_date: str) -> str:
     return hashlib.sha256(raw.encode()).hexdigest()
 
 
-async def get_cached(series_id: str, start_date: str, end_date: str) -> list | None:
-    """Return cached JSON list or None if missing/expired."""
+async def get_cached(
+    series_id: str, start_date: str, end_date: str, ttl: int | None = None
+) -> list | dict | None:
+    """Return the cached JSON value, or None if missing/expired.
+
+    `ttl` overrides the 24h default. Attribution results cost seconds of CPU
+    and their inputs update weekly at best, so they use a much longer TTL --
+    without this, the whole battery recomputes daily on a 1-vCPU box.
+    """
     if _db is None:
         return None
     key = _make_key(series_id, start_date, end_date)
@@ -58,15 +65,17 @@ async def get_cached(series_id: str, start_date: str, end_date: str) -> list | N
     if row is None:
         return None
     value_str, ts = row
-    if time.time() - ts > CACHE_TTL:
+    if time.time() - ts > (CACHE_TTL if ttl is None else ttl):
         await _db.execute("DELETE FROM cache WHERE key = ?", (key,))
         await _db.commit()
         return None
     return json.loads(value_str)
 
 
-async def set_cached(series_id: str, start_date: str, end_date: str, value: list) -> None:
-    """Store a JSON-serialisable list in the cache."""
+async def set_cached(
+    series_id: str, start_date: str, end_date: str, value: list | dict
+) -> None:
+    """Store a JSON-serialisable list or dict in the cache."""
     if _db is None:
         return
     key = _make_key(series_id, start_date, end_date)

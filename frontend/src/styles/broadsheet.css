@@ -77,37 +77,48 @@
 .ticker-change.down { color: var(--green); font-weight: 600; }
 .ticker-sep { color: rgba(212,160,18,0.2); margin-left: 8px; }
 
-/* ─── MASTHEAD ─── */
-.masthead {
+/* ─── HERO ─── */
+/* Masthead (big logo header) was removed. Only the 36px ticker sits above
+   the hero; a thin .hero-meta strip inside the hero carries the Desk /
+   date / VOL / LIVE signals at minimal visual weight. */
+.hero {
+  min-height: calc(100vh - 36px);
+  padding: 18px 48px 60px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 48px;
-  border-bottom: 1px solid var(--border);
+  flex-direction: column;
   position: relative;
-  z-index: 10;
+  overflow: hidden;
 }
-.mast-left { display: flex; flex-direction: column; gap: 2px; }
-.mast-title {
-  font-family: var(--font-display);
-  font-size: 22px;
-  letter-spacing: 0.02em;
-  color: var(--text);
-}
-.mast-sub {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-.mast-right { display: flex; align-items: center; gap: 24px; }
-.mast-date, .mast-vol {
+
+/* ─── HERO META STRIP (replaces masthead) ─── */
+.hero-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  position: relative;
+  z-index: 10;
+  padding-bottom: 24px;
+}
+.hero-meta-desk {
+  color: var(--gold);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+}
+.hero-meta-date,
+.hero-meta-vol {
   color: var(--text-2);
 }
+.hero-meta-sep {
+  color: rgba(212, 160, 18, 0.28);
+}
+
+/* LIVE pulse dot — kept for the hero meta strip. */
 .live-indicator {
   display: inline-flex;
   align-items: center;
@@ -132,21 +143,19 @@
   inset: 0;
   border-radius: 50%;
   background: var(--red);
-  animation: ping 1.5s ease-out infinite;
+  animation: livePing 1.5s ease-out infinite;
 }
-@keyframes ping {
+@keyframes livePing {
   0% { transform: scale(1); opacity: 0.8; }
   100% { transform: scale(3); opacity: 0; }
 }
 
-/* ─── HERO ─── */
-.hero {
-  min-height: calc(100vh - 76px);
-  padding: 40px 48px 60px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
+@media (max-width: 720px) {
+  .hero-meta {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding-bottom: 16px;
+  }
 }
 
 /* Data rain background */
@@ -976,3 +985,206 @@
 @media (max-width: 980px) {
   .global-wrap { grid-template-columns: 1fr; }
 }
+
+/* ─── MARKETS (Polymarket evidence) ─── */
+.markets-sec { padding-top: 96px; padding-bottom: 96px; }
+
+.mkt-status {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: var(--text-2);
+  padding: 40px 0;
+  text-transform: uppercase;
+}
+.mkt-status.mkt-err { color: var(--red); }
+
+.mkt-meta {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  padding: 12px 0 14px;
+  border-top: 2px solid var(--gold);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.mkt-meta-k {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--text-2);
+  margin-right: 8px;
+  text-transform: uppercase;
+}
+.mkt-meta-v {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.mkt-meta-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--text-2);
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+.mkt-tag-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 4px;
+  margin-left: 10px;
+}
+.mkt-tag-dot:first-child { margin-left: 0; }
+.mkt-meta-src {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* Flat dense grid of all market cards. Cards auto-fit to fill the row,
+   which collapses cleanly at narrow widths without tall empty bands. */
+.mkt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+}
+.mkt-cat {
+  --role-color: var(--gold);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--role-color);
+  padding: 16px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  opacity: 0;
+  transform: translateY(16px);
+}
+.mkt-grid.in .mkt-cat {
+  animation: slideInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.mkt-cat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  background: radial-gradient(ellipse at top, var(--role-color), transparent 70%);
+  opacity: 0.06;
+  pointer-events: none;
+}
+.mkt-cat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.mkt-cat-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--role-color);
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border: 1px solid var(--role-color);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--role-color) 8%, transparent);
+}
+.mkt-cat-vol {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--text-2);
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.mkt-cat-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.mkt-rows { display: flex; flex-direction: column; gap: 12px; }
+
+.mkt-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(212,160,18,0.06);
+  text-decoration: none;
+  color: inherit;
+}
+.mkt-row:last-child { border-bottom: none; padding-bottom: 0; }
+.mkt-link {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.mkt-link:hover .mkt-q { color: var(--role-color); }
+.mkt-q {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+  font-weight: 500;
+  transition: color 0.15s ease;
+  /* Clamp to 2 lines so cards stay uniform heights across the grid. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.mkt-bar-wrap {
+  height: 3px;
+  background: rgba(212,160,18,0.08);
+  overflow: hidden;
+  position: relative;
+}
+.mkt-bar {
+  height: 100%;
+  width: 0;
+  transition: width 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mkt-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+.mkt-prob {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.mkt-vol { color: var(--text-2); text-transform: uppercase; }
+
+@media (max-width: 720px) {
+  .mkt-meta { gap: 16px; }
+  .mkt-meta-src { margin-left: 0; }
+  .mkt-meta-legend { margin-left: 0; }
+}
+

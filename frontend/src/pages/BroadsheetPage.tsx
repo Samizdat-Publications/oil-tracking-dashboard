@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { useDownstream, useMilestones, useOilPrices } from '../hooks/useOilPrices';
 import { useCrisisComparison } from '../hooks/useCrisisComparison';
+import { usePolymarketSummary } from '../hooks/usePolymarket';
 import {
   COMMODITY_DATA,
   IRAN_WAR_DATE,
@@ -10,7 +11,7 @@ import {
   computeCorrelation,
   getValueBeforeDate,
 } from '../lib/commodity-data';
-import type { CrisisData, Milestone, PriceSeries } from '../types';
+import type { CrisisData, Milestone, PolymarketCategory, PolymarketMarketItem, PriceSeries } from '../types';
 import '../styles/broadsheet.css';
 
 // ─── helpers ────────────────────────────────────────────────────────────
@@ -236,20 +237,18 @@ function Hero() {
         })}
       </div>
 
-      <header className="masthead">
-        <div className="mast-left">
-          <span className="mast-title">CRUDE OIL ANALYTICS</span>
-          <span className="mast-sub">War Economy Desk</span>
-        </div>
-        <div className="mast-right">
-          <span className="mast-date">{today}</span>
-          <span className="mast-vol">VOL. III &middot; NO. 47</span>
-          <span className="live-indicator">
-            <span className="live-dot" />
-            LIVE
-          </span>
-        </div>
-      </header>
+      <div className="hero-meta">
+        <span className="hero-meta-desk">War Economy Desk</span>
+        <span className="hero-meta-sep">&middot;</span>
+        <span className="hero-meta-date">{today}</span>
+        <span className="hero-meta-sep">&middot;</span>
+        <span className="hero-meta-vol">VOL. III &middot; NO. 47</span>
+        <span className="hero-meta-sep">&middot;</span>
+        <span className="live-indicator">
+          <span className="live-dot" />
+          LIVE
+        </span>
+      </div>
 
       <div className="hero-grid">
         <div className={`hero-left ${mounted ? 'in' : ''}`}>
@@ -342,22 +341,48 @@ function Hero() {
 }
 
 // ─── HERO CHART ─────────────────────────────────────────────────────────
+// Locked-in view per chart-lab iteration: 24 months of WTI, Feb 14 baseline
+// rule, in-window peak call-out, 1px stroke. If you want to re-tune, use the
+// ChartLabPage (?view=chart-lab) and lift the winning params back here.
 function HeroChart({ series }: { series: PriceSeries | undefined }) {
   const [ref, inView] = useInView<HTMLDivElement>();
   const points = series?.observations ?? [];
   const W = 620;
   const H = 360;
-  const { path, areaPath, warX, minV, maxV, endY } = useMemo(() => {
+  const {
+    path,
+    areaPath,
+    warX,
+    minV,
+    maxV,
+    endY,
+    baselineY,
+    peakX,
+    peakY,
+    peakValue,
+  } = useMemo(() => {
     if (points.length < 2) {
-      return { path: '', areaPath: '', warX: W * 0.5, minV: 56, maxV: 139, endY: H / 2 };
+      return {
+        path: '',
+        areaPath: '',
+        warX: W * 0.5,
+        minV: 56,
+        maxV: 139,
+        endY: H / 2,
+        baselineY: null as number | null,
+        peakX: W,
+        peakY: H / 2,
+        peakValue: 0,
+      };
     }
     const minV = Math.min(...points.map((p) => p.value));
     const maxV = Math.max(...points.map((p) => p.value));
     const range = Math.max(1, maxV - minV);
+    const yOf = (v: number) => H - ((v - minV) / range) * (H - 40) - 20;
     const path = points
       .map((p, i) => {
         const x = (i / (points.length - 1)) * W;
-        const y = H - ((p.value - minV) / range) * (H - 40) - 20;
+        const y = yOf(p.value);
         return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
       })
       .join(' ');
@@ -365,9 +390,23 @@ function HeroChart({ series }: { series: PriceSeries | undefined }) {
     const warIdx = points.findIndex((p) => p.date >= IRAN_WAR_DATE);
     const warX = warIdx >= 0 ? (warIdx / (points.length - 1)) * W : W * 0.85;
     const lastVal = points[points.length - 1].value;
-    const endY = H - ((lastVal - minV) / range) * (H - 40) - 20;
-    return { path, areaPath, warX, minV, maxV, endY };
-  }, [points]);
+    const endY = yOf(lastVal);
+
+    // Feb 14 baseline as a horizontal gold dashed rule
+    const baselineVal = series ? getValueBeforeDate(series, WAR_BASELINE_DATE) : null;
+    const baselineY = baselineVal != null ? yOf(baselineVal) : null;
+
+    // In-window peak call-out
+    const peakIdx = points.reduce(
+      (best, p, i) => (p.value > points[best].value ? i : best),
+      0,
+    );
+    const peakX = (peakIdx / (points.length - 1)) * W;
+    const peakY = yOf(points[peakIdx].value);
+    const peakValue = points[peakIdx].value;
+
+    return { path, areaPath, warX, minV, maxV, endY, baselineY, peakX, peakY, peakValue };
+  }, [points, series]);
 
   return (
     <div className="hero-chart" ref={ref}>
@@ -388,6 +427,32 @@ function HeroChart({ series }: { series: PriceSeries | undefined }) {
           </pattern>
         </defs>
         <rect width={W} height={H} fill="url(#bsHeroGrid)" />
+
+        {baselineY != null && (
+          <g className="baseline-marker">
+            <line
+              x1={0}
+              y1={baselineY}
+              x2={W}
+              y2={baselineY}
+              stroke="#D4A012"
+              strokeWidth={0.75}
+              strokeDasharray="4 4"
+              opacity={0.55}
+            />
+            <text
+              x={8}
+              y={baselineY - 6}
+              fill="#D4A012"
+              fontSize={9}
+              fontFamily="'JetBrains Mono'"
+              letterSpacing="0.12em"
+            >
+              FEB 14 BASELINE
+            </text>
+          </g>
+        )}
+
         <line
           x1={warX}
           y1={10}
@@ -409,15 +474,35 @@ function HeroChart({ series }: { series: PriceSeries | undefined }) {
         >
           FEB 28 &middot; WAR BEGINS
         </text>
+
         <path d={areaPath} fill="url(#bsHeroFill)" className="chart-area" />
         <path
           d={path}
           stroke="#00F0FF"
-          strokeWidth={1.5}
+          strokeWidth={1}
           fill="none"
           className="chart-line"
           strokeLinecap="round"
+          strokeLinejoin="round"
         />
+
+        {peakValue > 0 && (
+          <g className="peak-marker">
+            <circle cx={peakX} cy={peakY} r={3} fill="#CC2936" />
+            <text
+              x={peakX}
+              y={peakY - 10}
+              fill="#E8ECF4"
+              fontSize={10}
+              fontFamily="'JetBrains Mono'"
+              textAnchor="middle"
+              fontWeight={700}
+            >
+              ${peakValue.toFixed(2)}
+            </text>
+          </g>
+        )}
+
         <circle cx={W} cy={endY} r={4} fill="#00F0FF" className="chart-dot" />
         <circle
           cx={W}
@@ -458,16 +543,26 @@ function categorize(headline: string): string {
   return 'tension';
 }
 
+const NUM_WORDS = [
+  'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven',
+  'eight', 'nine', 'ten', 'eleven', 'twelve',
+];
+
 function Timeline() {
   const [ref, inView] = useInView<HTMLElement>();
   const milestonesQ = useMilestones();
   const events = (milestonesQ.data?.milestones ?? []).filter((m) => m.type !== 'today').slice(0, 8);
+  // Convert the actual count to a word so the heading stays honest when the
+  // milestones API changes. Falls back to "eight" while data is loading so
+  // the layout doesn't flash "zero inflection points" on cold load.
+  const count = events.length;
+  const countWord = count === 0 ? 'eight' : (NUM_WORDS[count] ?? String(count));
 
   return (
     <section className="section section-wide timeline-sec" ref={ref}>
       <div className="section-head">
         <span className="section-number">03 / WAR TIMELINE</span>
-        <h2 className="editorial-h">Forty-eight days, seven inflection points.</h2>
+        <h2 className="editorial-h">Forty-eight days, {countWord} inflection points.</h2>
         <p className="editorial-sub">Each event left a fingerprint in the price of oil.</p>
       </div>
       <div className={`timeline-wrap ${inView ? 'in' : ''}`}>
@@ -549,7 +644,7 @@ function GlobalFlow() {
   return (
     <section className="section section-wide global-sec" ref={ref}>
       <div className="section-head">
-        <span className="section-number">04 / GLOBAL FLOW</span>
+        <span className="section-number">02 / GLOBAL FLOW</span>
         <h2 className="editorial-h">A planet run on eight pipelines.</h2>
         <p className="editorial-sub">
           101.8 million barrels cross the globe every day. Ten countries produce eighty percent of
@@ -792,7 +887,7 @@ function HormuzMap() {
   return (
     <section className="section section-wide hormuz-sec" ref={ref}>
       <div className="section-head">
-        <span className="section-number">05 / CHOKEPOINT</span>
+        <span className="section-number">04 / CHOKEPOINT</span>
         <h2 className="editorial-h">The world&rsquo;s oil flows through a 21-mile gap.</h2>
         <p className="editorial-sub">
           Roughly one in five barrels of crude on earth crosses the Strait of Hormuz each day. On
@@ -1001,7 +1096,7 @@ function CrisisCompare() {
   return (
     <section className="section section-wide crisis-sec" ref={ref}>
       <div className="section-head">
-        <span className="section-number">07 / HOW BAD IS IT</span>
+        <span className="section-number">05 / HOW BAD IS IT</span>
         <h2 className="editorial-h">Versus the last fifty years of oil shocks.</h2>
         <p className="editorial-sub">
           Peak price deviation from pre-crisis baseline. 2026 is still climbing.
@@ -1038,6 +1133,173 @@ function CrisisCompare() {
           );
         })}
       </div>
+    </section>
+  );
+}
+
+// ─── MARKETS (Polymarket evidence) ──────────────────────────────────────
+// Curated categories — the narrative: prediction markets are corroborating
+// what the price charts already show. Each category is tagged by its role
+// (evidence, cause, spillover) and rendered in a single flat grid so the
+// layout stays dense instead of sprawling into three stacked bands.
+type MarketRole = 'evidence' | 'cause' | 'spillover';
+const ROLE_LABEL: Record<MarketRole, string> = {
+  evidence: 'Evidence',
+  cause: 'Cause',
+  spillover: 'Spillover',
+};
+const ROLE_COLOR: Record<MarketRole, string> = {
+  evidence: 'var(--cyan)',
+  cause: 'var(--red)',
+  spillover: 'var(--gold)',
+};
+const MARKET_CURATION: Array<{ key: string; role: MarketRole }> = [
+  { key: 'oil_targets', role: 'evidence' },
+  { key: 'gas_energy', role: 'evidence' },
+  { key: 'iran_war', role: 'cause' },
+  { key: 'geopolitical', role: 'cause' },
+  { key: 'recession', role: 'spillover' },
+  { key: 'fed', role: 'spillover' },
+  { key: 'inflation', role: 'spillover' },
+];
+
+function fmtVol(v: number): string {
+  if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `$${(v / 1_000).toFixed(0)}K`;
+  return `$${v.toFixed(0)}`;
+}
+
+function pickMarkets(cat: PolymarketCategory, n = 2): PolymarketMarketItem[] {
+  // Prefer highlight first, then by volume. Default 2 keeps card heights
+  // consistent across the grid.
+  const byVol = [...cat.markets].sort((a, b) => b.volume - a.volume);
+  const seen = new Set<string>();
+  const out: PolymarketMarketItem[] = [];
+  if (cat.highlight) {
+    out.push(cat.highlight);
+    seen.add(cat.highlight.id);
+  }
+  for (const m of byVol) {
+    if (out.length >= n) break;
+    if (!seen.has(m.id)) {
+      out.push(m);
+      seen.add(m.id);
+    }
+  }
+  return out;
+}
+
+function MarketRow({ market }: { market: PolymarketMarketItem }) {
+  const pct = Math.max(0, Math.min(1, market.yes_probability));
+  const pctLabel = Math.round(pct * 100);
+  // Color ramp: low prob = cool, high prob = hot (gold/red).
+  const hot = pct >= 0.6;
+  const warm = pct >= 0.35;
+  const barColor = hot ? 'var(--red)' : warm ? 'var(--gold)' : 'var(--cyan)';
+  const content = (
+    <>
+      <div className="mkt-q">{market.question}</div>
+      <div className="mkt-bar-wrap">
+        <div
+          className="mkt-bar"
+          style={{ width: `${pctLabel}%`, background: barColor, boxShadow: `0 0 10px ${barColor}` }}
+        />
+      </div>
+      <div className="mkt-foot">
+        <span className="mkt-prob" style={{ color: barColor }}>
+          {pctLabel}%
+        </span>
+        <span className="mkt-vol">{fmtVol(market.volume)} vol</span>
+      </div>
+    </>
+  );
+  if (market.source_url) {
+    return (
+      <a className="mkt-row mkt-link" href={market.source_url} target="_blank" rel="noopener noreferrer">
+        {content}
+      </a>
+    );
+  }
+  return <div className="mkt-row">{content}</div>;
+}
+
+function Markets() {
+  const [ref, inView] = useInView<HTMLElement>();
+  const { data, isLoading, isError } = usePolymarketSummary();
+
+  const cards = useMemo(() => {
+    if (!data) return [];
+    return MARKET_CURATION.map((c) => {
+      const cat = data.categories.find((x) => x.key === c.key);
+      if (!cat || cat.markets.length === 0) return null;
+      return { role: c.role, cat };
+    }).filter((x): x is { role: MarketRole; cat: PolymarketCategory } => x !== null);
+  }, [data]);
+
+  return (
+    <section className="section section-wide markets-sec" ref={ref}>
+      <div className="section-head">
+        <span className="section-number">07 / MARKETS</span>
+        <h2 className="editorial-h">The smart money agrees.</h2>
+        <p className="editorial-sub">
+          Real-money prediction markets pricing the same shock the tape already shows &mdash; crude targets,
+          gasoline, Hormuz escalation, and the recession risk bleeding in.
+        </p>
+      </div>
+
+      {isLoading && (
+        <div className="mkt-status">Loading Polymarket feeds&hellip;</div>
+      )}
+      {isError && (
+        <div className="mkt-status mkt-err">
+          Polymarket feed temporarily unavailable. Data resumes on next refresh cycle.
+        </div>
+      )}
+      {!isLoading && !isError && data && (
+        <>
+          <div className="mkt-meta">
+            <span>
+              <em className="mkt-meta-k">Markets</em>
+              <span className="mkt-meta-v">{data.market_count}</span>
+            </span>
+            <span>
+              <em className="mkt-meta-k">Total volume</em>
+              <span className="mkt-meta-v">{fmtVol(data.total_volume)}</span>
+            </span>
+            <span className="mkt-meta-legend">
+              <span className="mkt-tag-dot" style={{ background: ROLE_COLOR.evidence }} />Evidence
+              <span className="mkt-tag-dot" style={{ background: ROLE_COLOR.cause }} />Cause
+              <span className="mkt-tag-dot" style={{ background: ROLE_COLOR.spillover }} />Spillover
+            </span>
+            <span className="mkt-meta-src">Polymarket</span>
+          </div>
+
+          <div className={`mkt-grid ${inView ? 'in' : ''}`}>
+            {cards.map(({ role, cat }, i) => {
+              const picks = pickMarkets(cat, 2);
+              const color = ROLE_COLOR[role];
+              return (
+                <div
+                  className="mkt-cat"
+                  key={cat.key}
+                  style={{ ['--role-color' as string]: color, animationDelay: `${i * 0.06}s` } as CSSProperties}
+                >
+                  <div className="mkt-cat-head">
+                    <span className="mkt-cat-tag">{ROLE_LABEL[role]}</span>
+                    <span className="mkt-cat-vol">{fmtVol(cat.total_volume)}</span>
+                  </div>
+                  <div className="mkt-cat-name">{cat.name}</div>
+                  <div className="mkt-rows">
+                    {picks.map((m) => (
+                      <MarketRow key={m.id} market={m} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </section>
   );
 }
@@ -1128,20 +1390,22 @@ export function BroadsheetPage() {
       <Ticker currentWTI={m.currentWTI} dollarSinceWar={m.dollarSinceWar} />
       <Hero />
       <div className="rule" />
+      <GlobalFlow />
+      <div className="rule" />
+      <Timeline />
+      <div className="rule" />
+      <HormuzMap />
+      <div className="rule" />
+      <CrisisCompare />
+      <div className="rule" />
+      <Downstream />
+      <div className="rule" />
+      <Markets />
+      <div className="rule" />
       <PullQuote
         text="Every dollar increase in crude oil costs American households an estimated $1.4 billion per year in higher energy and consumer goods prices."
         source="U.S. Energy Information Administration"
       />
-      <div className="rule" />
-      <Timeline />
-      <div className="rule" />
-      <GlobalFlow />
-      <div className="rule" />
-      <HormuzMap />
-      <div className="rule" />
-      <Downstream />
-      <div className="rule" />
-      <CrisisCompare />
       <div className="rule" />
       <Forecast />
       <div className="rule" />

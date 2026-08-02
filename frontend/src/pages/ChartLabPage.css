@@ -1,0 +1,223 @@
+/* ChartLabPage — isolated design surface for iterating on the Hero chart.
+   Uses the broadsheet CSS variables (`var(--gold)`, `var(--cyan)`, etc.) so
+   it stays visually consistent with the final destination. */
+
+.chart-lab {
+  min-height: 100vh;
+  padding: 60px 64px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  background: var(--bg);
+}
+
+/* ─── HEADER ─── */
+.lab-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 48px;
+  align-items: end;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+}
+
+.lab-header-left { max-width: 640px; }
+
+.section-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.lab-title {
+  font-family: var(--font-display);
+  font-size: 42px;
+  line-height: 1.05;
+  color: var(--text);
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.lab-sub {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-2);
+  margin: 0;
+}
+.lab-sub code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gold);
+  background: rgba(212, 160, 18, 0.08);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.lab-metrics {
+  display: flex;
+  gap: 28px;
+  align-items: flex-end;
+}
+.lab-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+.lab-metric-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+.lab-metric-value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.lab-metric-delta .lab-metric-value { color: var(--cyan); }
+
+/* ─── CONTROLS ─── */
+.lab-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px 48px;
+  padding: 20px 24px;
+  background: rgba(10, 14, 24, 0.6);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.lab-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lab-control-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.lab-toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lab-toggle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 2px;
+}
+.lab-toggle:hover {
+  color: var(--text);
+  border-color: rgba(212, 160, 18, 0.4);
+}
+.lab-toggle.active {
+  color: var(--bg);
+  background: var(--gold);
+  border-color: var(--gold);
+  font-weight: 700;
+}
+
+.lab-control-note {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-2);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* ─── CANVAS ─── */
+.lab-canvas {
+  flex: 1;
+  min-height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background:
+    radial-gradient(ellipse at center, rgba(212, 160, 18, 0.04), transparent 60%),
+    rgba(8, 11, 20, 0.5);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  position: relative;
+}
+
+.lab-chart {
+  width: 100%;
+  max-width: 1000px;
+  position: relative;
+}
+.lab-chart .chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.lab-chart-stats {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+.lab-chart-stats-sep {
+  color: rgba(212, 160, 18, 0.35);
+}
+
+.lab-loading,
+.lab-error {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+.lab-error { color: var(--red); }
+
+/* ─── FOOTER ─── */
+.lab-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .chart-lab { padding: 40px 24px 32px; }
+  .lab-header {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .lab-metrics { flex-wrap: wrap; }
+  .lab-title { font-size: 32px; }
+}

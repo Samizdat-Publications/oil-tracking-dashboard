@@ -15,7 +15,9 @@ from dotenv import load_dotenv
 
 from services.cache import init_cache, clear_cache, close_cache
 from services.fred_client import SERIES_IDS, get_series
-from routers import prices, simulation, correlations, milestones, polymarket, crisis
+from routers import (
+    prices, simulation, correlations, milestones, polymarket, crisis, attribution,
+)
 from dependencies import verify_localhost
 from models.schemas import (
     HealthResponse,
@@ -143,6 +145,7 @@ app.include_router(correlations.router)
 app.include_router(milestones.router)
 app.include_router(polymarket.router)
 app.include_router(crisis.router)
+app.include_router(attribution.router)
 
 
 # ---------------------------------------------------------------------------

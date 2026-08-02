@@ -22,3 +22,9 @@ frontend/dist-ssr/
 .vscode/
 .idea/
 *.sw?
+
+# Design-tool exports and scratch archives. These are large binary drops from
+# Claude Design / other tools, not source. Keep them locally; the briefs in
+# docs/design-briefs/ are the durable artefact.
+*.zip
+Oil Dashboard New Design/

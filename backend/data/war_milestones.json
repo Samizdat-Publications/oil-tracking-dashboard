@@ -1,12 +1,145 @@
 [
   {
+    "id": "diplomatic-collapse",
     "date": "2026-01-15",
-    "headline": "Iran tensions escalate as diplomatic channels collapse",
-    "description": "Breakdown of nuclear negotiations leads to increased military posturing in the Persian Gulf. Oil markets begin pricing in supply risk."
+    "kind": "context",
+    "sign": 1,
+    "study": false,
+    "headline": "Iran nuclear talks collapse; Gulf posturing begins",
+    "description": "Breakdown of nuclear negotiations leads to increased military posturing in the Persian Gulf. Oil markets begin pricing supply risk - though WTI is still near a 12-month low of $57 and had fallen roughly 20% over 2025.",
+    "source_url": "https://en.wikipedia.org/wiki/2026_Iran_war_fuel_crisis",
+    "source_tier": 2
   },
   {
+    "id": "scotus-ieepa",
+    "date": "2026-02-20",
+    "kind": "tariff",
+    "sign": -1,
+    "study": false,
+    "headline": "Supreme Court strikes down the IEEPA tariffs, 6-3",
+    "description": "Learning Resources v. Trump holds that the International Emergency Economic Powers Act does not authorize tariffs. Collection ends February 24. Average import tariffs fall roughly 4.8 percentage points - eight days before the Iran strikes.",
+    "source_url": "https://www.dallasfed.org/research/economics/2026/0602",
+    "source_tier": 1
+  },
+  {
+    "id": "section-122",
+    "date": "2026-02-24",
+    "kind": "tariff",
+    "sign": 1,
+    "study": false,
+    "headline": "Section 122 blanket 10% surcharge replaces the struck-down tariffs",
+    "description": "Proclamation 11012 imposes a 10 percent ad valorem surcharge on roughly $1.0 trillion of imports. Energy and energy products are exempted verbatim. The surcharge expires by statute on July 24, 2026.",
+    "source_url": "https://www.federalregister.gov/",
+    "source_tier": 1
+  },
+  {
+    "id": "first-strike",
     "date": "2026-02-28",
-    "headline": "US strikes Iran; Strait of Hormuz closed to tanker traffic",
-    "description": "Global oil supply loses ~5M barrels/day as the world's most critical shipping lane shuts down. Crude oil spikes immediately."
+    "kind": "war",
+    "sign": 1,
+    "study": true,
+    "headline": "US and Israel strike Iran; Strait of Hormuz closes",
+    "description": "Coordinated strikes begin. The IRGC declares the Strait of Hormuz closed within days, removing roughly 13.8 million barrels per day of gross transit - about 20 percent of world oil trade. WTI begins a five-week climb from $67 to $114.",
+    "source_url": "https://www.iea.org/reports/oil-market-report-april-2026",
+    "source_tier": 1
+  },
+  {
+    "id": "platts-dubai-break",
+    "date": "2026-03-02",
+    "kind": "context",
+    "sign": 1,
+    "study": false,
+    "headline": "Platts suspends all Hormuz-transiting grades from the Dubai benchmark",
+    "description": "The price reporting agency cuts deliverable grades from five to two, leaving only Murban (loading ex-Fujairah) and Oman. The Dubai benchmark after this date measures a structurally different basket than before it.",
+    "source_url": "https://www.spglobal.com/commodityinsights/",
+    "source_tier": 2
+  },
+  {
+    "id": "iea-release",
+    "date": "2026-03-11",
+    "kind": "policy",
+    "sign": -1,
+    "study": false,
+    "headline": "IEA members agree to release 400 million barrels",
+    "description": "The largest coordinated release in the agency's 52-year history - roughly one third of government stockpiles across 32 nations. The US share is 172 million barrels over about 120 days. Expert estimates put the short-term price effect near $2 per barrel.",
+    "source_url": "https://www.iea.org/",
+    "source_tier": 1
+  },
+  {
+    "id": "ceasefire-1",
+    "date": "2026-04-07",
+    "kind": "war",
+    "sign": -1,
+    "study": true,
+    "headline": "Two-week ceasefire agreed; Hormuz reopens partially",
+    "description": "The US and Iran agree to a two-week ceasefire including reopening of the Strait. Oil plunges below $100 from its $114 peak.",
+    "source_url": "https://www.euronews.com/video/2026/04/08/iran-ceasefire-pushes-oil-prices-down-as-markets-remain-cautious",
+    "source_tier": 2
+  },
+  {
+    "id": "physical-paper-peak",
+    "date": "2026-04-15",
+    "kind": "context",
+    "sign": 1,
+    "study": false,
+    "headline": "Physical crude trades $35 above paper - a record",
+    "description": "North Sea Dated commands a record $35 per barrel premium over ICE Brent futures. April's Dated range spans roughly $50 intramonth, the widest ever recorded. The premium collapses to $3 by early May.",
+    "source_url": "https://www.iea.org/reports/oil-market-report-may-2026",
+    "source_tier": 1
+  },
+  {
+    "id": "ceasefire-2",
+    "date": "2026-06-18",
+    "kind": "war",
+    "sign": -1,
+    "study": true,
+    "headline": "60-day ceasefire and US-Iran Memorandum of Understanding",
+    "description": "Vessels transiting the Strait must coordinate with Iran's newly established Persian Gulf Strait Authority. Transits triple within days; Hormuz oil flow recovers to about 4.8 million barrels per day. WTI falls all the way back to $69.74 - below its pre-war level.",
+    "source_url": "https://www.cnbc.com/2026/06/26/oil-prices-middle-east-iran-strait-of-hormuz-opec-iraq-wti-brent-crude.html",
+    "source_tier": 2
+  },
+  {
+    "id": "strikes-resume",
+    "date": "2026-07-08",
+    "kind": "war",
+    "sign": 1,
+    "study": true,
+    "headline": "US strikes Iran again; the ceasefire is declared over",
+    "description": "Retaliation for attacks on three commercial ships in the Strait. WTI rises 4.4 percent to $73.52 and Brent 5.2 percent to $78.02 on the day.",
+    "source_url": "https://www.cnbc.com/2026/07/08/oil-prices-brent-wti-iran-us-hormuz.html",
+    "source_tier": 2
+  },
+  {
+    "id": "saudi-tankers",
+    "date": "2026-07-23",
+    "kind": "war",
+    "sign": 1,
+    "study": true,
+    "headline": "Attacks on Saudi tankers; war risk premiums hit 7.5-10% of hull value",
+    "description": "Marsh reports war risk insurance at 7.5 to 10 percent of hull value for a single transit, up from 1 to 3 percent weeks earlier and 0.25 percent before the war. On a $100 million tanker that is $7.5-10 million per voyage.",
+    "source_url": "https://www.cnbc.com/2026/07/23/oil-prices-today-wti-brent-trump-iran-hormuz.html",
+    "source_tier": 2
+  },
+  {
+    "id": "section-122-expiry",
+    "date": "2026-07-24",
+    "kind": "tariff",
+    "sign": -1,
+    "study": false,
+    "headline": "Section 122 surcharge expires; Section 301 becomes the baseline",
+    "description": "The 10 percent blanket surcharge lapses by statute after 150 days. Section 301 forced-labor tariffs at 10 and 12.5 percent across roughly 99 percent of imports become the operative regime.",
+    "source_url": "https://www.federalregister.gov/",
+    "source_tier": 1
+  },
+  {
+    "id": "escalation-july-end",
+    "date": "2026-07-29",
+    "kind": "war",
+    "sign": 1,
+    "study": true,
+    "headline": "Escalation threats push Brent back above $90",
+    "description": "Renewed threats against Iran drive Brent above $90 as tanker attacks in the Strait continue and fighting spreads toward the Red Sea.",
+    "source_url": "https://www.cnbc.com/2026/07/29/oil-prices-today-brent-wti-iran-us-hormuz.html",
+    "source_tier": 2
   }
 ]
