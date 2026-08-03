@@ -156,6 +156,134 @@ COMPARISON_METRICS: dict[str, dict] = {
 }
 
 
+#: NBER-dated US recessions (peak month -> trough month, inclusive).
+#: https://www.nber.org/research/business-cycle-dating
+NBER_RECESSIONS: list[tuple[str, str]] = [
+    ("1990-07", "1991-03"),
+    ("2001-03", "2001-11"),
+    ("2007-12", "2009-06"),
+    ("2020-02", "2020-04"),
+]
+
+#: The COVID window. Deliberately wider than the NBER recession (which was only
+#: two months) because the economic distortion plainly outlasted the formal
+#: contraction -- reopening, supply chains and the stimulus response all land
+#: inside it. The end date is a judgement call and is stated as one.
+COVID_WINDOW = ("2020-03", "2021-06")
+
+
+def _month_mask(dates: np.ndarray, windows: list[tuple[str, str]]) -> np.ndarray:
+    """True where a date falls inside any (start_month, end_month) window."""
+    out = np.zeros(dates.size, dtype=bool)
+    for start, end in windows:
+        lo = np.datetime64(start, "M").astype("datetime64[D]")
+        hi = (np.datetime64(end, "M") + 1).astype("datetime64[D]")
+        out |= (dates >= lo) & (dates < hi)
+    return out
+
+
+def _masked_annual_rate(
+    dates: np.ndarray, deltas: np.ndarray, term, *,
+    exclude: np.ndarray | None = None,
+    lag_months: int = 0,
+    periods_per_year: float = 12.0,
+    is_flow: bool = False,
+) -> dict | None:
+    """Annualised rate for one term, over months that survive the mask.
+
+    Excluding months from a start-to-end level comparison is not meaningful --
+    you cannot subtract a month out of `(end/start)^(1/years)`. So every
+    adjustment works on the *monthly changes* instead: mask the months, average
+    what remains, annualise. That makes all four adjustments the same
+    arithmetic and keeps them comparable to each other.
+
+    `lag_months` shifts the term's start forward, crediting its opening months
+    to the predecessor -- a crude stand-in for policy acting with a lag.
+    """
+    start = np.datetime64(term.start, "D")
+    if lag_months:
+        start = start + np.timedelta64(int(lag_months * 30.44), "D")
+    m = dates > start
+    if term.end:
+        m &= dates <= np.datetime64(term.end, "D")
+    if exclude is not None:
+        m &= ~exclude
+    kept = deltas[m]
+    if kept.size < 6:
+        return None
+
+    mean = float(kept.mean())
+    return {
+        "annualised_pct": round(mean * periods_per_year, 1) if is_flow
+                          else round((np.exp(mean * periods_per_year) - 1.0) * 100.0, 2),
+        "months_used": int(kept.size),
+        "months_dropped": int((~m).sum() - (dates <= start).sum()
+                              - (0 if not term.end else (dates > np.datetime64(term.end, "D")).sum())),
+        "years": round(kept.size / periods_per_year, 2),
+    }
+
+
+def _adjustment_set(dates: np.ndarray, deltas: np.ndarray, *,
+                    is_flow: bool, ppy: float = 12.0) -> dict:
+    """Run every adjustment over every term. Returns {adjustment: {term: rate}}.
+
+    The point is not any single adjusted number -- it is whether the *ordering*
+    survives. If the ranking is stable across all four, the difference is
+    robust. If it flips once the pandemic is removed, then the headline
+    comparison was measuring which administration happened to be holding the
+    chair during a black swan, and the page should say so.
+    """
+    covid = _month_mask(dates, [COVID_WINDOW])
+    recession = _month_mask(dates, NBER_RECESSIONS)
+
+    specs = {
+        "none": {
+            "label": "As measured",
+            "note": "Inauguration to inauguration, every month counted.",
+            "kwargs": {},
+        },
+        "ex_covid": {
+            "label": "Excluding COVID",
+            "note": f"Drops {COVID_WINDOW[0]} to {COVID_WINDOW[1]}. Removes both the "
+                    "2020 collapse and the reopening surge, which land in different "
+                    "administrations and distort them in opposite directions.",
+            "kwargs": {"exclude": covid},
+        },
+        "ex_recession": {
+            "label": "Excluding recessions",
+            "note": "Drops every NBER-dated recession month, applied equally to all "
+                    "terms. Tests whether a party gap is really about which "
+                    "administrations met downturns.",
+            "kwargs": {"exclude": recession},
+        },
+        "lag12": {
+            "label": "12-month policy lag",
+            "note": "Credits each term's first 12 months to its predecessor. Economic "
+                    "policy acts with long and variable lags; this is a crude but "
+                    "transparent way to stop giving a president credit for their "
+                    "first year.",
+            "kwargs": {"lag_months": 12},
+        },
+    }
+
+    out: dict[str, dict] = {}
+    for key, spec in specs.items():
+        rows = {}
+        for term in TERMS:
+            r = _masked_annual_rate(dates, deltas, term, periods_per_year=ppy,
+                                    is_flow=is_flow, **spec["kwargs"])
+            if r:
+                rows[term.key] = r
+        # Rank completed terms only, best first.
+        rankable = [(k, v) for k, v in rows.items()
+                    if v["years"] >= MIN_COMPLETE_YEARS]
+        out[key] = {
+            "label": spec["label"], "note": spec["note"], "terms": rows,
+            "rankable_keys": [k for k, _ in rankable],
+        }
+    return out
+
+
 async def administrations(metric: str = "cpi_headline") -> dict:
     """One metric across every administration since Clinton, banded by party.
 
@@ -230,11 +358,20 @@ async def administrations(metric: str = "cpi_headline") -> dict:
         vals = [r["change"]["annualised_pct"] for r in rankable if r["party"] == p]
         return round(sum(vals) / len(vals), 2) if vals else None
 
+    # Monthly log-changes drive every adjustment; resample to monthly first so
+    # quarterly and daily series share one clock with the recession masks.
+    monthly = tsmod.resample(ts, "M", how="last") if ts.freq != "M" else ts
+    adjustments = {}
+    if len(monthly) > 24 and monthly.positive and float(monthly.values.min()) > 0:
+        d_dates, d_vals = tsmod.dlog(monthly)
+        adjustments = _adjustment_set(d_dates, d_vals, is_flow=False)
+
     return {
         "metric": metric, "label": spec["label"], "unit": unit,
         "higher_is_worse": spec["higher_is_worse"],
         "points": points,
         "terms": rows,
+        "adjustments": adjustments,
         "by_party": {
             "D": {"label": "Democratic", "mean_annualised_pct": party_mean("D")},
             "R": {"label": "Republican", "mean_annualised_pct": party_mean("R")},
@@ -321,10 +458,16 @@ async def _administrations_jobs() -> dict:
         vals = [r["mean_monthly"] for r in rankable if r["party"] == p]
         return round(sum(vals) / len(vals), 0) if vals else None
 
+    # Payrolls are already monthly and already a flow, so the raw change is the
+    # right quantity -- annualising it would turn "jobs per month" into "jobs
+    # per year" and break comparison with the headline figure.
+    adjustments = _adjustment_set(dates, changes * 1000.0, is_flow=True, ppy=1.0)
+
     return {
         "metric": "jobs", "label": "Job creation per month",
         "unit": "jobs added per month", "higher_is_worse": False,
         "points": points, "terms": rows,
+        "adjustments": adjustments,
         "by_party": {
             "D": {"label": "Democratic", "mean_annualised_pct": party_mean("D")},
             "R": {"label": "Republican", "mean_annualised_pct": party_mean("R")},
