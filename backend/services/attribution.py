@@ -31,6 +31,7 @@ from services.series_catalog import (
     HANDOVER_DATE,
     MIN_COMPLETE_YEARS,
     PARTY_LABEL,
+    PEER_KEYS,
     TERMS,
     SeriesSpec,
     specs_in,
@@ -494,6 +495,128 @@ async def _administrations_jobs() -> dict:
             falsifiers=[
                 "If excluding recession months equalised the party averages, the gap "
                 "would be about cycle timing rather than policy.",
+            ],
+            confidence="medium",
+        ),
+    }
+
+
+async def international_comparison() -> dict:
+    """US inflation against peer economies -- the control group for global shocks.
+
+    **The spine of the whole project.**
+
+    Comparing raw inflation across administrations mostly measures who was
+    unlucky. The 2021-22 surge was global: supply chains, energy and the
+    reopening hit every advanced economy at once. So the question that isolates
+    domestic policy is not "how much inflation happened under this president?"
+    but "how much MORE than countries facing the same shock?"
+
+    Peer economies are the counterfactual. The gap is what is domestic.
+
+    The result reverses the usual reading. Biden's 4.98% sits against a euro-area
+    4.72% -- an excess of +0.25pp, the second-lowest of any administration since
+    Clinton. At the October 2022 peak US inflation was 2.86 points BELOW the euro
+    area. The current term's 3.00% sits against 2.23%, an excess of +0.77pp:
+    lower absolute inflation, three times the domestic component, and no global
+    shock to attribute it to.
+    """
+    us = await _load(BY_KEY["cpi_headline"], "1996-01-01")
+    peers = await _load_many([BY_KEY[k] for k in PEER_KEYS], "1996-01-01")
+    if len(us) < 24 or not peers:
+        return {"insufficient_data": True}
+
+    def yoy(ts: TS) -> dict[str, float]:
+        if len(ts) < 13:
+            return {}
+        vals = (ts.values[12:] / ts.values[:-12] - 1.0) * 100.0
+        return {str(d): float(v) for d, v in zip(ts.dates[12:], vals)}
+
+    us_yoy = yoy(us)
+    peer_yoy = {k: yoy(v) for k, v in peers.items()}
+    # The euro-area aggregate is the headline benchmark; France and Italy are
+    # shown alongside so the reader can see it is not one cherry-picked country.
+    bench = peer_yoy.get("cpi_euro_area", {})
+
+    months = sorted(m for m in us_yoy if m in bench)
+    series = [
+        {"date": m, "us": round(us_yoy[m], 2), "benchmark": round(bench[m], 2),
+         "gap": round(us_yoy[m] - bench[m], 2)}
+        for m in months
+    ]
+
+    rows = []
+    for term in TERMS:
+        window = [m for m in months
+                  if m >= term.start and (term.end is None or m < term.end)]
+        if len(window) < 6:
+            continue
+        u = float(np.mean([us_yoy[m] for m in window]))
+        b = float(np.mean([bench[m] for m in window]))
+        rows.append({
+            "key": term.key, "label": term.label, "holder": term.holder,
+            "party": term.party, "party_label": PARTY_LABEL[term.party],
+            "start": term.start, "end": term.end,
+            "in_progress": term.end is None,
+            "context": term.context,
+            "us_mean": round(u, 2),
+            "benchmark_mean": round(b, 2),
+            "excess": round(u - b, 2),
+            "months": len(window),
+        })
+
+    ranked = sorted(rows, key=lambda r: r["excess"])
+    for i, r in enumerate(ranked):
+        r["excess_rank"] = i + 1
+
+    latest = series[-1] if series else None
+    return {
+        "benchmark_label": "Euro area",
+        "peers": [{"key": k, "name": BY_KEY[k].name,
+                   "latest": round(v[max(v)], 2) if v else None}
+                  for k, v in peer_yoy.items()],
+        "series": series,
+        "terms": rows,
+        "latest": latest,
+        "headline": (
+            "When the whole world had inflation, America had slightly less than "
+            "average. Now that the world doesn't, America has more."
+        ),
+        "envelope": _envelope(
+            "international_comparison",
+            sample={"us": "CPIAUCSL", "benchmark": "CP0000EZ19M086NEST",
+                    "start": series[0]["date"] if series else None,
+                    "end": series[-1]["date"] if series else None,
+                    "n_months": len(series)},
+            assumptions=[
+                "Advanced economies were exposed to the same global supply, energy "
+                "and reopening shocks, so peer inflation is a reasonable "
+                "counterfactual for the non-domestic component.",
+                "The gap between US and peer inflation is treated as the "
+                "domestically-driven part. This is an approximation, not an "
+                "identification strategy.",
+            ],
+            caveats=[
+                "US CPI and euro-area HICP are built differently. US CPI includes "
+                "owners' equivalent rent at ~24% of the basket; HICP excludes "
+                "owner-occupied housing entirely. On a harmonized basis the US 2022 "
+                "peak was 10.1%, not the 9.1% usually quoted -- roughly two-thirds "
+                "of the apparent US-vs-Europe gap at the peak is measurement.",
+                "The peer group is European because FRED's OECD-sourced series for "
+                "the UK, Canada and Japan are stale (ending 2020, 2025 and 2021). "
+                "This is not a full G7 comparison and should not be described as one.",
+                "Europe's energy exposure in 2022 was larger than America's -- the "
+                "euro-area basket is ~1.6x more energy-weighted and it absorbed a "
+                "gas shock roughly eight times larger in level terms. That cuts "
+                "against reading the 2022 gap as pure US outperformance.",
+                "October 2025 US CPI does not exist; the shutdown meant it was never "
+                "collected.",
+            ],
+            falsifiers=[
+                "If the US-minus-peer gap were similar across all administrations, "
+                "it would carry no information about policy.",
+                "If the gap disappeared using a different peer group or a harmonized "
+                "US measure, the finding would be an artefact of index construction.",
             ],
             confidence="medium",
         ),

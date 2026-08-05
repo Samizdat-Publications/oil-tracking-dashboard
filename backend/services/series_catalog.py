@@ -153,7 +153,26 @@ INTERNATIONAL: list[SeriesSpec] = [
                "international", "index", sa=False,
                note="No US administration sets the price of diesel in Rotterdam. If the "
                     "shock is global, a domestic-policy explanation cannot carry it."),
+    # Peer-country consumer prices. These are the control group for the whole
+    # project: the 2021-22 inflation surge hit every advanced economy, so the
+    # question that isolates domestic policy is not "how much inflation?" but
+    # "how much MORE than countries facing the same shock?"
+    #
+    # Only these three run to the present. FRED's OECD-sourced series for the
+    # UK, Canada and Japan are stale (ending 2020, 2025 and 2021 respectively),
+    # so the peer group is European by data availability, not by choice -- and
+    # the UI must say so rather than implying a full G7 comparison.
+    SeriesSpec("cpi_euro_area", "CP0000EZ19M086NEST", "Euro area", "international",
+               "index", sa=False,
+               note="Harmonized index across 19 euro-area economies."),
+    SeriesSpec("cpi_france", "CP0000FRM086NEST", "France", "international", "index",
+               sa=False),
+    SeriesSpec("cpi_italy", "CP0000ITM086NEST", "Italy", "international", "index",
+               sa=False),
 ]
+
+#: Peer economies used as the control group for global shocks.
+PEER_KEYS = ["cpi_euro_area", "cpi_france", "cpi_italy"]
 
 # ---------------------------------------------------------------------------
 # Macro scorecard -- the two-term ledger.

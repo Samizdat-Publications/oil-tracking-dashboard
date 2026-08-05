@@ -44,6 +44,16 @@ async def _cached(name: str, params: str, compute):
     return result
 
 
+@router.get("/international")
+async def international():
+    """US inflation vs peer economies -- the control group for global shocks.
+
+    The 2021-22 surge hit every advanced economy. Peer inflation is therefore
+    the counterfactual, and the US-minus-peer gap is the domestic component.
+    """
+    return await _cached("international", "-", attr.international_comparison)
+
+
 @router.get("/administrations")
 async def administrations(metric: str = Query("cpi_headline", pattern=r"^[a-z0-9_]{2,32}$")):
     """One metric across every administration since Clinton, banded by party.
