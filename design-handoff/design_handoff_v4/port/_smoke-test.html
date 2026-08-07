@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hormuz-engine smoke test</title>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;900&family=Chivo+Mono:wght@400;700&family=Archivo:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* Minimal harness. This is NOT the design — see reference/ for that.
+     It exists to prove the engine runs standalone and to show the wiring. */
+  body { margin:0; background:#0A1A24; color:#F4EDE0; font-family:Archivo,sans-serif; padding:24px; }
+  .wrap { max-width:1100px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
+  .row { display:flex; gap:14px; flex-wrap:wrap; }
+  .map { flex:3 1 520px; min-width:280px; border:3px solid #F5A300; background:#061218; }
+  .mapwrap { position:relative; width:100%; height:340px; }
+  canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .rail { flex:1 1 240px; display:flex; flex-direction:column; gap:12px; }
+  .price { background:#F5A300; color:#12100E; padding:16px; }
+  .price b { font:900 52px/1 Chivo,sans-serif; letter-spacing:-.035em; display:block; }
+  .cell { border:3px solid rgba(244,237,224,.15); padding:14px; }
+  .lab { font:700 10px/1 'Chivo Mono',monospace; letter-spacing:.13em; color:#7A8A95; }
+  .val { font:900 28px/1 Chivo,sans-serif; letter-spacing:-.02em; }
+  .cap { font:400 13px/1.35 Archivo,sans-serif; color:#9BA9B6; margin-top:4px; }
+  .chartwrap { position:relative; width:100%; height:220px; }
+  .ctl { display:flex; gap:9px; align-items:center; flex-wrap:wrap; }
+  button { min-height:44px; padding:0 15px; border:0; border-radius:0; cursor:pointer;
+           font:900 12px/1 Chivo,sans-serif; letter-spacing:.13em; background:#F5A300; color:#12100E; }
+  button.ghost { background:transparent; color:#C9D6DE; border:2px solid rgba(244,237,224,.2); }
+  button.sp { min-width:54px; background:transparent; color:#7A8A95; border:2px solid rgba(244,237,224,.14);
+              font-family:'Chivo Mono',monospace; font-size:12px; letter-spacing:0; }
+  button.sp[data-on="1"] { background:rgba(245,163,0,.16); color:#F5A300; border-color:#F5A300; }
+  #date { font:700 15px/1 'Chivo Mono',monospace; min-width:120px; }
+  #track { position:relative; height:44px; touch-action:none; cursor:ew-resize; }
+  #rail2 { position:absolute; left:0; right:0; top:21px; height:4px; background:rgba(244,237,224,.12); }
+  #fill { position:absolute; left:0; width:0; top:21px; height:4px; background:#F5A300; }
+  #thumb { position:absolute; left:0; top:15px; width:16px; height:16px; margin-left:-8px;
+           background:#F4EDE0; box-shadow:0 0 0 3px rgba(245,163,0,.4); }
+  .ev { background:#0A1015; border-left:5px solid #F5A300; padding:12px 14px; }
+  .ev h4 { margin:4px 0; font:900 17px/1.25 Chivo,sans-serif; }
+  .ev p { margin:0; font:400 14px/1.4 Archivo,sans-serif; color:#9BA9B6; }
+  #status { font:700 11px/1 Chivo,sans-serif; letter-spacing:.13em; }
+  .ok { color:#3FA96A } .bad { color:#D91E18 }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div><span class="lab">SMOKE TEST</span> — <span id="assert" class="lab">running…</span></div>
+
+  <div class="row">
+    <div class="map">
+      <div class="mapwrap" id="mapwrap"><canvas id="map"></canvas></div>
+      <div class="ev" id="ev">
+        <span class="lab" id="evmeta"></span>
+        <h4 id="evhead"></h4>
+        <p id="evdetail"></p>
+      </div>
+    </div>
+    <div class="rail">
+      <div class="price"><span class="lab">WTI CRUDE · $/BARREL</span><b id="price">—</b><span class="lab" id="pricecap"></span></div>
+      <div class="cell"><div class="lab">THROUGH THE STRAIT · MB/D</div><div class="val" id="flow">—</div><div class="cap" id="flowcap"></div></div>
+      <div class="cell"><div class="lab">WAR-RISK PREMIUM</div><div class="val" id="risk">—</div><div class="cap" id="riskcap"></div></div>
+      <div class="cell"><div class="lab">TANKERS DRAWN WAITING</div><div class="val" id="queue">0</div><div class="cap">Illustrative. No verified queue count exists.</div></div>
+    </div>
+  </div>
+
+  <div class="chartwrap" id="chartwrap"><canvas id="chart"></canvas></div>
+
+  <div class="ctl">
+    <button id="play">PLAY</button>
+    <button id="replay" class="ghost">REPLAY</button>
+    <span id="date">—</span>
+    <span style="flex:1"></span>
+    <span id="status"></span>
+    <button class="sp" data-v="1">1×</button>
+    <button class="sp" data-v="2">2×</button>
+    <button class="sp" data-v="6">6×</button>
+  </div>
+
+  <div id="track"><div id="rail2"></div><div id="fill"></div><div id="thumb"></div></div>
+</div>
+
+<script type="module">
+import { HormuzEngine, scrubTicks, SPAN } from './hormuz-engine.js';
+
+const $ = id => document.getElementById(id);
+
+// Scrub ticks come from the ledger, never hard-coded.
+for (const t of scrubTicks()) {
+  const s = document.createElement('span');
+  s.style.cssText = `position:absolute;left:${t.leftPct}%;top:${t.top}px;width:${t.width}px;height:${t.height}px;background:${t.color};display:block`;
+  $('track').appendChild(s);
+}
+
+let lastEventIndex = -2;
+
+const engine = new HormuzEngine({
+  mapCanvas: $('map'), mapWrap: $('mapwrap'),
+  chartCanvas: $('chart'), chartWrap: $('chartwrap'),
+  onReadout(r) {
+    // Plain textContent writes. In React these go through ImperativeText so a
+    // re-render cannot wipe them — see port/reveal.js.
+    $('price').textContent = r.price;
+    $('pricecap').textContent = r.priceCaption;
+    $('pricecap').style.opacity = r.priceDimmed ? .72 : 1;
+    $('flow').textContent = r.flow;   $('flow').style.color = r.flowColor;
+    $('flowcap').textContent = r.flowCaption;
+    $('risk').textContent = r.risk;   $('risk').style.color = r.riskColor;
+    $('riskcap').textContent = r.riskCaption;
+    $('queue').textContent = r.queue; $('queue').style.color = r.queueColor;
+    $('date').textContent = r.date;
+    $('status').textContent = r.gateLabel;
+    $('status').style.color = r.gateColor;
+    $('play').textContent = r.playing ? 'PAUSE' : 'PLAY';
+    $('fill').style.width = r.progressPct.toFixed(2) + '%';
+    $('thumb').style.left = r.progressPct.toFixed(2) + '%';
+    if (r.event && r.eventIndex !== lastEventIndex) {
+      lastEventIndex = r.eventIndex;
+      $('evmeta').textContent = `${r.event.date} · ${r.event.kind} · ${r.event.tier}`;
+      $('evhead').textContent = r.event.headline;
+      $('evdetail').textContent = r.event.detail;
+      $('ev').style.borderLeftColor = r.event.color;
+    }
+    document.querySelectorAll('.sp').forEach(b => b.dataset.on = (+b.dataset.v === r.speed) ? '1' : '0');
+  },
+});
+
+engine.mount();
+window.__engine = engine;
+
+$('play').onclick = () => engine.toggle();
+$('replay').onclick = () => engine.replay();
+document.querySelectorAll('.sp').forEach(b => b.onclick = () => engine.setSpeed(+b.dataset.v));
+
+const track = $('track');
+track.addEventListener('pointerdown', e => {
+  engine.beginScrub(); track.setPointerCapture(e.pointerId);
+  engine.seek(engine.dayFromClientX(e.clientX, track));
+});
+track.addEventListener('pointermove', e => {
+  if (!engine.scrubbing) return;
+  engine.seek(engine.dayFromClientX(e.clientX, track));
+});
+track.addEventListener('pointerup', e => { engine.endScrub(); track.releasePointerCapture(e.pointerId); });
+
+/* ---- assertions ---------------------------------------------------------- */
+setTimeout(() => {
+  const out = [];
+  const px = (cv) => {
+    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+    let n = 0; for (let i = 3; i < d.length; i += 40) if (d[i] > 0) n++;
+    return n;
+  };
+  if (px($('map')) < 100) out.push('map canvas empty');
+  if (px($('chart')) < 50) out.push('chart canvas empty');
+  if ($('price').textContent === '—') out.push('no price readout');
+
+  // Seek past the first event (day 15) before asserting the card — at 12 days/s
+  // the clock has only reached ~day 11 by now, and an empty card is correct there.
+  engine.seek(20);
+  if (!$('evhead').textContent) out.push('no event card');
+
+  // scrub to the closure and confirm vessels actually queue
+  engine.seek(80);
+  for (let i = 0; i < 400; i++) engine.step(1 / 30);
+  if (engine.queueCount < 3) out.push('vessels did not queue during closure (' + engine.queueCount + ')');
+  const closed = engine.getReadout();
+  if (closed.gateLabel !== 'STRAIT CLOSED') out.push('gate not closed at day 80: ' + closed.gateLabel);
+  if (closed.flow !== '0.0') out.push('flow readout wrong at day 80: ' + closed.flow);
+
+  engine.seek(96);
+  const peak = engine.getReadout();
+  if (peak.price !== '$114.01') out.push('peak price wrong: ' + peak.price);
+  if (peak.provenance !== 'verified') out.push('peak not flagged verified');
+
+  engine.seek(99);
+  if (engine.getReadout().provenance !== 'derived') out.push('day 99 not flagged derived');
+
+  engine.seek(140);
+  if (engine.getReadout().provenance !== 'interpolated') out.push('day 140 not flagged interpolated');
+
+  engine.seek(0);
+  engine.setPlaying(true);
+
+  const el = $('assert');
+  el.textContent = out.length ? 'FAIL — ' + out.join('; ') : 'PASS — engine renders, queues, and flags provenance correctly';
+  el.className = 'lab ' + (out.length ? 'bad' : 'ok');
+  window.__result = out;
+}, 900);
+</script>
+</body>
+</html>

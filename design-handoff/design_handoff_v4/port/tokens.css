@@ -1,0 +1,160 @@
+/* ============================================================================
+   tokens.css — every literal value in the design. Copy this file in.
+
+   Do not retype these into a Tailwind config by eye. If you use Tailwind v4,
+   import this file and reference the variables from @theme; the point is that
+   the hex codes exist in exactly one place.
+
+   THE THREE RULES THAT DEFINE THE LOOK, and that a "cleanup" pass will destroy:
+     1. border-radius is 0. Everywhere. No exceptions.
+     2. Shadows are HARD OFFSETS with zero blur. Never a soft drop shadow.
+     3. Section grounds carry a halftone dot texture, not a flat fill.
+   If the built page has rounded cards and soft shadows, it is not this design.
+   ============================================================================ */
+
+:root {
+  /* ---- ground + ink ---- */
+  --ink:            #12100E;   /* dark ground, body text on cream, offset shadows */
+  --paper:          #F4EDE0;   /* cream ground, text on dark */
+
+  /* ---- signal ---- */
+  --crimson:        #D91E18;   /* the war; negative deltas; held vessels */
+  --amber:          #F5A300;   /* primary accent; prices; callout blocks */
+  --poster-blue:    #1E3FBF;   /* §03 ground; Biden-era marks; tariff events */
+
+  /* ---- §07 sea ---- */
+  --sea:            #0A1A24;
+  --sea-deep:       #061218;
+  --sea-canvas-0:   #04090F;   /* canvas gradient stops */
+  --sea-canvas-1:   #08161F;
+  --sea-canvas-2:   #040B12;
+  --land-top:       #3A3225;
+  --land-bottom:    #26211A;
+  --land-edge:      #8A7B60;
+
+  /* ---- state ---- */
+  --green:          #1E7F4A;
+  --green-bright:   #3FA96A;   /* "TRANSIT NORMAL" */
+  --amber-dark:     #B36A00;
+
+  /* ---- event kinds (§07 ticks + chips) ---- */
+  --ev-war:         #FF5A4E;
+  --ev-tariff:      #7A8CFF;
+  --ev-policy:      #3FA96A;
+  --ev-context:     #8A99A8;
+
+  /* ---- muted, on dark ---- */
+  --on-dark-body:   #E6DDCE;
+  --on-dark-2:      #C9D6DE;
+  --on-dark-3:      #9BA9B6;
+  --on-dark-4:      #7A8A95;
+  --on-dark-5:      #5B6873;
+  --on-dark-rule:   rgba(244, 237, 224, .15);
+  --on-dark-faint:  rgba(244, 237, 224, .12);
+
+  /* ---- muted, on cream ---- */
+  --on-cream-body:  #3D372F;
+  --on-cream-2:     #6B6053;
+  --on-cream-rule:  rgba(18, 16, 14, .2);
+
+  /* ---- grey used for the "before" bar in §02 ---- */
+  --was:            #8A7F6E;
+
+  /* ---- type ---- */
+  --font-display:   Chivo, system-ui, sans-serif;      /* 400/600/700/900 */
+  --font-mono:      "Chivo Mono", ui-monospace, monospace;  /* 400/500/600/700 */
+  --font-body:      Archivo, system-ui, sans-serif;    /* 400/500/600/700 */
+
+  /* ---- radius + shadow ---- */
+  --radius:         0;
+  --shadow-offset:  clamp(4px, .7cqi, 8px);
+  --shadow-offset-lg: clamp(5px, .8cqi, 9px);
+  --shadow-offset-sm: clamp(3px, .55cqi, 6px);
+
+  /* ---- rhythm ---- */
+  --section-pad-y:  clamp(24px, 4cqi, 70px);
+  --section-pad-x:  clamp(14px, 3.4cqi, 56px);
+  --gap-sm:         clamp(8px, 1.3cqi, 14px);
+  --gap-md:         clamp(11px, 1.8cqi, 26px);
+  --gap-lg:         clamp(14px, 2.6cqi, 44px);
+
+  /* ---- motion ---- */
+  --ease-bar:       cubic-bezier(.2, .85, .25, 1);
+  --ease-stroke:    cubic-bezier(.3, .85, .3, 1);
+  --dur-bar:        .9s;
+  --dur-bar-lg:     1.05s;
+  --dur-col:        1.1s;
+  --dur-stroke:     1.5s;
+  --dur-fade:       .5s;
+}
+
+/* ============================================================================
+   THE CONTAINER. The whole page scales off container-query units, not vw.
+   Without container-type on the root, every clamp() in this design collapses to
+   its minimum and the page renders at phone sizes on a desktop. This one line
+   is load-bearing.
+   ============================================================================ */
+.v4-root {
+  container-type: inline-size;
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* ============================================================================
+   HALFTONE. Newsprint texture, 5px grid. Every full-width section has it.
+   ============================================================================ */
+.halftone-dark  { background-image: radial-gradient(rgba(244,237,224,.13) .7px, transparent .7px); background-size: 5px 5px; }
+.halftone-light { background-image: radial-gradient(rgba(18,16,14,.10) .7px, transparent .7px);   background-size: 5px 5px; }
+
+/* ============================================================================
+   TYPE RAMP. Fluid against cqi. Never below the stated minimum.
+   ============================================================================ */
+.t-h1      { font-family: var(--font-display); font-weight: 900; font-size: clamp(46px, 9.6cqi, 140px); line-height: .85; letter-spacing: -.035em; text-transform: uppercase; margin: 0; }
+.t-h2      { font-family: var(--font-display); font-weight: 900; font-size: clamp(34px, 6.2cqi, 92px);  line-height: .88; letter-spacing: -.03em;  text-transform: uppercase; margin: 0; }
+.t-stat    { font-family: var(--font-display); font-weight: 900; font-size: clamp(30px, 3.6cqi, 52px);  line-height: 1;   letter-spacing: -.03em; }
+.t-stat-lg { font-family: var(--font-display); font-weight: 900; font-size: clamp(34px, 4.4cqi, 64px);  line-height: 1;   letter-spacing: -.03em; }
+.t-stat-sm { font-family: var(--font-display); font-weight: 900; font-size: clamp(24px, 2.9cqi, 40px);  line-height: 1;   letter-spacing: -.03em; }
+.t-card    { font-family: var(--font-display); font-weight: 900; font-size: clamp(14px, 1.5cqi, 19px);  line-height: 1.1; text-transform: uppercase; }
+.t-lead    { font: 400 clamp(14.5px, 1.6cqi, 21px)/1.42 var(--font-body); text-wrap: pretty; }
+.t-body    { font: 400 clamp(13.5px, 1.44cqi, 18px)/1.45 var(--font-body); text-wrap: pretty; }
+.t-small   { font: 400 clamp(12.5px, 1.34cqi, 16px)/1.42 var(--font-body); text-wrap: pretty; }
+.t-kicker  { font: 700 clamp(9px, 1.05cqi, 12px)/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.t-label   { font: 700 clamp(8.5px, .98cqi, 11px)/1 var(--font-mono); letter-spacing: .13em; text-transform: uppercase; }
+.t-note    { font: 700 clamp(9.5px, 1.02cqi, 12px)/1.6 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+
+/* ============================================================================
+   PRIMITIVES
+   ============================================================================ */
+.panel-dark   { background: var(--ink);   color: var(--paper); box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--crimson); border-radius: 0; }
+.panel-amber  { background: var(--amber); color: var(--ink);   box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--ink);     border-radius: 0; }
+.panel-outline{ border: 3px solid var(--ink); background: var(--paper); box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--poster-blue); border-radius: 0; }
+.panel-onsea  { border: 3px solid var(--on-dark-rule); border-radius: 0; }
+
+/* The masthead stat boxes. */
+.stat-box { border: 3px solid var(--paper); box-shadow: var(--shadow-offset-sm) var(--shadow-offset-sm) 0 var(--crimson); padding: clamp(9px,1.3cqi,15px) clamp(10px,1.5cqi,17px); }
+
+/* Every repeating group in this design is an auto-fit grid. No media queries. */
+.grid-auto      { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: var(--gap-md); }
+.grid-auto-wide { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--gap-lg); }
+
+/* Bars start collapsed; the reveal flips the scale. */
+.bar-h { transform: scaleX(0); transform-origin: left;   transition: transform var(--dur-bar)  var(--ease-bar); }
+.bar-v { transform: scaleY(0); transform-origin: bottom; transition: transform var(--dur-col)  var(--ease-bar); }
+
+/* Every control. 44px minimum, no exceptions. */
+.control { min-height: 44px; border-radius: 0; cursor: pointer; font-family: var(--font-display); font-weight: 900; letter-spacing: .13em; }
+
+a { color: var(--crimson); }
+a:hover { color: #8F0F0B; }
+::selection { background: var(--amber); color: var(--ink); }
+
+@keyframes tk     { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes hzPulse{ 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+@keyframes hzFlash{ from { border-left-color: var(--crimson) } to { border-left-color: var(--amber) } }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .001s !important; transition-duration: .001s !important; }
+}
