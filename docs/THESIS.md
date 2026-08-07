@@ -372,6 +372,80 @@ point estimate we can defend.
 
 ---
 
+---
+
+## Strait of Hormuz — figures used in the simulation
+
+Added 2026-08-07 so the page's "every figure is sourced" claim is literally true.
+These were previously cited in-page but absent here, which
+`design-handoff/.../DATA-PROVENANCE.md` correctly flagged as a blocker.
+
+### Transit volumes — TIER 1 (IEA)
+
+| Figure | Value | As of |
+|---|---|---|
+| Pre-war gross transit | **13.8 mb/d** (~20% of world oil trade) | to 2026-02-28 |
+| Transit while closed | **0.0 mb/d** | 2026-03 to ~2026-06 |
+| Transit after the MoU | **4.8 mb/d** (~35% of baseline) | late June 2026 |
+
+Stepped values with as-of dates. **Never interpolate between them** — the strait did not
+reopen gradually, and a smooth curve would assert something that did not happen.
+
+### War-risk insurance — TIER 2 (Marsh via S&P Global; Strauss Center for calibration)
+
+| Date | Premium, % of hull | Per transit on a $100M hull | ≈ $/bbl |
+|---|---|---|---|
+| Pre-war | **0.25%** | $250k | $0.13 |
+| Early March | ~1% | $1.0M | $0.50 |
+| Mid-March | 2.5% | $2.5M | $1.25 |
+| **2026-04-15 peak** | **10%** | **$10M** | **$5.00** |
+| Early July | 1–3% | $1–3M | $0.50–1.50 |
+| **2026-07-23** | **7.5–10%** | $7.5–10M | $3.75–5.00 |
+
+$/bbl derived at 2M bbl per VLCC; hull value $100M from the Strauss Center range
+($100–120M). **Derived, and labelled as such.** The Joint War Committee publishes listed
+areas but explicitly **not** rates — there is no war-risk premium index at any price, so
+these come from trade-press reporting of broker quotes and carry that uncertainty.
+
+### Policy response — TIER 1 (IEA)
+
+**2026-03-11:** IEA members agreed to release **400 million barrels** — the largest
+coordinated release in the agency's 52-year history, ~⅓ of government stockpiles across 32
+nations; US share 172M over ~120 days. Expert estimates put the short-run price effect near
+**$2/bbl**. One of three contributors the IEA names for the June price retreat.
+
+### The April cost stack — TIER 1/2
+
+Added freight ≈ **$11.25/bbl** (TD3C WS137 → WS525; Baltic Exchange endpoints, Kpler
+conversion) plus war-risk ≈ **$4.87/bbl** = a documented stack of ≈**$16/bbl** against a
+**$25–35/bbl** wedge (IEA ceiling $35, mid-April). The remainder is scarcity rent for
+barrels that could not be delivered. Wedge closed to **$3/bbl** by early May (IEA).
+
+### Price anchors — TIER 1 (FRED `DCOILWTICO`, Cushing spot)
+
+2025 close $57.70 · 2026-01-02 **$57.21** · 2026-02-27 $66.96 · 2026-04-06 peak **$114.01** ·
+2026-07-01 **$69.74** · 2026-07-07 $71.53 · **2026-07-08 $74.56 (+4.24%)** · 2026-07-23
+$93.08 · 2026-07-27 $84.25 · 2026-07-29 $86.08 · 2026-08-03 $81.96.
+
+⚠️ **Press figures for 8 July quote $73.52 (+4.4%). That is the front-month futures
+contract, not Cushing spot.** Both are correct; they are different instruments. The page
+uses FRED spot throughout for internal consistency, because every other anchor comes from
+the same series. Do not mix the two on one chart.
+
+The **2026-02-28 $67.00** anchor is `approx.` (markets closed; nearest print 02-27 $66.96).
+The **2026-04-07 $96.91** anchor is `derived` — $114.01 × 0.85, from the reported ~15% fall
+after the ceasefire. Both must keep their labels.
+
+### What we still will not publish
+
+**No queue count.** No verified figure exists at any tier. The circulating "~325 stranded
+tankers" and "2,000 ships" are unsourceable; the IMO's own figure is ~1,600 *vessels of all
+types inside the Gulf*, which is a different quantity. The vessel layer in the simulation is
+illustrative and must keep its "NOT AIS DATA" label until IMF PortWatch transit volumes are
+wired in.
+
+---
+
 ## Key sources
 
 - [Fed Board FEDS Notes, tariff effects Part II (2026-04-08)](https://www.federalreserve.gov/econres/notes/feds-notes/detecting-tariff-effects-on-consumer-prices-in-real-time-part-II-20260408.html)
