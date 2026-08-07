@@ -335,3 +335,75 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ------------------------------------------------------- Hormuz simulation */
+
+/* The one dark surface on the page. It reads as an instrument panel rather than
+   a chart, which is the point — this is the section that shows a mechanism. */
+.hz {
+  background: #04090f;
+  border: 1px solid #1d2933;
+  color: #f4ede0;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.hz-readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #1d2933;
+}
+.hz-ro { display: flex; flex-direction: column; gap: 0.15rem; }
+.hz-ro-k {
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #8a99a8;
+}
+.hz-ro-v {
+  font-family: var(--mono); font-size: 1.35rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; color: #f5a300;
+}
+.hz-ro-n { font-family: var(--mono); font-size: 0.6rem; color: #6b7a88; }
+
+.hz-canvases { display: block; }
+.hz-map, .hz-chart { display: block; width: 100%; }
+.hz-chart { margin-top: 0.5rem; border-top: 1px solid #1d2933; }
+
+.hz-event {
+  border-left: 3px solid #f5a300;
+  padding: 0.6rem 0.9rem;
+  margin: 0.85rem 0;
+  min-height: 3.6rem;
+}
+.hz-event-t { display: block; font-weight: 700; font-size: 1rem; }
+.hz-event-d { display: block; font-size: 0.86rem; color: #a9b6c2; margin-top: 0.2rem; }
+
+.hz-controls {
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+}
+.hz-play {
+  min-width: 88px; min-height: 44px;
+  background: #f5a300; color: #04090f; border: 0;
+  font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.1em; cursor: pointer;
+}
+.hz-play:hover { background: #ffb524; }
+
+.hz-scrub {
+  flex: 1 1 180px; min-height: 44px; accent-color: #f5a300; cursor: pointer;
+}
+
+.hz-speeds { display: flex; gap: 0.25rem; }
+.hz-speed {
+  min-width: 44px; min-height: 44px;
+  background: none; border: 1px solid #2b3945; color: #8a99a8;
+  font-family: var(--mono); font-size: 0.72rem; cursor: pointer;
+}
+.hz-speed.is-on { border-color: #f5a300; color: #f5a300; }
+
+.hz-reduced {
+  font-family: var(--mono); font-size: 0.68rem; color: #8a99a8;
+  margin: 0.75rem 0 0;
+}

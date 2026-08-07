@@ -25,6 +25,7 @@ import {
   TimeChart, DollarBars, Columns, ExcessBars, WhatThisShows, SourceNote, Empty,
   type Line, type Marker, type Pt,
 } from '../v4/charts';
+import HormuzSimulation from '../v4/HormuzSimulation';
 import '../styles/v4.css';
 
 const HOUR = 3_600_000;
@@ -258,6 +259,41 @@ function Crossing() {
 }
 
 // ---------------------------------------------------------------------------
+// 04 — The crossing (simulation)
+// ---------------------------------------------------------------------------
+
+function Crossing2() {
+  const q = useSection('crude_daily');
+  const closes = (q.data?.observations ?? []) as { date: string; value: number }[];
+
+  return (
+    <Section
+      id="strait"
+      kicker="The mechanism · 2 January → 4 August 2026"
+      title={<>Twenty percent of<br />the world's oil</>}
+      standfirst="One route from a decision in February to a number on a fuel pump. Press play, or drag the scrubber to any day."
+    >
+      {q.isLoading && <Loading />}
+      {q.isError && <Failed retry={() => q.refetch()} />}
+      {closes.length > 0 && <HormuzSimulation closes={closes} />}
+      <WhatThisShows>
+        The strait carried about 13.8 million barrels a day before the strike — roughly a
+        fifth of world oil trade. It went to zero. Crude nearly doubled. When the June
+        memorandum reopened it to about 4.8 million barrels a day, the price fell back
+        below where it started. Then strikes resumed and it climbed again.
+      </WhatThisShows>
+      <SourceNote>
+        Price is FRED <code>DCOILWTICO</code>, daily closes. Transit volumes and war-risk
+        premiums are stepped values with as-of dates from the IEA and Marsh — they are not
+        interpolated, because the strait did not close or reopen gradually. Coastline
+        geometry is schematic and vessel positions are illustrative, not AIS tracking. No
+        queue count is shown: no verified figure exists at any tier.
+      </SourceNote>
+    </Section>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // 04 — Two choices, two signatures
 // ---------------------------------------------------------------------------
 
@@ -471,6 +507,7 @@ export default function LedgerPage() {
       <main>
         <Shelf />
         <Crossing />
+        <Crossing2 />
         <TwoChoices />
         <Work />
         <OtherSide />
