@@ -211,10 +211,18 @@
 .work-grid > div > .t-label { display: block; color: #A99C89; margin-bottom: clamp(10px, 1.6cqi, 18px); }
 
 .cols { display: flex; align-items: flex-end; gap: clamp(12px, 2cqi, 26px); height: clamp(160px, 20cqi, 260px); }
-.col { flex: 0 0 auto; width: clamp(56px, 7cqi, 96px); height: 100%; display: flex; flex-direction: column; }
-.col-v { color: var(--paper); font-variant-numeric: tabular-nums; margin-bottom: 6px; }
+/* The column sizes to its READOUT, not to its bar. "320,938" is roughly three
+   times the bar's width, so a column sized to the bar lets the number overflow
+   into its neighbour. Sizing the other way round — column to `max-content`, bar
+   to the designed width — keeps the bars thin and the numbers legible. Shrinking
+   the type to fit the bar is not an option: it lands under the 11px floor. */
+.col {
+  flex: 0 0 auto; width: max-content; min-width: clamp(56px, 7cqi, 96px);
+  height: 100%; display: flex; flex-direction: column;
+}
+.col-v { color: var(--paper); font-variant-numeric: tabular-nums; margin-bottom: 6px; white-space: nowrap; }
 .col-track { flex: 1; display: flex; align-items: flex-end; }
-.col-bar { display: block; width: 100%; }
+.col-bar { display: block; width: clamp(56px, 7cqi, 96px); }
 .col-biden { background: var(--poster-blue); border-top: 5px solid #BFD0FF; }
 .col-trump { background: var(--crimson);     border-top: 5px solid var(--paper); }
 .col-l { display: block; margin-top: 8px; color: #A99C89; }
