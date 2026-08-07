@@ -6,6 +6,7 @@ import { useSimulation } from './hooks/useSimulation';
 import { useInViewOnce } from './hooks/useInViewOnce';
 import { checkSetup } from './lib/api';
 
+const LedgerPage = lazy(() => import('./pages/LedgerPage'));
 const ReceiptPage = lazy(() => import('./pages/ReceiptPage'));
 const BroadsheetPage = lazy(() => import('./pages/BroadsheetPage').then(m => ({ default: m.BroadsheetPage })));
 const ChartLabPage = lazy(() => import('./pages/ChartLabPage').then(m => ({ default: m.ChartLabPage })));
@@ -218,7 +219,8 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
 function App() {
   // V3 ("The Receipt") is the default. The earlier views stay reachable so
   // nothing that was linked previously breaks:
-  //   /                  -> V3
+  //   /                  -> V4 ledger
+  //   ?view=receipt      -> V3 receipt
   //   ?view=broadsheet   -> V2 broadsheet
   //   ?view=dashboard    -> V1 classic dashboard
   //   ?view=chart-lab    -> design sandbox
@@ -230,8 +232,9 @@ function App() {
   const isDashboard = view === 'dashboard';
   const isChartLab = view === 'chart-lab';
   const isBroadsheet = view === 'broadsheet';
+  const isReceipt = view === 'receipt';
 
-  const fallback = <div style={{ background: '#06080F', minHeight: '100vh' }} />;
+  const fallback = <div style={{ background: '#F7F5F0', minHeight: '100vh' }} />;
 
   return (
     <ErrorBoundary>
@@ -245,8 +248,10 @@ function App() {
           </>
         ) : isBroadsheet ? (
           <Suspense fallback={fallback}><BroadsheetPage /></Suspense>
-        ) : (
+        ) : isReceipt ? (
           <Suspense fallback={fallback}><ReceiptPage /></Suspense>
+        ) : (
+          <Suspense fallback={fallback}><LedgerPage /></Suspense>
         )}
       </QueryClientProvider>
     </ErrorBoundary>

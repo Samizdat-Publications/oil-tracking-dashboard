@@ -17,9 +17,14 @@ const BASE = `${API_ORIGIN}/api/attribution`;
 const TIMEOUT_MS = 45_000;
 
 export class ApiError extends Error {
-  constructor(message: string, readonly status?: number) {
+  // Declared and assigned explicitly: TS `erasableSyntaxOnly` (on in this
+  // project) disallows constructor parameter properties.
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
     super(message);
     this.name = 'ApiError';
+    this.status = status;
   }
 }
 

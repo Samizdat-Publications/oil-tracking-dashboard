@@ -1,0 +1,337 @@
+/**
+ * V4 — "Trump's Economy: a ledger"
+ *
+ * American, institutional. The reference points are Federal Reserve
+ * publications and Census data products, not campaign material: a page whose
+ * only claim to authority is that it is just the numbers cannot look like it
+ * was art-directed to persuade.
+ *
+ * Red and blue are deliberately matched in weight. Squint at any chart and
+ * neither side should dominate — party colours follow the US convention, so
+ * every neutral element (axes, gridlines, rules) is grey or black only.
+ *
+ * Brief rules, enforced: border-radius 0, no blur anywhere, nothing below 11px
+ * at 375px, 44px touch targets, mobile-first.
+ */
+
+.v4 {
+  --ink: #14171c;
+  --ink-2: #4a5058;
+  --ink-3: #767d87;
+  --paper: #f7f5f0;
+  --paper-2: #efece4;
+  --rule: #d6d1c6;
+  --rule-2: #b9b3a5;
+
+  --red: #b02f2f;
+  --blue: #2e5eaa;
+  --gold: #9a7b2f;
+
+  --sans: 'Archivo', 'Chivo', system-ui, -apple-system, sans-serif;
+  --mono: 'Chivo Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --measure: 62ch;
+  --wide: 1120px;
+
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.v4 *, .v4 *::before, .v4 *::after { box-sizing: border-box; }
+.v4 a { color: var(--blue); }
+
+/* ------------------------------------------------------------- masthead */
+
+.v4-masthead {
+  max-width: var(--wide);
+  margin: 0 auto;
+  padding: 3rem 1.25rem 3.5rem;
+  border-bottom: 3px solid var(--ink);
+}
+
+.v4-masthead-kicker {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0 0 2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+}
+.v4-masthead-kicker span { color: var(--gold); }
+
+.v4-headline {
+  font-size: clamp(3rem, 13vw, 7rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  margin: 0 0 1.5rem;
+}
+
+.v4-lede {
+  font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin: 0 0 2.5rem;
+}
+
+/* -------------------------------------------------------------- sections */
+
+.v4-section {
+  max-width: var(--wide);
+  margin: 0 auto;
+  padding: 3.5rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.v4-kicker {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.75rem;
+}
+
+.v4-title {
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  margin: 0 0 1rem;
+}
+
+.v4-standfirst {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin: 0 0 2rem;
+}
+
+.v4-sub {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 2.5rem 0 0.5rem;
+}
+
+.v4-body { max-width: var(--measure); color: var(--ink-2); margin: 0 0 1rem; }
+.v4-body strong { color: var(--ink); }
+
+/* ---------------------------------------------------------------- charts */
+
+.v4-chart { margin: 0 0 1rem; }
+.v4-svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+.v4-grid { stroke: var(--rule); stroke-width: 1; }
+.v4-zero { stroke: var(--ink); stroke-width: 1.5; }
+.v4-axis { fill: var(--ink-3); font-family: var(--mono); font-size: 11px; }
+.v4-ref { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 5 4; }
+.v4-ref-label { fill: var(--ink-3); font-family: var(--mono); font-size: 11px; }
+
+.v4-marker line { stroke-width: 1; stroke-dasharray: 2 3; opacity: 0.6; }
+.v4-marker-up line, .v4-marker-up circle { stroke: var(--red); fill: var(--red); }
+.v4-marker-down line, .v4-marker-down circle { stroke: var(--blue); fill: var(--blue); }
+.v4-marker-flat line, .v4-marker-flat circle { stroke: var(--ink-3); fill: var(--ink-3); }
+
+.v4-legend {
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem;
+  font-family: var(--mono); font-size: 0.72rem; color: var(--ink-2);
+}
+.v4-legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+.v4-swatch { width: 14px; height: 3px; }
+
+/* "What this shows" — primary content that happens to sit under a chart. */
+.v4-wts {
+  border-left: 4px solid var(--ink);
+  background: var(--paper-2);
+  padding: 1rem 1.25rem;
+  margin: 0 0 1rem;
+  max-width: var(--measure);
+}
+.v4-wts-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 0.4rem;
+}
+.v4-wts p { margin: 0; font-size: 1.02rem; }
+.v4-wts strong { font-weight: 700; }
+
+.v4-source {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  line-height: 1.6;
+  color: var(--ink-3);
+  max-width: var(--measure);
+  margin: 0 0 1rem;
+}
+.v4-source code { color: var(--ink-2); }
+
+/* ------------------------------------------------------------ dollar bars */
+
+.v4-bars { margin: 0 0 1.5rem; }
+.v4-bar-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.3rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+@media (min-width: 700px) {
+  .v4-bar-row { grid-template-columns: 150px 1fr 190px; gap: 1rem; align-items: center; }
+}
+.v4-bar-label { font-weight: 600; font-size: 0.95rem; }
+.v4-bar-track { position: relative; height: 26px; }
+.v4-bar-from, .v4-bar-to { position: absolute; left: 0; height: 10px; display: block; }
+.v4-bar-from { top: 0; background: var(--ink-3); }
+.v4-bar-to { top: 13px; background: var(--red); }
+.v4-bar-to.is-down { background: var(--blue); }
+.v4-bar-nums {
+  font-family: var(--mono); font-size: 0.82rem;
+  display: flex; gap: 0.6rem; align-items: baseline;
+}
+.v4-bar-nums em { color: var(--ink-3); font-style: normal; }
+.v4-bar-nums b { color: var(--ink); }
+.v4-bar-nums i { color: var(--red); font-style: normal; margin-left: auto; }
+.v4-bar-nums i.is-down { color: var(--blue); }
+
+/* --------------------------------------------------------------- columns */
+
+.v4-col { fill: var(--ink-3); }
+.v4-col.neg { fill: var(--red); }
+.v4-col.after { fill: var(--gold); }
+.v4-col.after.neg { fill: var(--red); }
+.v4-split line { stroke: var(--ink); stroke-width: 1.5; }
+.v4-split-label { fill: var(--ink); font-family: var(--mono); font-size: 11px; }
+
+/* ---------------------------------------------------------- excess bars */
+
+.v4-excess { margin: 1rem 0 1.25rem; }
+.v4-excess-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 62px;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.v4-excess-row.is-current { background: var(--paper-2); }
+.v4-excess-label { font-size: 0.92rem; font-weight: 600; }
+.v4-excess-label em {
+  display: block; font-family: var(--mono); font-size: 0.62rem;
+  color: var(--ink-3); font-style: normal; letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.v4-excess-track { height: 18px; background: var(--paper-2); }
+.v4-excess-fill { display: block; height: 100%; }
+.v4-party-D { background: var(--blue); }
+.v4-party-R { background: var(--red); }
+.v4-excess-val { font-family: var(--mono); font-size: 0.86rem; text-align: right; }
+
+/* ------------------------------------------------------------- two choices */
+
+.v4-split {
+  display: grid; gap: 1.5rem; margin-bottom: 1.5rem;
+}
+@media (min-width: 820px) { .v4-split { grid-template-columns: 1fr 1fr; gap: 2.5rem; } }
+
+.v4-choice { border-top: 3px solid var(--ink); padding-top: 1rem; }
+.v4-choice-kicker {
+  font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0 0 0.5rem;
+}
+.v4-choice h3 { font-size: 1.7rem; margin: 0 0 1rem; font-weight: 800; }
+
+.v4-stats { margin: 0 0 1rem; }
+.v4-stats > div {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 0.45rem 0; border-bottom: 1px solid var(--rule);
+}
+.v4-stats dt { font-size: 0.9rem; color: var(--ink-2); }
+.v4-stats dd { font-family: var(--mono); font-size: 1.15rem; margin: 0; font-weight: 600; }
+
+/* ------------------------------------------------------- counters / asides */
+
+.v4-counter, .v4-honest {
+  border: 1px solid var(--rule-2);
+  border-left: 4px solid var(--ink-3);
+  background: var(--paper-2);
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+  max-width: var(--measure);
+}
+.v4-honest { border-left-color: var(--gold); }
+.v4-counter h3, .v4-honest h3 {
+  font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em;
+  text-transform: uppercase; margin: 0 0 0.75rem; color: var(--ink-2);
+}
+.v4-counter p, .v4-honest p { margin: 0 0 0.75rem; font-size: 0.95rem; color: var(--ink-2); }
+.v4-counter p:last-child, .v4-honest p:last-child { margin-bottom: 0; }
+
+/* -------------------------------------------------------------- big stats */
+
+.v4-bigstats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 0 0 1.75rem;
+}
+.v4-bigstats > div { border-top: 3px solid var(--ink); padding-top: 0.75rem; }
+.v4-bigstats > div.is-bad { border-top-color: var(--red); }
+.v4-big {
+  display: block; font-family: var(--mono); font-weight: 700;
+  font-size: clamp(1.8rem, 6vw, 2.8rem); line-height: 1;
+}
+.v4-bigstats .is-bad .v4-big { color: var(--red); }
+.v4-bigstats em { display: block; margin-top: 0.35rem; font-size: 0.82rem; color: var(--ink-2); font-style: normal; }
+
+/* ------------------------------------------------------- links / states */
+
+.v4-links { list-style: none; margin: 1rem 0 1.5rem; padding: 0; }
+.v4-links li { padding: 0.55rem 0; border-bottom: 1px solid var(--rule); }
+.v4-links a { min-height: 44px; display: inline-flex; align-items: center; }
+
+.v4-loading, .v4-empty {
+  padding: 2.5rem 1.25rem; text-align: center;
+  font-family: var(--mono); font-size: 0.82rem; color: var(--ink-3);
+  border: 1px dashed var(--rule-2);
+}
+.v4-failed {
+  padding: 1.25rem; border: 1px solid var(--red);
+  background: rgba(176, 47, 47, 0.06); color: var(--ink-2);
+}
+.v4-failed button {
+  margin-top: 0.6rem; min-height: 44px; padding: 0 1.25rem;
+  background: none; border: 1px solid var(--red); color: var(--red);
+  font-family: var(--mono); font-size: 0.8rem; cursor: pointer;
+}
+
+.v4-footer {
+  max-width: var(--wide); margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem; color: var(--ink-3); font-size: 0.9rem;
+}
+.v4-footer p { max-width: var(--measure); }
+.v4-footer-links { display: flex; gap: 1.5rem; margin-top: 1.25rem; }
+.v4-footer-links a {
+  font-family: var(--mono); font-size: 0.76rem;
+  min-height: 44px; display: inline-flex; align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v4 *, .v4 *::before, .v4 *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

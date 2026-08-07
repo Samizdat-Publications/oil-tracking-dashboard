@@ -16,13 +16,13 @@
  * we explicitly decline to claim.
  */
 
-import { Suspense, lazy, useState } from 'react';
+import { useState } from 'react';
 import {
   useBreadth, useEventStudy, useJobs, useMethodology, useReceipt, useScorecard, useStaples,
   usd, pct, thousands, monthLabel, dayLabel,
   type MethodEnvelope,
 } from '../v3/data';
-import { ColumnChart, EventBars, LineChart, PairedBars, EmptyState, type Series } from '../v3/charts';
+import { ColumnChart, EventBars, LineChart, PairedBars, type Series } from '../v3/charts';
 import '../styles/v3.css';
 
 const COLORS = {
@@ -210,7 +210,7 @@ function StaplesAct() {
         <>
           <PairedBars
             ariaLabel="Annualised price change of household staples, by presidential term"
-            previousLabel={`${data.terms.previous.holder} (${data.terms.previous.years ?? ''}${data.terms.previous.start.slice(0, 4)}–${(data.terms.previous.end ?? '').slice(0, 4)})`}
+            previousLabel={`${data.terms.previous.holder} (${data.terms.previous.start.slice(0, 4)}–${(data.terms.previous.end ?? '').slice(0, 4)})`}
             currentLabel={`${data.terms.current.holder} (${data.terms.current.start.slice(0, 4)}–now)`}
             rows={data.items.map((i) => ({
               key: i.key,
