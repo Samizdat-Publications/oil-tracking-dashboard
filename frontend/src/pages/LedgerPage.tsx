@@ -191,6 +191,38 @@ function Masthead() {
   );
 }
 
+/* --------------------------------------------------------------- ticker */
+
+/**
+ * Sits between §01 and §02. Ported from the reference: two identical runs, the
+ * second `aria-hidden`, translated -50% over 42s. The duplicate is what makes
+ * the loop seamless — at -50% the second run sits exactly where the first
+ * started, so the reset is invisible.
+ */
+const TICKER = [
+  'CRUDE $57 → $114 → $70 → $84',
+  'GROUND BEEF $5.55 → $6.83',
+  'COFFEE $7.02 → $9.46',
+  'GASOLINE $3.21 → $4.20',
+  'JOB CREATION 320,938/MO → 42,118/MO',
+  'LONG-TERM UNEMPLOYED 21.1% → 27.3%',
+  'US-SPECIFIC INFLATION EXCESS +0.77',
+  'HIRING RATE FROZEN AT 3.3%',
+];
+
+function Ticker() {
+  const run = (hidden: boolean) => (
+    <span className="tk-run" aria-hidden={hidden || undefined}>
+      {TICKER.map((t) => <span key={t}>{t}</span>)}
+    </span>
+  );
+  return (
+    <div className="tk" role="marquee" aria-label="Headline figures">
+      <div className="tk-inner">{run(false)}{run(true)}</div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------- §02 */
 
 const SHELF = [
@@ -655,6 +687,7 @@ export default function LedgerPage() {
   return (
     <div className="v4-root">
       <Masthead />
+      <Ticker />
       <Shelf />
       <Crossing />
       <TwoChoices />

@@ -362,3 +362,35 @@
   .v4-root .bar-v { transform: scaleY(1) !important; }
   .v4-root .seq   { opacity: 1 !important; }
 }
+
+/* ---------------------------------------------------------------- ticker */
+
+/* Between §01 and §02. Two identical runs translated -50%: at that point the
+   second run sits exactly where the first began, so the loop has no seam. */
+.tk {
+  background: var(--crimson);
+  color: var(--paper);
+  border-top: 3px solid var(--ink);
+  border-bottom: 3px solid var(--ink);
+  overflow: hidden;
+  padding: clamp(7px, 1.05cqi, 12px) 0;
+  container-type: inline-size;
+}
+.tk-inner {
+  display: flex;
+  width: max-content;
+  animation: tk 42s linear infinite;
+  font: 900 clamp(11.5px, 1.3cqi, 17px)/1 var(--font-display);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.tk-run {
+  display: flex;
+  gap: clamp(16px, 2.3cqi, 34px);
+  padding-right: clamp(16px, 2.3cqi, 34px);
+}
+@keyframes tk { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tk-inner { animation: none; }
+}
