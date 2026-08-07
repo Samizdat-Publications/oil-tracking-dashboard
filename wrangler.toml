@@ -1,0 +1,10 @@
+# Cloudflare Pages. Deploy with:
+#   npx wrangler pages deploy frontend/dist --project-name trumps-economy-ledger
+#
+# The site is fully static — the committed data snapshot means it needs no
+# backend at runtime. The Fly API stays available for local development and for
+# regenerating the snapshot, but nothing on the deployed page depends on it
+# being awake.
+name = "trumps-economy-ledger"
+compatibility_date = "2026-08-07"
+pages_build_output_dir = "frontend/dist"

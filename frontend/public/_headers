@@ -1,0 +1,15 @@
+# The snapshot is regenerated on each deploy; don't let a stale copy outlive it.
+/data-snapshot.json
+  Cache-Control: public, max-age=300, must-revalidate
+
+# Hashed asset filenames are safe to pin.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Facebook re-scrapes on a schedule, so the card must not be pinned for a year.
+/og.png
+  Cache-Control: public, max-age=3600
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

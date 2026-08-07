@@ -1,0 +1,2 @@
+# Single-page app: every path renders index.html, which reads ?view= itself.
+/*  /index.html  200
