@@ -19,7 +19,7 @@ import asyncio
 import json
 import os
 import sys
-import tempfile
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -27,8 +27,35 @@ from services import attribution as A  # noqa: E402
 from services.cache import close_cache, init_cache  # noqa: E402
 from services.fred_client import get_series  # noqa: E402
 
+import math  # noqa: E402
+
+import numpy as np  # noqa: E402
+
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                    "..", "frontend", "public", "data-snapshot.json")
+
+
+def to_json_safe(obj):
+    """Coerce numpy scalars to Python and non-finite floats to null.
+
+    FastAPI's encoder handles numpy transparently, so the live endpoints work
+    while `json.dump` on the same payload raises -- `np.bool_` is not a `bool`
+    as far as the stdlib encoder is concerned. Anything reaching the snapshot
+    has to survive plain serialisation.
+
+    NaN and Inf matter more: `json.dump` writes them as bare `NaN` / `Infinity`,
+    which is not valid JSON and makes `JSON.parse` throw in the browser. A null
+    renders as a gap, which is what a missing value should look like anyway.
+    """
+    if isinstance(obj, dict):
+        return {k: to_json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [to_json_safe(v) for v in obj]
+    if isinstance(obj, np.generic):
+        obj = obj.item()
+    if isinstance(obj, float) and not math.isfinite(obj):
+        return None
+    return obj
 
 ADMIN_METRICS = ["jobs", "cpi_headline", "gasoline_ap", "beef_ground",
                  "real_earnings", "unemployment", "sp500"]
@@ -96,23 +123,39 @@ async def main() -> None:
     target = os.path.abspath(OUT)
     os.makedirs(os.path.dirname(target), exist_ok=True)
 
-    # Write to a temp file in the same directory, then replace. os.replace is
-    # atomic on both POSIX and Windows, so a killed job leaves the previous
-    # good file rather than a truncated one.
-    fd, tmp = tempfile.mkstemp(dir=os.path.dirname(target), suffix=".tmp")
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            json.dump(snap, fh, separators=(",", ":"))
-            fh.flush()
-            os.fsync(fh.fileno())
-        # Fail loudly here rather than shipping something the browser chokes on.
-        with open(tmp, encoding="utf-8") as fh:
-            json.load(fh)
-        os.replace(tmp, target)
-    except BaseException:
-        if os.path.exists(tmp):
-            os.unlink(tmp)
-        raise
+    # Serialise and validate fully in memory, then write the target in a single
+    # call. Temp-file-plus-os.replace is the right approach on a normal
+    # filesystem, but this repo sits in a OneDrive-synced folder where the sync
+    # client takes a hard lock: replace, unlink and rename all fail with
+    # WinError 5. An earlier version's cleanup handler then deleted the
+    # freshly-built temp file on the way out, losing the good data.
+    #
+    # Building the payload first shrinks the window in which the target is
+    # inconsistent from "the whole fetch" (minutes) to one write call
+    # (milliseconds), which is the trade that matters here.
+    payload = json.dumps(to_json_safe(snap), separators=(",", ":"),
+                         allow_nan=False)
+    json.loads(payload)  # fail here, not in the browser
+
+    last: Exception | None = None
+    for i in range(12):
+        try:
+            with open(target, "w", encoding="utf-8") as fh:
+                fh.write(payload)
+                fh.flush()
+                os.fsync(fh.fileno())
+            break
+        except PermissionError as exc:  # OneDrive mid-upload
+            last = exc
+            time.sleep(0.25 * (i + 1))
+    else:
+        raise RuntimeError(
+            f"could not write {target} -- OneDrive or an editor is holding it "
+            f"open. Pause syncing and re-run."
+        ) from last
+
+    with open(target, encoding="utf-8") as fh:
+        json.load(fh)  # confirm what actually landed on disk
 
     print(f"\nwrote {target} ({os.path.getsize(target):,} bytes)")
     print(f"keys: {', '.join(snap['_meta']['endpoints'])}")
