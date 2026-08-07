@@ -395,6 +395,40 @@ def dlevel(ts: TS) -> tuple[np.ndarray, np.ndarray]:
     return ts.dates[1:], np.diff(ts.values)
 
 
+def yoy(ts: TS) -> tuple[np.ndarray, np.ndarray]:
+    """12-month percent change, matched **by calendar date, not by position**.
+
+    This is not a style preference. October 2025 CPI was never collected, and
+    `to_ts` drops missing observations -- so a positional `values[12:] /
+    values[:-12]` silently compares against the observation 13 calendar months
+    earlier for every month spanning the hole. That produced a June 2026
+    headline of 3.73% against the true 3.53%, which is the kind of error that
+    survives review because it looks plausible.
+
+    Months with no observation exactly 12 months prior are omitted rather than
+    approximated: a gap in the official series is a gap on the chart. See
+    docs/THESIS.md landmine 1.
+    """
+    if len(ts) < 13:
+        return np.array([], dtype="datetime64[D]"), np.array([], dtype=np.float64)
+
+    lookup = {str(d): v for d, v in zip(ts.dates, ts.values)}
+    out_dates: list[np.datetime64] = []
+    out_vals: list[float] = []
+    for d, v in zip(ts.dates, ts.values):
+        prior = str(d.astype("datetime64[M]") - 12)
+        # Monthly observations are dated to the first of the month.
+        key = f"{prior}-01" if len(prior) == 7 else prior
+        base = lookup.get(key)
+        if base is None or base == 0:
+            continue
+        out_dates.append(d)
+        out_vals.append((v / base - 1.0) * 100.0)
+
+    return (np.array(out_dates, dtype="datetime64[D]"),
+            np.array(out_vals, dtype=np.float64))
+
+
 def find_gaps(ts: TS, *, tolerance: float = 1.8) -> list[dict]:
     """Locate breaks longer than `tolerance` x the median spacing.
 

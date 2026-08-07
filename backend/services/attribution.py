@@ -317,9 +317,9 @@ async def administrations(metric: str = "cpi_headline") -> dict:
     # percent change so the axis is comparable across administrations; dollar
     # and rate series are shown as-is because the level is what people feel.
     if spec["kind"] == "yoy" and len(ts) > 13:
-        vals = (ts.values[12:] / ts.values[:-12] - 1.0) * 100.0
+        yd, yv = tsmod.yoy(ts)
         points = [{"date": str(d), "value": round(float(v), 2)}
-                  for d, v in zip(ts.dates[12:], vals)]
+                  for d, v in zip(yd, yv)]
         unit = "% change from a year earlier"
     else:
         points = [{"date": str(d), "value": round(float(v), 4)}
@@ -527,10 +527,8 @@ async def international_comparison() -> dict:
         return {"insufficient_data": True}
 
     def yoy(ts: TS) -> dict[str, float]:
-        if len(ts) < 13:
-            return {}
-        vals = (ts.values[12:] / ts.values[:-12] - 1.0) * 100.0
-        return {str(d): float(v) for d, v in zip(ts.dates[12:], vals)}
+        d, v = tsmod.yoy(ts)
+        return {str(a): float(b) for a, b in zip(d, v)}
 
     us_yoy = yoy(us)
     peer_yoy = {k: yoy(v) for k, v in peers.items()}
@@ -844,11 +842,11 @@ async def breadth_test() -> dict:
             points = [{"date": str(d), "value": round(float(v), 2)}
                       for d, v in zip(ts.dates, ts.values)]
         else:
-            if len(ts) < 13:
+            yd, yv = tsmod.yoy(ts)
+            if yd.size == 0:
                 continue
-            yoy = (ts.values[12:] / ts.values[:-12] - 1.0) * 100.0
             points = [{"date": str(d), "value": round(float(v), 2)}
-                      for d, v in zip(ts.dates[12:], yoy)]
+                      for d, v in zip(yd, yv)]
         latest = points[-1] if points else None
         out["measures"].append({
             "key": key, "name": spec.name, "fred_id": spec.fred_id,

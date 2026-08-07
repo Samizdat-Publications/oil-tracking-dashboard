@@ -180,7 +180,10 @@ PEER_KEYS = ["cpi_euro_area", "cpi_france", "cpi_italy"]
 # ---------------------------------------------------------------------------
 
 MACRO: list[SeriesSpec] = [
-    SeriesSpec("cpi_headline", "CPIAUCSL", "Headline CPI", "macro", "index"),
+    # NSA, not SA. BLS headlines the 12-month change on the unadjusted index,
+    # and that is the number the public and the press quote. Using CPIAUCSL
+    # would put us ~0.07pp off every published figure for no reason.
+    SeriesSpec("cpi_headline", "CPIAUCNS", "Headline CPI", "macro", "index", sa=False),
     SeriesSpec("cpi_core", "CPILFESL", "Core CPI", "macro", "index"),
     # Use the INDEX-level variants (M094), not the "% change at annual rate"
     # variants (M158). M158 is a single month annualised -- it read 0.13% in

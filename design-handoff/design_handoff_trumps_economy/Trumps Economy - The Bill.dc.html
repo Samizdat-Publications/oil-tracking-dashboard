@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""><link href="https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,300..900;1,400&amp;family=Chivo+Mono:wght@400;600;700&amp;family=Archivo:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><style>
+html,body{margin:0;background:#12100E;-webkit-text-size-adjust:100%}
+a{color:#D91E18}a:hover{color:#8F0F0B}
+::selection{background:#F5A300;color:#12100E}
+@keyframes tk{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important}}
+</style></helmet>
+<div style="container-type:inline-size;width:100%;background:#F4EDE0;color:#12100E;font-family:Archivo,system-ui,sans-serif;overflow-x:hidden">
+
+<section data-screen-label="01 Masthead" style="position:relative;background:#12100E;color:#F4EDE0;padding:clamp(16px,3cqi,40px) clamp(14px,3.4cqi,56px) clamp(18px,2.6cqi,34px);background-image:radial-gradient(rgba(244,237,224,.14) .7px,transparent .7px);background-size:5px 5px">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:clamp(7px,1.3cqi,15px);padding-bottom:clamp(11px,1.9cqi,21px);border-bottom:3px solid #D91E18">
+<span style="background:#D91E18;color:#F4EDE0;font:800 clamp(9px,1.15cqi,13px)/1 Chivo,sans-serif;letter-spacing:.14em;padding:6px 9px">TRUMP’S ECONOMY</span>
+<span style="font:600 clamp(9px,1.1cqi,13px)/1 'Chivo Mono',ui-monospace,monospace;letter-spacing:.09em;color:#C9BFAF">A LEDGER · THROUGH JULY 2026</span>
+<span style="flex:1;min-width:6px"></span>
+<span style="font:600 clamp(9px,1.1cqi,13px)/1 'Chivo Mono',ui-monospace,monospace;letter-spacing:.09em;color:#F5A300">EVERY FIGURE SOURCED</span>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(14px,2.6cqi,44px);padding:clamp(18px,3.2cqi,46px) 0 clamp(14px,2.2cqi,28px);align-items:end">
+<h1 style="margin:0;font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(46px,9.6cqi,140px);line-height:.85;letter-spacing:-.035em;text-transform:uppercase">The bill<br>for two<br><span style="color:#D91E18;text-shadow:clamp(3px,.55cqi,8px) clamp(3px,.55cqi,8px) 0 #F4EDE0">choices</span></h1>
+<div>
+<p style="margin:0 0 clamp(13px,1.9cqi,22px);font:400 clamp(15px,1.66cqi,22px)/1.42 Archivo,sans-serif;color:#E6DDCE;max-width:44ch;text-wrap:pretty">A war ordered in February. Tariffs imposed, struck down, and re-imposed. Neither was a pandemic, a financial crisis, or bad luck. Both are dated. Both landed on a grocery receipt.</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:clamp(8px,1.3cqi,14px)">
+<div style="border:3px solid #F4EDE0;padding:clamp(9px,1.3cqi,15px) clamp(10px,1.5cqi,17px);box-shadow:clamp(3px,.55cqi,6px) clamp(3px,.55cqi,6px) 0 #D91E18">
+<div style="font:700 clamp(8px,.98cqi,11px)/1.3 'Chivo Mono',monospace;letter-spacing:.1em;color:#F5A300">CRUDE, 2 JAN → 6 APR</div>
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(30px,3.6cqi,50px);line-height:1;letter-spacing:-.03em;margin-top:6px">+<span ref="{{ c1 }}">0</span><span style="font-size:.55em">%</span></div>
+</div>
+<div style="border:3px solid #F4EDE0;padding:clamp(9px,1.3cqi,15px) clamp(10px,1.5cqi,17px);box-shadow:clamp(3px,.55cqi,6px) clamp(3px,.55cqi,6px) 0 #D91E18">
+<div style="font:700 clamp(8px,.98cqi,11px)/1.3 'Chivo Mono',monospace;letter-spacing:.1em;color:#F5A300">GASOLINE / GALLON</div>
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(30px,3.6cqi,50px);line-height:1;letter-spacing:-.03em;margin-top:6px">$<span ref="{{ c2 }}">3.21</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:clamp(7px,1.5cqi,18px);margin-bottom:clamp(9px,1.4cqi,15px)">
+<div style="font:900 clamp(15px,1.8cqi,24px)/1 Chivo,sans-serif;text-transform:uppercase">West Texas Intermediate, 2026</div>
+<div style="font:500 clamp(11px,1.2cqi,15px)/1.3 Archivo,sans-serif;color:#A99C89">Prices tracked the war in both directions.</div>
+</div>
+
+<div ref="{{ oilWrap }}">
+<svg ref="{{ oilW }}" viewBox="0 0 1200 470" preserveAspectRatio="xMidYMid meet" style="display:{{ dW }};width:100%;height:auto;overflow:visible" role="img" aria-label="WTI crude in 2026: 57.21 dollars on 2 January, 114.01 at the 6 April peak, 69.74 on 1 July during the ceasefire, 84.25 on 27 July after strikes resumed">
+<defs>
+<pattern id="hz" width="14" height="14" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#D91E18" fill-opacity=".14"></rect><rect width="7" height="14" fill="#D91E18" fill-opacity=".32"></rect></pattern>
+<linearGradient id="oilf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F5A300" stop-opacity=".5"></stop><stop offset="1" stop-color="#F5A300" stop-opacity="0"></stop></linearGradient>
+</defs>
+<rect ref="{{ wb1 }}" x="380.6" y="26" width="560.6" height="374" fill="url(#hz)" style="opacity:0;transition:opacity .8s ease"></rect>
+<rect ref="{{ wb2 }}" x="1043.2" y="26" width="96.8" height="374" fill="url(#hz)" style="opacity:0;transition:opacity .8s ease .25s"></rect>
+<line x1="90" x2="1140" y1="400" y2="400" stroke="#F4EDE0" stroke-width="3"></line>
+<line x1="90" x2="1140" y1="320.4" y2="320.4" stroke="#F4EDE0" stroke-opacity=".2" stroke-dasharray="7 7"></line>
+<line x1="90" x2="1140" y1="57.7" y2="57.7" stroke="#F4EDE0" stroke-opacity=".2" stroke-dasharray="7 7"></line>
+<text x="80" y="406" text-anchor="end" style="font:700 19px 'Chivo Mono',monospace;fill:#8A7F6E">$40</text>
+<text x="80" y="326" text-anchor="end" style="font:700 19px 'Chivo Mono',monospace;fill:#8A7F6E">$57</text>
+<text x="80" y="64" text-anchor="end" style="font:700 19px 'Chivo Mono',monospace;fill:#8A7F6E">$114</text>
+<path ref="{{ oilAW }}" d="M90 320.4 L569.1 57.7 L1007.5 262.4 L1140 195.3 L1140 400 L90 400 Z" fill="url(#oilf)" style="opacity:0;transition:opacity .9s ease .4s"></path>
+<path ref="{{ oilPW }}" d="M90 320.4 L569.1 57.7 L1007.5 262.4 L1140 195.3" fill="none" stroke="#F5A300" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"></path>
+<g ref="{{ e1W }}" style="opacity:0;transition:opacity .5s ease">
+<line x1="380.6" x2="380.6" y1="26" y2="400" stroke="#D91E18" stroke-width="3"></line>
+<rect x="96" y="36" width="278" height="56" fill="#D91E18"></rect>
+<text x="108" y="58" style="font:700 16px 'Chivo Mono',monospace;fill:#12100E">28 FEB</text>
+<text x="108" y="81" style="font:900 19px Chivo,sans-serif;fill:#F4EDE0">STRIKE · HORMUZ CLOSES</text>
+</g>
+<g ref="{{ e2W }}" style="opacity:0;transition:opacity .5s ease">
+<line x1="941.2" x2="941.2" y1="26" y2="400" stroke="#1E3FBF" stroke-width="3"></line>
+<line x1="922" x2="941.2" y1="328" y2="328" stroke="#1E3FBF" stroke-width="3"></line>
+<rect x="690" y="300" width="232" height="56" fill="#1E3FBF"></rect>
+<text x="702" y="322" style="font:700 16px 'Chivo Mono',monospace;fill:#BFD0FF">18 JUN</text>
+<text x="702" y="345" style="font:900 19px Chivo,sans-serif;fill:#F4EDE0">CEASEFIRE</text>
+</g>
+<g ref="{{ e3W }}" style="opacity:0;transition:opacity .5s ease">
+<line x1="1043.2" x2="1043.2" y1="120" y2="400" stroke="#D91E18" stroke-width="3"></line>
+<rect x="906" y="420" width="234" height="36" fill="#D91E18"></rect>
+<text x="919" y="445" style="font:900 17px Chivo,sans-serif;fill:#F4EDE0">8 JUL · STRIKES RESUME</text>
+</g>
+<g ref="{{ pkW }}" style="opacity:0;transition:opacity .5s ease">
+<circle cx="569.1" cy="57.7" r="13" fill="#F5A300" stroke="#12100E" stroke-width="4"></circle>
+<rect x="590" y="30" width="160" height="46" fill="#F5A300"></rect>
+<text x="603" y="63" style="font:900 29px Chivo,sans-serif;fill:#12100E">$114.01</text>
+</g>
+<g ref="{{ tpW }}" style="opacity:0;transition:opacity .5s ease">
+<circle cx="1007.5" cy="262.4" r="12" fill="#1E3FBF" stroke="#F4EDE0" stroke-width="3"></circle>
+<text x="1007.5" y="300" text-anchor="middle" style="font:900 23px Chivo,sans-serif;fill:#BFD0FF">$69.74</text>
+<circle cx="1140" cy="195.3" r="12" fill="#D91E18" stroke="#F4EDE0" stroke-width="3"></circle>
+<text x="1140" y="172" text-anchor="middle" style="font:900 23px Chivo,sans-serif;fill:#F4EDE0">$84.25</text>
+</g>
+<circle cx="90" cy="320.4" r="10" fill="#F4EDE0"></circle>
+<text x="90" y="440" style="font:700 17px 'Chivo Mono',monospace;fill:#8A7F6E">2 JAN · $57.21</text>
+</svg>
+
+<svg ref="{{ oilN }}" viewBox="0 0 620 560" preserveAspectRatio="xMidYMid meet" style="display:{{ dN }};width:100%;height:auto;overflow:visible" role="img" aria-label="WTI crude in 2026: 57.21 dollars on 2 January, 114.01 at the 6 April peak, 69.74 on 1 July during the ceasefire, 84.25 on 27 July after strikes resumed">
+<rect ref="{{ wb1n }}" x="213.9" y="60" width="277.6" height="380" fill="url(#hz)" style="opacity:0;transition:opacity .8s ease"></rect>
+<rect ref="{{ wb2n }}" x="542" y="60" width="48" height="380" fill="url(#hz)" style="opacity:0;transition:opacity .8s ease .25s"></rect>
+<line x1="70" x2="590" y1="440" y2="440" stroke="#F4EDE0" stroke-width="3"></line>
+<line x1="70" x2="590" y1="358.3" y2="358.3" stroke="#F4EDE0" stroke-opacity=".2" stroke-dasharray="6 6"></line>
+<line x1="70" x2="590" y1="88.5" y2="88.5" stroke="#F4EDE0" stroke-opacity=".2" stroke-dasharray="6 6"></line>
+<text x="62" y="446" text-anchor="end" style="font:700 20px 'Chivo Mono',monospace;fill:#8A7F6E">$40</text>
+<text x="62" y="364" text-anchor="end" style="font:700 20px 'Chivo Mono',monospace;fill:#8A7F6E">$57</text>
+<text x="62" y="95" text-anchor="end" style="font:700 20px 'Chivo Mono',monospace;fill:#8A7F6E">$114</text>
+<path ref="{{ oilAN }}" d="M70 358.3 L307.3 88.5 L524.4 298.7 L590 229.8 L590 440 L70 440 Z" fill="url(#oilf)" style="opacity:0;transition:opacity .9s ease .4s"></path>
+<path ref="{{ oilPN }}" d="M70 358.3 L307.3 88.5 L524.4 298.7 L590 229.8" fill="none" stroke="#F5A300" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"></path>
+<g ref="{{ e1N }}" style="opacity:0;transition:opacity .5s ease">
+<line x1="213.9" x2="213.9" y1="60" y2="440" stroke="#D91E18" stroke-width="3"></line>
+<rect x="60" y="14" width="290" height="40" fill="#D91E18"></rect>
+<text x="72" y="42" style="font:900 20px Chivo,sans-serif;fill:#F4EDE0">28 FEB · HORMUZ CLOSES</text>
+</g>
+<g ref="{{ e2N }}" style="opacity:0;transition:opacity .5s ease">
+<line x1="491.5" x2="491.5" y1="60" y2="440" stroke="#1E3FBF" stroke-width="3"></line>
+<rect x="366" y="470" width="224" height="38" fill="#1E3FBF"></rect>
+<text x="378" y="497" style="font:900 19px Chivo,sans-serif;fill:#F4EDE0">18 JUN · CEASEFIRE</text>
+</g>
+<g ref="{{ e3N }}" style="opacity:0;transition:opacity .5s ease">
+<line x1="542" x2="542" y1="60" y2="440" stroke="#D91E18" stroke-width="3"></line>
+<rect x="300" y="518" width="290" height="38" fill="#D91E18"></rect>
+<text x="312" y="545" style="font:900 19px Chivo,sans-serif;fill:#F4EDE0">8 JUL · STRIKES RESUME</text>
+</g>
+<g ref="{{ pkN }}" style="opacity:0;transition:opacity .5s ease">
+<circle cx="307.3" cy="88.5" r="13" fill="#F5A300" stroke="#12100E" stroke-width="4"></circle>
+<rect x="322" y="76" width="164" height="46" fill="#F5A300"></rect>
+<text x="335" y="109" style="font:900 30px Chivo,sans-serif;fill:#12100E">$114.01</text>
+</g>
+<g ref="{{ tpN }}" style="opacity:0;transition:opacity .5s ease">
+<circle cx="524.4" cy="298.7" r="12" fill="#1E3FBF" stroke="#F4EDE0" stroke-width="3"></circle>
+<text x="512" y="338" text-anchor="middle" style="font:900 24px Chivo,sans-serif;fill:#BFD0FF">$69.74</text>
+<circle cx="590" cy="229.8" r="12" fill="#D91E18" stroke="#F4EDE0" stroke-width="3"></circle>
+<text x="578" y="212" text-anchor="end" style="font:900 24px Chivo,sans-serif;fill:#F4EDE0">$84.25</text>
+</g>
+<circle cx="70" cy="358.3" r="10" fill="#F4EDE0"></circle>
+<text x="70" y="400" style="font:700 19px 'Chivo Mono',monospace;fill:#8A7F6E">$57.21</text>
+</svg>
+</div>
+
+<div style="border-top:3px solid #F5A300;margin-top:clamp(10px,1.5cqi,16px);padding-top:clamp(11px,1.6cqi,17px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:clamp(11px,1.8cqi,28px)">
+<div><span style="display:inline-block;background:#F5A300;color:#12100E;font:900 clamp(9px,1.08cqi,12px)/1 Chivo,sans-serif;letter-spacing:.12em;padding:5px 8px;margin-bottom:9px">WHAT THIS SHOWS</span>
+<p style="margin:0;font:400 clamp(13.5px,1.44cqi,18px)/1.45 Archivo,sans-serif;color:#E6DDCE;text-wrap:pretty">Oil nearly doubled after the February strike, fell all the way back to its pre-war level during the June ceasefire, then climbed again when strikes resumed three weeks later. Inflation does not switch off on the day of a ceasefire and back on three weeks later. Neither do tariffs.</p></div>
+<div style="border-left:3px solid rgba(244,237,224,.2);padding-left:clamp(11px,1.6cqi,20px);font:700 clamp(9.5px,1.02cqi,12px)/1.6 'Chivo Mono',monospace;letter-spacing:.06em;color:#A99C89">FOUR VERIFIED CLOSES FROM FRED <span style="color:#F5A300">DCOILWTICO</span>. THE PATH BETWEEN THEM IS DRAWN STRAIGHT — THE DAILY SERIES IS NOT WIRED IN YET, AND WE WILL NOT INVENT IT.</div>
+</div>
+</section>
+
+<div style="background:#D91E18;color:#F4EDE0;border-top:3px solid #12100E;border-bottom:3px solid #12100E;overflow:hidden;padding:clamp(7px,1.05cqi,12px) 0">
+<div style="display:flex;width:max-content;animation:tk 42s linear infinite;font:900 clamp(11.5px,1.3cqi,17px)/1 Chivo,sans-serif;letter-spacing:.03em;text-transform:uppercase">
+<span style="display:flex;gap:clamp(16px,2.3cqi,34px);padding-right:clamp(16px,2.3cqi,34px)"><sc-for list="{{ ticker }}" as="t" hint-placeholder-count="8"><span>{{ t }}</span></sc-for></span>
+<span style="display:flex;gap:clamp(16px,2.3cqi,34px);padding-right:clamp(16px,2.3cqi,34px)" aria-hidden="true"><sc-for list="{{ ticker }}" as="t" hint-placeholder-count="8"><span>{{ t }}</span></sc-for></span>
+</div>
+</div>
+
+<section data-screen-label="02 The shelf" style="padding:clamp(24px,4cqi,70px) clamp(14px,3.4cqi,56px);background-image:radial-gradient(rgba(18,16,14,.1) .7px,transparent .7px);background-size:5px 5px">
+<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:clamp(9px,1.8cqi,26px);margin-bottom:clamp(16px,2.4cqi,32px)">
+<h2 style="margin:0;font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(34px,6.2cqi,92px);line-height:.88;letter-spacing:-.03em;text-transform:uppercase">The shelf</h2>
+<div style="font:600 clamp(11px,1.25cqi,15px)/1.35 'Chivo Mono',monospace;letter-spacing:.06em;color:#6B6053;padding-bottom:clamp(4px,.8cqi,10px)">JANUARY 2025 → NOW · ACTUAL DOLLARS</div>
+</div>
+<div ref="{{ shelf }}" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:clamp(12px,2cqi,26px)">
+<sc-for list="{{ staples }}" as="s" hint-placeholder-count="3">
+<div style="background:#12100E;color:#F4EDE0;padding:clamp(14px,1.9cqi,22px);box-shadow:clamp(4px,.7cqi,8px) clamp(4px,.7cqi,8px) 0 #D91E18">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:clamp(11px,1.5cqi,16px)">
+<span style="font:900 clamp(14px,1.5cqi,19px)/1.1 Chivo,sans-serif;text-transform:uppercase">{{ s.label }}</span>
+<span style="background:#D91E18;color:#F4EDE0;font:900 clamp(13px,1.5cqi,19px)/1 Chivo,sans-serif;padding:5px 8px;white-space:nowrap">+{{ s.pct }}%</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:clamp(8px,1.1cqi,13px)">
+<div>
+<div style="display:flex;justify-content:space-between;font:700 clamp(9.5px,1cqi,12px)/1 'Chivo Mono',monospace;letter-spacing:.08em;color:#A99C89;margin-bottom:5px"><span>JAN 2025</span><span>${{ s.from }}</span></div>
+<div style="height:clamp(16px,1.9cqi,24px);background:rgba(244,237,224,.12)"><div ref="{{ s.refA }}" style="height:100%;width:{{ s.wFrom }};background:#8A7F6E;transform:scaleX(0);transform-origin:left;transition:transform .9s cubic-bezier(.2,.85,.25,1)"></div></div>
+</div>
+<div>
+<div style="display:flex;justify-content:space-between;font:700 clamp(9.5px,1cqi,12px)/1 'Chivo Mono',monospace;letter-spacing:.08em;color:#F5A300;margin-bottom:5px"><span>NOW</span><span>${{ s.to }}</span></div>
+<div style="height:clamp(22px,2.7cqi,34px);background:rgba(244,237,224,.12)"><div ref="{{ s.refB }}" style="height:100%;width:{{ s.wTo }};background:#F5A300;transform:scaleX(0);transform-origin:left;transition:transform 1.05s cubic-bezier(.2,.85,.25,1) .2s"></div></div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="margin-top:clamp(14px,2.2cqi,26px);border-top:3px solid #12100E;padding-top:clamp(11px,1.6cqi,17px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:clamp(11px,1.8cqi,28px)">
+<div><span style="display:inline-block;background:#12100E;color:#F5A300;font:900 clamp(9px,1.08cqi,12px)/1 Chivo,sans-serif;letter-spacing:.12em;padding:5px 8px;margin-bottom:9px">WHAT THIS SHOWS</span>
+<p style="margin:0;font:400 clamp(13.5px,1.44cqi,18px)/1.45 Archivo,sans-serif;text-wrap:pretty">Ground beef cost $5.55 in January 2025. It costs $6.83 now. Coffee went from $7.02 to $9.46. Bars are on a common dollar scale, so the lengths are comparable.</p></div>
+</div>
+</section>
+
+<section data-screen-label="03 The crossing" style="background:#1E3FBF;color:#F4EDE0;padding:clamp(24px,4cqi,70px) clamp(14px,3.4cqi,56px);background-image:radial-gradient(rgba(244,237,224,.16) .7px,transparent .7px);background-size:5px 5px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(12px,2.4cqi,40px);align-items:end;margin-bottom:clamp(16px,2.4cqi,30px)">
+<h2 style="margin:0;font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(34px,6.2cqi,92px);line-height:.88;letter-spacing:-.03em;text-transform:uppercase">The lines<br>crossed in<br><span style="color:#F5A300">between</span></h2>
+<p style="margin:0;font:400 clamp(14.5px,1.6cqi,21px)/1.42 Archivo,sans-serif;color:#DCE4FF;max-width:46ch;text-wrap:pretty">Other rich countries are the control group. At the height of the global surge America was doing <strong style="color:#F5A300">better</strong> than Europe. Four years later Europe is near its target and America is a point above it.</p>
+</div>
+
+<div ref="{{ xWrap }}">
+<svg ref="{{ xW }}" viewBox="0 0 1200 470" preserveAspectRatio="xMidYMid meet" style="display:{{ dW }};width:100%;height:auto;overflow:visible" role="img" aria-label="Headline inflation: October 2022 US 7.76 percent versus euro area 10.62; June 2026 US 3.73 versus euro area 2.73. The lines cross.">
+<line x1="220" x2="220" y1="40" y2="390" stroke="#F4EDE0" stroke-opacity=".28"></line>
+<line x1="980" x2="980" y1="40" y2="390" stroke="#F4EDE0" stroke-opacity=".28"></line>
+<line x1="120" x2="1080" y1="390" y2="390" stroke="#F4EDE0" stroke-width="3"></line>
+<text x="220" y="424" text-anchor="middle" style="font:900 21px Chivo,sans-serif;fill:#BFD0FF">OCT 2022</text>
+<text x="980" y="424" text-anchor="middle" style="font:900 21px Chivo,sans-serif;fill:#BFD0FF">JUN 2026</text>
+<text x="220" y="450" text-anchor="middle" style="font:700 16px 'Chivo Mono',monospace;fill:#8FA3E8">GLOBAL PEAK</text>
+<text x="980" y="450" text-anchor="middle" style="font:700 16px 'Chivo Mono',monospace;fill:#8FA3E8">NO GLOBAL SHOCK</text>
+<path ref="{{ xEuW }}" d="M220 85.3 L980 311.7" fill="none" stroke="#BFD0FF" stroke-width="6" stroke-linecap="round"></path>
+<path ref="{{ xUsW }}" d="M220 167.3 L980 283" fill="none" stroke="#F5A300" stroke-width="8" stroke-linecap="round"></path>
+<g ref="{{ xMkW }}" style="opacity:0;transition:opacity .6s ease">
+<circle cx="782.9" cy="253" r="22" fill="none" stroke="#D91E18" stroke-width="4"></circle>
+<circle cx="782.9" cy="253" r="6" fill="#D91E18"></circle>
+</g>
+<circle cx="220" cy="85.3" r="10" fill="#BFD0FF"></circle><circle cx="980" cy="311.7" r="10" fill="#BFD0FF"></circle>
+<circle cx="220" cy="167.3" r="12" fill="#F5A300"></circle><circle cx="980" cy="283" r="13" fill="#F5A300"></circle>
+<text x="204" y="78" text-anchor="end" style="font:900 26px Chivo,sans-serif;fill:#BFD0FF">10.62%</text>
+<text x="204" y="176" text-anchor="end" style="font:900 28px Chivo,sans-serif;fill:#F5A300">7.76%</text>
+<text x="1000" y="318" style="font:900 26px Chivo,sans-serif;fill:#BFD0FF">2.73%</text>
+<text x="1000" y="278" style="font:900 28px Chivo,sans-serif;fill:#F5A300">3.73%</text>
+<g ref="{{ gpLW }}" style="opacity:0;transition:opacity .6s ease">
+<rect x="252" y="40" width="284" height="40" fill="#F4EDE0"></rect>
+<text x="266" y="68" style="font:900 20px Chivo,sans-serif;fill:#1E3FBF">US 2.86 PTS BELOW EUROPE</text>
+</g>
+<g ref="{{ gpRW }}" style="opacity:0;transition:opacity .6s ease .2s">
+<rect x="626" y="330" width="276" height="40" fill="#D91E18"></rect>
+<text x="640" y="358" style="font:900 20px Chivo,sans-serif;fill:#F4EDE0">US 1.00 PT ABOVE EUROPE</text>
+</g>
+</svg>
+
+<svg ref="{{ xN }}" viewBox="0 0 620 580" preserveAspectRatio="xMidYMid meet" style="display:{{ dN }};width:100%;height:auto;overflow:visible" role="img" aria-label="Headline inflation: October 2022 US 7.76 percent versus euro area 10.62; June 2026 US 3.73 versus euro area 2.73. The lines cross.">
+<line x1="150" x2="150" y1="60" y2="460" stroke="#F4EDE0" stroke-opacity=".28"></line>
+<line x1="470" x2="470" y1="60" y2="460" stroke="#F4EDE0" stroke-opacity=".28"></line>
+<line x1="70" x2="560" y1="460" y2="460" stroke="#F4EDE0" stroke-width="3"></line>
+<text x="150" y="492" text-anchor="middle" style="font:900 23px Chivo,sans-serif;fill:#BFD0FF">OCT 2022</text>
+<text x="470" y="492" text-anchor="middle" style="font:900 23px Chivo,sans-serif;fill:#BFD0FF">JUN 2026</text>
+<text x="150" y="518" text-anchor="middle" style="font:700 17px 'Chivo Mono',monospace;fill:#8FA3E8">GLOBAL PEAK</text>
+<text x="470" y="518" text-anchor="middle" style="font:700 17px 'Chivo Mono',monospace;fill:#8FA3E8">NO SHOCK</text>
+<path ref="{{ xEuN }}" d="M150 118.3 L470 372.2" fill="none" stroke="#BFD0FF" stroke-width="6" stroke-linecap="round"></path>
+<path ref="{{ xUsN }}" d="M150 210.4 L470 340" fill="none" stroke="#F5A300" stroke-width="9" stroke-linecap="round"></path>
+<g ref="{{ xMkN }}" style="opacity:0;transition:opacity .6s ease">
+<circle cx="387.1" cy="306.4" r="22" fill="none" stroke="#D91E18" stroke-width="4"></circle>
+<circle cx="387.1" cy="306.4" r="6" fill="#D91E18"></circle>
+</g>
+<circle cx="150" cy="118.3" r="10" fill="#BFD0FF"></circle><circle cx="470" cy="372.2" r="10" fill="#BFD0FF"></circle>
+<circle cx="150" cy="210.4" r="12" fill="#F5A300"></circle><circle cx="470" cy="340" r="13" fill="#F5A300"></circle>
+<text x="138" y="112" text-anchor="end" style="font:900 26px Chivo,sans-serif;fill:#BFD0FF">10.62</text>
+<text x="138" y="219" text-anchor="end" style="font:900 28px Chivo,sans-serif;fill:#F5A300">7.76</text>
+<text x="488" y="379" style="font:900 26px Chivo,sans-serif;fill:#BFD0FF">2.73</text>
+<text x="488" y="334" style="font:900 28px Chivo,sans-serif;fill:#F5A300">3.73</text>
+<g ref="{{ gpLN }}" style="opacity:0;transition:opacity .6s ease">
+<rect x="70" y="20" width="360" height="38" fill="#F4EDE0"></rect>
+<text x="82" y="47" style="font:900 20px Chivo,sans-serif;fill:#1E3FBF">THEN: US 2.86 PTS BELOW</text>
+</g>
+<g ref="{{ gpRN }}" style="opacity:0;transition:opacity .6s ease .2s">
+<rect x="200" y="528" width="360" height="38" fill="#D91E18"></rect>
+<text x="212" y="555" style="font:900 20px Chivo,sans-serif;fill:#F4EDE0">NOW: US 1.00 PT ABOVE</text>
+</g>
+</svg>
+</div>
+
+<div style="border-top:3px solid #F5A300;margin-top:clamp(12px,1.8cqi,20px);padding-top:clamp(11px,1.6cqi,17px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:clamp(11px,1.8cqi,28px)">
+<div><span style="display:inline-block;background:#F5A300;color:#12100E;font:900 clamp(9px,1.08cqi,12px)/1 Chivo,sans-serif;letter-spacing:.12em;padding:5px 8px;margin-bottom:9px">WHAT THIS SHOWS</span>
+<p style="margin:0;font:400 clamp(13.5px,1.44cqi,18px)/1.45 Archivo,sans-serif;color:#DCE4FF;text-wrap:pretty">In 2022 nearly every rich country had high inflation at once, and America’s was slightly lower than Europe’s. Since 2025 Europe’s has come down and America’s has not. Same shock, different outcome.</p></div>
+<div style="border-left:3px solid rgba(244,237,224,.25);padding-left:clamp(11px,1.6cqi,20px);font:700 clamp(9.5px,1.02cqi,12px)/1.6 'Chivo Mono',monospace;letter-spacing:.06em;color:#8FA3E8">TWO MONTHS, FOUR VERIFIED VALUES. THE MONTHLY SERIES BETWEEN THEM IS NOT WIRED IN, SO THE PATH IS DRAWN STRAIGHT AND LABELLED AS SUCH.</div>
+</div>
+</section>
+
+<section data-screen-label="04 Two choices" style="padding:clamp(24px,4cqi,70px) clamp(14px,3.4cqi,56px)">
+<h2 style="margin:0 0 clamp(6px,1cqi,12px);font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(34px,6.2cqi,92px);line-height:.88;letter-spacing:-.03em;text-transform:uppercase">Two choices,<br>two signatures</h2>
+<p style="margin:0 0 clamp(18px,2.6cqi,34px);font:400 clamp(14.5px,1.6cqi,21px)/1.42 Archivo,sans-serif;max-width:62ch;text-wrap:pretty">The war and the tariffs do not show up in the same place, and saying so is what makes the rest of this page believable. The war is in the tails. The tariffs are in the core.</p>
+<div ref="{{ choices }}" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:clamp(14px,2.2cqi,30px)">
+
+<div style="background:#D91E18;color:#F4EDE0;padding:clamp(16px,2.2cqi,28px);box-shadow:clamp(5px,.8cqi,9px) clamp(5px,.8cqi,9px) 0 #12100E">
+<div style="font:700 clamp(9.5px,1.05cqi,12px)/1 'Chivo Mono',monospace;letter-spacing:.14em;margin-bottom:7px">CHOICE ONE · 28 FEBRUARY 2026</div>
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(30px,3.9cqi,58px);line-height:.92;letter-spacing:-.03em;text-transform:uppercase;margin-bottom:clamp(13px,1.9cqi,22px)">The war</div>
+<div style="display:flex;flex-direction:column;gap:clamp(10px,1.4cqi,16px)">
+<sc-for list="{{ warStats }}" as="w" hint-placeholder-count="3">
+<div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;font:700 clamp(10px,1.08cqi,13px)/1.2 'Chivo Mono',monospace;letter-spacing:.06em;margin-bottom:5px"><span>{{ w.label }}</span><span style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(17px,1.9cqi,26px);letter-spacing:-.02em">{{ w.value }}</span></div>
+<div style="height:clamp(11px,1.3cqi,16px);background:rgba(18,16,14,.28)"><div ref="{{ w.ref }}" style="height:100%;width:{{ w.w }};background:#F5A300;transform:scaleX(0);transform-origin:left;transition:transform 1s cubic-bezier(.2,.85,.25,1)"></div></div>
+</div>
+</sc-for>
+</div>
+<p style="margin:clamp(13px,1.9cqi,20px) 0 0;font:400 clamp(13px,1.4cqi,17px)/1.45 Archivo,sans-serif;text-wrap:pretty">Energy was never tariffed — crude is exempt from every schedule. The only route from policy into a gasoline price in 2026 runs through the strait.</p>
+</div>
+
+<div style="background:#12100E;color:#F4EDE0;padding:clamp(16px,2.2cqi,28px);box-shadow:clamp(5px,.8cqi,9px) clamp(5px,.8cqi,9px) 0 #F5A300">
+<div style="font:700 clamp(9.5px,1.05cqi,12px)/1 'Chivo Mono',monospace;letter-spacing:.14em;margin-bottom:7px;color:#F5A300">CHOICE TWO · ONGOING</div>
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(30px,3.9cqi,58px);line-height:.92;letter-spacing:-.03em;text-transform:uppercase;margin-bottom:clamp(13px,1.9cqi,22px)">The tariffs</div>
+<div style="font:700 clamp(9.5px,1.05cqi,12px)/1.2 'Chivo Mono',monospace;letter-spacing:.06em;color:#A99C89;margin-bottom:7px">CORE PCE, NO ENERGY COMPONENT</div>
+<div style="display:flex;align-items:flex-end;gap:clamp(8px,1.3cqi,16px);margin-bottom:clamp(12px,1.7cqi,20px)">
+<div><div style="font:700 clamp(9px,1cqi,11px)/1 'Chivo Mono',monospace;color:#A99C89;margin-bottom:4px">APR 2025</div><div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(26px,3cqi,42px);line-height:1;color:#8A7F6E">2.61%</div></div>
+<div style="flex:1;height:3px;background:repeating-linear-gradient(90deg,#F5A300 0 8px,transparent 8px 14px);margin-bottom:clamp(10px,1.2cqi,16px)"></div>
+<div><div style="font:700 clamp(9px,1cqi,11px)/1 'Chivo Mono',monospace;color:#F5A300;margin-bottom:4px">MAY 2026</div><div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(30px,3.6cqi,50px);line-height:1;color:#F5A300">3.42%</div></div>
+</div>
+<div style="border:3px solid #F5A300;padding:clamp(10px,1.4cqi,16px);margin-bottom:clamp(12px,1.7cqi,18px)">
+<div style="font:700 clamp(9px,1cqi,11px)/1 'Chivo Mono',monospace;letter-spacing:.1em;color:#F5A300;margin-bottom:5px">A PERSISTENT CREEP OF</div>
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(34px,4.4cqi,64px);line-height:1;letter-spacing:-.03em">+<span ref="{{ c3 }}">0.00</span> PTS</div>
+</div>
+<p style="margin:0;font:400 clamp(13px,1.4cqi,17px)/1.45 Archivo,sans-serif;color:#E6DDCE;text-wrap:pretty">Running above core CPI throughout, with no energy in it. That is what goods-price pass-through looks like. Credible estimates put tariffs at <strong style="color:#F5A300">0.4–0.8 points</strong> of core PCE — a range, not a point estimate, because no defensible point estimate exists.</p>
+</div>
+</div>
+
+<div style="margin-top:clamp(14px,2.2cqi,26px);background:#F5A300;padding:clamp(14px,2cqi,24px);box-shadow:clamp(4px,.7cqi,8px) clamp(4px,.7cqi,8px) 0 #12100E">
+<div style="display:flex;flex-wrap:wrap;gap:clamp(10px,1.6cqi,24px);align-items:flex-start">
+<span style="background:#12100E;color:#F5A300;font:900 clamp(9px,1.08cqi,12px)/1 Chivo,sans-serif;letter-spacing:.12em;padding:6px 9px;white-space:nowrap">THE HONEST PART</span>
+<p style="margin:0;flex:1;min-width:min(100%,260px);font:400 clamp(13.5px,1.48cqi,19px)/1.45 Archivo,sans-serif;text-wrap:pretty">The Supreme Court struck down the IEEPA tariffs on 20 February 2026, which cut average tariffs by about 4.8 points. The Dallas Fed found the Hormuz shipping-cost increase <strong>completely offsets it</strong>, putting the net tariff effect through 2026 close to zero. So the headline spike is the war, and the tariffs are the slow creep in the core. Both are consequences of decisions taken after January 2025 — but they are not the same number, and we will not add them together.</p>
+</div>
+</div>
+</section>
+
+<section data-screen-label="05 Work" style="background:#12100E;color:#F4EDE0;padding:clamp(24px,4cqi,70px) clamp(14px,3.4cqi,56px);background-image:radial-gradient(rgba(244,237,224,.14) .7px,transparent .7px);background-size:5px 5px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(12px,2.4cqi,40px);align-items:end;margin-bottom:clamp(18px,2.6cqi,34px)">
+<h2 style="margin:0;font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(34px,6.2cqi,92px);line-height:.88;letter-spacing:-.03em;text-transform:uppercase">A frozen<br>labour market</h2>
+<p style="margin:0;font:400 clamp(14.5px,1.6cqi,21px)/1.42 Archivo,sans-serif;color:#E6DDCE;max-width:46ch;text-wrap:pretty">Unemployment is near record lows and that is true. It is also the wrong number. Few people are being laid off — but if you lose a job you stay out far longer, and you cannot move for a raise.</p>
+</div>
+<div ref="{{ jobs }}" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(14px,2.2cqi,32px);align-items:end">
+<div>
+<div style="font:700 clamp(10px,1.1cqi,13px)/1 'Chivo Mono',monospace;letter-spacing:.1em;color:#F5A300;margin-bottom:clamp(11px,1.5cqi,16px)">JOBS CREATED PER MONTH</div>
+<div style="display:flex;align-items:flex-end;gap:clamp(12px,2cqi,28px);height:clamp(160px,20cqi,260px)">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%">
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(19px,2.3cqi,32px);line-height:1;letter-spacing:-.02em;margin-bottom:7px"><span ref="{{ c4 }}">0</span></div>
+<div ref="{{ jb1 }}" style="width:100%;height:100%;background:#1E3FBF;border-top:5px solid #BFD0FF;transform:scaleY(0);transform-origin:bottom;transition:transform 1.1s cubic-bezier(.2,.85,.25,1)"></div>
+<div style="font:900 clamp(11px,1.2cqi,15px)/1 Chivo,sans-serif;letter-spacing:.06em;padding-top:8px">BIDEN</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%">
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(19px,2.3cqi,32px);line-height:1;letter-spacing:-.02em;margin-bottom:7px;color:#D91E18"><span ref="{{ c5 }}">0</span></div>
+<div ref="{{ jb2 }}" style="width:100%;height:13.1%;background:#D91E18;border-top:5px solid #F4EDE0;transform:scaleY(0);transform-origin:bottom;transition:transform 1.1s cubic-bezier(.2,.85,.25,1) .35s"></div>
+<div style="font:900 clamp(11px,1.2cqi,15px)/1 Chivo,sans-serif;letter-spacing:.06em;padding-top:8px;color:#D91E18">TRUMP II</div>
+</div>
+<div style="flex:1.1;padding-bottom:clamp(24px,3cqi,42px)">
+<div style="background:#D91E18;color:#F4EDE0;padding:clamp(9px,1.3cqi,15px);box-shadow:clamp(3px,.55cqi,6px) clamp(3px,.55cqi,6px) 0 #F4EDE0">
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(28px,3.4cqi,48px);line-height:1;letter-spacing:-.03em">−87<span style="font-size:.55em">%</span></div>
+<div style="font:700 clamp(9px,1cqi,11px)/1.3 'Chivo Mono',monospace;letter-spacing:.08em;margin-top:4px">MONTHLY JOB CREATION</div>
+</div>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:clamp(11px,1.6cqi,20px)">
+<div style="font:700 clamp(10px,1.1cqi,13px)/1 'Chivo Mono',monospace;letter-spacing:.1em;color:#F5A300">THE NUMBER THAT MATTERS</div>
+<sc-for list="{{ jobStats }}" as="j" hint-placeholder-count="3">
+<div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:5px"><span style="font:700 clamp(10px,1.08cqi,13px)/1.25 'Chivo Mono',monospace;letter-spacing:.05em;color:#C9BFAF">{{ j.label }}</span><span style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(16px,1.85cqi,25px);letter-spacing:-.02em;color:{{ j.ink }};white-space:nowrap">{{ j.value }}</span></div>
+<div style="height:clamp(13px,1.5cqi,19px);background:rgba(244,237,224,.12)"><div ref="{{ j.ref }}" style="height:100%;width:{{ j.w }};background:{{ j.ink }};transform:scaleX(0);transform-origin:left;transition:transform 1s cubic-bezier(.2,.85,.25,1)"></div></div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="border-top:3px solid #F5A300;margin-top:clamp(14px,2.2cqi,26px);padding-top:clamp(11px,1.6cqi,17px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:clamp(11px,1.8cqi,28px)">
+<div><span style="display:inline-block;background:#F5A300;color:#12100E;font:900 clamp(9px,1.08cqi,12px)/1 Chivo,sans-serif;letter-spacing:.12em;padding:5px 8px;margin-bottom:9px">WHAT THIS SHOWS</span>
+<p style="margin:0;font:400 clamp(13.5px,1.44cqi,18px)/1.45 Archivo,sans-serif;color:#E6DDCE;text-wrap:pretty">The economy added 320,938 jobs a month under Biden and adds 42,118 now. More than a quarter of the unemployed have been out of work for over six months, up from a fifth.</p></div>
+<div style="border-left:3px solid rgba(244,237,224,.2);padding-left:clamp(11px,1.6cqi,20px);font:700 clamp(9.5px,1.02cqi,12px)/1.6 'Chivo Mono',monospace;letter-spacing:.06em;color:#A99C89">THE OTHER SIDE: POWELL SAID IN DEC 2025 THAT PAYROLL GROWTH MAY BE <span style="color:#F5A300">OVERSTATED</span> BY ~60,000/MO VIA THE BIRTH-DEATH MODEL. THAT BIAS FLATTERS THESE NUMBERS, NOT THE REVERSE.</div>
+</div>
+</section>
+
+<section data-screen-label="06 Other side of the coin" style="padding:clamp(24px,4cqi,70px) clamp(14px,3.4cqi,56px);background:#F4EDE0">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(12px,2.4cqi,40px);align-items:end;margin-bottom:clamp(16px,2.4cqi,30px)">
+<h2 style="margin:0;font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(34px,6.2cqi,92px);line-height:.88;letter-spacing:-.03em;text-transform:uppercase">The other side<br>of the coin</h2>
+<p style="margin:0;font:400 clamp(14.5px,1.6cqi,21px)/1.42 Archivo,sans-serif;max-width:46ch;text-wrap:pretty">A page that only shows you the bad rows is a page you should not trust. Here are the ones that argue the other way, at the same size as everything else.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:clamp(11px,1.8cqi,22px)">
+<sc-for list="{{ against }}" as="a" hint-placeholder-count="4">
+<div style="border:3px solid #12100E;padding:clamp(13px,1.8cqi,22px);background:#F4EDE0;box-shadow:clamp(4px,.7cqi,8px) clamp(4px,.7cqi,8px) 0 #1E3FBF">
+<div style="font:700 clamp(9px,1cqi,11.5px)/1 'Chivo Mono',monospace;letter-spacing:.11em;color:#1E3FBF;margin-bottom:7px">{{ a.tag }}</div>
+<div style="font-family:Chivo,sans-serif;font-weight:900;font-size:clamp(24px,2.9cqi,40px);line-height:1;letter-spacing:-.03em;margin-bottom:9px">{{ a.value }}</div>
+<div style="font:900 clamp(12px,1.3cqi,16px)/1.2 Chivo,sans-serif;text-transform:uppercase;margin-bottom:7px">{{ a.label }}</div>
+<p style="margin:0;font:400 clamp(12.5px,1.34cqi,16px)/1.42 Archivo,sans-serif;color:#3D372F;text-wrap:pretty">{{ a.why }}</p>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section data-screen-label="07 The strait">
+<dc-import name="HormuzStrait" hint-size="100%,1400px"></dc-import>
+</section>
+
+<section data-screen-label="08 Sources" style="background:#12100E;color:#F4EDE0;padding:clamp(20px,2.8cqi,40px) clamp(14px,3.4cqi,56px) clamp(30px,5cqi,80px)">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:clamp(11px,1.8cqi,26px);font:700 clamp(9.5px,1.02cqi,12px)/1.65 'Chivo Mono',monospace;letter-spacing:.05em;color:#A99C89">
+<div><span style="color:#F5A300">SOURCES —</span> BLS, BEA, EIA, FRED, CLEVELAND FED, DALLAS FED (WP 2609), BROOKINGS HUTCHINS, EUROSTAT, NBER, GAO, IEA, IMF PORTWATCH.</div>
+<div><span style="color:#F5A300">MISSING —</span> OCTOBER 2025 CPI DOES NOT EXIST AND NEVER WILL. IT WAS NEVER COLLECTED DURING THE 43-DAY SHUTDOWN. EVERY 12-MONTH CHANGE THROUGH OCT 2026 IS UNDEFINED. WE SHOW GAPS AS GAPS.</div>
+<div><span style="color:#F5A300">NOT WIRED IN —</span> DAILY CRUDE, MONTHLY CPI SERIES, PEER COUNTRIES BEYOND THE EURO AREA. THE PATHS BETWEEN VERIFIED POINTS ARE DRAWN STRAIGHT AND SAID TO BE.</div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+/* Figures: docs/design-briefs/2026-08-03-v4-economic-decline.md and docs/THESIS.md.
+   Nothing interpolated. See v4-data.js for provenance and the brief-vs-thesis conflicts. */
+const TICKER = [
+  'CRUDE $57 \u2192 $114 \u2192 $70 \u2192 $84',
+  'GROUND BEEF $5.55 \u2192 $6.83',
+  'COFFEE $7.02 \u2192 $9.46',
+  'GASOLINE $3.21 \u2192 $4.20',
+  'JOB CREATION 320,938/MO \u2192 42,118/MO',
+  'LONG-TERM UNEMPLOYED 21.1% \u2192 27.3%',
+  'US-SPECIFIC INFLATION EXCESS +0.77',
+  'HIRING RATE FROZEN AT 3.3%',
+];
+
+/* Common $0\u2013$10 scale so bar lengths are comparable across items. */
+const STAPLES = [
+  { label: 'Ground beef, 1 lb', from: '5.55', to: '6.83', pct: '23', wFrom: '55.5%', wTo: '68.3%' },
+  { label: 'Coffee, 1 lb',      from: '7.02', to: '9.46', pct: '35', wFrom: '70.2%', wTo: '94.6%' },
+  { label: 'Gasoline, 1 gal',   from: '3.21', to: '4.20', pct: '31', wFrom: '32.1%', wTo: '42.0%' },
+];
+
+/* Scaled against gasoline's +26.7% as the longest bar. */
+const WAR = [
+  { label: 'GASOLINE Y/Y', value: '+26.7%', w: '100%' },
+  { label: 'CPI ENERGY Y/Y', value: '+15.7%', w: '58.8%' },
+  { label: 'HEADLINE CPI Y/Y', value: '+3.7%', w: '13.9%' },
+];
+
+/* Each scaled within its own plausible range; value text carries the real number. */
+const JOBSTATS = [
+  { label: 'LONG-TERM UNEMPLOYED, SHARE OF ALL UNEMPLOYED', value: '21.1% \u2192 27.3%', w: '91%', ink: '#D91E18' },
+  { label: 'HIRING RATE (PRE-2020 ~3.9%)', value: '3.3%', w: '85%', ink: '#F5A300' },
+  { label: 'QUITS RATE \u2014 NOBODY IS MOVING FOR A RAISE', value: '1.9%', w: '49%', ink: '#F5A300' },
+];
+
+const AGAINST = [
+  { tag: 'THE OTHER SIDE', value: '\u221245%', label: 'Eggs, per year',
+    why: 'Down sharply. Avian influenza resolved. That is not policy, and we are not claiming it.' },
+  { tag: 'THE OTHER SIDE', value: '2.6%', label: 'Core CPI',
+    why: 'At or near the 2% target. The overshoot lives in the tails, not across the basket.' },
+  { tag: 'THE OTHER SIDE', value: '2.7%', label: 'Median CPI',
+    why: 'A relative-price shock moves the tail. Broad demand inflation would move this. It has not.' },
+  { tag: 'THE OTHER SIDE', value: 'UP', label: 'S&P 500',
+    why: 'Record corporate profits have led to a bull market. Those with existing wealth seeing the biggest returns. ' },
+];
+
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    const r = () => React.createRef();
+    this.state = { narrow: false };
+    // counters
+    this.c1 = r(); this.c2 = r(); this.c3 = r(); this.c4 = r(); this.c5 = r();
+    // oil chart, wide + narrow
+    ['oilW','oilN','oilPW','oilPN','oilAW','oilAN','wb1','wb2','wb1n','wb2n',
+     'e1W','e2W','e3W','e1N','e2N','e3N','pkW','pkN','tpW','tpN'].forEach(k => { this[k] = r(); });
+    // crossing chart
+    ['xW','xN','xUsW','xEuW','xUsN','xEuN','xMkW','xMkN','gpLW','gpRW','gpLN','gpRN'].forEach(k => { this[k] = r(); });
+    // bar groups
+    this.shelf = r(); this.choices = r(); this.jobs = r();
+    this.oilWrap = r(); this.xWrap = r();
+    this.shelfRefs = STAPLES.map(() => ({ a: r(), b: r() }));
+    this.warRefs = WAR.map(r);
+    this.jobBarRefs = JOBSTATS.map(r);
+    this.jb1 = r(); this.jb2 = r();
+    this.rafs = [];
+  }
+
+  componentDidMount() {
+    // Mounting after an unmount on the same instance would otherwise leave `dead`
+    // set, which silently disables every rAF path (reveals, counters, size poll)
+    // while leaving one-shot work like dashPrep looking fine.
+    this.dead = false;
+    this.pending = []; this.pumping = false;
+    this.reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Charts swap geometry rather than shrinking their labels into illegibility.
+    // ResizeObserver never delivers callbacks in an embedded preview frame — not
+    // even the initial one — so the width is measured synchronously here and then
+    // polled, the same way the scroll reveals are.
+    this.host = this.shelf.current && this.shelf.current.closest('div[style*="container-type"]');
+    this.lastW = this.hostW();
+    if (this.lastW < 760) this.state = { ...this.state, narrow: true };
+    this.sizePoll();
+
+    this.dashPrep();
+    this.watch();
+  }
+
+  hostW() {
+    const el = this.host || document.body;
+    return el.clientWidth || window.innerWidth || 1000;
+  }
+
+  sizePoll() {
+    if (this.dead) return;
+    const w = this.hostW();
+    if (w !== this.lastW) {
+      this.lastW = w;
+      const n = w < 760;
+      if (n !== this.state.narrow) this.setState({ narrow: n });
+    }
+    this.rafs.push(requestAnimationFrame(() => this.sizePoll()));
+  }
+
+  componentDidUpdate() {
+    this.dashPrep();
+    if (this.cvals) this.cvals.forEach((t, ref) => { if (ref.current) ref.current.textContent = t; });
+  }
+  componentWillUnmount() {
+    this.dead = true;
+    this.rafs.forEach(cancelAnimationFrame);
+  }
+
+  /* Stroke reveals need a length, which only exists after layout. */
+  dashPrep() {
+    ['oilPW','oilPN','xUsW','xEuW','xUsN','xEuN'].forEach(k => {
+      const el = this[k].current; if (!el || el.dataset.ready) return;
+      const L = el.getTotalLength();
+      el.dataset.len = L; el.dataset.ready = '1';
+      el.style.strokeDasharray = L + ' ' + L;
+      el.style.strokeDashoffset = this.reduce ? 0 : L;
+      el.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(.3,.85,.3,1)';
+    });
+  }
+
+  once(el, run) {
+    if (!el) return;
+    if (this.reduce) { run(); return; }
+    (this.pending = this.pending || []).push({ el, run });
+    if (!this.pumping) { this.pumping = true; this.pump(); }
+  }
+
+  /* IntersectionObserver does not fire inside an embedded preview frame, so reveals
+     are driven by a bounded rAF poll on getBoundingClientRect. It stops itself once
+     every trigger has run, so there is no standing per-frame cost. */
+  pump() {
+    if (this.dead) return;
+    const vh = window.innerHeight || 800;
+    this.pending = (this.pending || []).filter(t => {
+      const r = t.el.getBoundingClientRect();
+      if (r.bottom > 40 && r.top < vh * 0.58) { t.run(); return false; }
+      return true;
+    });
+    if (this.pending.length) this.rafs.push(requestAnimationFrame(() => this.pump()));
+    else this.pumping = false;
+  }
+
+  /* Counter output is written imperatively, so a later re-render would restore the
+     template's seed text. Every value is recorded and re-applied on update. */
+  put(ref, text) {
+    (this.cvals = this.cvals || new Map()).set(ref, text);
+    if (ref.current) ref.current.textContent = text;
+  }
+
+  count(ref, to, dec, dur, fmt) {
+    if (!ref.current) return;
+    if (this.reduce) { this.put(ref, fmt ? fmt(to) : to.toFixed(dec)); return; }
+    const t0 = performance.now();
+    const tick = now => {
+      const p = Math.min(1, (now - t0) / dur);
+      const v = to * (1 - Math.pow(1 - p, 3));
+      this.put(ref, fmt ? fmt(v) : v.toFixed(dec));
+      if (p < 1) this.rafs.push(requestAnimationFrame(tick));
+    };
+    this.rafs.push(requestAnimationFrame(tick));
+  }
+
+  grow(ref, d) {
+    const el = ref.current; if (!el) return;
+    setTimeout(() => { if (el) el.style.transform = el.style.transform.indexOf('scaleY') >= 0 ? 'scaleY(1)' : 'scaleX(1)'; }, this.reduce ? 0 : d);
+  }
+  show(ref, d) {
+    const el = ref.current; if (!el) return;
+    setTimeout(() => { if (el) el.style.opacity = 1; }, this.reduce ? 0 : d);
+  }
+  drawLine(ref, d) {
+    const el = ref.current; if (!el) return;
+    setTimeout(() => { if (el) el.style.strokeDashoffset = 0; }, this.reduce ? 0 : d);
+  }
+
+  watch() {
+    const sec = ref => ref.current && ref.current.closest('section');
+
+    // --- masthead + oil chart: the war annotations land as the line reaches them.
+    // Both geometries are animated, so resizing across the breakpoint after the
+    // reveal never exposes an un-run chart.
+    this.once(sec(this.c1), () => {
+      // hero counters run on load; the chart waits for its own wrapper
+      this.count(this.c1, 99, 0, 1400);
+      this.count(this.c2, 4.20, 2, 1600);
+    });
+    this.once(this.oilWrap.current, () => {
+      [['wb1','wb2','e1W','e2W','e3W','pkW','tpW','oilPW','oilAW'],
+       ['wb1n','wb2n','e1N','e2N','e3N','pkN','tpN','oilPN','oilAN']].forEach(s => {
+        this.show(this[s[0]], 150);
+        this.drawLine(this[s[7]], 200);
+        this.show(this[s[8]], 400);
+        this.show(this[s[2]], 500);   // strike
+        this.show(this[s[5]], 1000);  // peak
+        this.show(this[s[3]], 1350);  // ceasefire
+        this.show(this[s[6]], 1500);  // round trip
+        this.show(this[s[1]], 1700);
+        this.show(this[s[4]], 1800);  // strikes resume
+      });
+    });
+
+    // --- shelf
+    this.once(this.shelf.current, () => {
+      this.shelfRefs.forEach((r, i) => { this.grow(r.a, i * 130); this.grow(r.b, i * 130 + 90); });
+    });
+
+    // --- the crossing
+    this.once(this.xWrap.current, () => {
+      [['xUsW','xEuW','xMkW','gpLW','gpRW'], ['xUsN','xEuN','xMkN','gpLN','gpRN']].forEach(s => {
+        this.drawLine(this[s[1]], 100);
+        this.drawLine(this[s[0]], 100);
+        this.show(this[s[3]], 900);
+        this.show(this[s[2]], 1500);
+        this.show(this[s[4]], 1750);
+      });
+    });
+
+    // --- two choices
+    this.once(this.choices.current, () => {
+      this.warRefs.forEach((r, i) => this.grow(r, i * 150));
+      this.count(this.c3, 0.81, 2, 1500);
+    });
+
+    // --- work
+    this.once(this.jobs.current, () => {
+      this.grow(this.jb1, 100);
+      this.grow(this.jb2, 450);
+      this.count(this.c4, 320938, 0, 1500, v => Math.round(v).toLocaleString('en-US'));
+      this.count(this.c5, 42118, 0, 1500, v => Math.round(v).toLocaleString('en-US'));
+      this.jobBarRefs.forEach((r, i) => this.grow(r, 300 + i * 150));
+    });
+  }
+
+  renderVals() {
+    const nr = this.state.narrow;
+    return {
+      dW: nr ? 'none' : 'block',
+      dN: nr ? 'block' : 'none',
+      ticker: TICKER,
+      staples: STAPLES.map((s, i) => ({ ...s, refA: this.shelfRefs[i].a, refB: this.shelfRefs[i].b })),
+      warStats: WAR.map((w, i) => ({ ...w, ref: this.warRefs[i] })),
+      jobStats: JOBSTATS.map((j, i) => ({ ...j, ref: this.jobBarRefs[i] })),
+      against: AGAINST,
+      c1: this.c1, c2: this.c2, c3: this.c3, c4: this.c4, c5: this.c5,
+      oilW: this.oilW, oilN: this.oilN, oilPW: this.oilPW, oilPN: this.oilPN,
+      oilAW: this.oilAW, oilAN: this.oilAN,
+      wb1: this.wb1, wb2: this.wb2, wb1n: this.wb1n, wb2n: this.wb2n,
+      e1W: this.e1W, e2W: this.e2W, e3W: this.e3W, e1N: this.e1N, e2N: this.e2N, e3N: this.e3N,
+      pkW: this.pkW, pkN: this.pkN, tpW: this.tpW, tpN: this.tpN,
+      xW: this.xW, xN: this.xN, xUsW: this.xUsW, xEuW: this.xEuW, xUsN: this.xUsN, xEuN: this.xEuN,
+      xMkW: this.xMkW, xMkN: this.xMkN, gpLW: this.gpLW, gpRW: this.gpRW, gpLN: this.gpLN, gpRN: this.gpRN,
+      shelf: this.shelf, choices: this.choices, jobs: this.jobs, jb1: this.jb1, jb2: this.jb2,
+      oilWrap: this.oilWrap, xWrap: this.xWrap,
+    };
+  }
+}
+</script>
+</body>
+</html>
