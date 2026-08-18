@@ -7,7 +7,7 @@ A single-page data site built entirely on published government statistics. Every
 number traces to a named series. Nothing is modelled, smoothed, or invented — and
 the things it declines to claim are written down alongside the things it does.
 
-![The ledger](frontend/public/og.png)
+![The masthead: "The bill for two choices", with crude oil's 2026 round trip charted beneath it](docs/screenshots/01-masthead.png)
 
 ---
 
@@ -46,26 +46,99 @@ pandemic, no financial crisis, and no global shock to point at.
 
 ## What's on the page
 
-| Section | What it does |
-|---|---|
-| **The bill** | Crude oil, 394 daily closes, with war events marked |
-| **The shelf** | Grocery staples in actual dollars — not index points |
-| **The lines crossed in between** | US vs peer-country inflation, and the excess by administration |
-| **Twenty percent of the world's oil** | A playable Strait of Hormuz simulation |
-| **Two choices, two signatures** | The war shows up in the tails; the tariffs in the core |
-| **A frozen labour market** | Job creation, and why the unemployment rate is the wrong number |
-| **The other side of the coin** | What is genuinely going well |
-| **Check our work** | Sources, and a correction we made to ourselves |
+Eight sections, each captured below from the built site. Every chart carries a
+plain-English **"what this shows"** callout stating the finding rather than the axes —
+the page is designed to work if you read only those.
 
-### The simulation
+### 01 · The bill for two choices
 
-Press play or drag the scrubber through 214 days. Transit volume, war-risk insurance
-and the crude price move together; the vessel layer empties when the strait closes and
-refills when it reopens.
+394 daily crude closes with the war events marked. Prices fell for twelve months
+*before* the war, broke +99% in five weeks after a dated strike, round-tripped to
+pre-war levels during the June ceasefire, and climbed again when strikes resumed.
+
+![Crude oil from $57 to $114 to $70 to $84, with the February strike and the Hormuz
+closure marked on the chart](docs/screenshots/01-masthead.png)
+
+### 02 · The shelf
+
+Groceries in actual dollars, not index points. A CPI category rising "6.4%" is
+abstract; ground beef going from $5.55 to $6.83 a pound is not.
+
+![Grocery staples with before and after prices on a shared dollar
+scale](docs/screenshots/02-shelf.png)
+
+### 03 · The lines crossed in between
+
+The control-group argument, drawn. At the October 2022 global peak US inflation ran
+**2.86 points below** the euro area. It now runs **1.00 point above**. The lines
+cross in between, which is the whole finding.
+
+![Two lines from October 2022 to June 2026: the US falling from 7.76% to 3.73%, the
+euro area from 10.62% to 2.73%, crossing in between](docs/screenshots/03-crossing.png)
+
+### 04 · Two choices, two signatures
+
+The war and the tariffs are kept **separate and never summed** — the Dallas Fed found
+the SCOTUS tariff rollback and the Hormuz shipping-cost increase roughly cancel, so
+adding them would double-count. The war shows up in the tails; the tariffs in the core.
+
+![Two cards, war and tariffs, with the honest-part block explaining why the two
+effects are not added together](docs/screenshots/04-choices.png)
+
+### 05 · A frozen labour market
+
+This section deliberately leads with **long-term unemployment (21.1% → 27.3%)** rather
+than the unemployment rate. The rate is near record lows and that is true — it is also
+the wrong number. Few people are laid off, but if you lose a job you stay out far
+longer, and the frozen quits rate means nobody can move for a raise.
+
+![Job creation falling from 320,938 to 42,118 a month, with long-term unemployment,
+hiring and quits rates alongside](docs/screenshots/05-work.png)
+
+### 06 · The other side of the coin
+
+Rows that cut *against* the thesis, rendered at full size rather than shrunk into a
+footnote. A page that only ever finds confirming evidence is not measuring anything.
+
+![Indicators that are genuinely going well, shown at the same visual weight as the
+rest of the page](docs/screenshots/06-other-side.png)
+
+### 07 · Everything came through here
+
+A playable Strait of Hormuz simulation. Press play or drag the scrubber through 214
+days: transit volume, war-risk insurance and the crude price move together, and the
+vessel layer queues when the strait closes and drains when it reopens.
+
+![The Strait of Hormuz with modelled tanker traffic, a ×3.5 inset on the narrows, live
+readouts and a scrubbable price chart](docs/screenshots/07-strait.png)
 
 Transit and war-risk are **stepped values with as-of dates, never interpolated** — the
 strait did not close or reopen gradually, and drawing a smooth curve between 0.0 and
-4.8 mb/d would assert intermediate values nobody measured.
+4.8 mb/d would assert intermediate values nobody measured. The map is labelled
+*illustrative geometry · vessel positions are not AIS data*, because they are not.
+
+### 08 · Check our work
+
+Every series ID, and a correction the project made to itself.
+
+![The sources strip listing BLS, BEA, Federal Reserve, EIA and Eurostat via
+FRED](docs/screenshots/08-sources.png)
+
+### On a phone
+
+The layout is driven by container queries and `auto-fit` grids rather than breakpoints,
+so it reflows continuously instead of snapping at fixed widths. Measured at 390px:
+**0px of horizontal overflow.**
+
+| Masthead | Labour market | The strait |
+|---|---|---|
+| ![](docs/screenshots/m-01-masthead.png) | ![](docs/screenshots/m-05-work.png) | ![](docs/screenshots/m-07-strait.png) |
+
+> Screenshots are generated from the built site by `frontend/scripts/shoot.mjs`, which
+> renders under `prefers-reduced-motion: reduce`. The page treats that as *static but
+> complete* — every counter at its final value, every bar grown, the simulation stepped
+> to a settled end state — so the shots show real end states rather than a paused
+> animation frame. Regenerate with `node scripts/shoot.mjs <url> ../docs/screenshots`.
 
 ---
 
