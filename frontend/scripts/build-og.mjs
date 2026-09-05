@@ -42,6 +42,11 @@ const coffee = byKey('coffee');
 const now = intl?.terms?.find((t) => t.in_progress);
 const biden = intl?.terms?.find((t) => t.key === 'biden');
 
+const jobsEnd = jobs?.current_term?.end ?? null;
+const asOf = jobsEnd
+  ? `through ${new Date(`${jobsEnd}T00:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
+  : 'through the latest data';
+
 const required = { intl, beef, coffee, jobs, now, biden };
 for (const [name, v] of Object.entries(required)) {
   if (!v) {
@@ -83,10 +88,10 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
     margin-top:26px;
   }
 </style></head><body>
-  <div class="kicker"><span>A ledger &middot; through July 2026</span><b>Every figure sourced</b></div>
+  <div class="kicker"><span>A ledger &middot; ${asOf}</span><b>Every figure sourced</b></div>
   <h1>The bill for two choices</h1>
   <p class="sub">A war ordered in February. Tariffs imposed, struck down, re-imposed.
-     Neither was a pandemic or bad luck. Both are dated &mdash; and both landed on a grocery receipt.</p>
+     Seven months on the strait is still shut, and foreign gold is leaving the New York Fed.</p>
   <div class="grid">
     <div class="stat">
       <div class="num">${money(beef.current_term.end_value)}</div>

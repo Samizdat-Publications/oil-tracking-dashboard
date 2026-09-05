@@ -110,6 +110,17 @@
     "source_tier": 2
   },
   {
+    "id": "three-tankers-july",
+    "date": "2026-07-14",
+    "kind": "war",
+    "sign": 1,
+    "study": false,
+    "headline": "Three tankers attacked in a single day; a seafarer killed",
+    "description": "Stolt Magnesium, Mombasa B and Al Bahyah are struck in and around the strait. One crew member is killed on Mombasa B and eight injured. The IRGC says it targeted vessels using mined routes.",
+    "source_url": "https://en.wikipedia.org/wiki/List_of_ships_attacked_during_the_2026_Iran_war",
+    "source_tier": 2
+  },
+  {
     "id": "saudi-tankers",
     "date": "2026-07-23",
     "kind": "war",
@@ -141,5 +152,104 @@
     "description": "Renewed threats against Iran drive Brent above $90 as tanker attacks in the Strait continue and fighting spreads toward the Red Sea.",
     "source_url": "https://www.cnbc.com/2026/07/29/oil-prices-today-brent-wti-iran-us-hormuz.html",
     "source_tier": 2
+  },
+  {
+    "id": "august-lull",
+    "date": "2026-08-01",
+    "kind": "context",
+    "sign": -1,
+    "study": false,
+    "headline": "A month-long lull in US-Iran strikes begins; attacks on merchant ships continue",
+    "description": "No large US or Iranian military exchanges for the month. Thirteen commercial vessels are nonetheless struck in August. The strait stays effectively closed: IMF PortWatch counts single-digit daily transits against a pre-war average of about 83.",
+    "source_url": "https://news.usni.org/2026/09/04/u-s-iran-trade-strikes-in-strait-of-hormuz-as-both-battle-on-social-media",
+    "source_tier": 2
+  },
+  {
+    "id": "july-cpi",
+    "date": "2026-08-12",
+    "kind": "context",
+    "sign": 0,
+    "study": false,
+    "headline": "July CPI: 3.4% headline, 2.5% core, energy +14.7%",
+    "description": "Headline and core both ease a tenth from June. Energy falls 1.5% on the month but remains 14.7% above a year earlier. The breadth test still reads as a tail shock: median CPI 2.7%.",
+    "source_url": "https://www.bls.gov/news.release/cpi.nr0.htm",
+    "source_tier": 1
+  },
+  {
+    "id": "iea-august",
+    "date": "2026-08-13",
+    "kind": "context",
+    "sign": 1,
+    "study": false,
+    "headline": "IEA: Gulf exports down 2.1 mb/d; world supply to fall 4.3 mb/d in 2026",
+    "description": "The August Oil Market Report says the strait was 'effectively closed again in early July'. Observed stocks have drawn 410 million barrels since February. World demand is now forecast to fall 1.6 mb/d this year.",
+    "source_url": "https://www.iea.org/reports/oil-market-report-august-2026",
+    "source_tier": 1
+  },
+  {
+    "id": "minoan-dignity",
+    "date": "2026-08-18",
+    "kind": "war",
+    "sign": 1,
+    "study": false,
+    "headline": "MV Minoan Dignity struck, one crew killed, on the day the President says the strait is 'open and operating'",
+    "description": "The bulk carrier is abandoned after an Iranian strike. Lloyd's List Intelligence counts about 14 non-Iranian transits a day that week against roughly 100 before the war.",
+    "source_url": "https://www.cnbc.com/2026/08/18/iran-war-strait-hormuz-ship-traffic-oil.html",
+    "source_tier": 2
+  },
+  {
+    "id": "mines-cleared",
+    "date": "2026-08-25",
+    "kind": "policy",
+    "sign": -1,
+    "study": false,
+    "headline": "US Navy says it has cleared mines from the strait",
+    "description": "Officials confirm underwater drones identified more than 100 suspected mines. Transits do not recover: PortWatch counts four vessels that day.",
+    "source_url": "https://en.wikipedia.org/wiki/2026_Iran_war",
+    "source_tier": 2
+  },
+  {
+    "id": "sidr",
+    "date": "2026-08-31",
+    "kind": "war",
+    "sign": 1,
+    "study": false,
+    "headline": "Saudi tanker Sidr struck; two crew killed. Thirteen merchant ships hit in August",
+    "description": "The deadliest attack of the month closes it. WTI ends August at $87.03, up from $69.74 at the July ceasefire low.",
+    "source_url": "https://news.usni.org/2026/09/04/u-s-iran-trade-strikes-in-strait-of-hormuz-as-both-battle-on-social-media",
+    "source_tier": 2
+  },
+  {
+    "id": "strikes-resume-september",
+    "date": "2026-09-01",
+    "kind": "war",
+    "sign": 1,
+    "study": true,
+    "headline": "US and Iran trade strikes in the strait; the August lull ends",
+    "description": "Renewed exchanges after a month of quiet. WTI spot closes $91.48, up 5.1% on the day; Brent $96.02. Event added on 5 September 2026 with the price path already visible -- the sign is theory-driven (escalation raises prices) but this event is not pre-registered in the way the first six were.",
+    "source_url": "https://news.usni.org/2026/09/04/u-s-iran-trade-strikes-in-strait-of-hormuz-as-both-battle-on-social-media",
+    "source_tier": 2
+  },
+  {
+    "id": "dnb-gold",
+    "date": "2026-09-02",
+    "kind": "context",
+    "sign": 0,
+    "study": false,
+    "headline": "Dutch central bank confirms it moved 86 tonnes of gold out of New York and Ottawa",
+    "description": "De Nederlandsche Bank cites 'increasing geopolitical unrest'. New York's share of Dutch reserves falls from 31% to 18.5%. The Fed's own custody table shows foreign gold under earmark down about 160 tonnes since August 2025.",
+    "source_url": "https://www.dnb.nl/en/general-news/press-release-2026/dnb-improves-tradability-of-gold-reserves",
+    "source_tier": 1
+  },
+  {
+    "id": "august-payrolls",
+    "date": "2026-09-04",
+    "kind": "context",
+    "sign": 0,
+    "study": false,
+    "headline": "August payrolls +162,000, the best month in five; long-term unemployed 27%",
+    "description": "Well above the 53,000 consensus. Unemployment 4.1%. One strong month lifts the term average to about 42,000 a month against 321,000 in the previous term. Hires rate 3.2%, quits 1.9%: still low-fire, low-hire.",
+    "source_url": "https://www.bls.gov/news.release/empsit.nr0.htm",
+    "source_tier": 1
   }
 ]

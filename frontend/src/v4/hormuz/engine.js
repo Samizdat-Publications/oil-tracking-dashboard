@@ -48,65 +48,129 @@
    ============================================================================ */
 
 export const DAY0 = Date.UTC(2025, 11, 31);
-export const SPAN = 214;                 // 31 Dec 2025 → 2 Aug 2026
+/* The span is DATA-DRIVEN. It defaults to the last hand-verified anchor and is
+   extended by configureTimeline() to the last daily close in the snapshot, so
+   the scrubber always runs to the most recent trading day without anyone
+   editing a constant. `export let` is a live binding: every reader sees the
+   updated value. */
+export let SPAN = 214;                   // 31 Dec 2025 → 2 Aug 2026 (fallback)
 export const BASE_DAYS_PER_SECOND = 12;  // 1x
 
+/** Day offset from DAY0 for an ISO date. Every dated thing below uses this
+    rather than a hand-counted integer -- the old integers drifted twice. */
+export function dayOf(iso) {
+  const y = +iso.slice(0, 4), m = +iso.slice(5, 7) - 1, d = +iso.slice(8, 10);
+  return Math.round((Date.UTC(y, m, d) - DAY0) / 86400000);
+}
+
 /* ---------------------------------------------------------------- timeline */
-/* Price anchors. `approx` and `derived` are NOT decoration — they drive the
-   caption, the dash pattern and the decimal precision. Keep the flags. */
+/* Fallback price anchors, used only when the daily series is not supplied.
+   `approx` and `derived` are NOT decoration — they drive the caption, the dash
+   pattern and the decimal precision. Keep the flags. */
 export const ANCHORS = [
   { d: 0,   v: 57.70 },
   { d: 2,   v: 57.21 },
   { d: 59,  v: 67.00, approx: true },
-  { d: 96,  v: 114.01 },
-  { d: 99,  v: 96.91, derived: true },   // 114.01 × 0.85, per THESIS.md
+  { d: 97,  v: 114.58 },
+  { d: 98,  v: 96.17 },
   { d: 182, v: 69.74 },
-  { d: 189, v: 73.52 },
+  { d: 189, v: 74.56 },
   { d: 208, v: 84.25 },
 ];
 
-/* Continuous flow, for the vessel simulation only. Never shown as a number. */
+/* Measured data, supplied by configureTimeline(). When `prices` is set the
+   chart draws every close and the readout never interpolates; when `flow` is
+   set the vessel model and the transit readout follow IMF PortWatch counts. */
+export const TL = { prices: null, flow: null, baseline: null, lastFlowDay: null, lastPriceDay: null };
+
+/**
+ * Wire real series into the timeline.
+ *   prices:   [{date:'2026-01-02', value: 57.21}, ...]   FRED DCOILWTICO
+ *   transits: { observations:[{date, total, tanker}], baseline:{total_per_day} }  IMF PortWatch
+ * Extends SPAN to the later of the two series' last dates.
+ */
+export function configureTimeline({ prices, transits } = {}) {
+  if (prices && prices.length) {
+    TL.prices = prices
+      .filter(p => p.value !== null && p.value !== undefined && p.date >= '2025-12-31')
+      .map(p => ({ d: dayOf(p.date), v: +p.value, iso: p.date }))
+      .sort((a, b) => a.d - b.d);
+    TL.lastPriceDay = TL.prices.length ? TL.prices[TL.prices.length - 1].d : null;
+  }
+  if (transits && transits.observations && transits.observations.length) {
+    TL.flow = transits.observations
+      .filter(o => o.total !== null && o.total !== undefined && o.date >= '2025-12-01')
+      .map(o => ({ d: dayOf(o.date), v: +o.total, tanker: o.tanker, iso: o.date }))
+      .sort((a, b) => a.d - b.d);
+    TL.baseline = transits.baseline && transits.baseline.total_per_day
+      ? +transits.baseline.total_per_day : null;
+    TL.lastFlowDay = TL.flow.length ? TL.flow[TL.flow.length - 1].d : null;
+  }
+  /* Run to the latest of: last close, last transit count, last dated event.
+     FRED publishes closes with a lag of a few days, so the newest events can
+     sit past the last close; the price readout then holds that close and says
+     the market data has not caught up yet. */
+  const lastEvent = EVENTS.length ? EVENTS[EVENTS.length - 1].d : 0;
+  const ends = [TL.lastPriceDay, TL.lastFlowDay, lastEvent].filter(x => x !== null && x !== undefined);
+  if (ends.length) SPAN = Math.max(SPAN, ...ends);
+  return SPAN;
+}
+
+/* Continuous flow FALLBACK for the vessel simulation only. Never shown as a
+   number. Superseded by TL.flow when PortWatch data is present. */
 export const FLOW_KF = [
   { d: 0, v: 13.8 }, { d: 59, v: 13.8 }, { d: 62, v: 0 }, { d: 97, v: 0 },
   { d: 101, v: 1.6 }, { d: 169, v: 1.6 }, { d: 173, v: 4.8 }, { d: 189, v: 4.8 },
   { d: 194, v: 3.5 }, { d: 214, v: 3.5 },
 ];
 
-/* Stepped readouts. These hold their last published value with an as-of date
-   and render an em-dash when none exists. NEVER interpolate them. */
+/* Stepped readouts (fallback). These hold their last published value with an
+   as-of date and render an em-dash when none exists. NEVER interpolate them. */
 export const FLOW_READ = [
-  { d: 0,   val: '13.8', pct: '100% of baseline',    cap: 'Pre-war gross transit \u2014 about 20% of world oil trade (IEA)', known: true },
+  { d: 0,   val: '13.8', pct: '100% of baseline',    cap: 'Pre-war gross transit — about 20% of world oil trade (IEA)', known: true },
   { d: 59,  val: '13.8', pct: 'closing',             cap: 'Strikes begin. The IRGC declares the Strait closed within days.', known: true },
-  { d: 62,  val: '0.0',  pct: '0% of baseline',      cap: 'Strait declared closed \u2014 13.8 mb/d of gross transit removed (IEA)', known: true },
-  { d: 97,  val: '\u2014', pct: 'no published figure', cap: 'Reopened partially under the two-week ceasefire. No transit figure was published.', known: false },
+  { d: 62,  val: '0.0',  pct: '0% of baseline',      cap: 'Strait declared closed — 13.8 mb/d of gross transit removed (IEA)', known: true },
+  { d: 97,  val: '—', pct: 'no published figure', cap: 'Reopened partially under the two-week ceasefire. No transit figure was published.', known: false },
   { d: 173, val: '4.8',  pct: '35% of baseline',     cap: 'As of late June: transits triple, flow recovers to about 4.8 mb/d (IEA/CNBC)', known: true },
-  { d: 189, val: '\u2014', pct: 'no published figure', cap: 'Strikes resume and tanker attacks continue. No transit figure published since.', known: false },
+  { d: 189, val: '—', pct: 'no published figure', cap: 'Strikes resume and tanker attacks continue. No transit figure published since.', known: false },
 ];
 
 export const RISK_READ = [
-  { d: 0,   val: '0.25%',      cap: 'Last reading: pre-war standard rate (Strauss Center)' },
-  { d: 59,  val: '\u2014',     cap: 'Repricing. No published reading between the first strike and mid-April.' },
-  { d: 105, val: '10%',        cap: 'Reading of 15 Apr: 10% of a $100M hull \u2014 about $4.87/bbl (IEA, Marsh)' },
-  { d: 182, val: '1\u20133%',  cap: 'Reading of early July, after the June ceasefire (Marsh)' },
-  { d: 204, val: '7.5\u201310%', cap: 'Reading of 23 Jul, after attacks on Saudi tankers (Marsh)' },
-];
+  { date: '2025-12-31', val: '0.25%',      cap: 'Last reading: pre-war standard rate (Strauss Center)' },
+  { date: '2026-02-28', val: '—',     cap: 'Repricing. No published reading between the first strike and mid-April.' },
+  { date: '2026-04-15', val: '10%',        cap: 'Reading of 15 Apr: 10% of a $100M hull — about $4.87/bbl (IEA, Marsh)' },
+  { date: '2026-07-01', val: '1–3%',  cap: 'Reading of early July, after the June ceasefire (Marsh)' },
+  { date: '2026-07-23', val: '7.5–10%', cap: 'Reading of 23 Jul, after attacks on Saudi tankers (Marsh)' },
+  { date: '2026-08-01', val: '7.5–10%', cap: 'Still quoted through August; Marsh: few owners buying at that level. No August reading published.' },
+].map(r => ({ ...r, d: dayOf(r.date) }));
 
-/* k = war | tariff | policy | context.  t = provenance tier (1 or 2). */
+/* k = war | tariff | policy | context.  t = provenance tier (1 or 2).
+   Dated, not day-numbered: the offsets are derived. */
 export const EVENTS = [
-  { d: 15,  k: 'context', t: 2, h: 'Iran nuclear talks collapse; Gulf posturing begins', s: 'WTI is still near a 12-month low of $57, down about 20% over 2025.' },
-  { d: 51,  k: 'tariff',  t: 1, h: 'Supreme Court strikes down the IEEPA tariffs, 6\u20133', s: 'Learning Resources v. Trump. Average import tariffs fall about 4.8pp \u2014 eight days before the strikes.' },
-  { d: 55,  k: 'tariff',  t: 1, h: 'Section 122 blanket 10% surcharge replaces them', s: 'Roughly $1.0 trillion of imports. Energy and energy products are exempted verbatim.' },
-  { d: 59,  k: 'war',     t: 1, h: 'US and Israel strike Iran; the Strait of Hormuz closes', s: 'About 13.8 mb/d of gross transit removed \u2014 a fifth of world oil trade. WTI begins a five-week climb.' },
-  { d: 61,  k: 'context', t: 2, h: 'Platts suspends Hormuz grades from the Dubai benchmark', s: 'Deliverable grades cut from five to two. The benchmark now measures a different basket.' },
-  { d: 70,  k: 'policy',  t: 1, h: 'IEA members release 400 million barrels', s: 'The largest coordinated release in 52 years. Expert estimates put the price effect near $2/bbl.' },
-  { d: 97,  k: 'war',     t: 2, h: 'Two-week ceasefire agreed; Hormuz reopens partially', s: 'Oil plunges below $100 from its $114 peak.' },
-  { d: 105, k: 'context', t: 1, h: 'Physical crude trades $35 over paper \u2014 a record', s: 'North Sea Dated over ICE Brent. The premium collapses to $3 by early May.' },
-  { d: 169, k: 'war',     t: 2, h: '60-day ceasefire and US\u2013Iran Memorandum of Understanding', s: 'Transits triple within days. WTI falls to $69.74 \u2014 below its pre-war level.' },
-  { d: 189, k: 'war',     t: 2, h: 'US strikes Iran again; the ceasefire is declared over', s: 'WTI rises 4.4% to $73.52 on the day; Brent 5.2% to $78.02.' },
-  { d: 204, k: 'war',     t: 2, h: 'Attacks on Saudi tankers; war-risk premiums hit 7.5\u201310%', s: 'Up from 1\u20133% weeks earlier and 0.25% before the war \u2014 $7.5\u201310M per voyage on a $100M hull.' },
-  { d: 205, k: 'tariff',  t: 1, h: 'Section 122 surcharge expires by statute', s: 'Section 301 forced-labor tariffs at 10% and 12.5% become the operative regime.' },
-  { d: 210, k: 'war',     t: 2, h: 'Escalation threats push Brent back above $90', s: 'Tanker attacks in the Strait continue and fighting spreads toward the Red Sea.' },
-];
+  { date: '2026-01-15', k: 'context', t: 2, h: 'Iran nuclear talks collapse; Gulf posturing begins', s: 'WTI is still near a 12-month low of $57, down about 20% over 2025.' },
+  { date: '2026-02-20', k: 'tariff',  t: 1, h: 'Supreme Court strikes down the IEEPA tariffs, 6–3', s: 'Learning Resources v. Trump. Average import tariffs fall about 4.8pp — eight days before the strikes.' },
+  { date: '2026-02-24', k: 'tariff',  t: 1, h: 'Section 122 blanket 10% surcharge replaces them', s: 'Roughly $1.0 trillion of imports. Energy and energy products are exempted verbatim.' },
+  { date: '2026-02-28', k: 'war',     t: 1, h: 'US and Israel strike Iran; the Strait of Hormuz closes', s: 'About 13.8 mb/d of gross transit removed — a fifth of world oil trade. WTI begins a five-week climb.' },
+  { date: '2026-03-02', k: 'context', t: 2, h: 'Platts suspends Hormuz grades from the Dubai benchmark', s: 'Deliverable grades cut from five to two. The benchmark now measures a different basket.' },
+  { date: '2026-03-11', k: 'policy',  t: 1, h: 'IEA members release 400 million barrels', s: 'The largest coordinated release in 52 years. Expert estimates put the price effect near $2/bbl.' },
+  { date: '2026-04-07', k: 'war',     t: 2, h: 'Two-week ceasefire agreed; Hormuz reopens partially', s: 'Spot closes at its $114.58 peak the same day and falls to $96.17 the next.' },
+  { date: '2026-04-15', k: 'context', t: 1, h: 'Physical crude trades $35 over paper — a record', s: 'North Sea Dated over ICE Brent. The premium collapses to $3 by early May.' },
+  { date: '2026-06-18', k: 'war',     t: 2, h: '60-day ceasefire and US–Iran Memorandum of Understanding', s: 'Transits triple within days. WTI falls to $69.74 — below its pre-war level.' },
+  { date: '2026-07-08', k: 'war',     t: 2, h: 'US strikes Iran again; the ceasefire is declared over', s: 'WTI spot rises 4.2% to $74.56 on the day; the futures contract 4.4% to $73.52. Brent 5.2% to $78.02.' },
+  { date: '2026-07-14', k: 'war',     t: 2, h: 'Three tankers attacked in a single day; a seafarer killed', s: 'Stolt Magnesium, Mombasa B and Al Bahyah are struck. The IRGC says it targeted vessels using mined routes.' },
+  { date: '2026-07-23', k: 'war',     t: 2, h: 'Attacks on Saudi tankers; war-risk premiums hit 7.5–10%', s: 'Up from 1–3% weeks earlier and 0.25% before the war — $7.5–10M per voyage on a $100M hull.' },
+  { date: '2026-07-24', k: 'tariff',  t: 1, h: 'Section 122 surcharge expires by statute', s: 'Section 301 forced-labor tariffs at 10% and 12.5% become the operative regime.' },
+  { date: '2026-07-29', k: 'war',     t: 2, h: 'Escalation threats push Brent back above $90', s: 'Tanker attacks in the Strait continue and fighting spreads toward the Red Sea.' },
+  { date: '2026-08-01', k: 'context', t: 2, h: 'A month-long lull in US–Iran strikes begins', s: 'No large military exchanges in August. Thirteen merchant ships are struck anyway, and PortWatch counts single-digit daily transits against a pre-war 83.' },
+  { date: '2026-08-12', k: 'context', t: 1, h: 'July CPI: 3.4% headline, 2.5% core, energy +14.7%', s: 'Both ease a tenth from June. The breadth test still reads as a tail shock: median CPI 2.7%.' },
+  { date: '2026-08-13', k: 'context', t: 1, h: 'IEA: Gulf exports down 2.1 mb/d; world supply to fall 4.3 mb/d in 2026', s: 'The strait was “effectively closed again in early July”. Stocks have drawn 410 million barrels since February.' },
+  { date: '2026-08-18', k: 'war',     t: 2, h: 'MV Minoan Dignity struck, one crew killed', s: 'The same day the President says the strait is “open and operating”. Lloyd’s List counts about 14 transits a day, against roughly 100 before the war.' },
+  { date: '2026-08-25', k: 'policy',  t: 2, h: 'US Navy says it has cleared mines from the strait', s: 'Underwater drones identified more than 100 suspected mines. Transits do not recover: PortWatch counts four vessels that day.' },
+  { date: '2026-08-31', k: 'war',     t: 2, h: 'Saudi tanker Sidr struck; two crew killed', s: 'The deadliest attack of a month in which thirteen merchant ships were hit. WTI ends August at $87.03.' },
+  { date: '2026-09-01', k: 'war',     t: 2, h: 'US and Iran trade strikes; the August lull ends', s: 'WTI spot closes $91.48, up 5.1% on the day. Brent $96.02. A September Fed rate rise is now priced at better than even odds.' },
+  { date: '2026-09-02', k: 'context', t: 1, h: 'Dutch central bank confirms 86 tonnes of gold moved out of New York and Ottawa', s: '“In view of increasing geopolitical unrest.” New York’s share of Dutch reserves falls from 31% to 18.5%.' },
+  { date: '2026-09-04', k: 'context', t: 1, h: 'August payrolls +162,000, the best month in five', s: 'Unemployment 4.1%. Long-term unemployed 27% of the jobless. Hires 3.2%, quits 1.9%: still low-fire, low-hire.' },
+].map(e => ({ ...e, d: dayOf(e.date) }));
 
 export const KIND_COLOR = { war: '#FF5A4E', tariff: '#7A8CFF', policy: '#3FA96A', context: '#8A99A8' };
 
@@ -140,6 +204,17 @@ export function lerpKF(arr, day) {
 export function stepKF(arr, day) { let cur = arr[0]; for (const s of arr) if (day >= s.d) cur = s; return cur; }
 
 export function priceAt(day) {
+  /* Measured mode: hold the last close on or before `day`. Weekends and
+     holidays show Friday's close with a "market shut" caption -- that is a
+     real number with a real date, not an interpolation. */
+  if (TL.prices && TL.prices.length) {
+    const P = TL.prices;
+    if (day < P[0].d) return { v: P[0].v, exact: false, held: true, a: P[0] };
+    let lo = 0, hi = P.length - 1;
+    while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (P[mid].d <= day) lo = mid; else hi = mid - 1; }
+    const a = P[lo];
+    return { v: a.v, exact: Math.abs(day - a.d) < 0.55, held: Math.abs(day - a.d) >= 0.55, a };
+  }
   const A = ANCHORS;
   if (day <= A[0].d) return { v: A[0].v, exact: true, a: A[0] };
   for (let i = 1; i < A.length; i++) {
@@ -160,7 +235,42 @@ export function formatDay(day) {
     .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })
     .toUpperCase();
 }
-export function flowFrac(day) { return Math.max(0, Math.min(1, lerpKF(FLOW_KF, day) / 13.8)); }
+/** Trailing 7-day mean of measured transits ending on `day`, or null. */
+export function flowMean7(day) {
+  const F = TL.flow;
+  if (!F || !F.length) return null;
+  const last = Math.min(day, TL.lastFlowDay);
+  const win = F.filter(o => o.d <= last && o.d > last - 7);
+  if (!win.length) return null;
+  return win.reduce((s, o) => s + o.v, 0) / win.length;
+}
+
+export function flowFrac(day) {
+  if (TL.flow && TL.baseline) {
+    const m = flowMean7(day);
+    if (m !== null) return Math.max(0, Math.min(1, m / TL.baseline));
+  }
+  return Math.max(0, Math.min(1, lerpKF(FLOW_KF, day) / 13.8));
+}
+
+/** The transit readout: measured when PortWatch is wired, stepped otherwise. */
+export function flowRead(day) {
+  if (TL.flow && TL.baseline) {
+    const m = flowMean7(day);
+    if (m === null) return { val: '—', pct: 'no data yet', cap: 'IMF PortWatch series begins later.', known: false };
+    const pct = Math.round((m / TL.baseline) * 100);
+    const beyond = day > TL.lastFlowDay + 0.5;
+    const asOf = beyond ? ' · latest available, ' + formatDay(TL.lastFlowDay) : '';
+    return {
+      val: m.toFixed(1),
+      pct: pct + '% of pre-war',
+      cap: '7-day average of AIS-counted transits · pre-war ' + TL.baseline.toFixed(0) + ' a day · IMF PortWatch' + asOf,
+      known: true, closed: m / TL.baseline < 0.12,
+    };
+  }
+  const fr = stepKF(FLOW_READ, day);
+  return { ...fr, closed: fr.val === '0.0' };
+}
 
 /* Scrubber tick marks are DERIVED from EVENTS so they cannot drift out of sync
    with the ledger the way hard-coded percentages would. */
@@ -301,18 +411,25 @@ export class HormuzEngine {
   getReadout() {
     const d = this.day, pr = priceAt(d);
     const a = pr.a || {};
+    const measured = !!(TL.prices && TL.prices.length);
     const priceCaption = pr.exact
       ? (a.derived ? 'DERIVED \u00B7 \u221215% FROM THE PEAK'
         : a.approx ? 'APPROX. CLOSE \u00B7 ' + formatDay(a.d)
         : 'VERIFIED CLOSE \u00B7 ' + formatDay(a.d))
+      : measured ? (d > TL.lastPriceDay + 0.5 ? 'LAST PUBLISHED CLOSE \u00B7 ' + formatDay(a.d)
+                                             : 'MARKET SHUT \u00B7 LAST CLOSE ' + formatDay(a.d))
       : 'BETWEEN CLOSES \u00B7 DRAWN STRAIGHT';
-    const provenance = pr.exact ? (a.derived ? 'derived' : a.approx ? 'approx' : 'verified') : 'interpolated';
+    const provenance = pr.exact ? (a.derived ? 'derived' : a.approx ? 'approx' : 'verified')
+      : measured ? 'held' : 'interpolated';
 
-    const fr = stepKF(FLOW_READ, d);
+    const fr = flowRead(d);
     const rr = stepKF(RISK_READ, d);
     const ff = flowFrac(d);
-    const gate = ff > 0.97 ? { label: 'TRANSIT NORMAL', color: '#3FA96A' }
-      : ff < 0.06 ? { label: 'STRAIT CLOSED', color: '#D91E18' }
+    /* Measured counts are noisy day to day; a 7-day mean under three-quarters
+       of the pre-war average is not "normal" traffic. */
+    const NORMAL = TL.flow ? 0.6 : 0.97, CLOSED = TL.flow ? 0.12 : 0.06;
+    const gate = ff >= NORMAL ? { label: 'TRANSIT NORMAL', color: '#3FA96A' }
+      : ff < CLOSED ? { label: 'STRAIT CLOSED', color: '#D91E18' }
       : { label: 'PARTIAL TRANSIT', color: '#F5A300' };
 
     let idx = -1;
@@ -324,11 +441,13 @@ export class HormuzEngine {
       date: formatDay(d),
       /* Exact closes print two decimals; interpolated values print rounded
          integers. The precision IS the provenance signal — keep it. */
-      price: '$' + (pr.exact ? pr.v.toFixed(2) : Math.round(pr.v)),
+      /* A held close is still a verified two-decimal number; only an
+         interpolated one is rounded, because rounding IS the provenance signal. */
+      price: '$' + ((pr.exact || measured) ? pr.v.toFixed(2) : Math.round(pr.v)),
       priceCaption, provenance,
       priceDimmed: !pr.exact || !!a.derived || !!a.approx,
       flow: fr.val, flowPct: fr.pct, flowCaption: fr.cap,
-      flowColor: !fr.known ? '#7A8A95' : (fr.val === '0.0' ? '#D91E18' : '#3FA96A'),
+      flowColor: !fr.known ? '#7A8A95' : (fr.closed ? '#D91E18' : ff >= NORMAL ? '#3FA96A' : '#F5A300'),
       risk: rr.val, riskCaption: rr.cap,
       riskColor: rr.val === '\u2014' ? '#7A8A95' : '#F5A300',
       queue: String(this.queueCount),
@@ -728,13 +847,13 @@ export class HormuzEngine {
       ctx.fillStyle = '#5B6873'; ctx.fillText('$' + v, L - 7, Y(v) + 3);
     });
 
-    /* Pre-war level. The whole round-trip argument is measured against it. */
+    /* Pre-war level: the last close before the strike. The whole round-trip
+       argument is measured against it. */
+    const preWar = TL.prices && TL.prices.length ? priceAt(dayOf('2026-02-27')).v : 57.21;
     ctx.strokeStyle = 'rgba(244,237,224,.3)'; ctx.setLineDash([2, 4]); ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(L, Y(57.21)); ctx.lineTo(w - R, Y(57.21)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(L, Y(preWar)); ctx.lineTo(w - R, Y(preWar)); ctx.stroke(); ctx.setLineDash([]);
 
-    ctx.beginPath();
-    ANCHORS.forEach((a, i) => { i ? ctx.lineTo(X(a.d), Y(a.v)) : ctx.moveTo(X(a.d), Y(a.v)); });
-    ctx.strokeStyle = 'rgba(245,163,0,.16)'; ctx.lineWidth = 1.5; ctx.stroke();
+    const dNow = this.day, pn = priceAt(dNow), mode = this.o.gapTreatment;
 
     EVENTS.forEach(e => {
       if (e.k !== 'war') return;
@@ -743,9 +862,42 @@ export class HormuzEngine {
       ctx.beginPath(); ctx.moveTo(X(e.d), T + 4); ctx.lineTo(X(e.d), h - B); ctx.stroke();
     });
 
-    const dNow = this.day, pn = priceAt(dNow), mode = this.o.gapTreatment;
+    if (TL.prices && TL.prices.length) {
+      /* Measured mode: the whole daily path faintly, the played part bright.
+         No dashes -- every vertex is a verified close. */
+      const P = TL.prices;
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      P.forEach((p, i) => { i ? ctx.lineTo(X(p.d), Y(p.v)) : ctx.moveTo(X(p.d), Y(p.v)); });
+      ctx.strokeStyle = 'rgba(245,163,0,.16)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+      ctx.beginPath();
+      let started = false;
+      for (const p of P) {
+        if (p.d > dNow) break;
+        started ? ctx.lineTo(X(p.d), Y(p.v)) : ctx.moveTo(X(p.d), Y(p.v));
+        started = true;
+      }
+      if (started) { ctx.lineTo(X(Math.min(dNow, SPAN)), Y(pn.v)); }
+      ctx.strokeStyle = '#F5A300'; ctx.lineWidth = 2.4;
+      ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(245,163,0,.55)';
+      ctx.stroke(); ctx.shadowBlur = 0;
+
+      /* Event closes get a dot; drawing 170 dots would be noise. */
+      EVENTS.forEach(e => {
+        const pe = priceAt(e.d), on = e.d <= dNow;
+        ctx.beginPath(); ctx.arc(X(e.d), Y(pe.v), on ? 3.2 : 2, 0, 6.2832);
+        ctx.fillStyle = on ? '#F5A300' : 'rgba(245,163,0,.28)'; ctx.fill();
+        if (on) { ctx.strokeStyle = 'rgba(10,26,36,.9)'; ctx.lineWidth = 1.2; ctx.stroke(); }
+      });
+    }
+
+    ctx.beginPath();
+    if (!TL.prices) ANCHORS.forEach((a, i) => { i ? ctx.lineTo(X(a.d), Y(a.v)) : ctx.moveTo(X(a.d), Y(a.v)); });
+    ctx.strokeStyle = 'rgba(245,163,0,.16)'; ctx.lineWidth = 1.5; if (!TL.prices) ctx.stroke();
+
     ctx.lineJoin = 'round'; ctx.strokeStyle = '#F5A300';
-    for (let i = 1; i < ANCHORS.length && mode !== 'anchorsOnly'; i++) {
+    for (let i = 1; i < ANCHORS.length && mode !== 'anchorsOnly' && !TL.prices; i++) {
       const a = ANCHORS[i - 1], b = ANCHORS[i];
       if (a.d >= dNow) break;
       const endD = Math.min(b.d, dNow);
@@ -761,7 +913,7 @@ export class HormuzEngine {
     }
     ctx.setLineDash([]); ctx.shadowBlur = 0;
 
-    ANCHORS.forEach(a => {
+    if (!TL.prices) ANCHORS.forEach(a => {
       const on = a.d <= dNow;
       ctx.beginPath(); ctx.arc(X(a.d), Y(a.v), on ? 3.4 : 2.2, 0, 6.2832);
       ctx.fillStyle = on ? '#F5A300' : 'rgba(245,163,0,.28)'; ctx.fill();
@@ -772,9 +924,14 @@ export class HormuzEngine {
     ctx.beginPath(); ctx.moveTo(X(dNow), T); ctx.lineTo(X(dNow), h - B); ctx.stroke();
     ctx.beginPath(); ctx.arc(X(dNow), Y(pn.v), 4.4, 0, 6.2832); ctx.fillStyle = '#F4EDE0'; ctx.fill();
 
-    // Day offsets are month starts counted from 31 Dec 2025.
+    // Month labels derived from DAY0 and SPAN, so extending the span adds months.
     ctx.font = '600 9.5px "Chivo Mono", monospace'; ctx.fillStyle = '#5B6873'; ctx.textAlign = 'center';
-    [[1, 'JAN'], [32, 'FEB'], [60, 'MAR'], [91, 'APR'], [121, 'MAY'], [152, 'JUN'], [182, 'JUL'], [213, 'AUG']]
-      .forEach(([d, l]) => { if (w > 460 || ['JAN', 'APR', 'JUL'].indexOf(l) >= 0) ctx.fillText(l, X(d), h - 7); });
+    const NAMES = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    for (let m = 0; m < 24; m++) {
+      const d = Math.round((Date.UTC(2026, m, 1) - DAY0) / 86400000);
+      if (d > SPAN - 6) break;
+      const l = NAMES[m % 12];
+      if (w > 460 || ['JAN', 'APR', 'JUL', 'OCT'].indexOf(l) >= 0) ctx.fillText(l, X(d), h - 7);
+    }
   }
 }

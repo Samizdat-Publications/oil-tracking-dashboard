@@ -1,0 +1,419 @@
+{
+  "_meta": {
+    "as_of": "2026-09-05",
+    "note": "Figures the page uses that do not live on FRED. Every entry carries a source, a URL, a tier and an as-of date, and is mirrored in docs/THESIS.md (section 'September 2026 update'). TIER 1 = official statistics, central banks, IEA, IMF, WTO, Fed research. TIER 2 = Reuters, Bloomberg, FT, CNBC, S&P Global, Lloyd's List, Kpler, major outlets. TIER 3 is never load-bearing and does not appear here.",
+    "rule": "If a figure here disagrees with a FRED series in the snapshot, the FRED series wins and this entry must be corrected."
+  },
+
+  "gold": {
+    "fed_earmarked_gold": {
+      "name": "Gold held under earmark at the New York Fed for foreign and international accounts",
+      "source": "Federal Reserve, International Summary Statistics, Table 3.13 'Selected Foreign Official Assets Held at Federal Reserve Banks' (July 2026 release, provisional)",
+      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260731.htm",
+      "tier": 1,
+      "unit": "millions of US dollars at the statutory $42.22 per fine troy ounce",
+      "note": "The statutory valuation has not changed since 1973, so a change in this row is a change in OUNCES, not in price. Tonnes = usd_m / 42.22 * 31.1034768 / 1000.",
+      "points": [
+        { "date": "2025-08-01", "usd_m": 8034 },
+        { "date": "2025-09-01", "usd_m": 7986 },
+        { "date": "2025-10-01", "usd_m": 7952 },
+        { "date": "2025-11-01", "usd_m": 7912 },
+        { "date": "2025-12-01", "usd_m": 7899 },
+        { "date": "2026-01-01", "usd_m": 7879 },
+        { "date": "2026-02-01", "usd_m": 7879 },
+        { "date": "2026-03-01", "usd_m": 7872 },
+        { "date": "2026-04-01", "usd_m": 7852 },
+        { "date": "2026-05-01", "usd_m": 7839 },
+        { "date": "2026-06-01", "usd_m": 7818 }
+      ]
+    },
+    "fed_custody_treasuries": {
+      "name": "US Treasury securities held in custody at the Federal Reserve for foreign official and international accounts",
+      "source": "Federal Reserve, Table 3.13 (July 2026 release)",
+      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260731.htm",
+      "tier": 1,
+      "unit": "millions of US dollars, face value",
+      "points": [
+        { "date": "2025-12-01", "usd_m": 2713888 },
+        { "date": "2026-01-01", "usd_m": 2782557 },
+        { "date": "2026-02-01", "usd_m": 2775373 },
+        { "date": "2026-03-01", "usd_m": 2717909 },
+        { "date": "2026-04-01", "usd_m": 2725241 },
+        { "date": "2026-05-01", "usd_m": 2665990 },
+        { "date": "2026-06-01", "usd_m": 2616059 }
+      ]
+    },
+    "historical_custody": {
+      "name": "Foreign gold in New York Fed custody, long run",
+      "source": "Federal Reserve Bank of New York gold vault page; Fed Table 3.13 history",
+      "url": "https://www.newyorkfed.org/aboutthefed/goldvault",
+      "tier": 2,
+      "note": "Approximate. The 1971 figure is the commonly cited post-Bretton-Woods level; the Fed's own statement is that custody has declined since the beginning of the century.",
+      "points": [
+        { "date": "1971-08-01", "tonnes": 13000, "confidence": "approx" }
+      ]
+    },
+    "moves": [
+      {
+        "country": "Netherlands",
+        "bank": "De Nederlandsche Bank",
+        "tonnes": 86,
+        "from": "Federal Reserve Bank of New York and Bank of Canada (Ottawa)",
+        "to": "Bank of England, London",
+        "period": "March to August 2026",
+        "announced": "2026-09-02",
+        "before_share_new_york_pct": 31.3,
+        "after_share_new_york_pct": 18.5,
+        "total_reserves_tonnes": 612.4,
+        "quote": "in view of increasing geopolitical unrest",
+        "source": "DNB press release, 2 September 2026",
+        "url": "https://www.dnb.nl/en/general-news/press-release-2026/dnb-improves-tradability-of-gold-reserves",
+        "tier": 1
+      },
+      {
+        "country": "France",
+        "bank": "Banque de France",
+        "tonnes": 129,
+        "from": "Federal Reserve Bank of New York",
+        "to": "Paris",
+        "period": "July 2025 to January 2026",
+        "note": "Sold older-format bars in New York and bought London Good Delivery bars in Paris across 26 transactions; booked a gain of about EUR 12.8bn. No bar was physically shipped.",
+        "source": "Banque de France, as reported by Bloomberg and Yahoo Finance, 17 June 2026",
+        "url": "https://finance.yahoo.com/markets/commodities/articles/central-banks-pulling-gold-us-100215182.html",
+        "tier": 2
+      },
+      {
+        "country": "India",
+        "bank": "Reserve Bank of India",
+        "share_abroad_before_pct": 55,
+        "share_abroad_before_date": "2023-03",
+        "share_abroad_after_pct": 22,
+        "share_abroad_after_date": "2026-03",
+        "from": "Bank of England and Bank for International Settlements",
+        "to": "India",
+        "source": "RBI half-yearly report on management of foreign exchange reserves, as reported by Investing.com, June 2026",
+        "url": "https://www.investing.com/analysis/why-central-banks-are-bringing-gold-home-again-200678403",
+        "tier": 2
+      },
+      {
+        "country": "Germany",
+        "bank": "Deutsche Bundesbank",
+        "tonnes_at_new_york": 1236,
+        "total_reserves_tonnes": 3352,
+        "status": "Under political pressure to repatriate; no formal plan as of September 2026.",
+        "source": "Bundesbank storage disclosure; Bloomberg / Yahoo Finance, 17 June 2026",
+        "url": "https://finance.yahoo.com/markets/commodities/articles/central-banks-pulling-gold-us-100215182.html",
+        "tier": 2
+      }
+    ],
+    "ecb_reserve_shares": {
+      "name": "Gold vs US Treasuries as a share of global official reserves, end-2025",
+      "gold_pct": 27,
+      "treasuries_pct": 22,
+      "treasuries_pct_2024": 25,
+      "note": "ECB attributes the crossover mainly to valuation: gold rose about 60% in 2025 after about 30% in 2024. It also reports official Treasury custody at the New York Fed fell USD 82bn to USD 2.7tn in March 2026 as some central banks sold to defend their currencies after the war began.",
+      "source": "ECB, 'The international role of the euro', June 2026",
+      "url": "https://www.ecb.europa.eu/press/other-publications/ire/html/ecb.ire202606.en.html",
+      "tier": 1
+    },
+    "fed_counterpoint": {
+      "name": "Why gold did not actually overtake Treasuries as the world's favourite reserve asset",
+      "author": "Colin Weiss, Federal Reserve Board",
+      "date": "2026-09-03",
+      "world_gold_reserves_end_2025_usd_tn": 5.1,
+      "world_gold_ex_us_end_2025_usd_tn": 4.0,
+      "foreign_official_treasuries_end_2025_usd_tn": 3.9,
+      "finding": "The crossover is a valuation effect driven by private ETF demand since late 2024, not central bank accumulation; by June 2026 foreign official Treasury holdings again exceeded world gold reserves excluding the US in dollar terms. Five legacy holders (US, Germany, Italy, France, IMF) own 52% of official gold and have not added since the 1970s. Foreign officials bought roughly USD 200bn of Treasuries net between 2022 and April 2026.",
+      "source": "FEDS Notes",
+      "url": "https://www.federalreserve.gov/econres/notes/feds-notes/why-gold-didnt-actually-overtake-treasury-securities-as-the-worlds-favorite-reserve-asset-20260903.html",
+      "tier": 1
+    },
+    "gold_price": {
+      "record": { "date": "2026-01-28", "usd_oz": 5589.38 },
+      "latest": { "date": "2026-09-04", "usd_oz": 4470.66 },
+      "note": "No FRED series carries the LBMA price after 2022, so this is Tier 2. Gold is DOWN about a fifth from its January record; the custody story is about where gold sits, not what it costs.",
+      "source": "Trading Economics; CBS News, September 2026",
+      "url": "https://tradingeconomics.com/commodity/gold",
+      "tier": 2
+    },
+    "tic_foreign_holdings": {
+      "date": "2026-06",
+      "total_usd_tn": 9.3,
+      "change_in_month_usd_bn": -72.1,
+      "note": "Declines in three of the four months since the February 2026 record, led by Japan and China. Still the largest foreign holdings on record bar February.",
+      "source": "US Treasury, Treasury International Capital data for June 2026 (released 17 August 2026), as reported by Bloomberg",
+      "url": "https://home.treasury.gov/data/treasury-international-capital-tic-system",
+      "tier": 1
+    },
+    "wgc_survey": {
+      "expect_global_holdings_up_pct": 89,
+      "expect_own_holdings_up_pct": 45,
+      "note": "Record share planning to add. Survey of reserve managers.",
+      "source": "World Gold Council, 2026 Central Bank Gold Reserves Survey, June 2026",
+      "url": "https://www.kitco.com/news/article/2026-06-16/record-45-central-banks-plan-increase-gold-holdings-wgc-survey-finds",
+      "tier": 2
+    }
+  },
+
+  "trade": {
+    "wto": {
+      "name": "World merchandise trade volume growth",
+      "release": "2026-03-19",
+      "growth_2025_pct": 4.6,
+      "growth_2026_baseline_pct": 1.9,
+      "growth_2026_high_energy_pct": 1.4,
+      "growth_2027_pct": 2.6,
+      "october_2025_forecast_for_2026_pct": 0.5,
+      "gdp_hit_high_energy_pp": -0.3,
+      "hormuz_quote": "Traffic through the Strait of Hormuz collapsing from 138 commercial vessels per day to almost zero.",
+      "source": "WTO, Global Trade Outlook and Statistics, March 2026",
+      "url": "https://www.wto.org/english/news_e/news26_e/stat_19mar26_329_e.htm",
+      "tier": 1
+    },
+    "iea_august_omr": {
+      "name": "IEA Oil Market Report, August 2026",
+      "release": "2026-08-13",
+      "world_demand_change_2026_mbd": -1.6,
+      "world_supply_change_2026_mbd": -4.3,
+      "world_supply_2026_mbd": 102,
+      "gulf_shut_in_mbd": 8.3,
+      "regional_exports_change_mbd": -2.1,
+      "regional_exports_mbd": 15,
+      "stock_draw_feb_to_jul_mb": 410,
+      "stock_draw_feb_to_jul_mbd": 2.7,
+      "dated_brent_end_july_usd": 96.80,
+      "dated_brent_spike_23_july_usd": 105,
+      "diesel_export_disruption_mbd": 1.3,
+      "jet_export_disruption_mbd": 0.67,
+      "note": "The strait was 'effectively closed again in early July'. Demand contracted 4.9 mb/d year on year in Q2 and 2.8 mb/d in Q3.",
+      "source": "IEA",
+      "url": "https://www.iea.org/reports/oil-market-report-august-2026",
+      "tier": 1
+    },
+    "drewry_wci": {
+      "date": "2026-09-03",
+      "composite_usd_per_40ft": 4465,
+      "shanghai_jebel_ali_usd": 8254,
+      "shanghai_jebel_ali_wow_pct": 6,
+      "shanghai_los_angeles_usd": 7185,
+      "shanghai_rotterdam_usd": 4092,
+      "source": "Drewry World Container Index, 3 September 2026",
+      "url": "https://www.drewry.co.uk/supply-chain-advisors/supply-chain-expertise/world-container-index-assessed-by-drewry",
+      "tier": 2
+    },
+    "iata": {
+      "date": "2026-06-07",
+      "net_profit_2026_usd_bn": 23.0,
+      "net_profit_2026_prior_forecast_usd_bn": 41,
+      "net_profit_2025_usd_bn": 45,
+      "jet_fuel_2026_usd_bbl": 152,
+      "jet_fuel_2025_usd_bbl": 90,
+      "fuel_bill_2026_usd_bn": 350,
+      "fuel_bill_2025_usd_bn": 252,
+      "source": "IATA press release, 7 June 2026",
+      "url": "https://www.iata.org/en/pressroom/2026-releases/06-07-middle-east-disruptions-high-fuel-prices-halve-airline-industry-profitability/",
+      "tier": 2
+    },
+    "us_trade_july": {
+      "release": "2026-09-03",
+      "deficit_usd_bn": 88.6,
+      "prior_month_deficit_usd_bn": 71.2,
+      "imports_usd_bn": 399.3,
+      "exports_usd_bn": 310.7,
+      "goods_deficit_usd_bn": 119.6,
+      "ytd_deficit_change_pct": -29.6,
+      "source": "BEA / Census, U.S. International Trade in Goods and Services, July 2026",
+      "url": "https://www.bea.gov/news/2026/us-international-trade-goods-and-services-july-2026",
+      "tier": 1
+    }
+  },
+
+  "war": {
+    "transits_kpler": {
+      "date": "2026-09-02",
+      "ten_day_avg_vessels_per_day": 13,
+      "note": "Six vessels on 2 Sep, eleven on 1 Sep, five on 31 Aug.",
+      "source": "Kpler, as reported by Al Jazeera, 3 September 2026",
+      "url": "https://www.aljazeera.com/news/2026/9/3/how-much-oil-is-going-through-hormuz-how-data-doesnt-match-us-claims",
+      "tier": 2
+    },
+    "transits_lloyds": {
+      "week_ending": "2026-09-01",
+      "avg_transits_per_day": 12,
+      "prewar_transits_per_day": 100,
+      "prewar_oil_mbd": 20,
+      "source": "Lloyd's List Intelligence, as reported by Al Jazeera, 3 September 2026",
+      "url": "https://www.aljazeera.com/news/2026/9/3/how-much-oil-is-going-through-hormuz-how-data-doesnt-match-us-claims",
+      "tier": 2
+    },
+    "us_claims": {
+      "president_quote": "some 30 ships pass through Hormuz every night",
+      "president_quote_date": "late August 2026",
+      "officials_claim": "40 commercial ships carrying some 18 million barrels passed through on Tuesday 1 September",
+      "treasury_secretary_claim": "at least 10 million barrels a day",
+      "note": "Analysts told Al Jazeera the official counts appear to include naval auxiliaries, tugs, coastal craft and vessels transmitting no AIS position.",
+      "source": "Al Jazeera, 3 September 2026, citing CNN and Treasury remarks",
+      "url": "https://www.aljazeera.com/news/2026/9/3/how-much-oil-is-going-through-hormuz-how-data-doesnt-match-us-claims",
+      "tier": 2
+    },
+    "august_attacks": {
+      "vessels_struck_in_august": 13,
+      "seafarers_killed_31_aug": 2,
+      "vessel_31_aug": "MT Sidr (Saudi crude tanker)",
+      "vessel_18_aug": "MV Minoan Dignity (one crew killed)",
+      "source": "USNI News, 4 September 2026 and 21 August 2026; CNBC, 18 August 2026",
+      "url": "https://news.usni.org/2026/09/04/u-s-iran-trade-strikes-in-strait-of-hormuz-as-both-battle-on-social-media",
+      "tier": 2
+    },
+    "mines_cleared": {
+      "date": "2026-08-25",
+      "suspected_mines_identified": 100,
+      "note": "US officials confirmed the Navy had cleared mines from the strait; underwater drones identified more than 100 suspected mines.",
+      "source": "US officials, as summarised from contemporaneous CNN/Reuters reporting",
+      "url": "https://en.wikipedia.org/wiki/2026_Iran_war",
+      "tier": 2
+    },
+    "war_risk_premium": {
+      "date": "2026-07-22",
+      "pct_of_hull_low": 7.5,
+      "pct_of_hull_high": 10,
+      "prewar_pct_of_hull": 0.25,
+      "note": "Marsh: 'few shipowners seem to be buying policies at that level'. No published reading for August.",
+      "source": "Marsh, via S&P Global Commodity Insights, 22 July 2026; i-law, late July 2026",
+      "url": "https://www.spglobal.com/energy/en/news-research/latest-news/shipping/072226-middle-east-shipping-insurance-costs-rise-on-hormuz-risks-marsh",
+      "tier": 2
+    },
+    "lull": {
+      "start": "2026-08-01",
+      "end": "2026-09-01",
+      "note": "A month-long lull in US-Iran military exchanges; attacks on merchant ships continued throughout. Ended with renewed strikes in the first days of September.",
+      "source": "CNN, 4 September 2026; USNI News, 4 September 2026",
+      "url": "https://news.usni.org/2026/09/04/u-s-iran-trade-strikes-in-strait-of-hormuz-as-both-battle-on-social-media",
+      "tier": 2
+    }
+  },
+
+  "prices": {
+    "aaa_labor_day": {
+      "date": "2026-09-04",
+      "usd_per_gal": 4.15,
+      "note": "First Labor Day weekend on record with the national average above $4.",
+      "source": "AAA",
+      "url": "https://gasprices.aaa.com/",
+      "tier": 2
+    },
+    "diesel_record": {
+      "date": "2026-09-04",
+      "usd_per_gal": 5.85,
+      "prior_record_usd": 5.82,
+      "prior_record_date": "2022-06",
+      "note": "GasBuddy daily tracker. The EIA weekly survey (FRED GASDESW), which the page uses for the bar, read $5.65 on 24 August, itself a series record.",
+      "source": "GasBuddy, via Yahoo Finance, 4 September 2026",
+      "url": "https://finance.yahoo.com/energy/articles/national-diesel-price-reaches-time-163250834.html",
+      "tier": 2
+    }
+  },
+
+  "rates": {
+    "fedwatch_september_hike": {
+      "date": "2026-08-28",
+      "probability_pct": 57.5,
+      "prior_day_pct": 35.4,
+      "note": "Probability of a 25bp increase at the September FOMC after Chair Kevin Warsh's Jackson Hole remarks that underlying inflation had not 'meaningfully improved'.",
+      "source": "CME FedWatch, as reported by ATFX / Marketplace, late August 2026",
+      "url": "https://www.marketplace.org/story/2026/08/31/will-the-fed-raise-rates-at-september-fomc-meeting",
+      "tier": 2
+    }
+  },
+
+  "labour": {
+    "august_payrolls": {
+      "release": "2026-09-04",
+      "change": 162000,
+      "consensus": 53000,
+      "july_revised": 21000,
+      "june_revised": 31000,
+      "unemployment_rate_pct": 4.1,
+      "long_term_unemployed_share_pct": 27.0,
+      "long_term_unemployed_millions": 1.93,
+      "ahe_yoy_pct": 3.1,
+      "note": "Best month in five. Leisure and hospitality led; information lost jobs.",
+      "source": "BLS, The Employment Situation, August 2026",
+      "url": "https://www.bls.gov/news.release/empsit.nr0.htm",
+      "tier": 1
+    },
+    "jolts_july": {
+      "release": "2026-09-01",
+      "openings_m": 7.27,
+      "hires_rate_pct": 3.2,
+      "quits_rate_pct": 1.9,
+      "source": "BLS, Job Openings and Labor Turnover, July 2026",
+      "url": "https://www.bls.gov/news.release/jolts.nr0.htm",
+      "tier": 1
+    }
+  },
+
+  "sentiment": {
+    "umich_august": {
+      "release": "2026-08-28",
+      "index": 51.7,
+      "index_jan_2025": 71.7,
+      "expectations_1y_pct": 4.0,
+      "expectations_1y_feb_2026_pct": 3.4,
+      "expectations_long_run_pct": 3.3,
+      "share_expect_income_to_beat_inflation_pct": 8,
+      "share_expect_income_to_beat_inflation_dec_2024_pct": 18,
+      "quote": "sentiment declines in August were seen for all political groups and were particularly acute among Republicans",
+      "source": "University of Michigan Surveys of Consumers, final August 2026",
+      "url": "https://www.sca.isr.umich.edu/",
+      "tier": 1
+    }
+  },
+
+  "inflation": {
+    "euro_area_flash_august": {
+      "release": "2026-09-01",
+      "headline_pct": 3.3,
+      "july_pct": 2.9,
+      "energy_pct": 14.3,
+      "energy_july_pct": 10.3,
+      "source": "Eurostat flash estimate",
+      "url": "https://ec.europa.eu/eurostat/web/products-euro-indicators/w/2-01092026-ap",
+      "tier": 1
+    },
+    "us_july_cpi": {
+      "release": "2026-08-12",
+      "headline_pct": 3.4,
+      "core_pct": 2.5,
+      "energy_pct": 14.7,
+      "source": "BLS, Consumer Price Index, July 2026",
+      "url": "https://www.bls.gov/news.release/cpi.nr0.htm",
+      "tier": 1
+    },
+    "us_july_pce": {
+      "release": "2026-08-26",
+      "headline_pct": 3.7,
+      "core_pct": 3.3,
+      "source": "BEA, Personal Income and Outlays, July 2026",
+      "url": "https://www.bea.gov/news/2026/personal-income-and-outlays-july-2026",
+      "tier": 1
+    }
+  },
+
+  "research": {
+    "dallas_fed_wp2624": {
+      "title": "The Incidence of Fuel-Price Shocks and Tax Holidays: Evidence from the 2026 Oil Shock",
+      "finding": "The 2026 Iran war raised gasoline expenditure shares 2.9 times more in the lowest-income census tracts than in the highest; pre-shock exposure explains 89% of the gap.",
+      "source": "Dallas Fed Working Paper 2624 (Bradt & Taylor)",
+      "url": "https://www.dallasfed.org/research/papers/2026/wp2624",
+      "tier": 1
+    },
+    "dallas_fed_0417": {
+      "title": "Implications of the Iran war for U.S. inflation",
+      "date": "2026-04-17",
+      "finding": "Current scenario: headline PCE +0.6pp and core +0.2pp Q4/Q4 2026; a three-quarter closure lifts headline by 1.1pp. Long-run expectations effect 'negligible'.",
+      "url": "https://www.dallasfed.org/research/economics/2026/0417",
+      "tier": 1
+    }
+  }
+}

@@ -9,6 +9,48 @@ Oil Price Tracking Dashboard — a full-stack app that visualizes how oil price 
 **Repo:** github.com/Samizdat-Publications/oil-tracking-dashboard
 **Iran War baseline date:** 2026-02-28 (constant `IRAN_WAR_DATE` in `lib/commodity-data.ts`)
 
+
+## V4 ledger (the page at `/`) — read this first
+
+The default route is `frontend/src/pages/LedgerPage.tsx`, the V4 "ledger". Everything
+above about sections, Plotly, Zustand and the ticker describes the legacy V1 dashboard
+(`?view=dashboard`) and is kept for that view only.
+
+**Nothing on the V4 page is typed in.** `frontend/src/v4/ledger-data.ts` derives a
+`Figures` object from `frontend/public/data-snapshot.json`; the page renders it. To update
+the site after new data:
+
+```bash
+cd backend  && py scripts/build_snapshot.py     # FRED + IMF PortWatch + context JSON
+cd frontend && npm run build                     # tsc, vite, og.png from the snapshot
+```
+
+Then commit and push. Do not edit numbers in JSX; if a figure is wrong, fix the series
+or `backend/data/context_figures.json` and rebuild.
+
+**Snapshot blocks:** `international`, `staples`, `jobs`, `breadth`, `scorecard`,
+`event_study`, `receipt`, `administrations`, `macro` (services/macro.py: latest /
+handover / pre-war per series, 12-month changes by calendar month), `crude_daily`,
+`hormuz_transits` (services/portwatch.py, IMF PortWatch chokepoint6, baseline 83.1
+vessels/day), `war_milestones`, `context` (curated tiered figures not on FRED; every
+entry has source, url, tier; mirrored in docs/THESIS.md).
+
+**The simulation** (`src/v4/hormuz/engine.js`) runs on `configureTimeline({prices,
+transits})`. `EVENTS` and `RISK_READ` are dated ISO strings; day offsets are derived.
+`SPAN` is `export let` and extends to the latest close / transit / event. Do not rewrite
+the drawing maths or coastline arrays.
+
+**Screenshots for the README:** `npx vite preview --port 4193` then
+`node scripts/shoot.mjs http://localhost:4193/ ../docs/screenshots`.
+
+**Section ids** (for shoot.mjs and anchors): masthead, shelf, crossing, choices, work,
+squeeze, gold, trade, strait, other-side, sources.
+
+**Rules that are load-bearing:** zero fabrication; rows that cut against the argument
+stay at full size; war and tariff effects are never summed; no queue count; official
+claims are drawn next to measured data and labelled as claims; the crude peak is
+$114.58 on 7 Apr 2026 (the series), not $114.01.
+
 ## Commands
 
 **Backend (FastAPI, port 8000):**

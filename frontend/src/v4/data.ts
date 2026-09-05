@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- the snapshot is untyped JSON straight from the endpoints. */
 /**
  * V4 data layer.
  *
@@ -46,6 +47,9 @@ const ENDPOINTS = {
   scorecard: '/scorecard',
   event_study: '/event-study',
   receipt: '/receipt',
+  macro: '/macro',
+  context: '/context',
+  hormuz_transits: '/hormuz-transits',
 } as const;
 
 export type SnapshotKey = keyof typeof ENDPOINTS | 'administrations' | 'crude_daily' | 'war_milestones';
@@ -108,6 +112,24 @@ export async function getData(key: SnapshotKey, metric?: string): Promise<any> {
   return snap[key] ?? null;
 }
 
+/**
+ * Everything the ledger page needs, in one object keyed like the snapshot.
+ *
+ * In snapshot mode this is the snapshot itself. In API mode it fans out to the
+ * live endpoints and reassembles the same shape, so the page code is identical
+ * either way. `crude_daily` and `war_milestones` have no attribution endpoint;
+ * in API mode they come from the committed snapshot as a fallback.
+ */
+export async function getAll(): Promise<Record<string, any>> {
+  if (SOURCE !== 'api') return loadSnapshot();
+  const keys = Object.keys(ENDPOINTS) as (keyof typeof ENDPOINTS)[];
+  const live = await Promise.all(keys.map((k) => fromApi(ENDPOINTS[k]).catch(() => null)));
+  const snap = await loadSnapshot().catch(() => ({}));
+  const out: Record<string, any> = { ...snap };
+  keys.forEach((k, i) => { if (live[i]) out[k] = live[i]; });
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Provenance
 // ---------------------------------------------------------------------------
@@ -116,7 +138,7 @@ export const PROVENANCE = {
   brief: 'docs/design-briefs/2026-08-03-v4-economic-decline.md',
   thesis: 'docs/THESIS.md',
   snapshot: 'frontend/public/data-snapshot.json',
-  asOf: 'June 2026',
+  asOf: 'July 2026 (CPI) · August 2026 (jobs) · daily to the latest close',
 } as const;
 
 /**

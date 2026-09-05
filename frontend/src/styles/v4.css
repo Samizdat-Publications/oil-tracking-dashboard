@@ -402,3 +402,112 @@
 @media (prefers-reduced-motion: reduce) {
   .tk-inner { animation: none; }
 }
+
+/* ======================================================================
+   September 2026 additions. Same three rules: zero radius, hard offsets,
+   halftone grounds. Nothing here re-declares a token.
+   ====================================================================== */
+
+/* §02 card source line */
+.card-src { color: #8A7F6E; margin: 10px 0 0; }
+
+/* §06 the squeeze */
+.sq-grid { margin-bottom: clamp(14px, 2.2cqi, 26px); }
+.sq-tile {
+  border: 3px solid var(--ink); background: var(--paper);
+  padding: clamp(14px, 2cqi, 22px); display: flex; flex-direction: column; gap: 7px;
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--crimson);
+}
+.sq-tile.sq-good { box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--poster-blue); }
+.sq-k { color: #6B6053; }
+.sq-v { color: var(--ink); font-variant-numeric: tabular-nums; }
+.sq-bad .sq-v { color: var(--crimson); }
+.sq-good .sq-v { color: var(--poster-blue); }
+.sq-from { color: #6B6053; }
+.sq-w { color: #4A4238; margin: 4px 0 0; }
+
+/* §07 gold */
+.gold-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: clamp(14px, 2.6cqi, 40px);
+  margin-bottom: clamp(16px, 2.4cqi, 30px);
+}
+.gold-vault > .t-label { display: block; color: #A99C89; margin-bottom: clamp(10px, 1.6cqi, 18px); }
+.vault-big { display: flex; flex-wrap: wrap; align-items: baseline; gap: clamp(8px, 1.4cqi, 18px); margin-bottom: clamp(12px, 1.8cqi, 20px); }
+.vault-n { color: var(--amber); font-variant-numeric: tabular-nums; }
+.vault-cap { color: #C9BFAF; }
+.vault-bars {
+  display: flex; align-items: flex-start; gap: clamp(4px, .8cqi, 10px);
+  height: clamp(120px, 15cqi, 190px);
+  border-top: 3px solid var(--amber);
+  padding-top: 6px;
+}
+.vault-col { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; height: 100%; min-width: 0; }
+.vault-v { color: var(--paper); font-variant-numeric: tabular-nums; margin-bottom: 4px; white-space: nowrap; }
+.vault-track { flex: 1; width: 100%; display: flex; align-items: flex-start; }
+/* Bars hang DOWN from the axis: gold leaving. transform-origin top. */
+.vault-bar { display: block; width: 100%; background: var(--amber); transform-origin: top; }
+.vault-m { color: #A99C89; margin-top: 6px; }
+.vault-note { color: #A99C89; margin: 10px 0 0; }
+
+.gold-tres { padding: clamp(12px, 1.8cqi, 20px); background: rgba(244,237,224,.04); }
+.gold-tres > .t-label { display: block; color: #A99C89; margin-bottom: clamp(10px, 1.4cqi, 14px); }
+.tres-bars { display: flex; flex-direction: column; gap: 6px; }
+.tres-col { display: grid; grid-template-columns: 38px 1fr 56px; align-items: center; gap: 8px; }
+.tres-m { color: #A99C89; }
+.tres-track { display: block; height: clamp(12px, 1.4cqi, 18px); background: rgba(244,237,224,.1); overflow: hidden; }
+.tres-bar { display: block; height: 100%; }
+.tres-bar.is-neg { background: var(--crimson); }
+.tres-bar.is-pos { background: #BFD0FF; }
+.tres-v { font-variant-numeric: tabular-nums; text-align: right; }
+.tres-v.is-neg { color: #FF8A80; }
+.tres-v.is-pos { color: #BFD0FF; }
+.tres-cap { color: rgba(244,237,224,.78); margin: 12px 0 0; }
+
+.gold-moves { margin-bottom: clamp(16px, 2.4cqi, 30px); }
+.move-card { padding: clamp(14px, 2cqi, 22px); display: flex; flex-direction: column; gap: 7px; box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--amber); }
+.move-k { color: var(--poster-blue); }
+.move-v { color: var(--ink); font-variant-numeric: tabular-nums; }
+.move-l { color: var(--ink); }
+.move-w { color: #4A4238; margin: 4px 0 0; }
+.sec-ink .honest { margin-top: 0; }
+
+/* §08 trade */
+.trade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: clamp(14px, 2.6cqi, 40px);
+  margin-bottom: clamp(16px, 2.4cqi, 30px);
+}
+.trade-panel { padding: clamp(12px, 1.8cqi, 20px); background: rgba(6,18,24,.28); }
+.trade-panel > .t-label { display: block; color: #BFD0FF; margin-bottom: clamp(10px, 1.6cqi, 18px); }
+.trade-cols { display: flex; align-items: flex-end; gap: clamp(10px, 1.8cqi, 22px); height: clamp(150px, 18cqi, 240px); }
+.tcol { flex: 1 1 0; height: 100%; display: flex; flex-direction: column; min-width: 0; }
+.tcol-v { color: var(--paper); font-variant-numeric: tabular-nums; margin-bottom: 6px; white-space: nowrap; }
+.tcol-track { flex: 1; display: flex; align-items: flex-end; }
+.tcol-bar { display: block; width: 100%; }
+.col-was { background: #8A7F6E; border-top: 5px solid #C9BFAF; }
+.col-amber { background: var(--amber); border-top: 5px solid var(--paper); }
+.col-crimson { background: var(--crimson); border-top: 5px solid var(--paper); }
+.tcol-l { display: block; margin-top: 8px; color: #BFD0FF; line-height: 1.4; }
+.trade-cap { color: #DCE4FF; margin: 12px 0 0; }
+.transit-rows { display: flex; flex-direction: column; gap: clamp(8px, 1.1cqi, 13px); }
+.sec-blue .bar-k { color: #BFD0FF; }
+.fill-claim { background: repeating-linear-gradient(45deg, #BFD0FF 0 6px, transparent 6px 12px); }
+
+.trade-tiles { margin-bottom: clamp(14px, 2.2cqi, 26px); }
+.ttile {
+  border: 3px solid rgba(244,237,224,.25); padding: clamp(12px, 1.8cqi, 20px);
+  display: flex; flex-direction: column; gap: 6px; background: rgba(6,18,24,.2);
+}
+.ttile-k { color: #BFD0FF; }
+.ttile-v { color: var(--amber); font-variant-numeric: tabular-nums; }
+.ttile-w { color: #DCE4FF; margin: 4px 0 0; }
+
+/* §09 strait legend note */
+.hz-legend-note { color: #8A99A8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v4-root .vault-bar, .v4-root .tcol-bar { transform: none !important; }
+}

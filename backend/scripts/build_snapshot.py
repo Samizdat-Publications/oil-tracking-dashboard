@@ -17,22 +17,25 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 import os
 import sys
 import time
+from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import numpy as np  # noqa: E402
 
 from services import attribution as A  # noqa: E402
 from services.cache import close_cache, init_cache  # noqa: E402
 from services.fred_client import get_series  # noqa: E402
+from services.macro import macro_snapshot  # noqa: E402
+from services.portwatch import get_hormuz_transits  # noqa: E402
 
-import math  # noqa: E402
-
-import numpy as np  # noqa: E402
-
-OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                   "..", "frontend", "public", "data-snapshot.json")
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, "..", "frontend", "public", "data-snapshot.json")
+DATA = os.path.join(ROOT, "data")
 
 
 def to_json_safe(obj):
@@ -57,8 +60,14 @@ def to_json_safe(obj):
         return None
     return obj
 
+
 ADMIN_METRICS = ["jobs", "cpi_headline", "gasoline_ap", "beef_ground",
                  "real_earnings", "unemployment", "sp500"]
+
+
+def _load_json(name: str):
+    with open(os.path.join(DATA, name), encoding="utf-8") as fh:
+        return json.load(fh)
 
 
 async def build() -> dict:
@@ -72,6 +81,7 @@ async def build() -> dict:
         ("scorecard", A.scorecard()),
         ("event_study", A.war_event_study("wti")),
         ("receipt", A.receipt(miles_per_week=240, household_size=2)),
+        ("macro", macro_snapshot()),
     ]:
         print(f"  {name} ...", flush=True)
         snap[name] = await coro
@@ -81,9 +91,9 @@ async def build() -> dict:
         print(f"  administrations/{m} ...", flush=True)
         snap["administrations"][m] = await A.administrations(m)
 
-    # Daily crude for the strait simulation. Design fell back to a handful of
-    # anchors with straight lines between them because this was not wired; real
-    # dailies remove that caveat and the "DRAWN STRAIGHT BETWEEN CLOSES" legend.
+    # Daily crude for the masthead chart and the strait simulation. The first
+    # build of the page drew straight lines between four verified closes because
+    # this was not wired; the dailies remove that caveat.
     print("  crude_daily ...", flush=True)
     obs = await get_series("DCOILWTICO", "2025-01-01")
     snap["crude_daily"] = {
@@ -94,20 +104,31 @@ async def build() -> dict:
         "note": ("Cushing SPOT, not front-month futures. Press figures for 8 Jul 2026 "
                  "quote $73.52 from the futures contract; spot closed $74.56. Both are "
                  "correct and they are different instruments -- do not mix them on one "
-                 "chart."),
+                 "chart. The spot peak is $114.58 on 7 Apr 2026, the day the first "
+                 "ceasefire was announced; an earlier version of the page quoted "
+                 "$114.01 on 6 Apr, which is the previous day's close."),
         "observations": obs,
     }
 
-    milestones_path = os.path.join(os.path.dirname(os.path.dirname(
-        os.path.abspath(__file__))), "data", "war_milestones.json")
-    with open(milestones_path, encoding="utf-8") as fh:
-        snap["war_milestones"] = json.load(fh)
+    # IMF PortWatch: measured daily transits. This is what turns the vessel layer
+    # from illustrative into a real series. Failure here is loud, not silent --
+    # the page would otherwise fall back to the stepped IEA figures and say so.
+    print("  hormuz_transits ...", flush=True)
+    try:
+        snap["hormuz_transits"] = await get_hormuz_transits("2025-01-01")
+    except Exception as exc:
+        print(f"    PortWatch unavailable: {exc}", flush=True)
+        snap["hormuz_transits"] = None
+
+    snap["war_milestones"] = _load_json("war_milestones.json")
+    snap["context"] = _load_json("context_figures.json")
 
     snap["_meta"] = {
-        "generated": "2026-08-07",
+        "generated": date.today().isoformat(),
         "note": ("Real endpoint responses. Shape matches /api/attribution/<key> "
                  "exactly, so the frontend can swap snapshot -> api with no other "
-                 "change."),
+                 "change. `context` mirrors data/context_figures.json: curated, "
+                 "tiered figures that do not live on FRED."),
         "endpoints": sorted(k for k in snap if not k.startswith("_")),
     }
     return snap
@@ -129,10 +150,6 @@ async def main() -> None:
     # client takes a hard lock: replace, unlink and rename all fail with
     # WinError 5. An earlier version's cleanup handler then deleted the
     # freshly-built temp file on the way out, losing the good data.
-    #
-    # Building the payload first shrinks the window in which the target is
-    # inconsistent from "the whole fetch" (minutes) to one write call
-    # (milliseconds), which is the trade that matters here.
     payload = json.dumps(to_json_safe(snap), separators=(",", ":"),
                          allow_nan=False)
     json.loads(payload)  # fail here, not in the browser
@@ -160,6 +177,9 @@ async def main() -> None:
     print(f"\nwrote {target} ({os.path.getsize(target):,} bytes)")
     print(f"keys: {', '.join(snap['_meta']['endpoints'])}")
     print(f"crude daily closes: {len(snap['crude_daily']['observations'])}")
+    ht = snap.get("hormuz_transits")
+    if ht:
+        print(f"hormuz transits: {len(ht['observations'])} days, latest {ht['latest']}")
 
 
 if __name__ == "__main__":

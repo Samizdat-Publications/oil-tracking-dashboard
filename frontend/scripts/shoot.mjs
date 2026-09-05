@@ -21,9 +21,12 @@ const SECTIONS = [
   ['crossing',   '03-crossing'],
   ['choices',    '04-choices'],
   ['work',       '05-work'],
-  ['other-side', '06-other-side'],
-  ['strait',     '07-strait'],
-  ['sources',    '08-sources'],
+  ['squeeze',    '06-squeeze'],
+  ['gold',       '07-gold'],
+  ['trade',      '08-trade'],
+  ['strait',     '09-strait'],
+  ['other-side', '10-other-side'],
+  ['sources',    '11-sources'],
 ];
 
 await mkdir(OUT, { recursive: true });
@@ -40,6 +43,7 @@ const page = await browser.newPage({
   reducedMotion: 'reduce',
 });
 await page.goto(BASE, { waitUntil: 'networkidle' });
+await page.waitForSelector('#sources', { timeout: 30000 }); // sections mount after the snapshot loads
 await page.waitForTimeout(1200); // canvases settle
 
 for (const [id, name] of SECTIONS) {
@@ -58,8 +62,9 @@ const m = await browser.newPage({
   reducedMotion: 'reduce',
 });
 await m.goto(BASE, { waitUntil: 'networkidle' });
+await m.waitForSelector('#sources', { timeout: 30000 });
 await m.waitForTimeout(1200);
-for (const [id, name] of [['masthead', 'm-01-masthead'], ['work', 'm-05-work'], ['strait', 'm-07-strait']]) {
+for (const [id, name] of [['masthead', 'm-01-masthead'], ['work', 'm-05-work'], ['gold', 'm-07-gold'], ['strait', 'm-09-strait']]) {
   const el = m.locator(`#${id}`);
   await el.scrollIntoViewIfNeeded();
   await m.waitForTimeout(400);

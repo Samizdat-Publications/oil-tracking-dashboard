@@ -232,3 +232,49 @@ async def methodology():
             "import-content weight per CPI category is available to us.",
         ],
     }
+
+
+@router.get("/macro")
+async def macro():
+    """Point-in-time readouts for the ledger page: latest, handover, pre-war.
+
+    Cached for a day rather than a week -- several inputs are daily.
+    """
+    key = f"attr:{ATTR_VERSION}:macro"
+    try:
+        hit = await get_cached(key, "-", "-", ttl=86400)
+        if hit is not None:
+            return hit
+    except Exception as exc:
+        log.warning("attribution cache read failed for macro: %s", exc)
+    from services.macro import macro_snapshot
+
+    result = await macro_snapshot()
+    try:
+        await set_cached(key, "-", "-", result)
+    except Exception as exc:
+        log.warning("attribution cache write failed for macro: %s", exc)
+    return result
+
+
+@router.get("/hormuz-transits")
+async def hormuz_transits():
+    """IMF PortWatch daily vessel transits through the Strait of Hormuz."""
+    from services.portwatch import get_hormuz_transits
+
+    return await get_hormuz_transits()
+
+
+@router.get("/context")
+async def context():
+    """Curated, tiered figures that do not live on FRED.
+
+    Static JSON, every entry sourced and dated. See data/context_figures.json.
+    """
+    import json
+    import os
+
+    path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                        "data", "context_figures.json")
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)

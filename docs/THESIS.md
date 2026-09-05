@@ -95,7 +95,7 @@ The identification isn't a model, it's a reversal. Verified from FRED:
 |---|---|---|
 | 2026-01-02 | **$57.21** | 12-month low, falling for a year |
 | 2026-02-28 | — | US/Israel strike Iran; Hormuz closes |
-| 2026-04-06 | **$114.01** | peak |
+| 2026-04-07 | **$114.58** | peak (corrected Sep 2026; 6 Apr closed $114.01) |
 | 2026-06-18 | — | 60-day ceasefire / MoU |
 | **2026-07-01** | **$69.74** | **fully round-trips to pre-war** |
 | 2026-07-08 | — | US strikes resume; ceasefire "over" |
@@ -423,7 +423,7 @@ barrels that could not be delivered. Wedge closed to **$3/bbl** by early May (IE
 
 ### Price anchors — TIER 1 (FRED `DCOILWTICO`, Cushing spot)
 
-2025 close $57.70 · 2026-01-02 **$57.21** · 2026-02-27 $66.96 · 2026-04-06 peak **$114.01** ·
+2025 close $57.70 · 2026-01-02 **$57.21** · 2026-02-27 $66.96 · 2026-04-07 peak **$114.58** (6 Apr $114.01) ·
 2026-07-01 **$69.74** · 2026-07-07 $71.53 · **2026-07-08 $74.56 (+4.24%)** · 2026-07-23
 $93.08 · 2026-07-27 $84.25 · 2026-07-29 $86.08 · 2026-08-03 $81.96.
 
@@ -467,3 +467,213 @@ wired in.
 - Exact BDTI point value for Feb 2026 (never obtained; the 3,723 March record is
   single-outlet Signal Ocean)
 - Whether a published HS→CPI crosswalk exists
+
+
+---
+
+## September 2026 update — what changed in a month, and what it does to the argument
+
+**Written 2026-09-05.** Every figure below is either a FRED series in the snapshot
+(`frontend/public/data-snapshot.json`, block `macro`) or an entry in
+`backend/data/context_figures.json` with a source, URL and tier. Where the two could
+disagree, FRED wins. The page reads these blocks directly; nothing is retyped.
+
+### The war is not over, and the strait is not open
+
+- **Hormuz is effectively closed again since early July** (IEA, August OMR — TIER 1).
+  IMF PortWatch (TIER 1, AIS-based) counts **4–6 vessels a day** in late August against a
+  pre-war average of **83.1 a day** (Jan 2025–Feb 2026), of which 46.6 were tankers.
+  Kpler's 10-day average to 2 Sep is 13 a day; Lloyd's List Intelligence ~12 (TIER 2).
+- **Official claims do not match the data.** The President said "some 30 ships pass
+  through Hormuz every night" (late August); two US officials told CNN 40 ships carrying
+  18 million barrels passed on 1 Sep. Analysts told Al Jazeera the official counts include
+  naval auxiliaries, tugs, coastal craft and AIS-dark vessels (TIER 2). The page shows the
+  claim as a hatched bar next to the measured counts, and says both are what they are.
+- **Thirteen merchant ships struck in August**; MT *Sidr* on 31 Aug killed two seafarers,
+  MV *Minoan Dignity* on 18 Aug killed one — the same day the President said the strait was
+  "open and operating" (USNI, CNBC — TIER 2).
+- **Mines cleared 25 Aug** per US officials (100+ suspected mines identified). Transits did
+  not recover: PortWatch counted four vessels that day.
+- **The August lull ended 1 Sep** with renewed US–Iran strikes. WTI spot closed **$91.48**
+  (+5.1% on the day); Brent $96.02 (FRED — TIER 1).
+- **War-risk cover still quoted at 7.5–10% of hull**; Marsh: few owners buying at that
+  level. No August reading published (S&P Global, i-law — TIER 2).
+
+### Prices — the round trip has a third leg
+
+| Anchor | WTI spot (FRED DCOILWTICO) |
+|---|---|
+| 2 Jan 2026 | $57.21 |
+| 27 Feb (last pre-war close) | $66.96 |
+| **7 Apr — peak** | **$114.58** |
+| 8 Apr | $96.17 |
+| 1 Jul | $69.74 |
+| 31 Aug | $87.03 |
+| 1 Sep | $91.48 |
+
+**Correction.** Earlier versions of this file and the page gave the peak as $114.01 on
+6 April. The series peak is **$114.58 on 7 April**, the day the first ceasefire was
+announced; 6 April is the previous close. The anchors in the simulation and the masthead
+now come from the series, not from this table, so this cannot recur.
+
+- Gasoline (EIA weekly, GASREGW): **$4.071** on 31 Aug, from $3.109 at the handover.
+  AAA: **$4.15 on 4 Sep, the first Labor Day above $4** (TIER 2).
+- Diesel (EIA weekly, GASDESW): **$5.599** on 31 Aug; **$5.652 on 24 Aug is a series
+  record**. GasBuddy's daily tracker printed $5.85 on 4 Sep, above the June 2022 record
+  (TIER 2). Diesel is the price of moving everything else; it is on the shelf now.
+- Jet fuel USGC $3.72/gal (28 Aug) from $2.41 at the handover.
+- Airline fares CPI **+25.5% y/y** (Jul, NSA). IATA cut 2026 industry profit from $41bn
+  to **$23bn** on a jet-fuel assumption of $152/bbl vs $90 in 2025 (TIER 2).
+
+### Inflation — the breadth test still holds; Europe is now catching the same shock
+
+| Measure (Jul 2026) | Value | Source |
+|---|---|---|
+| Headline CPI y/y (NSA) | **3.36%** (BLS headline 3.4%) | BLS — TIER 1 |
+| Core CPI y/y | **2.47%** | BLS — TIER 1 |
+| Median CPI | **2.69%** | Cleveland Fed — TIER 1 |
+| 16% trimmed-mean CPI | 2.60% | Cleveland Fed — TIER 1 |
+| CPI energy y/y | **+14.45%** | BLS — TIER 1 |
+| CPI gasoline y/y | **+24.6%** | BLS — TIER 1 |
+| Headline PCE y/y | 3.70% | BEA — TIER 1 |
+| **Core PCE y/y** | **3.34%** (from 2.61% in Apr 2025: **+0.73pp** creep) | BEA — TIER 1 |
+| Euro area HICP, Jul | 2.93% | Eurostat via FRED — TIER 1 |
+| **Euro area HICP, Aug flash** | **3.3%**, energy **+14.3%** | Eurostat — TIER 1 |
+
+- The US–euro gap in July is **+0.43pp** (3.36 vs 2.93), down from +1.11 in May. It is
+  narrowing **because Europe's inflation is rising**, not because America's fell much:
+  the August flash puts euro-area energy at +14.3%. This strengthens the "global oil
+  shock" reading and weakens any "America-specific excess" reading for 2026. The page
+  now says so in §03 rather than leaving the spring gap on the chart.
+- The lines crossed in **October 2023** (US 3.24 vs EA 2.87) and the US has been above
+  every month since. The chart now draws all 46 months rather than two endpoints.
+- **Trump II US-specific excess is now +0.65pp** (term mean US 2.88% vs EA 2.23%), from
+  +0.77 in the August build. Biden's is +0.25 on the same basis. Both are computed by the
+  same code over the same series.
+- **Consumer expectations are not anchored the way markets are.** Michigan year-ahead
+  expectations **4.0%** (Aug; 3.4% in Feb 2026), long-run 3.3%; 10-year breakeven 2.35%,
+  5y5y 2.33% (TIER 1). Only **8%** of consumers expect income to beat inflation next year,
+  down from 18% in December 2024 (Michigan — TIER 1). Sentiment **51.7** (Aug final) from
+  71.7 in January 2025; Hsu: declines "were seen for all political groups and were
+  particularly acute among Republicans".
+- **Regressivity, sourced.** Dallas Fed WP 2624 (Bradt & Taylor): the 2026 shock raised
+  gasoline expenditure shares **2.9×** more in the lowest-income census tracts than the
+  highest; pre-shock exposure explains 89% of the gap (TIER 1).
+
+### The Fed is now leaning toward a hike
+
+- Fed funds upper bound **3.75%** (unchanged since December). CME FedWatch put a
+  **September 25bp hike at 57.5%** on 28 Aug after Chair Kevin Warsh's Jackson Hole remark
+  that underlying inflation had not "meaningfully improved" (TIER 2).
+- 10-year Treasury **4.77%** (3 Sep) from 4.61% at the handover and 4.04% the week
+  before the war. 30-year mortgage **6.71%**, *lower* than 7.04% at the handover — shown
+  as the row that cuts the other way.
+
+### Labour — one strong month, same frozen market
+
+- **August payrolls +162,000** (consensus 53,000), best in five months; unemployment 4.1%;
+  July revised to +21,000, June +31,000 (BLS — TIER 1). The page leads with it in §05 and
+  in "the other side".
+- Term average is now **42,474 a month over 19 months** vs **320,938** in the previous term
+  (ratio 13.2%). The August build showed 42,118 on the page and 32,778 in the snapshot —
+  the page had been typed in from an earlier run. That class of drift is what the data
+  layer rewrite removes.
+- **Long-term unemployed 27.0%** of the jobless (1.93M), from 21.1% in January 2025.
+  Hires rate **3.2%** (Jul, weakest since February), quits **1.9%**, U-6 7.7%. Openings
+  7.27M. "Low fire, low hire" is unchanged by one good payroll print.
+
+### Gold — the custody story, sourced to the Fed's own table
+
+The claim circulating is "countries are pulling all their gold out of America." The
+defensible version is narrower and better sourced:
+
+- **Fed Table 3.13, earmarked gold** (TIER 1): gold held at the New York Fed for foreign
+  and international accounts, valued at the **statutory $42.22/oz fixed in 1973**. Because
+  the price is fixed, a change in this row is *ounces*, not valuation. It read **$8,034M in
+  Aug 2025 → $7,818M in Jun 2026**, i.e. **≈5,919 t → ≈5,760 t: about 159 tonnes out**,
+  and it fell or held flat in **every one of those ten months**; none rose. (Derivation:
+  usd_m / 42.22 × 31.1034768 / 1000. Tested in `backend/tests/test_macro.py`.)
+- **Netherlands, 86 t** out of New York and Ottawa to London, Mar–Aug 2026, "in view of
+  increasing geopolitical unrest"; New York's share of Dutch reserves 31.3% → 18.5%
+  (DNB press release 2 Sep 2026 — TIER 1).
+- **France, 129 t** out of the New York Fed Jul 2025–Jan 2026, by selling old-format bars
+  in New York and buying Good Delivery bars in Paris across 26 deals; no bar shipped
+  (Bloomberg/Yahoo, 17 Jun 2026 — TIER 2).
+- **India**: share of gold held abroad 55% (Mar 2023) → 22% (Mar 2026), repatriated from
+  the BoE and BIS (RBI report via Investing.com — TIER 2).
+- **Germany**: 1,236 t of 3,352 t still at the New York Fed; political pressure, **no
+  plan** (TIER 2). Do not imply Germany has moved anything.
+- **Treasuries in Fed custody for foreign officials** (Table 3.13, face value): $2.78tn
+  Jan 2026 → **$2.62tn Jun 2026**. TIC total foreign holdings **$9.3tn** in June, −$72.1bn
+  on the month, down in three of four months since the February record (Treasury — TIER 1).
+- **ECB, June 2026**: gold **27%** of global official reserves vs Treasuries **22%** at
+  end-2025, first crossover since 1996 — "mainly valuation" (TIER 1).
+
+**The honest part, which the page carries at full size:**
+- **Gold is DOWN ~20%** from its 28 Jan 2026 record of $5,589 to ~$4,470 (TIER 2). The
+  custody story is about where gold sits, not what it costs.
+- **The broad dollar index is UP** since the war began (117.5 on 13 Feb → 118.7 on 28 Aug,
+  FRED DTWEXBGS) though down from 129.5 at the handover. This is not a dollar collapse.
+- **Fed FEDS Note, 3 Sep 2026 (Weiss)**: the gold-over-Treasuries headline is "misleading"
+  — driven by private ETF demand since late 2024; by June 2026 foreign official Treasury
+  holdings again exceeded world gold reserves ex-US in dollar terms; the five legacy
+  holders own 52% of official gold and have not added since the 1970s; foreign officials
+  bought ~$200bn of Treasuries net 2022–Apr 2026 (TIER 1). We quote it. What it does not
+  address is the ounce-denominated custody decline above, which is why the page leads with
+  Table 3.13 rather than with the valuation crossover.
+
+### Trade — less is moving
+
+- **WTO (19 Mar 2026)**: world merchandise trade volume growth **4.6% (2025) → 1.9%
+  (2026 baseline) → 1.4% if energy stays high**; 2027 2.6%. October 2025 had forecast 0.5%
+  for 2026 on tariffs alone. WTO: "Traffic through the Strait of Hormuz collapsing from
+  138 commercial vessels per day to almost zero" (TIER 1).
+- **IEA (Aug 2026)**: world oil **demand −1.6 mb/d in 2026**, **supply −4.3 mb/d to 102
+  mb/d**; Gulf shut-in 8.3 mb/d; regional exports −2.1 mb/d to 15 mb/d; observed stocks
+  drawn **410 mb** Feb–Jul (2.7 mb/d); Dated Brent $96.80 end-July, $105 spike 23 Jul;
+  diesel exports −1.3 mb/d y/y (TIER 1).
+- **US trade, July** (BEA, 3 Sep): deficit **$88.6bn** from $71.2bn; imports **$399.3bn**;
+  YTD deficit **−29.6%** vs 2025 (TIER 1). Both facts stay: the tariffs cut imports before
+  the war cut everything.
+- **Customs duties** (BEA, annualised): **$326bn in Q2 2026** from $364bn in Q4 2025 —
+  the SCOTUS ruling in the data. Gross, never net (refunds $49bn in June).
+- **Drewry WCI, 3 Sep**: Shanghai–Jebel Ali **$8,254/40ft, +6% w/w** on Gulf risk;
+  composite $4,465; Shanghai–LA $7,185 (TIER 2).
+
+### Tariff regime as of September 2026
+
+Section 122 (10% blanket) lapsed 24 Jul and was replaced the same day by **Section 301
+forced-labour duties at 10% standard / 12.5% for a 46-economy list including China**.
+Section 232 product tariffs (steel, aluminium, copper at 50% since the 1 Jun proclamation;
+autos, semiconductors, lumber at 25–50%) and Section 301 China tariffs (25–100%) remain.
+A second §301 investigation on excess industrial capacity is pending (Morgan Lewis, Tax
+Foundation, Trade Compliance Resource Hub — TIER 2). Energy remains exempt throughout.
+
+### Event study — one event added, and how
+
+`data/war_milestones.json` gained ten dated entries for July–September. **One** is marked
+`study: true`: the 1 Sep resumption of strikes (sign +1). It was added on 5 Sep with the
+price path visible, so it is **not pre-registered** in the way the first six were; the
+sign is theory-driven and the entry says so in its description. With it, 5 of 7 events
+match (binomial p = 0.23; signed-magnitude test p ≈ 0.08 before the addition). The
+evidence for "prices track the war in both directions" rests on the four large, matched,
+pre-registered events, not on the count.
+
+### Data-integrity notes added this month
+
+- **PortWatch is a floor, not a census.** AIS-dark vessels are not counted, and Iran-linked
+  traffic increasingly runs dark. The page labels every PortWatch figure "AIS-counted".
+- **FRED daily closes lag two to three trading days.** The simulation's span now extends to
+  the latest dated event and the price readout says "LAST PUBLISHED CLOSE" beyond the last
+  print rather than interpolating.
+- **The gold price has no live FRED series** (LBMA series end 2022). Price figures are
+  TIER 2 and shown only in the honest-part panel, never as a headline.
+- **Michigan sentiment on FRED (UMCSENT) lags the survey by a month.** The page uses the
+  survey's own final August release, cited as such.
+
+### Still to verify
+
+- A Tier 1 or 2 source for the "over 100 suspected mines" figure other than the Wikipedia
+  summary of contemporaneous reporting.
+- Whether Germany's Bundesbank has made any formal statement since June on New York holdings.
+- The 2 Sep and later WTI closes once FRED publishes them (rebuild the snapshot).
