@@ -16,7 +16,12 @@ PortWatch transit counts, and a THESIS.md update sourcing every new figure.
 cd backend  && py scripts/build_snapshot.py
 cd frontend && npm run build
 ```
-Then `git push`. Cloudflare Pages builds from `main`.
+Then `git push`, and deploy — the Pages project is **not** git-connected:
+```
+npx --prefix frontend wrangler pages deploy frontend/dist --project-name trumps-economy-ledger --branch main
+```
+Wrangler is already authenticated on this machine (OAuth). Verify with
+`curl -s https://trumps-economy-ledger.pages.dev/data-snapshot.json | py -c "import sys,json;print(json.load(sys.stdin)['_meta']['generated'])"`.
 
 **Tests:** `py -m pytest backend/tests/ -q` → 28 pass. Frontend: `npx tsc --noEmit -p
 tsconfig.app.json` clean; eslint has a pre-existing false positive on `ref={r.status}` in

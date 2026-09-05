@@ -25,7 +25,9 @@ cd backend  && py scripts/build_snapshot.py     # FRED + IMF PortWatch + context
 cd frontend && npm run build                     # tsc, vite, og.png from the snapshot
 ```
 
-Then commit and push. Do not edit numbers in JSX; if a figure is wrong, fix the series
+Then commit, push, and deploy — the Cloudflare Pages project is NOT git-connected:
+`npx --prefix frontend wrangler pages deploy frontend/dist --project-name trumps-economy-ledger --branch main`.
+Do not edit numbers in JSX; if a figure is wrong, fix the series
 or `backend/data/context_figures.json` and rebuild.
 
 **Snapshot blocks:** `international`, `staples`, `jobs`, `breadth`, `scorecard`,
