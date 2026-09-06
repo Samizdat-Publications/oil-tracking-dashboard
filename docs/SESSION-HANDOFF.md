@@ -100,3 +100,30 @@ HormuzSimulation and scoped `no-explicit-any` disables on the snapshot consumers
 - The insider-trading probe never shares a visual frame with the paper-physical spread.
 - `docs/THESIS.md` governs every claim on the page. Read it before writing copy.
 - Do NOT use git worktrees in this OneDrive folder.
+
+## Addendum — later on 2026-09-05: the data pipeline for V5 is built
+
+Plan file: `~/.claude/plans/while-ddesign-is-working-encapsulated-sundae.md` (approved).
+Shipped in commit "Schema v2 snapshot": `services/eia.py`, `fiscal.py`, `chain.py`,
+`nowcast.py`, `odds.py`, multi-chokepoint `portwatch.py`, `attribution.passthrough_pair` +
+`receipt_lines`/`receipt_inputs`, `scripts/validate_snapshot.py`, the GitHub Actions
+workflow, `frontend/src/v4/receipt.ts` (+ vitest pin) and `live.ts`. Snapshot is schema v2,
+20 blocks, 0.72 MB. 41 backend tests, 7 frontend tests.
+
+**User must add four repo secrets** before the workflow can run: FRED_API_KEY, EIA_API_KEY,
+CLOUDFLARE_API_TOKEN (Pages: Edit), CLOUDFLARE_ACCOUNT_ID = c82dd5addf7f4ebc0260ae476166b8d1.
+Then trigger it once from the Actions tab (workflow_dispatch) and check a commit lands.
+
+**Headline findings from the new data** (all in THESIS.md update II): MTS customs receipts
+were NEGATIVE in May, June and July 2026 (refunds > collections); interest expense $1.27tn
+FYTD; debt $40.10tn; SPR 286.6M bbl; refinery utilisation 98%; every link of the barrel
+chain is significant on pre-war data, with a ~4-month lag from freight to the shelf and
+~2 months from EU gas to fertiliser; Hormuz 5% of baseline vs Suez 111%, Cape 103%.
+
+**Not yet wired into the V4 page** (deliberately — V5 will consume them): `eia`, `fiscal`
+(except the live debt patch), `chain`, `chokepoints`, `nowcast`, `polymarket`, the
+receipt picker UI. `deriveFigures` passes them through as `fig.eia`, `fig.chain`, etc.
+
+**In progress:** real Natural Earth coastline for the strait (`scripts/build-coast.mjs` ->
+`src/v4/hormuz/coast.json`; engine to read it). If that is unfinished, the schematic arrays
+still work and the label still says illustrative.

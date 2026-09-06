@@ -1031,8 +1031,9 @@ function Strait({ f }: { f: Figures }) {
           <span className="t-label">What we do not claim</span>
           <p className="t-small">
             No queue count — no verified figure exists at any tier, and the &ldquo;tankers waiting&rdquo; readout
-            is a model. No manipulation of the paper-physical spread; no regulator has alleged it. The map
-            geometry is schematic. The transit counts are real but AIS-based, so they are a floor.
+            is a model. No manipulation of the paper-physical spread; no regulator has alleged it. The coastline
+            is Natural Earth&rsquo;s, stretched to the frame; the ships on it are a model. The transit counts are
+            real but AIS-based, so they are a floor.
           </p>
         </div>
       </div>

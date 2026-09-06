@@ -2,9 +2,9 @@
    hormuz-engine.js — the Strait of Hormuz simulation, framework-free.
 
    THIS FILE IS THE IMPLEMENTATION, NOT A DESCRIPTION OF ONE.
-   Drop it in and call it. Do not rewrite the drawing maths, the coastline
-   arrays, the lane path or the queue logic — they are tuned, and re-deriving
-   them by eye is how the last port lost the design.
+   Drop it in and call it. Do not rewrite the drawing maths or the queue
+   logic — they are tuned. Coastline, lane and gate come from coast.json
+   (Natural Earth, built by scripts/build-coast.mjs); edit them there.
 
    It owns: both canvases, the rAF loop, the vessel simulation, the timeline.
    It does NOT own: any DOM text. It hands you a readout object and you render
@@ -175,20 +175,21 @@ export const EVENTS = [
 export const KIND_COLOR = { war: '#FF5A4E', tariff: '#7A8CFF', policy: '#3FA96A', context: '#8A99A8' };
 
 /* --------------------------------------------------------------- geography */
-/* Normalised 0..1 coordinates. Schematic — drawn to place the chokepoint
-   correctly, not surveyed. The "ILLUSTRATIVE GEOMETRY" label in the UI is what
-   makes that honest; do not remove the label without replacing these arrays
-   with real coastline data. */
-const IRAN = [[0,0],[0,.19],[.045,.215],[.088,.238],[.13,.232],[.163,.25],[.181,.283],[.203,.298],[.228,.286],[.25,.252],[.283,.262],[.318,.252],[.35,.272],[.392,.288],[.43,.279],[.463,.302],[.50,.324],[.53,.317],[.556,.33],[.578,.314],[.60,.325],[.622,.336],[.645,.349],[.666,.373],[.69,.398],[.716,.386],[.746,.393],[.777,.376],[.812,.351],[.855,.326],[.90,.306],[.95,.291],[1,.286],[1,0]];
-const OMAN = [[0,1],[0,.81],[.06,.80],[.13,.79],[.20,.778],[.27,.766],[.33,.756],[.39,.745],[.44,.735],[.485,.726],[.515,.69],[.535,.65],[.55,.60],[.565,.56],[.578,.52],[.588,.487],[.598,.466],[.606,.481],[.614,.462],[.624,.477],[.634,.458],[.645,.472],[.655,.456],[.662,.469],[.672,.49],[.685,.52],[.70,.552],[.712,.585],[.728,.64],[.745,.70],[.775,.75],[.82,.79],[.87,.822],[.92,.845],[.96,.858],[1,.865],[1,1]];
-const QESHM = [[.215,.352],[.245,.338],[.285,.336],[.325,.344],[.365,.358],[.397,.376],[.375,.393],[.335,.387],[.29,.375],[.248,.369]];
-const ISLES = [[.417,.353,.015,'HORMUZ'],[.452,.373,.010,'LARAK'],[.301,.468,.008,''],[.192,.531,.009,'']];
-const PORTS = [[.205,.297,'BANDAR ABBAS',1],[.583,.535,'KHASAB',-1],[.752,.688,'FUJAIRAH',-1]];
-/* The shipping lane. Vessels ride ±0.026 off centre — the real Traffic
-   Separation Scheme: outbound one side, inbound the other. */
-const LANE = [[-.02,.578],[.10,.570],[.21,.558],[.32,.540],[.42,.514],[.505,.484],[.567,.446],[.617,.404],[.652,.414],[.686,.434],[.722,.470],[.768,.540],[.836,.605],[.912,.652],[1.02,.688]];
+/* Natural Earth 1:10m land polygons, clipped to a box around the strait and
+   projected to 0..1 by scripts/build-coast.mjs. The box is stretched to the
+   canvas, so shapes are real and the aspect is not; the UI label says exactly
+   that. The Traffic Separation Scheme lane and the gate are placed on real
+   coordinates in the same projection. Vessel positions are still a model. */
+import COAST from './coast.json';
+const RINGS = COAST.rings;
+const ISLES = [];   // islands arrive as polygons now
+const PORTS = COAST.ports.map(p => [p.x, p.y, p.name, p.dir]);
+const LABELS = COAST.labels;
+/* Vessels ride ±0.026 off centre — the real Traffic Separation Scheme:
+   outbound one side, inbound the other. */
+const LANE = COAST.lane;
 
-const GATE_X = 0.617, GATE_TOP = 0.334, GATE_BOT = 0.462;
+const GATE_X = COAST.gate.x, GATE_TOP = COAST.gate.top, GATE_BOT = COAST.gate.bot;
 
 /* ----------------------------------------------------------------- helpers */
 export function lerpKF(arr, day) {
@@ -645,7 +646,7 @@ export class HormuzEngine {
     for (let y = 0.08; y < 1; y += 0.08) { ctx.beginPath(); ctx.moveTo(0, y * h); ctx.lineTo(w, y * h); ctx.stroke(); }
     for (let x = 0.12; x < 1; x += 0.12) { ctx.beginPath(); ctx.moveTo(x * w, 0); ctx.lineTo(x * w, h); ctx.stroke(); }
 
-    const shapes = [IRAN, OMAN, QESHM];
+    const shapes = RINGS;
     [[9, 'rgba(245,163,0,.045)'], [4, 'rgba(245,163,0,.07)']].forEach(([lw, col]) => {
       ctx.lineWidth = lw; ctx.strokeStyle = col; ctx.lineJoin = 'round';
       shapes.forEach(s => { this.poly(ctx, s, w, h); ctx.stroke(); });
@@ -699,16 +700,14 @@ export class HormuzEngine {
     }
 
     ctx.textAlign = 'center';
-    ctx.font = '700 9.5px "Chivo Mono", monospace'; ctx.fillStyle = '#C4B49A';
-    ctx.fillText('I R A N', 0.135 * w, 0.10 * h);
-    ctx.fillText('U . A . E .', 0.145 * w, 0.93 * h);
-    ctx.fillText('MUSANDAM \u00B7 OMAN', 0.60 * w, 0.88 * h);
-    if (w > 460) { ctx.font = '700 7.5px "Chivo Mono", monospace'; ctx.fillStyle = '#9C8E76'; ctx.fillText('QESHM', 0.30 * w, 0.366 * h); }
-    ctx.font = '600 9px "Chivo Mono", monospace';
-    ctx.fillStyle = '#4E7286'; ctx.textAlign = 'left';
-    ctx.fillText('P E R S I A N   G U L F', 0.04 * w, 0.70 * h);
-    ctx.textAlign = 'right';
-    ctx.fillText('G U L F   O F   O M A N', 0.965 * w, 0.35 * h);
+    for (const l of LABELS) {
+      const sea = l.text.indexOf('G U L F') >= 0;
+      if (l.text === 'QESHM' && w <= 460) continue;
+      ctx.font = sea ? '600 9px "Chivo Mono", monospace'
+        : l.text === 'QESHM' ? '700 7.5px "Chivo Mono", monospace' : '700 9.5px "Chivo Mono", monospace';
+      ctx.fillStyle = sea ? '#4E7286' : l.text === 'QESHM' ? '#9C8E76' : '#C4B49A';
+      ctx.fillText(l.text, l.x * w, l.y * h);
+    }
 
     if (w > 460) {
       PORTS.forEach(([x, y, name, dir]) => {
@@ -774,7 +773,7 @@ export class HormuzEngine {
   }
 
   paintInset(ctx, w, h, ff, base) {
-    const Z = 3.5, cx = GATE_X, cy = 0.398;
+    const Z = 3.5, cx = GATE_X, cy = (GATE_TOP + GATE_BOT) / 2;
     const iw = Math.min(258, w * 0.44), ih = Math.min(126, h * 0.36);
     const ix = w - 12 - iw, iy = h - 12 - ih;
     const vw = iw / (w * Z), vh = ih / (h * Z);
@@ -793,7 +792,7 @@ export class HormuzEngine {
     const IX = nx => ix + iw / 2 + (nx - cx) * w * Z;
     const IY = ny => iy + ih / 2 + (ny - cy) * h * Z;
 
-    [IRAN, OMAN].forEach(pts => {
+    RINGS.forEach(pts => {
       ctx.beginPath();
       pts.forEach((p, i) => { i ? ctx.lineTo(IX(p[0]), IY(p[1])) : ctx.moveTo(IX(p[0]), IY(p[1])); });
       ctx.closePath();
@@ -802,19 +801,19 @@ export class HormuzEngine {
     });
     [-0.026, 0.026].forEach(off => {
       ctx.beginPath();
-      for (let s = 0.36; s <= 0.66; s += 0.01) {
+      for (let s = 0.30; s <= 0.72; s += 0.01) {
         const p = this.lanePt(s, off);
-        s === 0.36 ? ctx.moveTo(IX(p.x), IY(p.y)) : ctx.lineTo(IX(p.x), IY(p.y));
+        s === 0.30 ? ctx.moveTo(IX(p.x), IY(p.y)) : ctx.lineTo(IX(p.x), IY(p.y));
       }
       ctx.strokeStyle = 'rgba(244,237,224,.16)'; ctx.setLineDash([5, 7]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
     });
     if (ff < 0.97) {
       const pulse = 0.6 + 0.4 * Math.sin(performance.now() / 380);
       ctx.strokeStyle = 'rgba(217,30,24,' + (0.35 + 0.5 * pulse).toFixed(3) + ')'; ctx.lineWidth = 2.6;
-      ctx.beginPath(); ctx.moveTo(IX(GATE_X), IY(0.336)); ctx.lineTo(IX(GATE_X), IY(0.460)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(IX(GATE_X), IY(GATE_TOP)); ctx.lineTo(IX(GATE_X), IY(GATE_BOT)); ctx.stroke();
     }
     for (const v of this.vessels) {
-      if (v.s < 0.34 || v.s > 0.68) continue;
+      if (v.s < 0.28 || v.s > 0.74) continue;
       const p = this.lanePt(v.s, v.dir > 0 ? -0.026 : 0.026);
       const x = IX(p.x), y = IY(p.y);
       if (x < ix - 40 || x > ix + iw + 40 || y < iy - 40 || y > iy + ih + 40) continue;

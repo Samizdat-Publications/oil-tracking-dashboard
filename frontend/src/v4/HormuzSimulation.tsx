@@ -201,13 +201,13 @@ export default function HormuzSimulation() {
         <div className="hz-mappanel">
           <div className="hz-mapwrap" ref={mapWrap}>
             <canvas ref={mapCanvas} className="hz-canvas" role="img"
-              aria-label="Strait of Hormuz with modelled tanker traffic. Geometry is illustrative and vessel positions are not AIS data." />
+              aria-label="Strait of Hormuz with modelled tanker traffic. Coastline from Natural Earth; vessel positions are a model, not AIS data." />
             <div className="hz-state">
               <span className="hz-dot" ref={r.statusDot} data-pulse="0" aria-hidden />
               <span className="t-label" ref={r.status}>TRANSIT NORMAL</span>
             </div>
             <div className="hz-illus t-label">
-              Illustrative geometry<br />Vessel positions are not AIS data
+              Natural Earth 10m coastline, stretched to fit<br />Vessel positions are a model, not AIS data
             </div>
           </div>
 
