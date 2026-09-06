@@ -241,3 +241,17 @@ Source of truth: `services/fred_client.py`. Key mapping: `wti` → `DCOILWTICO`,
 | `/api/milestones` | GET | Editorial + auto-detected war milestones |
 | `/api/polymarket/summary` | GET | War-economy prediction markets |
 | `/api/crisis/comparison` | GET | Historical crisis comparison (7 crises) |
+
+## Frozen V4 (do not break)
+
+The V4 ledger as of 2026-09-06 is frozen at tag `v4-ledger-frozen-2026-09-06` / branch
+`v4-frozen` and deployed permanently at https://trumps-economy-ledger-v4.pages.dev
+(Pages project `trumps-economy-ledger-v4`, production branch `v4-frozen`). It must stay
+deployable regardless of the V5 redesign. To redeploy it:
+
+    git checkout v4-frozen
+    cd frontend && npm ci && npm run build
+    npx wrangler pages deploy dist --project-name trumps-economy-ledger-v4 --branch v4-frozen
+
+V5 (Design's animated rebuild) lands as a separate page/project; `main` and the daily
+refresh workflow keep serving V4 at trumps-economy-ledger.pages.dev until V5 is accepted.
