@@ -400,6 +400,165 @@
     }
   },
 
+  "war_cost": {
+    "dod_cost": {
+      "usd_bn": 37.5, "as_of": "2026-07-21",
+      "prior": { "usd_bn": 29, "as_of": "2026-05-12", "source": "Acting Pentagon Comptroller Jules Hurst, House hearing" },
+      "source": "Defense Secretary Pete Hegseth, Senate Appropriations Committee testimony, 21 July 2026",
+      "url": "https://www.defensenews.com/news/pentagon-congress/2026/07/21/cost-of-iran-war-rises-to-375-billion-pentagon-requests-671-billion-more/",
+      "tier": 1
+    },
+    "supplemental_request": {
+      "usd_bn": 67.1, "munitions_usd_bn": 21,
+      "note": "Single biggest item is $21bn for munitions to rebuild stockpiles expended in the opening months.",
+      "source": "DoD FY2026 supplemental request; CSIS analysis",
+      "url": "https://www.csis.org/analysis/war-costs-make-third-876-billion-supplemental-request",
+      "tier": 1
+    },
+    "casualties": {
+      "us_killed": 18, "us_injured": "hundreds", "as_of": "2026-08-28",
+      "alt_count": { "killed": 20, "injured": 762, "source": "Wikipedia tally of contemporaneous reporting", "tier": 3 },
+      "source": "NBC News data desk, updated 28 August 2026",
+      "url": "https://www.nbcnews.com/data-graphics/iran-war-data-cost-death-toll-oil-gas-prices-strikes-trump-rcna588554",
+      "tier": 2
+    },
+    "aircraft": {
+      "as_of": "2026-05-13", "total_lost_or_damaged": 42, "dod_loss_estimate_usd_bn": 2.6,
+      "by_type": { "F-15E": 4, "F-35A": 1, "A-10": 1, "KC-135": 7, "E-3": 1, "MC-130J": 2, "HH-60W": 1, "MQ-9": 24, "MQ-4C": 1 },
+      "note": "Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. Count is as of the CRS report and will be updated from any later official tally.",
+      "source": "Congressional Research Service, IN12692, 'U.S. Aircraft Combat Losses in Operation Epic Fury'",
+      "url": "https://www.congress.gov/crs-product/IN12692",
+      "tier": 1
+    },
+    "bases": {
+      "bahrain_hub_struck": "2026-02-28",
+      "structures_damaged": 228,
+      "resupply_distance_miles": 2200,
+      "note": "Iran struck the Navy's Bahrain logistics hub on the first day. Regional ports large enough for a carrier remain inside missile range, so supply ships sail to Diego Garcia and the fleet resupplies at sea every five to six days. USS Abraham Lincoln spent about nine months deployed without a port call before USS George Washington relieved it on 20 August.",
+      "source": "Washington Post (228 structures); Stars and Stripes; Defense News",
+      "url": "https://www.stripes.com/theaters/middle_east/2026-04-29/iran-war-us-bases-bahrain-navy-21523332.html",
+      "tier": 2
+    },
+    "munitions": {
+      "patriot_remaining_share": 0.33, "thaad_used_share": 0.8, "patriot_used_share": 0.5,
+      "rebuild_years": 3, "as_of": "2026-07-27",
+      "denial": "Defense Secretary Hegseth disputed the reports (5 August); the President demanded answers on the shortages (3 September).",
+      "note": "CSIS estimated roughly a third of Patriot interceptors remained as of 27 July and that rebuilding to pre-war levels would take at least three years. CNN reported about 80% of THAAD and half of Patriot stocks used. The $21bn munitions line in the supplemental is consistent with the estimates the Secretary disputes.",
+      "source": "CSIS analysis, 27 July 2026; CNN; Stars and Stripes 5 Aug; Axios 3 Sep",
+      "url": "https://www.stripes.com/theaters/us/2026-08-05/us-missile-defense-stockpile-dangerously-low-22462099.html",
+      "tier": 2
+    },
+    "imagery": {
+      "date": "2026-04-05", "retroactive_to": "2026-03-09",
+      "note": "Planet Labs suspended distribution of satellite imagery of Iran and the wider conflict zone indefinitely 'following a direct request from the United States government'. Other providers curbed Middle East access from March.",
+      "source": "CBS News; Washington Post 11 March; NPR 10 April; SatNews 5 April",
+      "url": "https://www.cbsnews.com/news/iran-war-satellite-companies-curb-access-mideast-imagery/",
+      "tier": 2
+    },
+    "moodys_domestic_cost": { "usd_bn": 150, "source": "Moody's Analytics estimate including higher energy prices, via NBC News", "tier": 2 },
+    "trump_quote": { "text": "four to five weeks", "date": "2026-02-28", "context": "The President's stated expectation for the war's duration on the day it began.", "source": "NBC News", "tier": 2 }
+  },
+
+  "trade_disputes": {
+    "canada": {
+      "timeline": [
+        { "date": "2026-07-20", "event": "Three Section 338 proclamations: 50% tariffs on Canadian motor vehicles, alcoholic beverages and dairy, about C$27.6bn of exports. Energy, potash, Section 232 goods, fish and critical minerals excluded.", "tier": 1, "url": "https://www.whitehouse.gov/fact-sheets/2026/07/fact-sheet-president-donald-j-trump-imposes-additional-tariffs-on-canada/" },
+        { "date": "2026-08-18", "event": "Three-day suspension for talks in Washington.", "tier": 1, "url": "https://www.whitehouse.gov/presidential-actions/2026/08/temporary-suspension-of-additional-duties-to-offset-canadian-discrimination-against-the-commerce-of-the-united-states-with-respect-to-alcoholic-beverages-dairy-and-motor-vehicles/" },
+        { "date": "2026-08-22", "event": "Talks collapse; Carney recalls the negotiating team; 50% duties enter into force at 12:01 a.m.", "tier": 2, "url": "https://www.aljazeera.com/news/2026/8/22/carney-canada-will-enact-retaliatory-us-tariffs-starting-september-8" },
+        { "date": "2026-09-08", "event": "Canada's dollar-for-dollar counter-tariffs on C$27.6bn of US goods take effect: steel, dairy, appliances, agricultural equipment, pulp and paper, electronics.", "tier": 2, "url": "https://www.aljazeera.com/news/2026/8/23/canada-to-hit-us-with-retaliatory-tariffs-as-trade-war-escalates" }
+      ],
+      "usmca": "The White House states the USMCA will not be renewed in its current form.",
+      "tier": 1
+    },
+    "actions_since_june": [
+      { "date": "2026-06-01", "authority": "Section 301", "target": "Brazil", "action": "USTR notice proposing action on digital-trade and market-access policies", "tier": 2 },
+      { "date": "2026-07-22", "authority": "Section 301", "target": "Brazil", "rate": "25%", "action": "Tariffs implemented", "tier": 1 },
+      { "date": "2026-07-24", "authority": "Section 301 (forced labour)", "target": "All trading partners", "rate": "10% standard; 12.5% for 46 economies incl. China, Japan, Korea, Australia", "action": "Replaces the expired Section 122 surcharge the same day", "tier": 1 },
+      { "date": "2026-07-28", "authority": "Section 301", "target": "European Union", "rate": "10%", "action": "Implemented", "tier": 2 },
+      { "date": "2026-07-31", "authority": "Section 232", "target": "Pharmaceuticals", "rate": "0-100% tiered; generics exempt", "action": "Implemented", "tier": 1 },
+      { "date": "2026-08-22", "authority": "Section 338", "target": "Canada", "rate": "50%", "action": "Vehicles, alcohol, dairy in force", "tier": 1 },
+      { "date": "2026-09-03", "authority": "Section 232", "target": "Unmanned aircraft systems", "rate": "25-100%", "action": "Implemented", "tier": 2 },
+      { "date": "2026-11-10", "authority": "Section 301", "target": "China (cranes, cargo-handling equipment)", "rate": "100%", "action": "Delayed to this date", "tier": 2 },
+      { "date": "2026-12-04", "authority": "Section 232", "target": "Polysilicon, wafers, cells, modules", "rate": "10-15% plus minimum import prices", "action": "Scheduled", "tier": 2 }
+    ],
+    "source": "Federal Register proclamations (Tier 1); Trade Compliance Resource Hub tracker 2 Sep 2026; Tax Foundation tracker (Tier 2)",
+    "url": "https://www.tradecomplianceresourcehub.com/2026/09/02/trump-2-0-tariff-tracker/"
+  },
+
+  "energy_supply": {
+    "spr": {
+      "note": "Strategic Petroleum Reserve below 300 million barrels from 10 August, the lowest since 1983. Emergency releases March-April totalled 17.5 million barrels; a Venezuela supply deal to refill it was announced 29 August. Live weekly stock level is in the `eia` block (WCSSTUS1).",
+      "source": "CNBC 10 Aug 2026; NPR 16 Aug 2026; EIA weekly",
+      "url": "https://www.cnbc.com/2026/08/10/oil-in-strategic-petroleum-reserve-falls-below-300-million-barrels-lowest-since-1983.html",
+      "tier": 2
+    },
+    "fertilizer": {
+      "urea_peak_usd_t": 850, "urea_peak_month": "2026-04", "urea_rise_since_feb_pct": 80,
+      "urea_above_precrisis_through_autumn_pct": "35-56",
+      "ras_laffan_repair_years": "3-5",
+      "us_farmers_nitrogen_secured_pct": 60,
+      "hormuz_share_of_world_urea_exports_pct": 25,
+      "note": "The Gulf supplies about a quarter of world urea exports; the strait's closure and damage to Qatar's Ras Laffan LNG complex (the methane feedstock) pushed nitrogen prices to their highest since 2022. Next year's food prices start here.",
+      "source": "World Bank Open Data blog; WTO data blog 10 Jul 2026; CNBC 25 Mar 2026; Carnegie Endowment",
+      "url": "https://blogs.worldbank.org/en/opendata/fertilizer-prices-surge-as-strait-of-hormuz-disruptions-tighten-",
+      "tier": 1
+    },
+    "eu_gas": {
+      "ttf_rise_ytd_pct": 130, "ttf_eur_mwh_20_aug": 65,
+      "note": "Dutch TTF more than doubled in 2026; Oxford Economics puts euro-area headline inflation near 3.5% in H2 2026 on current gas pricing.",
+      "source": "Euronews 20 Aug 2026",
+      "url": "https://www.euronews.com/business/2026/08/20/europes-gas-prices-have-doubled-with-the-worst-yet-to-come",
+      "tier": 2
+    }
+  },
+
+  "freight": {
+    "van_fuel_surcharge_cents_per_mile": { "before": 41, "now": 61, "change_pct": 50 },
+    "cass_freight_index": { "shipments_pct": -2.9, "expenditures_pct": 1.2, "note": "Fewer shipments, higher spend: rates up, volumes down." },
+    "diesel_june_yoy_pct": 25.2,
+    "note": "Diesel moves everything on the shelf. Fuel surcharges are passed to shippers within weeks; shelf prices follow with a lag the chain block estimates.",
+    "source": "Cass Information Systems; TheTrucker.com June/August 2026 market reports; C.H. Robinson",
+    "url": "https://www.thetrucker.com/trucking-news/business/june-2026-report-freight-rates-and-fuel-expenses-continue-climb",
+    "tier": 2
+  },
+
+  "red_sea": {
+    "houthi_blockade_since": "2026-07",
+    "target": "Ships originating from or calling at Saudi ports",
+    "last_attack": "2026-08-24",
+    "transits_per_week_late_aug": 290,
+    "note": "A second front on the same shipping lane system. Bab el-Mandeb and Suez daily counts are in the `chokepoints` block.",
+    "source": "Lloyd's List Intelligence Red Sea Brief, 3 Sep 2026; MARAD advisory 2026-006; CNBC 22 Jul",
+    "url": "https://www.lloydslistintelligence.com/resources/blog/red-sea-brief-3-september-2026",
+    "tier": 2
+  },
+
+  "sentiment_by_party": {
+    "republicans_vs_prewar_pct": -19,
+    "note": "Republican respondents' sentiment fell 19% from its pre-war reading to the lowest since the 2024 election; declines in August were seen for all political groups and were 'particularly acute among Republicans' (Joanne Hsu).",
+    "source": "University of Michigan Surveys of Consumers, August 2026; Axios 14 Aug 2026",
+    "url": "https://www.axios.com/2026/08/14/consumer-sentiment-republicans",
+    "tier": 1
+  },
+
+  "interest_cbo": {
+    "fy2026_projection_usd_tn": 1.0,
+    "fytd_10_months_usd_bn": 963, "fytd_prior_usd_bn": 846, "fytd_change_pct": 14,
+    "share_of_revenue_pct": 18.5, "share_of_gdp_pct": 3.3,
+    "note": "Interest is the fastest-growing line in the budget. The live monthly total is in the `fiscal` block; this entry carries CBO's full-year projection and the record-share context.",
+    "source": "CBO; Peter G. Peterson Foundation interest tracker; Fortune 24 Aug 2026",
+    "url": "https://www.pgpf.org/programs-and-projects/fiscal-policy/monthly-interest-tracker-national-debt/",
+    "tier": 1
+  },
+
+  "farm_income": {
+    "net_farm_income_2026_usd_bn": 158.4, "change_nominal_pct": -2.6, "change_real_pct": -5.5,
+    "soybeans": "China halted US soybean purchases in 2025 during tariff talks and resumed under a commitment of at least 25 million tonnes a year through 2028.",
+    "source": "USDA ERS Farm Income Forecast, September 2026; American Farm Bureau; South Dakota Searchlight",
+    "url": "https://www.fb.org/intel/markets/usda-revises-farm-income-higher-but-costs-still-bite",
+    "tier": 1
+  },
+
   "research": {
     "dallas_fed_wp2624": {
       "title": "The Incidence of Fuel-Price Shocks and Tax Holidays: Evidence from the 2026 Oil Shock",

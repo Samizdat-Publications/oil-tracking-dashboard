@@ -106,10 +106,17 @@ export interface Figures {
   };
   trade: {
     wto: any; iea: any; drewry: any; iata: any; usTrade: any; claims: any; kpler: any; lloyds: any;
-    portwatch: { baseline: number | null; tankerBaseline: number | null; mean7: number | null; tanker7: number | null; latestDate: string | null; pct: number | null; source: any };
+    portwatch: { baseline: number | null; tankerBaseline: number | null; mean7: number | null; tanker7: number | null; latestDate: string | null; pct: number | null; source: any; live?: { asOf: string; source: string } };
     tradeBalance: Pt | null; imports: Pt | null; customsDuties: Pt | null; customsDutiesPeak: Pt | null;
     attacks: any; warRisk: any;
   };
+  /** Treasury Fiscal Data (snapshot), patched live in the browser when reachable. */
+  fiscal: {
+    debt: { latest: Pt | null; handover: Pt | null; live?: { asOf: string; source: string } } | null;
+    customs: any; interest: any;
+  };
+  /** New September 2026 blocks, passed through for V5 and the strait readouts. */
+  eia: any; chain: any; chokepoints: any; nowcast: any; odds: any; receiptInputs: any;
   other: { v: string; l: string; w: string }[];
   breadth: { headline: Pt | null; median: Pt | null; gap: number | null };
   eventStudy: any;
@@ -351,6 +358,14 @@ export function deriveFigures(snap: Record<string, any>): Figures {
       jobsMonth: jobsMonth ?? '—', crudeDate: crudeLatest?.date ?? '—', label: asOfLabel,
     },
     masthead, ticker, shelf, crossing, choices, work, squeeze, gold, trade, other,
+    fiscal: {
+      debt: snap.fiscal?.debt && !snap.fiscal.debt.error
+        ? { latest: pt(snap.fiscal.debt.latest), handover: pt(snap.fiscal.debt.handover) }
+        : null,
+      customs: snap.fiscal?.customs ?? null, interest: snap.fiscal?.interest ?? null,
+    },
+    eia: snap.eia ?? null, chain: snap.chain ?? null, chokepoints: snap.chokepoints ?? null,
+    nowcast: snap.nowcast ?? null, odds: snap.polymarket ?? null, receiptInputs: snap.receipt_inputs ?? null,
     breadth: { headline: bh, median: bmed, gap: bh && bmed ? bh.value - bmed.value : null },
     eventStudy: snap.event_study ?? null,
     sources: {

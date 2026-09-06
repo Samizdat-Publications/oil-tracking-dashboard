@@ -121,6 +121,17 @@
     "source_tier": 2
   },
   {
+    "id": "canada-338",
+    "date": "2026-07-20",
+    "kind": "tariff",
+    "sign": 1,
+    "study": false,
+    "headline": "Trump imposes 50% Section 338 tariffs on Canadian vehicles, alcohol and dairy",
+    "description": "Three proclamations under the 1930 Tariff Act, covering about C$27.6 billion of Canadian exports; energy, potash and Section 232 goods excluded. The White House says the duties apply regardless of USMCA origin and that the agreement will not be renewed in its current form.",
+    "source_url": "https://www.whitehouse.gov/fact-sheets/2026/07/fact-sheet-president-donald-j-trump-imposes-additional-tariffs-on-canada/",
+    "source_tier": 1
+  },
+  {
     "id": "saudi-tankers",
     "date": "2026-07-23",
     "kind": "war",
@@ -165,6 +176,17 @@
     "source_tier": 2
   },
   {
+    "id": "spr-below-300",
+    "date": "2026-08-10",
+    "kind": "policy",
+    "sign": -1,
+    "study": false,
+    "headline": "Strategic Petroleum Reserve falls below 300 million barrels, lowest since 1983",
+    "description": "Emergency releases to hold prices down have drawn the reserve to its lowest level in more than forty years. EIA weekly stocks read 286.6 million barrels by 28 August.",
+    "source_url": "https://www.cnbc.com/2026/08/10/oil-in-strategic-petroleum-reserve-falls-below-300-million-barrels-lowest-since-1983.html",
+    "source_tier": 2
+  },
+  {
     "id": "july-cpi",
     "date": "2026-08-12",
     "kind": "context",
@@ -198,6 +220,17 @@
     "source_tier": 2
   },
   {
+    "id": "canada-338-in-force",
+    "date": "2026-08-22",
+    "kind": "tariff",
+    "sign": 1,
+    "study": false,
+    "headline": "Section 338 tariffs on Canada take effect after talks collapse",
+    "description": "A three-day pause for negotiations ends without a deal; Prime Minister Carney recalls Canada's negotiators. The 50% duties enter into force at 12:01 a.m.",
+    "source_url": "https://www.aljazeera.com/news/2026/8/22/carney-canada-will-enact-retaliatory-us-tariffs-starting-september-8",
+    "source_tier": 2
+  },
+  {
     "id": "mines-cleared",
     "date": "2026-08-25",
     "kind": "policy",
@@ -206,6 +239,17 @@
     "headline": "US Navy says it has cleared mines from the strait",
     "description": "Officials confirm underwater drones identified more than 100 suspected mines. Transits do not recover: PortWatch counts four vessels that day.",
     "source_url": "https://en.wikipedia.org/wiki/2026_Iran_war",
+    "source_tier": 2
+  },
+  {
+    "id": "venezuela-spr",
+    "date": "2026-08-29",
+    "kind": "policy",
+    "sign": -1,
+    "study": false,
+    "headline": "Trump announces a deal with Caracas to refill the SPR with Venezuelan crude",
+    "description": "Announced as the reserve sits at a 44-year low. No volumes or dates published.",
+    "source_url": "https://www.npr.org/2026/08/16/nx-s1-5930403/u-s-oil-reserves-hit-the-lowest-level-seen-in-over-40-years",
     "source_tier": 2
   },
   {
@@ -251,5 +295,16 @@
     "description": "Well above the 53,000 consensus. Unemployment 4.1%. One strong month lifts the term average to about 42,000 a month against 321,000 in the previous term. Hires rate 3.2%, quits 1.9%: still low-fire, low-hire.",
     "source_url": "https://www.bls.gov/news.release/empsit.nr0.htm",
     "source_tier": 1
+  },
+  {
+    "id": "canada-retaliates",
+    "date": "2026-09-08",
+    "kind": "tariff",
+    "sign": 1,
+    "study": false,
+    "headline": "Canada's dollar-for-dollar counter-tariffs take effect on C$27.6 billion of US goods",
+    "description": "Steel, dairy, appliances, agricultural equipment, pulp and paper, electronics. Carney: talks will not resume until the US changes its approach.",
+    "source_url": "https://www.aljazeera.com/news/2026/8/23/canada-to-hit-us-with-retaliatory-tariffs-as-trade-war-escalates",
+    "source_tier": 2
   }
 ]

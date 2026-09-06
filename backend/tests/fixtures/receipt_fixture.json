@@ -1,0 +1,153 @@
+{
+  "inputs": {
+    "baseline_date": "2025-01-20",
+    "national": {
+      "gasoline": {
+        "delta": 0.8830000000000005,
+        "as_of": "2026-07-01",
+        "baseline": 3.211,
+        "current": 4.094,
+        "baseline_date": "2025-01-01",
+        "source": "BLS average price APU000074714"
+      },
+      "electricity": {
+        "delta": 0.018000000000000016,
+        "as_of": "2026-07-01",
+        "baseline": 0.179,
+        "current": 0.197,
+        "baseline_date": "2025-01-01",
+        "source": "BLS average price APU000072610"
+      }
+    },
+    "staple_moves": {
+      "median_pct": 4.65,
+      "n_items": 10,
+      "items": [
+        {
+          "key": "beef_ground",
+          "name": "Ground beef",
+          "pct": 24.17,
+          "move": 0.24165915238954017
+        },
+        {
+          "key": "steak_round",
+          "name": "Round steak",
+          "pct": 21.96,
+          "move": 0.21955704137066445
+        },
+        {
+          "key": "chicken_breast",
+          "name": "Chicken breast",
+          "pct": 4.64,
+          "move": 0.04635928445452242
+        },
+        {
+          "key": "bacon",
+          "name": "Bacon",
+          "pct": -6.53,
+          "move": -0.06530380465644525
+        },
+        {
+          "key": "eggs",
+          "name": "Eggs",
+          "pct": -55.8,
+          "move": -0.5580456289117707
+        },
+        {
+          "key": "milk",
+          "name": "Milk",
+          "pct": 7.16,
+          "move": 0.07155279503105572
+        },
+        {
+          "key": "bread",
+          "name": "Bread",
+          "pct": -5.45,
+          "move": -0.054545454545454564
+        },
+        {
+          "key": "coffee",
+          "name": "Coffee",
+          "pct": 32.74,
+          "move": 0.3273970651089899
+        },
+        {
+          "key": "bananas",
+          "name": "Bananas",
+          "pct": 4.67,
+          "move": 0.04669887278582929
+        },
+        {
+          "key": "potatoes",
+          "name": "Potatoes",
+          "pct": -2.29,
+          "move": -0.022926829268292592
+        }
+      ]
+    },
+    "assumptions": {
+      "vehicle_mpg": {
+        "value": 25.4,
+        "unit": "mpg",
+        "source": "EPA, average fuel economy of the US light-duty fleet on the road"
+      },
+      "grocery_spend_per_person_month": {
+        "value": 340.0,
+        "unit": "usd",
+        "source": "USDA Food Plans, moderate-cost plan, per person per month"
+      },
+      "electricity_kwh_per_household_month": {
+        "value": 855.0,
+        "unit": "kwh",
+        "source": "EIA Residential Energy Consumption Survey, US average"
+      }
+    }
+  },
+  "cases": [
+    {
+      "miles_per_week": 240,
+      "household_size": 2,
+      "expected": {
+        "fuel": 36.15,
+        "groceries": 31.64,
+        "electricity": 15.39
+      }
+    },
+    {
+      "miles_per_week": 0,
+      "household_size": 1,
+      "expected": {
+        "fuel": 0.0,
+        "groceries": 15.82,
+        "electricity": 15.39
+      }
+    },
+    {
+      "miles_per_week": 100,
+      "household_size": 1,
+      "expected": {
+        "fuel": 15.06,
+        "groceries": 15.82,
+        "electricity": 15.39
+      }
+    },
+    {
+      "miles_per_week": 500,
+      "household_size": 4,
+      "expected": {
+        "fuel": 75.32,
+        "groceries": 63.28,
+        "electricity": 15.39
+      }
+    },
+    {
+      "miles_per_week": 240,
+      "household_size": 3,
+      "expected": {
+        "fuel": 36.15,
+        "groceries": 47.46,
+        "electricity": 15.39
+      }
+    }
+  ]
+}

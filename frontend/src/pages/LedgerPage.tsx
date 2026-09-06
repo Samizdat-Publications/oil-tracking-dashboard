@@ -37,6 +37,7 @@ import HormuzSimulation from '../v4/HormuzSimulation';
 // @ts-expect-error — ported JS module, no types by design
 import { Reveal, ImperativeText, prepareStroke, drawStroke } from '../v4/reveal.js';
 import { getAll } from '../v4/data';
+import { applyLive, fetchLive } from '../v4/live';
 import { deriveFigures, fmt, money, pctS, mon, day, dayShort, monthLong, quarter, type Figures, type Pt } from '../v4/ledger-data';
 // Self-hosted per the brief -- no external asset hosts in production. Weights
 // are the ones tokens.css actually uses: Chivo 900 for display, Chivo Mono 700
@@ -920,7 +921,10 @@ function Trade({ f }: { f: Figures }) {
               <b className="t-label bar-v-lbl">{t.kpler?.ten_day_avg_vessels_per_day ?? '—'}</b>
             </div>
             <div className="bar-row">
-              <span className="t-label bar-k">PortWatch, 7-day average to {pw.latestDate ? day(pw.latestDate) : '—'}</span>
+              <span className="t-label bar-k">
+                PortWatch, 7-day average to {pw.latestDate ? day(pw.latestDate) : '—'}
+                {pw.live && <span className="chip chip-live"> LIVE · fetched in your browser</span>}
+              </span>
               <span className="track track-now"><span className="bar-h fill fill-crimson" style={{ width: `${pw.pct ?? 0}%` }} /></span>
               <b className="t-label bar-v-lbl">{pw.mean7 !== null ? pw.mean7.toFixed(1) : '—'}</b>
             </div>
@@ -1105,10 +1109,19 @@ export default function LedgerPage() {
 
   useEffect(() => {
     let live = true;
+    const ac = new AbortController();
     getAll()
-      .then((snap) => { if (live) setFig(deriveFigures(snap)); })
+      .then((snap) => {
+        if (!live) return;
+        setFig(deriveFigures(snap));
+        // Live where it is free: two keyless, CORS-open sources patch two
+        // readouts after first paint. Silent on failure; the snapshot stands.
+        fetchLive(ac.signal)
+          .then((patch) => { if (live) setFig((f) => (f ? applyLive(f, patch) : f)); })
+          .catch(() => { /* snapshot values stand */ });
+      })
       .catch((e) => { if (live) setErr(String(e?.message ?? e)); });
-    return () => { live = false; };
+    return () => { live = false; ac.abort(); };
   }, []);
 
   if (err) {

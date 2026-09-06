@@ -29,9 +29,22 @@ import numpy as np  # noqa: E402
 
 from services import attribution as A  # noqa: E402
 from services.cache import close_cache, init_cache  # noqa: E402
+from services.chain import chain_snapshot  # noqa: E402
+from services.eia import eia_snapshot  # noqa: E402
+from services.fiscal import fiscal_snapshot  # noqa: E402
 from services.fred_client import get_series  # noqa: E402
 from services.macro import macro_snapshot  # noqa: E402
-from services.portwatch import get_hormuz_transits  # noqa: E402
+from services.nowcast import cleveland_nowcast  # noqa: E402
+from services.odds import odds_snapshot  # noqa: E402
+from services.portwatch import chokepoints_snapshot, get_hormuz_transits  # noqa: E402
+
+#: Blocks the page cannot render without. validate_snapshot.py enforces these;
+#: everything else may fail soft and render as "no data".
+SCHEMA_VERSION = 2
+CRITICAL = ["international", "staples", "jobs", "breadth", "scorecard", "macro", "crude_daily",
+            "administrations", "receipt", "war_milestones", "context",
+            "eia", "fiscal", "chain", "receipt_inputs"]
+SOFT = ["hormuz_transits", "chokepoints", "nowcast", "polymarket"]
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "..", "frontend", "public", "data-snapshot.json")
@@ -82,9 +95,35 @@ async def build() -> dict:
         ("event_study", A.war_event_study("wti")),
         ("receipt", A.receipt(miles_per_week=240, household_size=2)),
         ("macro", macro_snapshot()),
+        ("eia", eia_snapshot()),
+        ("fiscal", fiscal_snapshot()),
+        ("chain", chain_snapshot()),
+        ("receipt_inputs", A.receipt_inputs()),
     ]:
         print(f"  {name} ...", flush=True)
         snap[name] = await coro
+
+    # The receipt picker needs regional prices; merge them in from EIA so the
+    # frontend has one block to read.
+    eia = snap.get("eia") or {}
+    if isinstance(snap.get("receipt_inputs"), dict) and not eia.get("error"):
+        snap["receipt_inputs"]["regions"] = eia.get("gasoline_by_area", {})
+        snap["receipt_inputs"]["electricity_by_state"] = eia.get("electricity_by_state", {})
+        snap["receipt_inputs"]["state_to_padd"] = eia.get("state_to_padd", {})
+
+    # Soft blocks: useful, not load-bearing. A failure here is logged, the block
+    # is null, and the page renders "no data" for it.
+    for name, coro in [
+        ("chokepoints", chokepoints_snapshot()),
+        ("nowcast", cleveland_nowcast()),
+        ("polymarket", odds_snapshot()),
+    ]:
+        print(f"  {name} (soft) ...", flush=True)
+        try:
+            snap[name] = await coro
+        except Exception as exc:
+            print(f"    unavailable: {exc}", flush=True)
+            snap[name] = None
 
     snap["administrations"] = {}
     for m in ADMIN_METRICS:
@@ -125,6 +164,9 @@ async def build() -> dict:
 
     snap["_meta"] = {
         "generated": date.today().isoformat(),
+        "schema_version": SCHEMA_VERSION,
+        "critical": CRITICAL,
+        "soft": SOFT,
         "note": ("Real endpoint responses. Shape matches /api/attribution/<key> "
                  "exactly, so the frontend can swap snapshot -> api with no other "
                  "change. `context` mirrors data/context_figures.json: curated, "

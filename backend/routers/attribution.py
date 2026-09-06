@@ -278,3 +278,67 @@ async def context():
                         "data", "context_figures.json")
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)
+
+
+async def _cached_daily(name: str, compute):
+    key = f"attr:{ATTR_VERSION}:{name}"
+    try:
+        hit = await get_cached(key, "-", "-", ttl=86400)
+        if hit is not None:
+            return hit
+    except Exception as exc:
+        log.warning("attribution cache read failed for %s: %s", name, exc)
+    result = await compute()
+    try:
+        await set_cached(key, "-", "-", result)
+    except Exception as exc:
+        log.warning("attribution cache write failed for %s: %s", name, exc)
+    return result
+
+
+@router.get("/eia")
+async def eia():
+    """SPR, refinery utilisation, crude exports, retail prices by area and state."""
+    from services.eia import eia_snapshot
+    return await _cached_daily("eia", eia_snapshot)
+
+
+@router.get("/fiscal")
+async def fiscal():
+    """Debt to the penny, customs duties net of refunds, interest expense."""
+    from services.fiscal import fiscal_snapshot
+    return await _cached_daily("fiscal", fiscal_snapshot)
+
+
+@router.get("/chain")
+async def chain():
+    """Follow the barrel: descriptive changes and pre-war pass-through per link."""
+    from services.chain import chain_snapshot
+    return await _cached_daily("chain", chain_snapshot)
+
+
+@router.get("/receipt-inputs")
+async def receipt_inputs():
+    """Baselines and staple moves for the client-side household receipt."""
+    return await _cached_daily("receipt_inputs", attr.receipt_inputs)
+
+
+@router.get("/chokepoints")
+async def chokepoints():
+    """IMF PortWatch transits for six chokepoints."""
+    from services.portwatch import chokepoints_snapshot
+    return await chokepoints_snapshot()
+
+
+@router.get("/nowcast")
+async def nowcast():
+    """Cleveland Fed daily inflation nowcast (model estimate, not a print)."""
+    from services.nowcast import cleveland_nowcast
+    return await cleveland_nowcast()
+
+
+@router.get("/odds")
+async def odds():
+    """Curated Polymarket odds, labelled as crowd odds."""
+    from services.odds import odds_snapshot
+    return await odds_snapshot()

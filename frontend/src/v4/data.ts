@@ -50,6 +50,13 @@ const ENDPOINTS = {
   macro: '/macro',
   context: '/context',
   hormuz_transits: '/hormuz-transits',
+  eia: '/eia',
+  fiscal: '/fiscal',
+  chain: '/chain',
+  receipt_inputs: '/receipt-inputs',
+  chokepoints: '/chokepoints',
+  nowcast: '/nowcast',
+  polymarket: '/odds',
 } as const;
 
 export type SnapshotKey = keyof typeof ENDPOINTS | 'administrations' | 'crude_daily' | 'war_milestones';

@@ -56,11 +56,23 @@ MACRO_SERIES: list[tuple[str, str, str, str, str]] = [
     ("cpi_core", "CPILFESL", "CPI: all items less food and energy", "index", "2024-01-01"),
     ("pce_core", "PCEPILFE", "PCE price index ex food and energy", "index", "2024-01-01"),
     ("pce_headline", "PCEPI", "PCE price index", "index", "2024-01-01"),
+    # September 2026 additions -- the metrics the page should have led with.
+    ("continued_claims", "CCSA", "Continued unemployment claims (insured)", "persons", "2025-01-01"),
+    ("real_ahe", "CES0500000013", "Real average hourly earnings, all private (1982-84 $)", "usd", "2024-01-01"),
+    ("prime_epop", "LNS12300060", "Prime-age (25-54) employment-population ratio", "pct", "2025-01-01"),
+    ("participation", "CIVPART", "Labor force participation rate", "pct", "2025-01-01"),
+    ("truck_ppi", "PCU484484", "Producer prices: truck transportation", "index", "2024-01-01"),
+    ("fertilizer_ppi", "PCU325311325311", "Producer prices: nitrogenous fertilizer", "index", "2024-01-01"),
+    ("eu_gas", "PNGASEUUSDM", "Natural gas, Europe (IMF, $/MMBtu)", "usd_mmbtu", "2024-01-01"),
+    ("cpi_food_away", "CUSR0000SEFV", "CPI: food away from home", "index", "2024-01-01"),
+    ("saving_rate", "PSAVERT", "Personal saving rate", "pct", "2025-01-01"),
 ]
 
 #: Index series whose 12-month change the page quotes.
 MACRO_YOY_KEYS = ["cpi_energy", "cpi_gasoline", "cpi_airfares", "cpi_food_home",
-                  "cpi_headline_nsa", "cpi_core", "pce_core", "pce_headline"]
+                  "cpi_headline_nsa", "cpi_core", "pce_core", "pce_headline",
+                  "real_ahe", "truck_ppi", "fertilizer_ppi", "eu_gas", "cpi_food_away",
+                  "import_prices_ex_pet"]
 
 
 def nearest_on_or_before(points: list[dict], when: str) -> dict | None:

@@ -677,3 +677,102 @@ pre-registered events, not on the count.
   summary of contemporaneous reporting.
 - Whether Germany's Bundesbank has made any formal statement since June on New York holdings.
 - The 2 Sep and later WTI closes once FRED publishes them (rebuild the snapshot).
+
+
+---
+
+## September 2026 update II — the metrics we should have led with, the chain, and the war's own bill
+
+**Written 2026-09-05**, same day as update I, after a review of what the page was missing.
+Every figure is either a FRED/EIA/Treasury/PortWatch series in the snapshot (blocks `macro`,
+`eia`, `fiscal`, `chain`, `chokepoints`, `nowcast`, `polymarket`, `receipt_inputs`) or an entry in
+`backend/data/context_figures.json` with source, URL and tier. FRED wins any disagreement.
+
+### Metrics — replace or add
+
+| Instead of | Use | Reading | Source (tier) |
+|---|---|---|---|
+| U-3 | **U-6** as the slack headline | 7.7% (Aug) | BLS `U6RATE` (1) |
+| Nominal AHE +3.1% | **Real AHE −0.2% y/y** (Jul) | wages behind prices | BLS Real Earnings; `CES0500000013` (1) |
+| "Initial claims low" | **Continued claims** for *duration* | 1.78M (Aug) — ~160k below a year ago; never call it high | DOL `CCSA` (1) |
+| Sentiment 51.7 | **By party** | Republicans −19% vs pre-war, lowest since the 2024 election | Michigan Aug 2026 (1) |
+| Quarterly gross duties | **MTS customs duties, monthly, NET of refunds** | **May, June (−$25.6bn), July (−$8.5bn) negative**; peak +$31.4bn Oct 2025 | Treasury `mts_table_9` (1) |
+| — | **Interest expense** | $1.27tn FYTD all categories, **$982bn** public issues (Aug); CBO $1.0tn FY26; 18.5% of revenue | Fiscal Data; CBO (1) |
+| — | **Debt to the penny** | **$40.10tn** (3 Sep) from $36.21tn at the handover | Fiscal Data (1) |
+| Crude only | **SPR** | **286.6M bbl** (28 Aug), lowest since 1983, from 394.6M at the handover | EIA `WCSSTUS1` (1) |
+| — | **Refinery utilisation** | **98%** — no slack; why diesel leads | EIA `WPULEUS3` (1) |
+| — | **US crude exports** | 4.5 mb/d — producers sell into the shortage | EIA `WCREXUS2` (1) |
+| National gasoline | **29 EIA areas weekly** (US, PADDs, 9 states, 10 metros); **residential electricity by state** | CA $5.52, TX $3.58, US $4.07 (31 Aug); US electricity 18.3¢/kWh (Jun) vs 15.9¢ (Jan 2025) | EIA (1) |
+| Hormuz only | **Six PortWatch chokepoints** | Hormuz **4.3/day, 5% of baseline**; Bab el-Mandeb 26/day (78%); Suez 43 (111%); Cape 92 (103%) | IMF PortWatch (1) |
+| Static CPI | **Cleveland Fed nowcast** | Aug CPI **3.38%** y/y, Sep 3.43%; core 2.38 / 2.32 (4 Sep) | Cleveland Fed (1; model) |
+| — | **Crowd odds** | Fed hike in Sep ~50%; regime falls before 2027 6.5%; US invades before 2027 14.5% | Polymarket (2; odds, not data) |
+
+Note on the chokepoint baselines: Jan 2025–Feb 2026 was itself depressed for Suez and Bab
+el-Mandeb by the 2024–25 Houthi campaign, so "111% of baseline" at Suez is recovery from a low
+base, not normal traffic. Say so.
+
+### The chain — estimated, not asserted (block `chain`, pre-war samples, HAC errors)
+
+| Link | Long-run elasticity (95%) | Peak lag | n pre-war | Latest y/y |
+|---|---|---|---|---|
+| WTI → diesel | **0.38** (0.22–0.54) | 0 wk | 1,094 | diesel +51% |
+| Diesel → truck-transport PPI | **0.13** (0.07–0.19) | 0 mo | 244 | PPI +8.2% |
+| Truck PPI → food at home | **0.42** (0.27–0.56) | **~4 months** | 244 | food at home +2.7% |
+| WTI → jet fuel | **0.65** (0.48–0.83) | 0 wk | 1,095 | jet +83% |
+| Jet fuel → airline fares | **0.18** (0.04–0.31) | 0 mo | 243 | fares +25.5% |
+| EU gas → nitrogen fertiliser PPI | **0.30** (0.19–0.42) | **~2 months** | 245 | fertiliser +45%, gas +56% |
+
+Every link is significant at 5% on data that end before the war. The four-month lag from
+freight to the shelf means the diesel record of late August reaches grocery prices around
+the turn of the year; the two-month lag from gas to fertiliser is already in the July PPI.
+These are reduced-form associations and the page says so; they are not structural parameters.
+
+Context for the fertiliser chain (Tier 1/2): the Gulf supplies ~25% of world urea exports;
+Ras Laffan repairs 3–5 years; urea peaked ~$850/t in April (+80% since February); US
+farmers had secured 60% of 2026 nitrogen; TTF +130% YTD (World Bank, WTO data blog, CNBC,
+Euronews).
+
+### Trade disputes since June (context `trade_disputes`)
+
+Canada: **50% Section 338** on vehicles, alcohol and dairy proclaimed 20 Jul (C$27.6bn),
+three-day pause 18 Aug, in force **22 Aug** after talks collapsed, Canadian counter-tariffs
+in force **8 Sep**; White House: USMCA not renewed as is. Brazil 25% §301 (22 Jul). §301
+forced-labour 10%/12.5% replaces §122 (24 Jul). Pharma §232 (31 Jul). EU 10% (28 Jul).
+Drones §232 (3 Sep). Polysilicon §232 (Dec). China crane tariffs delayed to 10 Nov.
+
+### What the war cost America (context `war_cost`) — the rule is the same: sourced, no adjectives
+
+- **Dollars:** DoD **$37.5bn** to 21 Jul (Hegseth, Senate Appropriations); $29bn at 12 May
+  (Comptroller Hurst); **$67.1bn** supplemental requested, **$21bn munitions**. Moody's Analytics:
+  domestic cost up to $150bn including energy (T2). Trump, 28 Feb: "four to five weeks".
+- **Lives:** **18 US service members killed**, hundreds injured (NBC data desk, 28 Aug). An
+  unofficial tally says 20 killed / 762 injured (T3; cite as alternative only).
+- **Airframes:** **CRS IN12692** — 42 aircraft lost or damaged to 13 May: 4 F-15E, 1 F-35A,
+  1 A-10, 7 KC-135, 1 E-3, 2 MC-130J, 1 HH-60W, 24 MQ-9, 1 MQ-4C; **DoD loss estimate $2.6bn**.
+  Three F-15Es were friendly fire (2 Mar); five KC-135s were hit on the ground at Prince
+  Sultan (14 Mar). Per-type pricing only from DoD unit costs where CRS gives them.
+- **Bases and logistics:** the Navy's Bahrain hub struck on 28 Feb; ≥228 structures or
+  equipment damaged across US sites (WaPo); supply runs 2,200 miles to Diego Garcia; USS
+  Abraham Lincoln ~9 months without a port call, relieved 20 Aug (Stars and Stripes, Defense
+  News — T2).
+- **Munitions:** CSIS (27 Jul) ~one-third of Patriot interceptors remaining, ≥3 years to
+  rebuild; CNN ~80% of THAAD and ~half of Patriots used. **Hegseth disputes** (5 Aug);
+  Trump demanded answers (Axios 3 Sep). The page shows the estimate, the denial, and the
+  $21bn munitions line beside each other. It does not use the word "cover-up".
+- **Imagery:** Planet Labs suspended Middle East imagery indefinitely on 5 Apr "following a
+  direct request from the United States government", retroactive to 9 Mar (CBS, WaPo, NPR).
+  Stated as fact; the reader draws the conclusion.
+- **Keep off:** the "174+" losses tracker (T3); anything about a leak investigation until a
+  named outlet reports specifics.
+
+### Pipeline
+
+The snapshot is now schema v2 with a validate gate (`backend/scripts/validate_snapshot.py`)
+and a GitHub Actions workflow (`.github/workflows/refresh-and-deploy.yml`) that rebuilds,
+gates, tests, builds and deploys every weekday at 13:00 UTC, then commits the snapshot back.
+Critical blocks: the August set plus `eia`, `fiscal`, `chain`, `receipt_inputs`. Soft blocks
+(`hormuz_transits`, `chokepoints`, `nowcast`, `polymarket`) may be null. The household
+receipt is now recomputed in the browser (`frontend/src/v4/receipt.ts`) from
+`receipt_inputs`, pinned to the Python arithmetic by a shared fixture, with a state picker
+that swaps in EIA regional gasoline and state electricity. Debt-to-the-penny and the Hormuz
+count are fetched live in the browser from keyless, CORS-open endpoints and marked LIVE.

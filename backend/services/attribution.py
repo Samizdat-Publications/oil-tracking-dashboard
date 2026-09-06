@@ -1262,14 +1262,23 @@ async def passthrough(good_key: str, *, max_lag: int = 8) -> dict:
                            name=SERIES_NAMES.get(good_key, good_key),
                            sa=good_key not in {"gasoline", "diesel", "natural_gas"})
 
-    oil_pre = tsmod.slice_between(oil, end=WAR_DATE, inclusive_end=False)
-    good_pre = tsmod.slice_between(good, end=WAR_DATE, inclusive_end=False)
+    return await passthrough_pair(oil, good, max_lag=max_lag)
+
+
+async def passthrough_pair(x: TS, y: TS, *, max_lag: int = 8) -> dict:
+    """Distributed-lag pass-through from ANY regressor series x to a good y.
+
+    Estimated on the pre-war sample only. `passthrough()` is the WTI special
+    case; `services/chain.py` uses this for every link in the barrel chain.
+    """
+    oil_pre = tsmod.slice_between(x, end=WAR_DATE, inclusive_end=False)
+    good_pre = tsmod.slice_between(y, end=WAR_DATE, inclusive_end=False)
     if len(good_pre) < 60:
-        return {"insufficient_data": True, "good": good_key, "n": len(good_pre)}
+        return {"insufficient_data": True, "good": y.key, "n": len(good_pre)}
 
     dates, ox, gy = tsmod.align(oil_pre, good_pre)
     if dates.size < 60:
-        return {"insufficient_data": True, "good": good_key, "n_aligned": int(dates.size)}
+        return {"insufficient_data": True, "good": y.key, "n_aligned": int(dates.size)}
 
     dx, dy = np.diff(np.log(ox)), np.diff(np.log(gy))
     lag = min(max_lag, max(2, dx.size // 20))
@@ -1280,7 +1289,7 @@ async def passthrough(good_key: str, *, max_lag: int = 8) -> dict:
 
     freq_days = {"D": 1, "W": 7, "M": 30.44}[good_pre.freq if good_pre.freq != "D" else "D"]
     return {
-        "good": good_key, "name": good.name, "oil": "wti",
+        "good": y.key, "name": y.name, "oil": x.key, "oil_name": x.name,
         "frequency": good_pre.freq, "n_obs": int(dl["n"]), "max_lag": lag,
         "lags": [
             {"lag": i, "days": round(i * freq_days),
@@ -1359,6 +1368,117 @@ RECEIPT_ASSUMPTIONS = {
 }
 
 
+def receipt_lines(prices: dict, staple_moves: list[float], *, miles_per_week: float,
+                  household_size: int, assumptions: dict) -> list[dict]:
+    """The receipt arithmetic with no I/O. Ported line-for-line to
+    frontend/src/v4/receipt.ts; backend/tests/test_receipt.py pins the two.
+
+    prices: {"gasoline": {"delta", "as_of", "baseline", "current"}, "electricity": {...}}
+    staple_moves: fractional moves (0.05 = +5%) across tracked staples.
+    """
+    a = assumptions
+    lines = []
+    fuel = prices.get("gasoline")
+    if fuel:
+        d, when, base_v, now_v = fuel["delta"], fuel["as_of"], fuel["baseline"], fuel["current"]
+        gallons_month = (miles_per_week * 52.0 / 12.0) / a["vehicle_mpg"]["value"]
+        lines.append({
+            "key": "fuel", "label": "Fuel", "category": "fuel",
+            "monthly_usd": round(d * gallons_month, 2),
+            "unit_change": round(d, 3), "unit": "per gallon",
+            "baseline_price": round(base_v, 3), "current_price": round(now_v, 3),
+            "quantity": round(gallons_month, 1), "quantity_unit": "gallons/month",
+            "as_of": when,
+            "arithmetic": (
+                f"${d:.2f}/gal x {gallons_month:.0f} gal/month "
+                f"({miles_per_week:.0f} mi/week / {a['vehicle_mpg']['value']} mpg)"
+            ),
+        })
+    if staple_moves:
+        basket_pct = float(np.median(staple_moves))
+        spend = a["grocery_spend_per_person_month"]["value"] * household_size
+        lines.append({
+            "key": "groceries", "label": "Groceries", "category": "food",
+            "monthly_usd": round(spend * basket_pct, 2),
+            "unit_change": round(basket_pct * 100, 2), "unit": "percent",
+            "quantity": round(spend, 2), "quantity_unit": "usd/month spend",
+            "n_items": len(staple_moves),
+            "arithmetic": (
+                f"median move across {len(staple_moves)} tracked staples "
+                f"({basket_pct*100:+.1f}%) x ${spend:.0f}/month grocery spend "
+                f"({household_size} people)"
+            ),
+        })
+    elec = prices.get("electricity")
+    if elec:
+        d, when, base_v, now_v = elec["delta"], elec["as_of"], elec["baseline"], elec["current"]
+        kwh = a["electricity_kwh_per_household_month"]["value"]
+        lines.append({
+            "key": "electricity", "label": "Electricity", "category": "energy",
+            "monthly_usd": round(d * kwh, 2),
+            "unit_change": round(d, 4), "unit": "per kWh",
+            "baseline_price": round(base_v, 4), "current_price": round(now_v, 4),
+            "quantity": kwh, "quantity_unit": "kWh/month", "as_of": when,
+            "arithmetic": f"${d:.4f}/kWh x {kwh:.0f} kWh/month",
+        })
+    return lines
+
+
+async def _receipt_prices(since: str) -> tuple[dict, list[float], list[dict]]:
+    """Load the series the receipt needs and reduce them to deltas + moves."""
+    keys = ["gasoline_ap", "electricity", "utility_gas"] + [
+        s.key for s in specs_in("staple")
+        if s.key not in {"gasoline_ap", "electricity", "utility_gas"}
+    ]
+    series = await _load_many([BY_KEY[k] for k in keys], "2023-01-01")
+
+    def delta(key: str):
+        ts = series.get(key)
+        if ts is None:
+            return None
+        base = tsmod.last_on_or_before(ts, since)
+        now = tsmod.last_on_or_before(ts, ts.end)
+        if not base or not now:
+            return None
+        return {"delta": now[1] - base[1], "as_of": now[0], "baseline": base[1],
+                "current": now[1], "baseline_date": base[0]}
+
+    prices = {}
+    for key, name in (("gasoline_ap", "gasoline"), ("electricity", "electricity")):
+        d = delta(key)
+        if d:
+            prices[name] = {**d, "source": f"BLS average price {BY_KEY[key].fred_id}"}
+    staple_keys = [s.key for s in specs_in("staple")
+                   if s.key not in {"gasoline_ap", "electricity", "utility_gas"}]
+    moves, items = [], []
+    for k in staple_keys:
+        d = delta(k)
+        if d and d["baseline"] > 0:
+            pct = d["current"] / d["baseline"] - 1.0
+            moves.append(pct)
+            items.append({"key": k, "name": BY_KEY[k].name, "pct": round(pct * 100, 2), "move": pct})
+    return prices, moves, items
+
+
+async def receipt_inputs(*, since: str = HANDOVER_DATE) -> dict:
+    """Everything the client-side receipt needs to recompute itself.
+
+    National BLS baselines and the staple moves come from here; regional
+    gasoline and state electricity are merged in by build_snapshot.py from the
+    EIA block so the picker can switch the fuel and power lines.
+    """
+    prices, moves, items = await _receipt_prices(since)
+    return {
+        "baseline_date": since,
+        "national": prices,
+        "staple_moves": {"median_pct": round(float(np.median(moves)) * 100, 2) if moves else None,
+                         "n_items": len(moves), "items": items},
+        "assumptions": RECEIPT_ASSUMPTIONS,
+        "note": ("Fuel and electricity lines are price deltas times stated quantities; groceries "
+                 "are the MEDIAN staple move times a USDA moderate-cost spend. Adjustable, sourced."),
+    }
+
+
 async def receipt(*, miles_per_week: float = 240.0, household_size: int = 2,
                   since: str = HANDOVER_DATE,
                   assumptions: dict | None = None) -> dict:
@@ -1377,79 +1497,9 @@ async def receipt(*, miles_per_week: float = 240.0, household_size: int = 2,
     if missing:
         raise ValueError(f"refusing to emit dollar figures without sources for: {missing}")
 
-    keys = ["gasoline_ap", "electricity", "utility_gas"] + [
-        s.key for s in specs_in("staple")
-        if s.key not in {"gasoline_ap", "electricity", "utility_gas"}
-    ]
-    series = await _load_many([BY_KEY[k] for k in keys], "2023-01-01")
-
-    def delta(key: str) -> tuple[float, str, float, float] | None:
-        ts = series.get(key)
-        if ts is None:
-            return None
-        base = tsmod.last_on_or_before(ts, since)
-        now = tsmod.last_on_or_before(ts, ts.end)
-        if not base or not now:
-            return None
-        return now[1] - base[1], now[0], base[1], now[1]
-
-    lines = []
-
-    # Fuel -- the largest and most direct line.
-    fuel = delta("gasoline_ap")
-    if fuel:
-        d, when, base_v, now_v = fuel
-        gallons_month = (miles_per_week * 52.0 / 12.0) / a["vehicle_mpg"]["value"]
-        lines.append({
-            "key": "fuel", "label": "Fuel", "category": "fuel",
-            "monthly_usd": round(d * gallons_month, 2),
-            "unit_change": round(d, 3), "unit": "per gallon",
-            "baseline_price": round(base_v, 3), "current_price": round(now_v, 3),
-            "quantity": round(gallons_month, 1), "quantity_unit": "gallons/month",
-            "as_of": when,
-            "arithmetic": (
-                f"${d:.2f}/gal x {gallons_month:.0f} gal/month "
-                f"({miles_per_week:.0f} mi/week / {a['vehicle_mpg']['value']} mpg)"
-            ),
-        })
-
-    # Groceries -- weighted by the observed staple basket move.
-    staple_keys = [s.key for s in specs_in("staple")
-                   if s.key not in {"gasoline_ap", "electricity", "utility_gas"}]
-    pct_moves = []
-    for k in staple_keys:
-        d = delta(k)
-        if d and d[2] > 0:
-            pct_moves.append((d[3] / d[2] - 1.0))
-    if pct_moves:
-        basket_pct = float(np.median(pct_moves))
-        spend = a["grocery_spend_per_person_month"]["value"] * household_size
-        lines.append({
-            "key": "groceries", "label": "Groceries", "category": "food",
-            "monthly_usd": round(spend * basket_pct, 2),
-            "unit_change": round(basket_pct * 100, 2), "unit": "percent",
-            "quantity": round(spend, 2), "quantity_unit": "usd/month spend",
-            "n_items": len(pct_moves),
-            "arithmetic": (
-                f"median move across {len(pct_moves)} tracked staples "
-                f"({basket_pct*100:+.1f}%) x ${spend:.0f}/month grocery spend "
-                f"({household_size} people)"
-            ),
-        })
-
-    # Home energy.
-    elec = delta("electricity")
-    if elec:
-        d, when, base_v, now_v = elec
-        kwh = a["electricity_kwh_per_household_month"]["value"]
-        lines.append({
-            "key": "electricity", "label": "Electricity", "category": "energy",
-            "monthly_usd": round(d * kwh, 2),
-            "unit_change": round(d, 4), "unit": "per kWh",
-            "baseline_price": round(base_v, 4), "current_price": round(now_v, 4),
-            "quantity": kwh, "quantity_unit": "kWh/month", "as_of": when,
-            "arithmetic": f"${d:.4f}/kWh x {kwh:.0f} kWh/month",
-        })
+    prices, pct_moves, _items = await _receipt_prices(since)
+    lines = receipt_lines(prices, pct_moves, miles_per_week=miles_per_week,
+                          household_size=household_size, assumptions=a)
 
     monthly = sum(l["monthly_usd"] for l in lines)
     base_dt = np.datetime64(since, "D")

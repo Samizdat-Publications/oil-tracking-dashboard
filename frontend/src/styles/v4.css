@@ -511,3 +511,6 @@
 @media (prefers-reduced-motion: reduce) {
   .v4-root .vault-bar, .v4-root .tcol-bar { transform: none !important; }
 }
+
+/* Live readouts: patched in the browser from keyless, CORS-open sources. */
+.chip-live { background: var(--green-bright); color: var(--ink); margin-left: 8px; padding: 3px 6px; font-size: .85em; }

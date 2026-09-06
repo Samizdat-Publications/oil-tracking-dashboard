@@ -42,6 +42,25 @@ transits})`. `EVENTS` and `RISK_READ` are dated ISO strings; day offsets are der
 `SPAN` is `export let` and extends to the latest close / transit / event. Do not rewrite
 the drawing maths or coastline arrays.
 
+**Refresh is automated.** `.github/workflows/refresh-and-deploy.yml` rebuilds the snapshot,
+gates it (`backend/scripts/validate_snapshot.py`), tests, builds, deploys to Pages and commits
+the snapshot back every weekday 13:00 UTC. Needs repo secrets FRED_API_KEY, EIA_API_KEY,
+CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. Locally the same sequence is:
+`py scripts/build_snapshot.py && py scripts/validate_snapshot.py ../frontend/public/data-snapshot.json`,
+then `npm test && npm run build`, then the wrangler deploy.
+
+**Schema v2 blocks (Sept 2026):** `eia` (services/eia.py: SPR, refinery utilisation, crude
+exports, gasoline for 29 areas, diesel by PADD, residential electricity by state),
+`fiscal` (services/fiscal.py: debt to the penny, MTS customs duties net of refunds, interest
+expense), `chain` (services/chain.py: crude->diesel->truck PPI->food; crude->jet->fares;
+EU gas->fertiliser, each with a pre-war pass-through elasticity via
+`attribution.passthrough_pair`), `receipt_inputs` (attribution.receipt_inputs + EIA regions;
+the browser recomputes the household receipt in `frontend/src/v4/receipt.ts`, pinned to
+Python by `backend/tests/fixtures/receipt_fixture.json` -- regenerate with
+`py tests/make_receipt_fixture.py`), soft blocks `chokepoints` (six PortWatch straits),
+`nowcast` (Cleveland Fed scrape), `polymarket` (services/odds.py curated questions).
+`frontend/src/v4/live.ts` patches debt and the Hormuz count live in the browser.
+
 **Screenshots for the README:** `npx vite preview --port 4193` then
 `node scripts/shoot.mjs http://localhost:4193/ ../docs/screenshots`.
 
