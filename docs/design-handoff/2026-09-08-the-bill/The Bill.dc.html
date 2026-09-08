@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<style>
+html,body{margin:0;background:#0B1E3F;color:#F7F5F0;} html{scroll-snap-type:y proximity}
+a{color:#F7F5F0} a:hover{color:#D4A017}
+details summary::-webkit-details-marker{display:none}
+@media (max-width:640px){ .g-num{font-size:104px !important} .g-side{display:none !important} .g-sentence{font-size:19px !important} .g-bottom{padding:0 20px 28px !important} .g-top{padding:20px !important} .p-grid{grid-template-columns:minmax(0,1fr) !important;grid-template-rows:auto minmax(0,1fr);padding:8px 16px 0 !important;gap:10px 0 !important} .p-pump{order:-1;gap:6px !important;flex:none} .p-pump > div{width:100%;gap:2px !important} .p-pump > div > div:nth-child(2){font-size:64px !important;padding:4px 8px !important;justify-content:center;border-radius:6px !important} .p-pump > div > div:nth-child(1){font-size:9px !important} .p-pump > div > div:nth-child(3){font-size:9px !important} .p-sentence{font-size:14px !important;line-height:1.3 !important;max-width:none !important} .p-cell{font-size:clamp(11px,2vh,28px) !important} .p-row{font-size:12px !important} .p-bottom{padding:8px 16px 14px !important;gap:8px 16px !important;align-items:center !important;flex-wrap:nowrap !important} .p-total{font-size:34px !important} .p-total-label{display:none !important} .a-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;padding:8px 16px !important} .p-cum{display:block !important;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#D4A017;padding:0 16px 6px} .p-bottom > label{flex:0 1 auto !important;min-width:0} .p-state{min-width:0 !important;width:100%;font-size:12px !important;padding:8px 28px 8px 10px !important;max-width:140px} .p-state-label{display:none !important} }
+select option{background:#061530;color:#F7F5F0}
+</style>
+</helmet>
+<div style="font-family:'Source Serif 4',Georgia,serif;background:#0B1E3F;color:#F7F5F0;overflow:clip">
+
+  <section data-screen-label="00 The globe" style="position:relative;height:160vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#0B1E3F">
+      <canvas ref="{{ canvasRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+
+      <div class="g-top" style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px;pointer-events:none">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div ref="{{ dateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85"></div>
+          <div ref="{{ eventRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;letter-spacing:.06em;max-width:460px;line-height:1.5;text-wrap:pretty;text-shadow:0 1px 6px rgba(11,30,63,.9)"></div>
+        </div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">SHIPS A DAY THROUGH SIX STRAITS<br>COUNTED FROM SATELLITE · IMF PORTWATCH</div>
+      </div>
+
+      <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;justify-content:space-between;align-items:flex-end;gap:32px;pointer-events:none">
+        <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#B22234;flex:none"></span>HIS WAR SHUT THE STRAIT OF HORMUZ</div>
+        <div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap">
+            <div class="g-num" ref="{{ numRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,240px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">83</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">ships a day<br>through Hormuz<br><span ref="{{ wasRef }}" style="color:rgba(247,245,240,.6)">before his war</span></div>
+          </div>
+          <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:640px;text-wrap:pretty;color:#F7F5F0">Before his war, eighty-three ships a day came through the Strait of Hormuz. Now four do. The oil goes the long way round Africa.</p>
+        </div>
+        <div class="g-side" ref="{{ legendRef }}" style="display:flex;flex-direction:column;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;color:rgba(247,245,240,.75);text-align:right;flex:none"></div>
+      </div>
+
+      <div ref="{{ cueRef }}" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;transition:opacity .4s">SCROLL</div>
+    </div>
+  </section>
+
+  <section style="background:#F7F5F0;color:#0B1E3F;padding:56px 36px 72px">
+    <details style="max-width:820px;margin:0 auto">
+      <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F">
+        <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · THE GLOBE
+      </summary>
+      <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
+        <p style="margin:0;text-wrap:pretty">Every moving dot on the globe is a share of a daily ship count. The IMF's PortWatch project estimates transit calls at each strait from satellite AIS positions. Ships transmitting no position are not counted, so each figure is a floor on traffic, not a census, and it is not a queue count. Recent days are revised as late AIS data arrives.</p>
+        <div style="display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr));gap:8px 16px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.02em">
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25)">STRAIT</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">BEFORE THE WAR</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">LAST 7 DAYS</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">OF BEFORE</div>
+          <sc-for list="{{ workRows }}" as="r" hint-placeholder-count="6">
+            <div style="display:contents">
+              <div>{{ r.name }}</div>
+              <div style="text-align:right">{{ r.base }}</div>
+              <div style="text-align:right;color:#8a6a0c;font-weight:500">{{ r.now }}</div>
+              <div style="text-align:right">{{ r.pct }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty">"Before the war" is the mean of daily counts from 1 January 2025 to 27 February 2026 (423 days). "Last 7 days" is the trailing mean ending 30 August 2026. Before the strike every strait is held at its pre-war mean. From 28 February, Hormuz follows its daily series day by day. For the other five straits the snapshot carries daily counts from 3 May 2026; between the strike and that date the globe draws a straight line from the pre-war mean to the first observed week, and says so here. The routes the dots follow are drawn schematically through each strait; ship positions are a model, the counts are not. "The long way round Africa" rests on Cape of Good Hope traffic at 103% of its pre-war mean while Bab el-Mandeb sits at 78%.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Source: IMF PortWatch (IMF / University of Oxford), AIS-based estimates, as of {{ asOf }} · <a href="https://portwatch.imf.org/" target="_blank" rel="noopener" style="color:#0B1E3F">portwatch.imf.org</a><br>Coastlines: Natural Earth via world-atlas, 1:110m for the globe and 1:50m for the Gulf region. The lane through the strait is the real Traffic Separation Scheme; the 33 km gate runs between Musandam and Larak.
+        </p>
+      </div>
+    </details>
+  </section>
+
+  <section data-screen-label="01 Two dates" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div ref="{{ stampStageRef }}" style="position:sticky;top:0;height:100vh;overflow:hidden;background:#6E1B27;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,4vh,40px);padding:24px">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <div ref="{{ stamp1Ref }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:clamp(12px,2.6vh,24px) clamp(20px,5vw,56px);border:4px double #F7F5F0;border-radius:6px;color:#F7F5F0;transform:rotate(-4deg) scale(1.8);opacity:0;will-change:transform,opacity;max-width:94vw;text-align:center">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(11px,1.6vh,14px);letter-spacing:.3em">ORDERED</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(64px,15vh,160px);line-height:.9;letter-spacing:-.01em;white-space:nowrap">28 FEB 2026</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3vh,30px);line-height:1.1;text-transform:uppercase;letter-spacing:.04em">He ordered the strike</div>
+      </div>
+      <div ref="{{ stamp2Ref }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:clamp(12px,2.6vh,24px) clamp(20px,5vw,56px);border:4px double #F7F5F0;border-radius:6px;color:#F7F5F0;transform:rotate(3deg) scale(1.8);opacity:0;will-change:transform,opacity;max-width:94vw;text-align:center">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(11px,1.6vh,14px);letter-spacing:.3em">IMPOSED</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(64px,15vh,160px);line-height:.9;letter-spacing:-.01em;white-space:nowrap">24 FEB 2026</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3vh,30px);line-height:1.1;text-transform:uppercase;letter-spacing:.04em;text-wrap:balance">He re-imposed the tariffs a court had struck down</div>
+      </div>
+      <div ref="{{ stampNoteRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:clamp(11px,1.5vh,13px);letter-spacing:.14em;color:rgba(247,245,240,.75);opacity:0;text-align:center;transition:opacity .4s">STRUCK DOWN · 20 FEB 2026 · SUPREME COURT, 6–3 · IMPOSED AGAIN FOUR DAYS LATER</div>
+      <p ref="{{ stampSentenceRef }}" class="g-sentence" style="margin:0;font-size:24px;line-height:1.35;max-width:640px;text-wrap:pretty;color:#F7F5F0;text-align:center;opacity:0;transition:opacity .4s">Every red mark on this page traces back to these two dates.</p>
+    </div>
+  </section>
+
+  <section data-screen-label="02 Oil doubled" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#0B1E3F">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <canvas ref="{{ seisRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div class="g-top" style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px;pointer-events:none">
+        <div ref="{{ seisDateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85">2 JAN 2026</div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">CRUDE OIL · A BARREL · EVERY DAILY CLOSE<br>WTI CUSHING SPOT · FRED</div>
+      </div>
+      <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#B22234;flex:none"></span>OIL DOUBLED IN FIVE WEEKS</div>
+        <div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap">
+          <div class="g-num" ref="{{ seisNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,200px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">$57</div>
+          <div ref="{{ seisSubRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">a barrel<br><span style="color:rgba(247,245,240,.6)">in January</span></div>
+        </div>
+        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:640px;text-wrap:pretty;color:#F7F5F0">Crude was $57 in January. Five weeks after his strike it was $115. It fell to $70 when he agreed a ceasefire, and it is $91 now that he has broken it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F7F5F0;color:#0B1E3F;padding:56px 36px 72px">
+    <details style="max-width:820px;margin:0 auto">
+      <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F">
+        <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · TWO DATES AND OIL
+      </summary>
+      <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The dates.</strong> On 20 February 2026 the Supreme Court held in <em>Learning Resources v. Trump</em>, 6–3, that the International Emergency Economic Powers Act does not authorise tariffs; collection ended 24 February. The same day, Proclamation 11012 imposed a 10% surcharge under Section 122 on roughly $1 trillion of imports. On 28 February the United States and Israel struck Iran and the Strait of Hormuz closed. On 24 July the Section 122 surcharge expired by statute and Section 301 tariffs became the operative regime; the stamp marks the act, not the expiry.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The trace.</strong> {{ crudeCount }} daily closes of WTI crude at Cushing, Oklahoma, 2 January to {{ crudeLast }} 2026, from FRED series DCOILWTICO. This is the spot price, not the futures contract: press figures for 8 July quote $73.52 from the futures contract while spot closed $74.56. Both are correct and they are different instruments. The peak close is $114.58 on 7 April, the day the first ceasefire was announced. The last close before the strike was $66.96 on 27 February; the peak came 39 days later. Red ticks mark his acts, blue ticks the two ceasefires. Weekends and holidays have no close and the needle holds.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: FRED DCOILWTICO (EIA) · Supreme Court, <em>Learning Resources v. Trump</em>, 20 Feb 2026 · Dallas Fed, June 2026, on the tariff ruling.</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-screen-label="03 The strait" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#0B1E3F">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <canvas ref="{{ straitRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div class="g-top" style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px;pointer-events:none">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div ref="{{ strDateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85">1 JAN 2026</div>
+          <div ref="{{ strEventRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;letter-spacing:.06em;max-width:460px;line-height:1.5;text-wrap:pretty;text-shadow:0 1px 6px rgba(11,30,63,.9)"></div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7;position:absolute;right:36px;bottom:40px">SHIPS COUNTED FROM SATELLITE · IMF PORTWATCH · POSITIONS ARE A MODEL</div>
+      </div>
+      <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#B22234;flex:none"></span>HE SAYS IT IS OPEN. THE SATELLITES SAY NO.</div>
+        <div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap">
+          <div class="g-num" ref="{{ strNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,240px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">83</div>
+          <div ref="{{ strSubRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">ships a day<br><span style="color:rgba(247,245,240,.6)">before his war</span></div>
+        </div>
+        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:640px;text-wrap:pretty;color:#F7F5F0">He says thirty ships a night. The satellites count four. Before his war it was eighty-three a day.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F7F5F0;color:#0B1E3F;padding:56px 36px 72px">
+    <details style="max-width:820px;margin:0 auto">
+      <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F">
+        <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · THE STRAIT
+      </summary>
+      <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
+        <p style="margin:0;text-wrap:pretty">The coastline is Natural Earth at 1:10m, clipped to a box around the strait; the box is stretched to the screen, so shapes are real and the aspect is not. The lane is the real Traffic Separation Scheme, outbound one side and inbound the other; the gate is the 33 km between Musandam and Larak. Every ship on the screen is a share of the day's count: the IMF PortWatch estimate of transit calls, from satellite AIS positions, averaged over the trailing seven days. Ships transmitting no position are not counted, so the figure is a floor, not a census, and it is not a queue count. Ship positions are a model; the counts are not.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">"Thirty a night."</strong> On 18 August 2026 the President said the strait was "open and operating." That day the MV Minoan Dignity was struck and one crew member was killed; Lloyd's List counted about 14 transits, PortWatch {{ strAug18 }}. The hatched fleet on the screen is his figure drawn to the same scale as the counted one. The pre-war figure is the mean of 423 days, 1 January 2025 to 27 February 2026: {{ strBase }} a day, of which {{ strTanker }} were tankers. Thirteen merchant ships were struck in August; on 25 August the US Navy said it had cleared the mines and PortWatch counted four vessels that day.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: IMF PortWatch (IMF / University of Oxford) chokepoint6, as of {{ asOf }} · Natural Earth 1:10m coastlines · Lloyd's List for the 18 August transit count.</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-screen-label="04 Your prices" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#0B1E3F;display:flex;flex-direction:column">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <div class="g-top" style="display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px 0;pointer-events:none">
+        <div ref="{{ pDateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85">JANUARY 2025</div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">WHAT YOU PAY · JANUARY 2025 AGAINST NOW<br>BLS AVERAGE PRICES · EIA WEEKLY DIESEL</div>
+      </div>
+
+      <div class="p-grid" style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0 48px;padding:18px 36px 0;align-items:stretch">
+        <div style="display:flex;flex-direction:column;min-height:0">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:0 18px;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:rgba(247,245,240,.5);padding:0 0 6px 8px;border-bottom:1px solid rgba(247,245,240,.15);flex:none">
+            <div></div><div style="text-align:right">JAN 2025</div><div style="text-align:right;padding-right:6px">NOW</div><div style="text-align:right;min-width:64px">CHANGE</div>
+          </div>
+          <div ref="{{ boardRef }}" style="flex:1;min-height:0;display:grid;grid-auto-rows:minmax(0,1fr);padding-top:4px">
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="14">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:0 18px;align-items:center;padding:0 0 0 8px;border-bottom:1px solid rgba(247,245,240,.07);min-height:0">
+                <div style="min-width:0;display:flex;flex-direction:column;gap:1px">
+                  <div class="p-row" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(13px,2.4vh,22px);line-height:1;letter-spacing:.02em;text-transform:uppercase;color:#F7F5F0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                  <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:clamp(8px,1.1vh,10px);letter-spacing:.06em;color:rgba(247,245,240,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.unit }} <span style="color:#6C8CD5">{{ r.note }}</span></div>
+                </div>
+                <div class="p-row" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(14px,2.6vh,24px);line-height:1;color:rgba(247,245,240,.55);font-variant-numeric:tabular-nums;text-align:right">{{ r.start }}</div>
+                <div class="p-cell" style="display:flex;gap:2px;justify-content:flex-end;font-size:clamp(15px,3vh,28px)">
+                  <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
+                    <div style="position:relative;width:{{ c.w }};height:1.22em;background:#061530;border-radius:3px;box-shadow:inset 0 0 0 1px rgba(247,245,240,.08),0 1px 0 rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;overflow:hidden">
+                      <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1em;line-height:1;color:{{ c.color }};font-variant-numeric:tabular-nums">{{ c.ch }}</span>
+                      <div style="position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.45)"></div>
+                      <div style="position:absolute;left:0;right:0;top:0;height:50%;background:rgba(247,245,240,.12);opacity:{{ c.flap }}"></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div class="p-row" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(14px,2.6vh,24px);line-height:1;color:{{ r.color }};font-variant-numeric:tabular-nums;text-align:right;min-width:48px;opacity:{{ r.changeOpacity }}">{{ r.change }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="p-pump" style="display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:20px;min-height:0">
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch;max-width:100%">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55)">DIESEL · US AVERAGE · A GALLON</div>
+            <div style="display:flex;align-items:center;gap:8px;background:#061530;border-radius:8px;padding:14px 18px;box-shadow:inset 0 0 0 1px rgba(247,245,240,.1),0 20px 60px rgba(0,0,0,.35);font-size:clamp(64px,15vh,150px)">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1em;line-height:1;color:#D4A017">$</span>
+              <sc-for list="{{ odo }}" as="d" hint-placeholder-count="4">
+                <sc-if value="{{ d.dot }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1em;line-height:1;color:#D4A017">.</span>
+                </sc-if>
+                <sc-if value="{{ d.digit }}" hint-placeholder-val="{{ true }}">
+                  <div style="position:relative;height:1em;width:0.5em;overflow:hidden;background:#0B1E3F;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(247,245,240,.1)">
+                    <div ref="{{ d.ref }}" style="position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;will-change:transform">
+                      <sc-for list="{{ digits }}" as="n" hint-placeholder-count="10">
+                        <div style="height:1em;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1em;line-height:1;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">{{ n }}</div>
+                      </sc-for>
+                    </div>
+                    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,21,48,.75),rgba(6,21,48,0) 12%,rgba(6,21,48,0) 88%,rgba(6,21,48,.75))"></div>
+                  </div>
+                </sc-if>
+              </sc-for>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:24px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;color:rgba(247,245,240,.55)"><span>WAS $3.72 WHEN HE TOOK OFFICE</span><span ref="{{ pWeekRef }}" style="color:#F7F5F0">20 JAN 2025</span></div>
+          </div>
+          <p class="g-sentence p-sentence" style="margin:0;font-size:24px;line-height:1.35;max-width:520px;text-wrap:pretty;color:#F7F5F0">Fourteen things you buy, January 2025 against now. Diesel has not cost this much since 2022. Four went down; we show those too. Eggs fell because the avian flu outbreak ended, not because of anything his administration did.</p>
+        </div>
+      </div>
+
+      <div class="p-cum" style="display:none">{{ cumulativeText }} since 20 Jan 2025</div>
+      <div class="p-bottom" style="padding:14px 36px 28px;display:flex;justify-content:space-between;align-items:flex-end;gap:32px;flex-wrap:wrap;flex:none">
+        <div style="display:flex;align-items:center;gap:14px;min-width:0">
+          <div class="p-total" style="display:flex;gap:3px;font-size:clamp(40px,9vh,86px)">
+            <sc-for list="{{ totalCells }}" as="c" hint-placeholder-count="7">
+              <div style="position:relative;width:{{ c.w }};height:1.12em;background:#061530;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(247,245,240,.1),0 2px 0 rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;overflow:hidden">
+                <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1em;line-height:1;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 30px rgba(212,160,23,.35)">{{ c.ch }}</span>
+                <div style="position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.45)"></div>
+                <div style="position:absolute;left:0;right:0;top:0;height:50%;background:rgba(247,245,240,.12);opacity:{{ c.flap }}"></div>
+              </div>
+            </sc-for>
+          </div>
+          <div class="p-total-label" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.2vh,30px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">a month<br>for a household<br><span style="color:rgba(247,245,240,.6)">in {{ placeName }}</span><br><span style="color:#D4A017">{{ cumulativeText }}</span> <span style="color:rgba(247,245,240,.6)">since 20 Jan 2025</span></div>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:rgba(247,245,240,.55);flex:none">
+          <span class="p-state-label">YOUR STATE · RE-FLIPS FUEL, POWER AND THE TOTAL</span>
+          <select class="p-state" value="{{ state }}" onChange="{{ onState }}" style="appearance:none;-webkit-appearance:none;background:#061530;color:#F7F5F0;border:1px solid rgba(247,245,240,.25);border-radius:4px;padding:10px 40px 10px 14px;font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.06em;min-width:260px;cursor:pointer;background-image:url(&quot;data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'&gt;&lt;path d='M1 1l5 5 5-5' fill='none' stroke='%23D4A017' stroke-width='1.5'/&gt;&lt;/svg&gt;&quot;);background-repeat:no-repeat;background-position:right 14px center">
+            <sc-for list="{{ stateOptions }}" as="o" hint-placeholder-count="3">
+              <option value="{{ o.code }}">{{ o.name }}</option>
+            </sc-for>
+          </select>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F7F5F0;color:#0B1E3F;padding:56px 36px 72px">
+    <details style="max-width:820px;margin:0 auto">
+      <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F">
+        <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · YOUR PRICES
+      </summary>
+      <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
+        <p style="margin:0;text-wrap:pretty">Thirteen of the fourteen prices are the Bureau of Labor Statistics' average prices for US cities, January 2025 against the latest month, July 2026. Diesel is the Energy Information Administration's weekly national average, 20 January 2025 (the week he took office) against 31 August 2026. Each board row flips from the first price to the second; nothing in between is shown. The pump rolls through every published week.</p>
+        <div style="display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr)) minmax(0,1.3fr);gap:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.02em">
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25)">ITEM</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">JAN 2025</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">LATEST</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">CHANGE</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25)">SERIES</div>
+          <sc-for list="{{ workPrices }}" as="r" hint-placeholder-count="14">
+            <div style="display:contents">
+              <div>{{ r.name }} <span style="color:rgba(11,30,63,.55)">{{ r.unit }}</span></div>
+              <div style="text-align:right">{{ r.start }}</div>
+              <div style="text-align:right;color:#8a6a0c;font-weight:500">{{ r.end }}</div>
+              <div style="text-align:right">{{ r.change }}</div>
+              <div style="color:rgba(11,30,63,.7)">{{ r.series }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">The total.</strong> {{ receiptMethod }} Fuel: {{ receiptFuel }}. Groceries: {{ receiptGroceries }}. Electricity: {{ receiptElectricity }}. The grocery line uses the median move across ten tracked staples, which ignores the largest increases on purpose. Household consumption varies enormously; these are national averages.</p>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">Your state.</strong> The running total under the monthly figure multiplies that month by the 17.3 months elapsed, as the published receipt does; prices moved through that window, notably falling back during the June ceasefire, so it is an approximation. Picking a state swaps the fuel and electricity rows and re-totals: gasoline from EIA's weekly state or PADD-region series (31 August 2026 against 20 January 2025), electricity from EIA's monthly state residential price (June 2026 against January 2025). The grocery line stays national. The US row uses the published receipt, which is built on the BLS national series, so the two fuel figures differ by a few cents.</p>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">Not a record.</strong> Diesel at $5.60 is the highest since 2022, not a record: EIA's national weekly average reached $5.82 in June 2022. <strong style="font-weight:600">Eggs.</strong> The fall is real and it is not policy: the 2022–25 spike was avian influenza, and prices came back down as the outbreak ended.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: BLS Average Price Data via FRED (series listed above) · EIA Weekly Retail Gasoline and Diesel Prices · EIA Electric Power Monthly · USDA Food Plans · EPA fleet fuel economy · EIA Residential Energy Consumption Survey.
+        </p>
+      </div>
+    </details>
+  </section>
+
+  <section data-screen-label="05 Nobody is hiring" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#0B1E3F">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <canvas ref="{{ crowdRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div class="g-top" style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px;pointer-events:none">
+        <div ref="{{ crowdDateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85">JANUARY 2025</div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">JOBS ADDED EACH MONTH · ONE FIGURE IS 10,000 PEOPLE<br>BLS PAYROLLS</div>
+      </div>
+      <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#B22234;flex:none"></span>HIRING HAS NEARLY STOPPED</div>
+        <div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap">
+          <div class="g-num" ref="{{ crowdNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,200px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">42,000</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">new jobs a month<br>since he took office<br><span style="color:rgba(247,245,240,.6)">was 321,000</span></div>
+        </div>
+        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:680px;text-wrap:pretty;color:#F7F5F0">Few people are being fired, but if you lose your job you stay out longer than at any point since he took office, and your paycheck buys less than it did a year ago.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F7F5F0;color:#0B1E3F;padding:56px 36px 72px">
+    <details style="max-width:820px;margin:0 auto">
+      <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F">
+        <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · HIRING
+      </summary>
+      <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
+        <p style="margin:0;text-wrap:pretty">Each figure is 10,000 jobs from the BLS monthly change in nonfarm payrolls. The left crowd adds the previous term's average, {{ jobsPrev }} a month over 48 months, for each of the {{ jobsN }} months since 20 January 2025. The right crowd adds what actually happened each month: {{ jobsCurr }} a month on average, five negative months (figures leave in red), and August 2026 at +162,000, the best month in five, drawn brighter because it deserves to be. Median rather than mean would read {{ jobsMed }} against {{ jobsPrevMed }}.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The frozen row.</strong> One hundred figures stand for the unemployed; the lit ones are the share out of work 27 weeks or more: {{ ltu0 }}% in January 2025, {{ ltu1 }}% in August 2026, the highest of his term. Unemployment itself is {{ unemp1 }}%, up from {{ unemp0 }}%: few are being fired (hires rate {{ hires }}%, quits {{ quits }}%), but those who are stay out longer.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The paycheck.</strong> Average hourly earnings rose {{ aheYoy }}% in the year to July 2026; consumer prices rose {{ cpiYoy }}%. The difference, {{ realYoy }}%, is derived from average hourly earnings for all private employees (CES0500000003) and CPI-U, not seasonally adjusted.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: BLS Current Employment Statistics (PAYEMS monthly change) · BLS long-term unemployed share, U-6, JOLTS hires and quits · BLS CPI-U NSA · all via FRED.</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-screen-label="06 What the war cost" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#6E1B27">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <canvas ref="{{ warRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div class="g-top" style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px;pointer-events:none">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85">28 FEB 2026 → NOW · SEVEN MONTHS</div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">HE SAID FOUR TO FIVE WEEKS<br>PENTAGON · CRS · NBC NEWS · CSIS</div>
+      </div>
+      <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#F7F5F0;flex:none"></span>SEVEN MONTHS IN. HE SAID FIVE WEEKS.</div>
+        <p class="g-sentence" style="margin:0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:760px;text-wrap:pretty;color:#F7F5F0">He said four to five weeks. Seven months on, the Navy resupplies from 2,200 miles away, and by one estimate a third of the missile interceptors are left. His Secretary of Defense disputes that number. His own budget request asks for $21 billion to replace them.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F7F5F0;color:#0B1E3F;padding:56px 36px 72px">
+    <details style="max-width:820px;margin:0 auto">
+      <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F">
+        <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · WHAT THE WAR COST
+      </summary>
+      <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Eighteen stars.</strong> US service members killed, NBC News data desk count as of 28 August 2026. A Wikipedia tally of contemporaneous reporting gives 20 killed and 762 injured; the lower, sourced figure is used. Injured: "hundreds."</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Forty-two aircraft.</strong> Congressional Research Service IN12692, "U.S. Aircraft Combat Losses in Operation Epic Fury," as of 13 May 2026: {{ aircraftList }}. Seventeen were manned aircraft and twenty-five were drones, drawn in outline. Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. DoD's loss estimate is $2.6bn.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">$37.5 billion.</strong> Defense Secretary Hegseth to the Senate Appropriations Committee, 21 July 2026, up from $29bn on 12 May. The bar then extends by $67.1bn, the FY2026 supplemental request, of which $21bn is munitions to rebuild stockpiles. Iran struck the Navy's Bahrain logistics hub on the first day; 228 structures were damaged and the fleet resupplies at sea from Diego Garcia, 2,200 miles away.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The interceptors, and the denial.</strong> CSIS estimated roughly a third of Patriot interceptors remained as of 27 July and that rebuilding would take at least three years; CNN reported about 80% of THAAD and half of Patriot stocks used. Secretary Hegseth disputed the reports on 5 August. The President demanded answers on the shortages on 3 September. The $21bn munitions line is consistent with the estimates the Secretary disputes. Both are printed on the screen.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: Defense News, 21 Jul 2026 · CRS IN12692 · NBC News data desk · Washington Post, Stars and Stripes on Bahrain · CSIS, CNN on munitions.</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-screen-label="07 What it buys" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#0B1E3F">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <canvas ref="{{ buyRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div class="g-top" style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px;pointer-events:none">
+        <div ref="{{ buyDateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85">42 AIRCRAFT LOST OR DAMAGED · PENTAGON ESTIMATE $2.6 BILLION</div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">WHAT HE LOST, PRICED IN THINGS YOU BUY<br>CRS · SONY · EIA · COLLEGE BOARD · COSTCO</div>
+      </div>
+      <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#B22234;flex:none"></span>WHAT THE LOST AIRCRAFT COST</div>
+        <div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap">
+          <div class="g-num" ref="{{ buyNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,200px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">0</div>
+          <div ref="{{ buySubRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">PlayStation 5s<br><span style="color:rgba(247,245,240,.6)">for one F-35A</span></div>
+        </div>
+        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:760px;text-wrap:pretty;color:#F7F5F0">Forty-two aircraft lost or damaged, at the Pentagon's own estimate of $2.6 billion: that is {{ buyPS5 }} million PlayStation 5s, or {{ buyDays }} days of every gallon of diesel the country burns, or {{ buyDogs }} Costco hot dogs for every American. The war itself has cost {{ buyRatio }} times that, and he has asked Congress for $67.1 billion more.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F7F5F0;color:#0B1E3F;padding:56px 36px 72px">
+    <details style="max-width:820px;margin:0 auto">
+      <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F">
+        <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · WHAT IT BUYS
+      </summary>
+      <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
+        <p style="margin:0;text-wrap:pretty">Every comparison divides one figure, the Department of Defense's $2.6 billion estimate for the 42 aircraft lost or damaged (Congressional Research Service, 13 May 2026), by one published price. The prices are list or national-average prices at the dates given, not what any particular buyer paid, and none is adjusted for what buying millions of anything would do to its price. Each square on the screen stands for a stated quantity; to the left of the equals sign are the aircraft themselves, manned aircraft filled and drones in outline. The squares drawn in red at the end are the war's $37.5 billion cost to 21 July 2026 at the same scale; they run off the top of the screen because at that scale they do.</p>
+        <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:8px 16px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.02em">
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25)">THING</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">PRICE</div>
+          <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">$2.6BN BUYS</div>
+          <div>PlayStation 5, standard</div><div style="text-align:right">$549.99</div><div style="text-align:right;color:#8a6a0c;font-weight:500">{{ buyPS5 }} million</div>
+          <div>Diesel, a gallon</div><div style="text-align:right">${{ buyDiesel }}</div><div style="text-align:right;color:#8a6a0c;font-weight:500">{{ buyGallons }} million gallons</div>
+          <div>A year of in-state tuition and fees</div><div style="text-align:right">$11,610</div><div style="text-align:right;color:#8a6a0c;font-weight:500">{{ buyTuition }},000 years</div>
+          <div>Costco hot dog and soda</div><div style="text-align:right">$1.50</div><div style="text-align:right;color:#8a6a0c;font-weight:500">{{ buyDogsTotal }} billion</div>
+          <div>One F-35A</div><div style="text-align:right">$82.5 million</div><div style="text-align:right;color:#8a6a0c;font-weight:500">{{ buyJet }} PlayStation 5s each</div>
+        </div>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty">"One for every {{ buyHH }} households" is {{ buyPS5 }} million consoles against about 132 million US households. "{{ buyDays }} days of diesel" divides {{ buyGallons }} million gallons by the roughly 164 million gallons of distillate fuel the United States burns each day (3.9 million barrels). "{{ buyDogs }} for every American" is {{ buyDogsTotal }} billion hot dogs against a population of about 340 million. The $2.6 billion is the Pentagon's own loss estimate reported by CRS; the war's running cost, $37.5 billion, is the Defense Secretary's figure of 21 July 2026. Sony raised the US price of the PlayStation 5 from $499.99 to $549.99 on 21 August 2025, citing "a challenging economic environment"; the comparison uses the higher price.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: CRS IN12692 (aircraft and the DoD loss estimate) · Defense Secretary testimony, Senate Appropriations, 21 Jul 2026 · Sony Interactive Entertainment, US list price, 21 Aug 2025 · EIA Weekly Retail Diesel, 31 Aug 2026; EIA distillate consumption, 2024 · College Board, Trends in College Pricing 2024–25 · Costco, $1.50 hot dog and soda, unchanged since 1985 · US Census Bureau, households and population, 2024 · F-35A unit cost, Lots 15–17, F-35 Joint Program Office.</p>
+      </div>
+    </details>
+  </section>
+
+  <section data-screen-label="08 The world backs away" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#0B1E3F">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(247,245,240,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <canvas ref="{{ vaultRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
+      <div class="g-top" style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px;pointer-events:none">
+        <div ref="{{ vaultDateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85">AUGUST 2025</div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">ONE BAR IS ONE TONNE · FEDERAL RESERVE TABLE 3.13</div>
+      </div>
+      <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#B22234;flex:none"></span>THE WORLD IS TAKING ITS GOLD HOME</div>
+        <div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap">
+          <div class="g-num" ref="{{ vaultNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,200px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">0</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">tonnes of gold<br>taken out of New York<br><span style="color:rgba(247,245,240,.6)">ten months · none came in</span></div>
+        </div>
+        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:720px;text-wrap:pretty;color:#F7F5F0">Ships go the long way round Africa now. Central banks are taking their gold out of the New York Fed, month after month, and the ones that say why say "geopolitical unrest."</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F7F5F0;color:#0B1E3F;padding:56px 36px 72px">
+    <details style="max-width:820px;margin:0 auto">
+      <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F">
+        <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · THE VAULT
+      </summary>
+      <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
+        <p style="margin:0;text-wrap:pretty">The Federal Reserve publishes gold held under earmark for foreign and international accounts, valued at the statutory $42.22 an ounce, unchanged since 1973. Because the price is fixed, a change in that row is a change in ounces, not in value: tonnes = millions of dollars ÷ 42.22 × 31.1035. That gives {{ vaultStart }} tonnes in August 2025 and {{ vaultEnd }} tonnes in June 2026, the latest provisional release: {{ vaultOut }} tonnes out, no month with an inflow.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.02em">
+          <sc-for list="{{ vaultRows }}" as="r" hint-placeholder-count="11">
+            <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(11,30,63,.15);padding:4px 0"><span style="color:rgba(11,30,63,.6)">{{ r.m }}</span><span style="color:#8a6a0c;font-weight:500">{{ r.t }}</span></div>
+          </sc-for>
+        </div>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Who, and why.</strong> De Nederlandsche Bank moved 86 tonnes out of New York and Ottawa to London between March and August 2026, "in view of increasing geopolitical unrest," cutting New York's share of Dutch reserves from 31.3% to 18.5% (announced 2 September). The Banque de France moved 129 tonnes' worth from New York to Paris between July 2025 and January 2026 by selling older bars in New York and buying in Paris; no bar was shipped. The Reserve Bank of India brought its share held abroad from 55% to 22%, though from London and Basel rather than New York. Germany, with 1,236 tonnes in New York, is under pressure to repatriate and has no formal plan.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The Fed's counter-argument, at full size.</strong> Colin Weiss (Federal Reserve Board, FEDS Notes, 3 September 2026): gold's apparent overtaking of Treasuries as a reserve asset is a valuation effect from private ETF demand, not central-bank buying; five legacy holders own 52% of official gold and have not added since the 1970s; foreign officials bought about $200bn of Treasuries net from 2022 to April 2026. Gold itself is down about a fifth from its January record ($5,589 to $4,471 an ounce), and the dollar index is up since the war began. Treasuries in Fed custody for foreign officials fell from $2.78tn in January to $2.62tn in June; total foreign Treasury holdings (TIC) were $9.3tn in June, the largest on record bar February.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: Federal Reserve International Summary Statistics, Table 3.13 (July 2026 release, provisional) · DNB press release 2 Sep 2026 · Bloomberg / Yahoo Finance 17 Jun 2026 · RBI half-yearly report · FEDS Notes 3 Sep 2026 · US Treasury TIC · Trading Economics for the gold price.
+        </p>
+      </div>
+    </details>
+  </section>
+
+  <section data-screen-label="09 Your bill" style="position:relative;height:100vh;scroll-snap-align:start">
+    <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#F7F5F0;display:flex;align-items:center;justify-content:center;padding:24px">
+      <div data-cue="1" style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:rgba(11,30,63,.5);pointer-events:none;opacity:0;transition:opacity .5s;z-index:2">SCROLL</div>
+      <div ref="{{ cardRef }}" style="width:min(1200px,100%);aspect-ratio:1200/630;max-height:100%;background:#0B1E3F;border:1px solid rgba(247,245,240,.25);border-radius:8px;position:relative;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.5);display:grid;grid-template-rows:auto minmax(0,1fr) auto;padding:clamp(14px,3vmin,40px) clamp(16px,3.5vmin,48px);gap:clamp(6px,1.5vmin,18px);container-type:inline-size">
+        <div style="position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(90deg,#B22234 0 7.69%,#F7F5F0 7.69% 15.38%)"></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-top:6px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(20px,4.2cqw,54px);line-height:1;letter-spacing:.02em;text-transform:uppercase;color:#F7F5F0">The Bill</div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(8px,1.1cqw,13px);letter-spacing:.14em;color:rgba(247,245,240,.6);text-align:right">{{ cardDate }}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:clamp(6px,1.4cqw,18px);min-height:0">
+          <sc-for list="{{ cardItems }}" as="it" hint-placeholder-count="8">
+            <div ref="{{ it.ref }}" style="display:flex;flex-direction:column;justify-content:center;gap:4px;border-top:1px solid rgba(247,245,240,.2);padding-top:clamp(4px,1cqw,10px);min-height:0;opacity:0;transform:translateY(24px);will-change:transform,opacity">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(22px,4.6cqw,60px);line-height:.95;letter-spacing:-.02em;color:{{ it.color }};font-variant-numeric:tabular-nums;white-space:nowrap">{{ it.num }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(7px,1cqw,12px);letter-spacing:.1em;color:rgba(247,245,240,.7);line-height:1.4;text-transform:uppercase">{{ it.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;border-top:1px solid rgba(247,245,240,.2);padding-top:clamp(6px,1.2cqw,14px)">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(16px,3cqw,38px);line-height:1;letter-spacing:.02em;text-transform:uppercase"><span style="color:#B22234">Ordered by Trump.</span> <span style="color:#F7F5F0">Paid by you.</span></div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(7px,1cqw,12px);letter-spacing:.14em;color:rgba(247,245,240,.6);text-align:right">GOVERNMENT DATA · EVERY SOURCE BELOW</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-screen-label="10 Check our work" style="background:#F7F5F0;color:#0B1E3F;padding:72px 36px 96px">
+    <div style="max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:28px;font-size:17px;line-height:1.5">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.16em;padding:14px 0;border-top:1px solid #0B1E3F;border-bottom:1px solid #0B1E3F;display:flex;align-items:center;gap:14px"><span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>CHECK OUR WORK</div>
+      <p style="margin:0;text-wrap:pretty;font-size:20px">Every number on this page comes from the government's own tables or a named source, and every block has a "Show the work" panel above with the series, the dates and the method. What follows is what the numbers can and cannot say.</p>
+      <div style="display:flex;flex-direction:column;gap:18px">
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The missing month.</strong> The October 2025 Consumer Price Index was never collected. Every twelve-month comparison on this page runs month to month across that gap rather than by counting observations.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Not a record, and not policy.</strong> Diesel at $5.60 is the highest since 2022, not a record: EIA's national weekly average reached $5.82 in June 2022. Eggs cost half what they did in January 2025 because the 2022–25 avian influenza outbreak ended; that fall is real and it is not policy. The oil peak is the daily spot close, $114.58 on 7 April, the day the first ceasefire was announced.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">What the counts are, and are not.</strong> PortWatch ship counts come from satellite AIS positions; ships transmitting no position are not counted, so every figure is a floor and none is a queue count. Ship and particle positions on the globe and the strait are a model; the counts driving them are not. Household costs are national averages built from stated quantities, and the running total assumes the current monthly gap applied evenly since 20 January 2025. The war-cost casualty figure is a news organisation's count, and a higher tally exists. Gold tonnage is derived from the Fed's statutory valuation, which fixes the price and so isolates the ounces. The "what the lost aircraft cost" comparisons divide one Pentagon figure by one list price each; they are scale, not a proposal for how the money should have been spent.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">What we will not do.</strong> War and tariff effects are never summed. Odds are odds. No queue count is published because none exists at any tier. The word "cover-up" does not appear; where an estimate is disputed, the denial is printed beside it.</p>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.75);line-height:1.8;border-top:1px solid rgba(11,30,63,.25);padding-top:18px">
+        <div style="letter-spacing:.16em;color:rgba(11,30,63,.55);margin-bottom:6px">SOURCES</div>
+        IMF PortWatch (IMF / University of Oxford), chokepoint transit estimates, as of {{ asOf }} · FRED: DCOILWTICO, GASDESW, PAYEMS, CPIAUCNS, CES0500000003, LNS13025703, U6RATE, JTSHIR, JTSQUR, SP500, MORTGAGE30US, DTWEXBGS, and the BLS average-price series listed on the board · EIA weekly retail gasoline and diesel, Electric Power Monthly, Weekly Petroleum Status Report · Federal Reserve International Summary Statistics Table 3.13; FEDS Notes, 3 Sep 2026 · De Nederlandsche Bank press release, 2 Sep 2026 · Banque de France via Bloomberg, 17 Jun 2026 · Reserve Bank of India half-yearly report · Congressional Research Service IN12692 · Defense Secretary testimony, Senate Appropriations, 21 Jul 2026; DoD FY2026 supplemental request · NBC News data desk, 28 Aug 2026 · CSIS; CNN on munitions · Washington Post; Stars and Stripes on Bahrain · Supreme Court, <em>Learning Resources v. Trump</em>, 20 Feb 2026; Dallas Fed, Jun 2026 · Natural Earth coastlines via world-atlas · USDA Food Plans; EPA fleet fuel economy; EIA RECS · Sony Interactive Entertainment US list price, 21 Aug 2025; College Board Trends in College Pricing 2024–25; Costco; US Census Bureau households and population; F-35 Joint Program Office unit cost.
+      </div>
+    </div>
+  </section>
+
+  
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { rows: [], asOf: '', prows: [], totalCells: [], state: 'US', tick: 0 };
+  canvasRef = React.createRef(); dateRef = React.createRef(); eventRef = React.createRef();
+  numRef = React.createRef(); wasRef = React.createRef(); legendRef = React.createRef(); cueRef = React.createRef();
+  boardRef = React.createRef(); pDateRef = React.createRef(); pWeekRef = React.createRef();
+  stampStageRef = React.createRef(); stamp1Ref = React.createRef(); stamp2Ref = React.createRef(); stampNoteRef = React.createRef(); stampSentenceRef = React.createRef();
+  seisRef = React.createRef(); seisDateRef = React.createRef(); seisNumRef = React.createRef(); seisSubRef = React.createRef();
+  straitRef = React.createRef(); strDateRef = React.createRef(); strEventRef = React.createRef(); strNumRef = React.createRef(); strSubRef = React.createRef();
+  crowdRef = React.createRef(); crowdDateRef = React.createRef(); crowdNumRef = React.createRef();
+  warRef = React.createRef();
+  vaultRef = React.createRef(); vaultDateRef = React.createRef(); vaultNumRef = React.createRef();
+  buyRef = React.createRef(); buyDateRef = React.createRef(); buyNumRef = React.createRef(); buySubRef = React.createRef();
+  cardRef = React.createRef(); cardItemRefs = [0, 1, 2, 3, 4, 5, 6, 7].map(() => React.createRef());
+  odoRefs = [React.createRef(), React.createRef(), React.createRef()];
+  STATES = 'AL Alabama,AK Alaska,AZ Arizona,AR Arkansas,CA California,CO Colorado,CT Connecticut,DE Delaware,DC District of Columbia,FL Florida,GA Georgia,HI Hawaii,ID Idaho,IL Illinois,IN Indiana,IA Iowa,KS Kansas,KY Kentucky,LA Louisiana,ME Maine,MD Maryland,MA Massachusetts,MI Michigan,MN Minnesota,MS Mississippi,MO Missouri,MT Montana,NE Nebraska,NV Nevada,NH New Hampshire,NJ New Jersey,NM New Mexico,NY New York,NC North Carolina,ND North Dakota,OH Ohio,OK Oklahoma,OR Oregon,PA Pennsylvania,RI Rhode Island,SC South Carolina,SD South Dakota,TN Tennessee,TX Texas,UT Utah,VT Vermont,VA Virginia,WA Washington,WV West Virginia,WI Wisconsin,WY Wyoming'.split(',').map(s => ({ code: s.slice(0, 2), name: s.slice(3) }));
+
+  renderVals() {
+    const P = this.prices;
+    const cellsOf = (str, color, flapOn) => [...str].map(ch => ({ ch, w: ch === '.' ? '0.38em' : ch === '$' || ch === '¢' || ch === '+' || ch === '−' ? '0.6em' : '0.72em', color, flap: flapOn ? 0.7 : 0 }));
+    const rows = (this.board || []).map(r => ({
+      name: r.name, unit: r.unit, note: r.note || '', start: r.startText, change: r.changeText, color: r.up ? '#D4A017' : '#6C8CD5',
+      changeOpacity: r.phase === 'done' ? 1 : 0.15,
+      cells: cellsOf(r.shown, r.phase === 'start' ? 'rgba(247,245,240,.35)' : r.up ? '#D4A017' : '#6C8CD5', r.phase === 'flipping' && r.flapOn),
+    }));
+    const tot = this.total || { shown: '+$0.00', phase: 'start' };
+    const totalCells = cellsOf(tot.shown, '#D4A017', tot.phase === 'flipping' && tot.flapOn).map(c => ({ ...c, w: c.w === '0.72em' ? '0.64em' : c.w }));
+    const rc = P && P.receipt, sel = this.receiptFor(this.state.state);
+    return {
+      canvasRef: this.canvasRef, dateRef: this.dateRef, eventRef: this.eventRef, numRef: this.numRef,
+      wasRef: this.wasRef, legendRef: this.legendRef, cueRef: this.cueRef,
+      workRows: this.state.rows, asOf: this.state.asOf,
+      boardRef: this.boardRef, pDateRef: this.pDateRef, pWeekRef: this.pWeekRef,
+      stampStageRef: this.stampStageRef, stamp1Ref: this.stamp1Ref, stamp2Ref: this.stamp2Ref, stampNoteRef: this.stampNoteRef, stampSentenceRef: this.stampSentenceRef,
+      seisRef: this.seisRef, seisDateRef: this.seisDateRef, seisNumRef: this.seisNumRef, seisSubRef: this.seisSubRef,
+      straitRef: this.straitRef, strDateRef: this.strDateRef, strEventRef: this.strEventRef, strNumRef: this.strNumRef, strSubRef: this.strSubRef,
+      strBase: this.data ? this.data.items.hormuz.baseline.total_per_day.toFixed(1) : '', strTanker: this.data ? this.data.items.hormuz.baseline.tanker_per_day.toFixed(1) : '',
+      strAug18: this.data ? (this.data.hormuz_daily.find(o => o[0] === '2026-08-18') || [0, '—'])[1] : '',
+      crowdRef: this.crowdRef, crowdDateRef: this.crowdDateRef, crowdNumRef: this.crowdNumRef, warRef: this.warRef,
+      vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
+      buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
+      ...this.billVals(),
+      cardRef: this.cardRef, cardItems: this.cardItems(),
+      cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS · 6 SEP 2026',
+      crudeCount: this.crude ? this.crude.observations.length : '', crudeLast: this.crude ? this.fmtISO(this.crude.observations.at(-1)[0]).replace(' 2026', '') : '',
+      rows, totalCells, digits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+      odo: [{ digit: true, ref: this.odoRefs[0] }, { dot: true }, { digit: true, ref: this.odoRefs[1] }, { digit: true, ref: this.odoRefs[2] }],
+      state: this.state.state, onState: e => this.setState({ state: e.target.value }, () => this.buildBoard(true)),
+      stateOptions: [{ code: 'US', name: 'United States' }].concat(this.STATES),
+      placeName: sel ? sel.name : 'the United States',
+      cumulativeText: rc && sel ? '$' + Math.round(sel.total * rc.months_elapsed).toLocaleString() + ' over ' + rc.months_elapsed.toFixed(1) + ' months' : '',
+      workPrices: (this.board || []).map(r => ({ name: r.name, unit: r.unit, start: r.startText, end: r.endText, change: r.changeText, series: r.series })),
+      receiptMethod: rc ? `Published receipt: $${rc.monthly_usd.toFixed(2)} a month, $${Math.round(rc.cumulative_usd).toLocaleString()} over the ${rc.months_elapsed.toFixed(1)} months since 20 January 2025.` : '',
+      receiptFuel: rc ? rc.lines[0].arithmetic : '', receiptGroceries: rc ? rc.lines[1].arithmetic : '', receiptElectricity: rc ? rc.lines[2].arithmetic : '',
+    };
+  }
+
+  /* ---------- block 1: two dates ---------- */
+  fmtISO(iso) { const d = new Date(iso + 'T00:00:00Z'); return d.getUTCDate() + ' ' + ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
+  stepStamps(P) {
+    const slam = (el, at) => {
+      if (!el) return;
+      const u = Math.max(0, Math.min(1, (P - at) / 0.1));
+      const e = 1 - Math.pow(1 - u, 3);                    // ease-out: lands hard
+      const rot = el === this.stamp1Ref.current ? -4 : 3;
+      el.style.opacity = String(Math.min(1, u * 3));
+      el.style.transform = 'rotate(' + rot + 'deg) scale(' + (1.8 - 0.8 * e).toFixed(3) + ')';
+      el.style.boxShadow = u >= 1 ? '0 0 0 1px rgba(247,245,240,.3), 0 0 60px rgba(247,245,240,.18)' : 'none';
+    };
+    slam(this.stamp1Ref.current, 0.12); slam(this.stamp2Ref.current, 0.3);
+    if (this.stampNoteRef.current) this.stampNoteRef.current.style.opacity = P > 0.42 ? '1' : '0';
+    if (this.stampSentenceRef.current) this.stampSentenceRef.current.style.opacity = P > 0.5 ? '1' : '0';
+  }
+
+  /* ---------- block 2: the seismograph ---------- */
+  setupSeis() {
+    const O = this.crude.observations;
+    this.sD0 = Date.UTC(2026, 0, 1);
+    const dayOf = iso => Math.round((Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) - this.sD0) / 86400000);
+    this.sPts = O.map(([d, v]) => ({ d: dayOf(d), v, iso: d }));
+    this.sLast = this.sPts.at(-1).d;
+    this.sMarks = [
+      { d: dayOf('2026-02-24'), red: true, t: '24 FEB · TARIFFS' }, { d: dayOf('2026-02-28'), red: true, t: '28 FEB · THE STRIKE' },
+      { d: dayOf('2026-04-07'), red: false, t: '7 APR · CEASEFIRE' }, { d: dayOf('2026-06-18'), red: false, t: '18 JUN · CEASEFIRE' },
+      { d: dayOf('2026-07-08'), red: true, t: '8 JUL · STRIKES AGAIN' }, { d: dayOf('2026-09-01'), red: true, t: '1 SEP · STRIKES' },
+    ];
+    this.sStrike = dayOf('2026-02-28');
+    this.sShake = 0; this.sPrevDay = 0;
+  }
+  seisPriceAt(day) {
+    const P = this.sPts; if (day <= P[0].d) return P[0];
+    let lo = 0, hi = P.length - 1;
+    while (lo < hi) { const m = (lo + hi + 1) >> 1; if (P[m].d <= day) lo = m; else hi = m - 1; }
+    return P[lo];
+  }
+  stepSeis(dt, P, t) {
+    const cv = this.seisRef.current; if (!cv || !this.sPts) return;
+    const tl = Math.max(0, Math.min(1, (P - 0.02) / 0.78));
+    const day = tl * this.sLast;
+    if (this.sPrevDay < this.sStrike && day >= this.sStrike) this.sShake = 0.5;
+    this.sPrevDay = day;
+    this.sShake = Math.max(0, this.sShake - dt);
+    const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#0B1E3F'; ctx.fillRect(0, 0, W, H);
+    const mobile = W < 640;
+    const sh = this.sShake, jx = sh ? (Math.random() - 0.5) * 18 * sh : 0, jy = sh ? (Math.random() - 0.5) * 18 * sh : 0;
+    ctx.save(); ctx.translate(jx, jy);
+    // paper: the needle sits at 68% of the width; the paper slides left under it as the days pass
+    const needleX = W * (mobile ? 0.8 : 0.7), pxPerDay = Math.max(4.5, W * 0.0055);
+    const top = H * (mobile ? 0.2 : 0.2), bot = H * (mobile ? 0.5 : 0.54);
+    const Y = v => bot - (v - 50) / 70 * (bot - top);
+    const X = d => needleX - (day - d) * pxPerDay;
+    ctx.fillStyle = '#10264D'; ctx.fillRect(0, top - 34, W, bot - top + 64);
+    ctx.strokeStyle = 'rgba(247,245,240,.07)'; ctx.lineWidth = 1;
+    for (let v = 50; v <= 120; v += 10) { ctx.beginPath(); ctx.moveTo(0, Y(v)); ctx.lineTo(W, Y(v)); ctx.stroke(); }
+    for (let d = Math.floor((day - needleX / pxPerDay) / 7) * 7; d <= day + (W - needleX) / pxPerDay; d += 7) { const x = X(d); ctx.beginPath(); ctx.moveTo(x, top - 30); ctx.lineTo(x, bot + 30); ctx.stroke(); }
+    // his acts and the ceasefires
+    ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.textAlign = 'left';
+    this.sMarks.forEach((m, i) => {
+      if (m.d > day) return;
+      const x = X(m.d); if (x < -120) return;
+      ctx.strokeStyle = m.red ? 'rgba(178,34,52,.8)' : 'rgba(108,140,213,.8)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(x, top - 30); ctx.lineTo(x, bot + 30); ctx.stroke();
+      if (!mobile || m.red) {
+        ctx.fillStyle = m.red ? '#E04B5C' : '#6C8CD5';
+        const ly = top - 18 + (i % 2) * 17;          // alternate rows so 24 Feb and 28 Feb both read
+        ctx.fillText(m.t, x + 5, ly);
+      }
+    });
+    // the trace
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.beginPath(); let started = false;
+    for (const p of this.sPts) { if (p.d > day) break; const x = X(p.d); if (x < -20) { started = false; continue; } started ? ctx.lineTo(x, Y(p.v)) : ctx.moveTo(x, Y(p.v)); started = true; }
+    const cur = this.seisPriceAt(day);
+    if (started) ctx.lineTo(needleX, Y(cur.v));
+    ctx.strokeStyle = 'rgba(212,160,23,.35)'; ctx.lineWidth = 7; ctx.stroke();
+    ctx.strokeStyle = '#F2C94C'; ctx.lineWidth = 2.2; ctx.stroke();
+    // the needle arm, pivoting from the right edge
+    const px = W - (mobile ? 8 : 40), py = (top + bot) / 2, ny = Y(cur.v);
+    ctx.strokeStyle = 'rgba(247,245,240,.85)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(needleX, ny); ctx.stroke();
+    ctx.fillStyle = '#F7F5F0'; ctx.beginPath(); ctx.arc(px, py, 5, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#B22234'; ctx.beginPath(); ctx.arc(needleX, ny, 3.5, 0, 6.2832); ctx.fill();
+    // the strike: a red flash across the paper for the first days
+    const since = day - this.sStrike;
+    if (since >= 0 && since < 6) { ctx.fillStyle = 'rgba(178,34,52,' + (0.25 * (1 - since / 6)).toFixed(3) + ')'; ctx.fillRect(0, top - 30, W, bot - top + 60); }
+    ctx.restore();
+    // scrim for the readouts
+    const sg = ctx.createLinearGradient(0, H * 0.5, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.9)');
+    ctx.fillStyle = sg; ctx.fillRect(0, H * 0.5, W, H * 0.5);
+    // readouts
+    const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
+    set(this.seisNumRef, '$' + Math.round(cur.v));
+    set(this.seisDateRef, this.fmtISO(cur.iso) + (Math.abs(cur.d - day) >= 1 ? ' · LAST CLOSE' : ''));
+    const done = tl >= 1;
+    const sub = this.seisSubRef.current;
+    if (sub) {
+      const html = done ? 'a barrel<br><span style="color:rgba(247,245,240,.6)">now · $57 in January · $115 at the peak</span>'
+        : cur.d < this.sStrike ? 'a barrel<br><span style="color:rgba(247,245,240,.6)">before his war</span>'
+        : cur.v >= 114 ? 'a barrel<br><span style="color:#E04B5C">the peak · five weeks after the strike</span>'
+        : 'a barrel<br><span style="color:rgba(247,245,240,.6)">' + (cur.d < this.sMarks[2].d ? 'after his strike' : cur.d < this.sMarks[4].d ? 'under the ceasefires' : 'the ceasefire broken') + '</span>';
+      if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; }
+    }
+  }
+
+  /* ---------- block 3: the strait ---------- */
+  strLane(s, off) {
+    const L = this.coastBox.lane, n = L.length - 1, t = s * n, i = Math.max(0, Math.min(n - 1, Math.floor(t))), f = t - i;   // s outside 0..1 extrapolates the end segments out to sea
+    const a = L[i], b = L[i + 1];
+    return { x: a[0] + (b[0] - a[0]) * f, y: a[1] + (b[1] - a[1]) * f + off, dx: b[0] - a[0], dy: b[1] - a[1] };
+  }
+  drawShip(ctx, x, y, ang, L, hull, ghost) {
+    const B = L * 0.2;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+    ctx.beginPath(); ctx.moveTo(L * 0.5, 0); ctx.quadraticCurveTo(L * 0.34, -B * 0.46, L * 0.14, -B * 0.5); ctx.lineTo(-L * 0.44, -B * 0.46);
+    ctx.quadraticCurveTo(-L * 0.5, 0, -L * 0.44, B * 0.46); ctx.lineTo(L * 0.14, B * 0.5); ctx.quadraticCurveTo(L * 0.34, B * 0.46, L * 0.5, 0); ctx.closePath();
+    if (ghost) { ctx.strokeStyle = 'rgba(247,245,240,.45)'; ctx.lineWidth = 1; ctx.setLineDash([2, 2]); ctx.stroke(); ctx.setLineDash([]); }
+    else { ctx.fillStyle = hull; ctx.fill(); ctx.fillStyle = 'rgba(11,30,63,.7)'; ctx.fillRect(-L * 0.42, -B * 0.34, Math.max(1.2, L * 0.14), B * 0.68); }
+    ctx.restore();
+  }
+  stepStrait(dt, P, t) {
+    const cv = this.straitRef.current, CB = this.coastBox; if (!cv || !CB || !this.routes) return;
+    const h = this.routes.hormuz;
+    const tl = Math.max(0, Math.min(1, (P - 0.02) / 0.6));
+    const day = tl * this.LAST;                          // 1 Jan → 30 Aug 2026 (same day0 as the globe)
+    const flow = this.flowAt(h, day), frac = Math.min(1, flow / h.base), closed = day >= this.STRIKE && frac < 0.12;
+    // ships: spawn ∝ the day's count, crawl when the count is low
+    const rate = Math.max(0.2, flow) * 0.12;
+    this.strAcc = Math.min(3, this.strAcc + rate * dt);
+    while (this.strAcc >= 1 && this.strShips.length < 90) { this.strAcc -= 1; const dir = Math.random() < 0.5 ? 1 : -1; this.strShips.push({ s: dir > 0 ? -0.6 : 1.6, dir, v: 0.05 + Math.random() * 0.02, w: [0.8, 1, 1.3][Math.floor(Math.random() * 3)] }); }
+    const slow = 0.3 + 0.7 * Math.pow(frac, 0.6);
+    for (const sh of this.strShips) sh.s += sh.v * dt * slow * sh.dir;
+    this.strShips = this.strShips.filter(sh => sh.s > -0.65 && sh.s < 1.65);
+    // paint
+    const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#0B1E3F'; ctx.fillRect(0, 0, W, H);
+    const mobile = W < 640;
+    const bb = CB.bbox, mw = (bb.east - bb.west) * Math.cos(26.15 * Math.PI / 180), mh = bb.north - bb.south;
+    // scale so the strait fills the frame; anchor the gate at a fixed point on screen
+    const gX = W * (mobile ? 0.5 : 0.56), gY = H * (mobile ? 0.3 : 0.34), gmid = (CB.gate.top + CB.gate.bot) / 2;
+    // zoom at least far enough that the clipped edges of the coastline box sit off-canvas, so the cut never reads as a shoreline
+    const kx = Math.max(gX / (CB.gate.x * mw), (W - gX) / ((1 - CB.gate.x) * mw)), ky = Math.max(gY / (gmid * mh), (H - gY) / ((1 - gmid) * mh));
+    const k = Math.max(Math.min(W / mw, H / mh) * (mobile ? 2.2 : 1.3), kx * 1.04, ky * 1.04);
+    const X = x => gX + (x - CB.gate.x) * mw * k, Y = y => gY + (y - gmid) * mh * k;
+    const og = ctx.createRadialGradient(gX, gY, 20, gX, gY, Math.max(W, H) * 0.8);
+    og.addColorStop(0, '#173261'); og.addColorStop(1, '#0B1E3F'); ctx.fillStyle = og; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(247,245,240,.05)'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 10; i++) { ctx.beginPath(); ctx.moveTo(X(i / 10), 0); ctx.lineTo(X(i / 10), H); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0, Y(i / 10)); ctx.lineTo(W, Y(i / 10)); ctx.stroke(); }
+    for (const ring of CB.rings) {
+      ctx.beginPath(); ring.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1]))); ctx.closePath();
+      ctx.fillStyle = '#2F4573'; ctx.fill(); ctx.strokeStyle = 'rgba(247,245,240,.5)'; ctx.lineWidth = 1.2; ctx.stroke();
+    }
+    ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.6)'; ctx.textAlign = 'center';
+    for (const l of CB.labels) { if (mobile && (l.text === 'QESHM' || l.text.indexOf('G U L F') >= 0)) continue; ctx.fillText(l.text, X(l.x), Y(l.y)); }
+    ctx.textAlign = 'left';
+    // the lane
+    const laneStroke = (off, style, dash, lw) => { ctx.beginPath(); for (let s = -0.6; s <= 1.6001; s += 0.02) { const p = this.strLane(s, off); s > -0.6 ? ctx.lineTo(X(p.x), Y(p.y)) : ctx.moveTo(X(p.x), Y(p.y)); } ctx.strokeStyle = style; ctx.lineWidth = lw; ctx.setLineDash(dash || []); ctx.stroke(); ctx.setLineDash([]); };
+    laneStroke(0, 'rgba(212,160,23,' + (0.06 + 0.16 * frac).toFixed(3) + ')', null, 26);
+    laneStroke(-0.026, 'rgba(247,245,240,.18)', [4, 6], 1); laneStroke(0.026, 'rgba(247,245,240,.18)', [4, 6], 1);
+    // the gate
+    const gx = X(CB.gate.x), gt = Y(CB.gate.top), gb = Y(CB.gate.bot);
+    if (closed) {
+      const pulse = 0.5 + 0.5 * Math.sin(t / 420);
+      ctx.strokeStyle = 'rgba(178,34,52,' + (0.3 + 0.3 * pulse).toFixed(2) + ')'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
+      ctx.strokeStyle = '#B22234'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
+      ctx.fillStyle = '#E04B5C'; ctx.font = '700 14px "IBM Plex Mono", monospace'; ctx.fillText('CLOSED', gx + 10, (gt + gb) / 2 + 4);
+    } else { ctx.strokeStyle = 'rgba(247,245,240,.4)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke(); }
+    ctx.fillStyle = 'rgba(247,245,240,.6)'; ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; ctx.fillText('33 KM', gx, gt - 8); ctx.textAlign = 'left';
+    // ships
+    const L = Math.max(10, W / 60);
+    for (const sh of this.strShips) {
+      const p = this.strLane(sh.s, sh.dir > 0 ? -0.026 : 0.026);
+      const ang = Math.atan2(p.dy * mh, p.dx * mw) + (sh.dir > 0 ? 0 : Math.PI);
+      this.drawShip(ctx, X(p.x), Y(p.y), ang, L * sh.w, '#F2C94C', false);
+    }
+    // his claim against the count: from 18 August, drawn to the same scale
+    const claimDay = this.dayOf('2026-08-18');
+    if (day >= claimDay - 0.5 && !mobile) {
+      const a = Math.min(1, (day - claimDay + 0.5) / 4);
+      ctx.globalAlpha = a;
+      const bx = W - 36 - 10 * (L * 1.15), by = H * 0.12;
+      ctx.font = '700 14px "IBM Plex Mono", monospace'; ctx.fillStyle = '#E04B5C'; ctx.textAlign = 'right'; ctx.fillText('HE SAYS · 30 A NIGHT · 18 AUG', W - 36, by - 10); ctx.textAlign = 'left';
+      for (let i = 0; i < 30; i++) this.drawShip(ctx, bx + (i % 10) * L * 1.15 + L / 2, by + Math.floor(i / 10) * L * 0.5 + L * 0.2, 0, L, null, true);
+      const cy2 = by + 3 * L * 0.5 + 26;
+      ctx.fillStyle = '#D4A017'; ctx.textAlign = 'right'; ctx.fillText('COUNTED · ' + Math.round(flow) + ' A DAY · 7-DAY MEAN', W - 36, cy2 - 10); ctx.textAlign = 'left';
+      for (let i = 0; i < Math.max(1, Math.round(flow)); i++) this.drawShip(ctx, bx + (i % 10) * L * 1.15 + L / 2, cy2 + Math.floor(i / 10) * L * 0.5 + L * 0.2, 0, L, '#F2C94C', false);
+      ctx.globalAlpha = 1;
+    }
+    const sg = ctx.createLinearGradient(0, H * 0.5, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.9)');
+    ctx.fillStyle = sg; ctx.fillRect(0, H * 0.5, W, H * 0.5);
+    // readouts
+    const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
+    set(this.strNumRef, day < this.STRIKE ? String(Math.round(h.base)) : String(Math.round(flow)));
+    set(this.strDateRef, day < this.STRIKE ? 'BEFORE THE WAR · 1 JAN 2025 – 27 FEB 2026' : this.fmtDay(Math.round(day)));
+    let ev = null; for (const e of this.events) if (day >= e.d && day < e.d + 22) ev = e;
+    const er = this.strEventRef.current; if (er) { const txt = ev ? ev.t : ''; if (er.textContent !== txt) { er.textContent = txt; er.style.color = ev && ev.red ? '#E04B5C' : '#6C8CD5'; } }
+    const sub = this.strSubRef.current;
+    if (sub) { const html = day < this.STRIKE ? 'ships a day<br><span style="color:rgba(247,245,240,.6)">before his war</span>' : closed ? 'ships a day<br><span style="color:#E04B5C">the strait is shut · was 83</span>' : 'ships a day<br><span style="color:rgba(247,245,240,.6)">was 83</span>'; if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; } }
+  }
+
+  /* ---------- block 9: the bill ---------- */
+  cardItems() {
+    const B = this.bill, P = this.prices, D = this.data, C = this.crude, R = this.cardItemRefs;
+    if (!B || !P || !D || !C) return R.map(ref => ({ ref, num: '', label: '', color: '#D4A017' }));
+    const h = D.items.hormuz;
+    return [
+      { num: '+$' + Math.round(P.receipt.monthly_usd), label: 'a month for a household · $' + Math.round(P.receipt.cumulative_usd).toLocaleString() + ' since 20 Jan 2025', color: '#D4A017' },
+      { num: '$' + Math.round(C.observations[0][1]) + ' → $' + Math.round(C.peak.value), label: 'crude oil · January to the peak, five weeks after his strike', color: '#D4A017' },
+      { num: Math.round(h.recent.mean7_total) + ' / day', label: 'ships through Hormuz · was ' + Math.round(h.baseline.total_per_day), color: '#D4A017' },
+      { num: '$' + P.diesel.latest.value.toFixed(2), label: 'diesel a gallon · highest since 2022', color: '#D4A017' },
+      { num: Math.round(B.jobs.curr.mean_monthly / 1000) + ',000', label: 'new jobs a month · was ' + Math.round(B.jobs.prev.mean_monthly / 1000) + ',000', color: '#D4A017' },
+      { num: B.war_cost.casualties.us_killed + ' dead', label: B.war_cost.aircraft.total_lost_or_damaged + ' aircraft · $' + B.war_cost.dod_cost.usd_bn + 'bn spent', color: '#F7F5F0' },
+      { num: B.gold.tonnes_out.toFixed(0) + ' t', label: 'gold out of the New York Fed · ten months', color: '#D4A017' },
+      { num: '28 Feb · 24 Feb', label: 'he ordered the strike · he re-imposed the tariffs', color: '#B22234' },
+    ].map((c, i) => ({ ...c, ref: R[i] }));
+  }
+  stepCard(P) {
+    this.cardItemRefs.forEach((ref, i) => {
+      const el = ref.current; if (!el) return;
+      const u = Math.max(0, Math.min(1, (P - 0.05 - i * 0.07) / 0.16)), e = 1 - Math.pow(1 - u, 3);
+      el.style.opacity = String(e); el.style.transform = 'translateY(' + (24 * (1 - e)).toFixed(1) + 'px)';
+    });
+  }
+
+  /* ---------- blocks 5–7: data for the readouts and Show the work ---------- */
+  billVals() {
+    const B = this.bill;
+    if (!B) return Object.fromEntries('jobsPrev jobsCurr jobsN jobsMed jobsPrevMed ltu0 ltu1 unemp0 unemp1 hires quits aheYoy cpiYoy realYoy aircraftList vaultStart vaultEnd vaultOut'.split(' ').map(k => [k, '']).concat([['vaultRows', []]]));
+    const fmt = n => Math.round(n).toLocaleString();
+    const ltu = B.ltu.points, un = B.unemployment.points;
+    const at = (pts, d) => (pts.find(p => p[0] === d) || [0, null])[1];
+    const mon = iso => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' }).toUpperCase();
+    return {
+      jobsPrev: fmt(B.jobs.prev.mean_monthly), jobsCurr: fmt(B.jobs.curr.mean_monthly), jobsN: B.jobs.curr.n_months, jobsMed: fmt(B.jobs.curr.median_monthly), jobsPrevMed: fmt(B.jobs.prev.median_monthly),
+      ltu0: at(ltu, '2025-01-01'), ltu1: B.ltu.latest.value, unemp0: at(un, '2025-01-01'), unemp1: B.unemployment.latest.value, hires: B.hires.latest.value, quits: B.quits.latest.value,
+      aheYoy: B.pay.ahe_yoy_pct.toFixed(1), cpiYoy: B.pay.cpi_yoy_pct.toFixed(1), realYoy: B.pay.real_yoy_pct.toFixed(1),
+      aircraftList: Object.entries(B.war_cost.aircraft.by_type).map(([k, v]) => v + ' ' + k).join(', '),
+      vaultStart: fmt(B.gold.earmarked[0][2]), vaultEnd: fmt(B.gold.earmarked.at(-1)[2]), vaultOut: B.gold.tonnes_out,
+      vaultRows: B.gold.earmarked.map(p => ({ m: mon(p[0]), t: fmt(p[2]) + ' t' })),
+    };
+  }
+  setupBill() {
+    const B = this.bill;
+    // block 5: the months of his term, and the previous-term pace for the same months
+    this.cMonths = B.jobs.monthly.filter(m => m[0] >= '2025-02-01');   // the 19 months of his term; January 2025 belongs to the previous one
+    this.cPrevPace = B.jobs.prev.mean_monthly;
+    this.cLeft = []; this.cRight = []; this.cMonthDone = -1;
+    // block 7: the vault — one bar per tonne, removed month by month
+    const E = B.gold.earmarked;
+    this.vTotal = Math.round(E[0][2]);
+    this.vOut = E.slice(1).map((p, i) => ({ date: p[0], n: Math.round(E[i][2] - p[2]) }));
+    this.vBars = []; this.vGone = []; this.vMonthDone = -1;
+  }
+  seeded(i) { const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }
+
+  /* ---------- block 5: the crowd ---------- */
+  stepCrowd(dt, P, t) {
+    const cv = this.crowdRef.current, B = this.bill; if (!cv || !B) return;
+    const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#0B1E3F'; ctx.fillRect(0, 0, W, H);
+    const mobile = W < 640;
+    const N = this.cMonths.length;
+    const tl = Math.max(0, Math.min(1, (P - 0.02) / 0.7));
+    const mIdx = Math.min(N - 1, Math.floor(tl * N));       // month being poured
+    if (mIdx < this.cMonthDone) { this.cLeft = []; this.cRight = []; this.cMonthDone = -1; }
+    while (this.cMonthDone < mIdx) {
+      this.cMonthDone++;
+      const m = this.cMonths[this.cMonthDone], k = this.cMonthDone;
+      const nL = Math.round(this.cPrevPace / 10000), nR = Math.round(m[1] / 10000);
+      for (let i = 0; i < nL; i++) this.cLeft.push({ born: t + i * 12, m: k });
+      if (nR >= 0) for (let i = 0; i < nR; i++) this.cRight.push({ born: t + i * 40, m: k, bright: m[0] === '2026-08-01' });
+      else for (let i = 0; i < -nR; i++) { const idx = this.cRight.length - 1 - i; if (idx >= 0 && !this.cRight[idx].leaving) this.cRight[idx].leaving = t + i * 30; }
+    }
+    // two stadiums: dots stack in rows of `cols`
+    const pad = mobile ? 16 : 36, gap = mobile ? 12 : 48, top = Math.max(H * (mobile ? 0.16 : 0.15), 128), bot = H * (mobile ? 0.5 : 0.47);
+    const stadW = (W - pad * 2 - gap) / 2, stadH = bot - top, NL = N * Math.round(this.cPrevPace / 10000);
+    const fw = Math.max(5, Math.sqrt(stadW * stadH * 0.88 / (1.9 * NL))), fh = fw * 1.9, cols = Math.floor(stadW / fw), step = stadW / cols;
+    const person = (x, y, w, fill, a) => {
+      ctx.globalAlpha = a; ctx.fillStyle = fill;
+      ctx.beginPath(); ctx.arc(x, y - w * 1.5, w * 0.2, 0, 6.2832); ctx.fill();
+      const bw = w * 0.64, bh = w * 1.15; ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(x - bw / 2, y - bh, bw, bh, [bw / 2, bw / 2, 1, 1]); else ctx.rect(x - bw / 2, y - bh, bw, bh);
+      ctx.fill();
+    };
+    const drawStadium = (x0, dots, title, sub, color) => {
+      ctx.strokeStyle = 'rgba(247,245,240,.18)'; ctx.lineWidth = 1; ctx.strokeRect(x0, top, stadW, bot - top);
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.textAlign = 'left'; ctx.fillText(title, x0, top - 36);
+      ctx.fillStyle = color; ctx.font = '700 24px "Barlow Condensed", sans-serif'; ctx.fillText(sub, x0, top - 9);
+      let n = 0;
+      for (let i = 0; i < dots.length; i++) {
+        const d = dots[i], age = (t - d.born) / 400; if (age < 0) continue;
+        if (d.leaving && t - d.leaving > 520) continue;
+        const col = n % cols, row = Math.floor(n / cols); n++;
+        const tx = x0 + step / 2 + col * step, ty = bot - fh * 0.08 - row * fh; if (ty - fh < top) continue;
+        const e = Math.min(1, age), y = ty - (1 - e) * (1 - e) * 120;
+        let a = 1, fill = d.bright ? '#FFE08A' : color;
+        if (d.leaving) { const la = Math.min(1, (t - d.leaving) / 500); a = 1 - la; fill = '#E04B5C'; }
+        person(tx, y, fw, fill, a * Math.min(1, age * 2));
+      }
+      ctx.globalAlpha = 1;
+    };
+    const cur = this.cMonths[mIdx];
+    drawStadium(pad, this.cLeft, 'AT THE PREVIOUS PACE · 2021–25 AVERAGE', '+' + Math.round(this.cPrevPace).toLocaleString() + ' A MONTH', 'rgba(247,245,240,.75)');
+    drawStadium(pad + stadW + gap, this.cRight, 'WHAT HAPPENED · SINCE 20 JAN 2025', (cur[1] >= 0 ? '+' : '−') + Math.abs(cur[1]).toLocaleString() + ' IN ' + new Date(cur[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase(), '#F2C94C');
+    // the frozen row: 100 figures for the unemployed; lit = out of work 27 weeks or more
+    if (!mobile) {
+      const ltuNow = (B.ltu.points.find(p => p[0] === cur[0]) || [0, B.ltu.latest.value])[1];
+      const ry = bot + 34, fw = stadW / 100;
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('OF EVERY 100 OUT OF WORK, OUT SIX MONTHS OR MORE', pad, ry - 10);
+      ctx.fillStyle = '#F7F5F0'; ctx.font = '700 24px "Barlow Condensed", sans-serif'; ctx.textAlign = 'right'; ctx.fillText(Math.round(ltuNow) + ' · WAS ' + Math.round(B.ltu.points.find(p => p[0] === '2025-01-01')[1]), pad + stadW, ry - 8); ctx.textAlign = 'left';
+      for (let i = 0; i < 100; i++) { const lit = i < Math.round(ltuNow); ctx.fillStyle = lit ? '#F7F5F0' : 'rgba(247,245,240,.18)'; const x = pad + i * fw + fw / 2; ctx.beginPath(); ctx.arc(x, ry + 4, 2, 0, 6.2832); ctx.fill(); ctx.fillRect(x - 1.4, ry + 7, 2.8, 7); }
+      // the paycheck, under the right-hand crowd
+      const px = pad + stadW + gap, py = ry;
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('YOUR RAISE, AFTER PRICES · YEAR TO JULY 2026', px, py - 10);
+      ctx.font = '700 30px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#F7F5F0'; ctx.fillText((B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%', px, py + 22); const pw = ctx.measureText((B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%').width;
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.fillText('PAY +' + B.pay.ahe_yoy_pct.toFixed(1) + '% · PRICES +' + B.pay.cpi_yoy_pct.toFixed(1) + '%', px + pw + 14, py + 22);
+    }
+    const sg = ctx.createLinearGradient(0, H * 0.55, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.9)');
+    ctx.fillStyle = sg; ctx.fillRect(0, H * 0.55, W, H * 0.45);
+    const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
+    set(this.crowdDateRef, new Date(cur[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase());
+    const shown = this.cMonths.slice(0, mIdx + 1); const mean = shown.reduce((s, m) => s + m[1], 0) / shown.length;
+    set(this.crowdNumRef, Math.round(mean / 1000).toLocaleString() + ',000');
+  }
+
+  /* ---------- block 6: what the war cost ---------- */
+  drawPlane(ctx, x, y, s, alpha, outline) {
+    ctx.save(); ctx.translate(x, y); ctx.globalAlpha = alpha;
+    ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(s * 0.18, -s * 0.2); ctx.lineTo(s, s * 0.25); ctx.lineTo(s, s * 0.45); ctx.lineTo(s * 0.15, s * 0.25); ctx.lineTo(s * 0.12, s * 0.7); ctx.lineTo(s * 0.4, s * 0.9); ctx.lineTo(s * 0.4, s); ctx.lineTo(0, s * 0.9);
+    ctx.lineTo(-s * 0.4, s); ctx.lineTo(-s * 0.4, s * 0.9); ctx.lineTo(-s * 0.12, s * 0.7); ctx.lineTo(-s * 0.15, s * 0.25); ctx.lineTo(-s, s * 0.45); ctx.lineTo(-s, s * 0.25); ctx.lineTo(-s * 0.18, -s * 0.2); ctx.closePath();
+    if (outline) { ctx.strokeStyle = 'rgba(247,245,240,.85)'; ctx.lineWidth = 1.2; ctx.lineJoin = 'round'; ctx.stroke(); } else { ctx.fillStyle = '#F7F5F0'; ctx.fill(); }
+    ctx.restore();
+  }
+  drawStar(ctx, x, y, R, alpha) {
+    ctx.save(); ctx.translate(x, y); ctx.globalAlpha = alpha; ctx.fillStyle = '#F7F5F0'; ctx.shadowColor = 'rgba(247,245,240,.6)'; ctx.shadowBlur = alpha * 14;
+    ctx.beginPath(); for (let i = 0; i < 10; i++) { const r = i % 2 ? R * 0.42 : R, a = -Math.PI / 2 + i * Math.PI / 5; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); } ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  /* A ledger: one row per cost. Big number and its label on the left, the pictograph at full width on the right. */
+  stepWar(dt, P, t) {
+    const cv = this.warRef.current, B = this.bill; if (!cv || !B) return;
+    const WC = B.war_cost;
+    const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#6E1B27'; ctx.fillRect(0, 0, W, H);
+    const mobile = W < 640, pad = mobile ? 16 : 36;
+    const ph = (a, b) => Math.max(0, Math.min(1, (P - a) / (b - a)));
+    const pStars = ph(0.02, 0.2), pPlanes = ph(0.2, 0.42), pMoney = ph(0.42, 0.66), pInt = ph(0.66, 0.86);
+    const nRows = mobile ? 3 : 4, top = H * 0.11, bot = H * (mobile ? 0.62 : 0.68), rowH = (bot - top) / nRows;
+    const numW = mobile ? W - pad * 2 : Math.min(W * 0.28, 360);
+    const gx = mobile ? pad : pad + numW + 32, gw = W - pad - gx;
+    const nf = mobile ? Math.round(Math.min(rowH * 0.34, 48)) : Math.round(Math.min(rowH * 0.55, 96));
+    ctx.textBaseline = 'alphabetic';
+    const row = (i, num, unit, lab1, lab2, a) => {
+      const y = top + i * rowH;
+      ctx.globalAlpha = 1; ctx.strokeStyle = 'rgba(247,245,240,.14)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+      ctx.globalAlpha = Math.min(1, a * 3); ctx.textAlign = 'left';
+      if (mobile) lab2 = null;
+      const blockH = nf * 0.72 + 12 + (lab2 ? 34 : 17), y0 = mobile ? y + 8 : y + (rowH - blockH) / 2, by = y0 + nf * 0.72;
+      ctx.font = '700 ' + nf + 'px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#D4A017'; ctx.fillText(num, pad, by);
+      const nw = ctx.measureText(num).width;
+      ctx.font = '600 ' + Math.round(nf * 0.3) + 'px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#F7F5F0'; ctx.fillText(unit, pad + nw + nf * 0.12, by);
+      const maxW = mobile ? W - pad * 2 : numW;
+      [lab1, lab2].forEach((s, k) => { if (!s) return; let fs = 14; ctx.font = '500 14px "IBM Plex Mono", monospace'; while (fs > 10 && ctx.measureText(s).width > maxW) { fs--; ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace'; } ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText(s, pad, by + 24 + k * 17); });
+      return mobile ? { x: gx, y: y + rowH * 0.52, w: gw, h: rowH * 0.46 } : { x: gx, y, w: gw, h: rowH };
+    };
+    // 1 · the dead: eighteen stars
+    const killed = WC.casualties.us_killed, lit = pStars * killed;
+    let bx = row(0, String(Math.round(lit)), 'DEAD', 'US SERVICE MEMBERS KILLED', 'NBC NEWS · 28 AUG 2026 · INJURED: HUNDREDS', pStars);
+    const perRow = 9, sR = Math.min(bx.h * 0.2, bx.w / (perRow * 2.5)), sStep = sR * 2.5;
+    const sx0 = bx.x + sR * 1.2, sy0 = bx.y + bx.h / 2 - sStep / 2;
+    for (let i = 0; i < killed; i++) { const a = Math.max(0, Math.min(1, lit - i)); if (a <= 0) continue; this.drawStar(ctx, sx0 + (i % perRow) * sStep, sy0 + Math.floor(i / perRow) * sStep, sR * (0.7 + 0.3 * a), a); }
+    // 2 · the aircraft: manned filled, drones in outline
+    const types = Object.entries(WC.aircraft.by_type), total = WC.aircraft.total_lost_or_damaged, shown = pPlanes * total;
+    const manned = types.filter(([k]) => !/^MQ/.test(k)).reduce((s, [, v]) => s + v, 0), drones = total - manned;
+    bx = row(1, String(Math.round(shown)), 'AIRCRAFT', 'LOST OR DAMAGED · ' + manned + ' MANNED · ' + drones + ' DRONES', 'CRS · 13 MAY 2026', pPlanes);
+    const pRow = mobile ? 14 : 21, pRows = Math.ceil(total / pRow), ps = Math.min(bx.h * 0.36 / pRows, bx.w / (pRow * 2.3)), pStep = ps * 2.3;
+    const px0 = bx.x + ps, py0 = bx.y + bx.h / 2 - (pRows - 1) * pStep / 2;
+    for (let i = 0; i < total; i++) { const a = Math.max(0, Math.min(1, shown - i)); if (a <= 0) continue; this.drawPlane(ctx, px0 + (i % pRow) * pStep, py0 + Math.floor(i / pRow) * pStep, ps, a, i >= manned); }
+    // 3 · the money: spent in gold; what he has asked for on top, dashed; the munitions slice in red
+    const spent = WC.dod_cost.usd_bn, ask = WC.supplemental_request.usd_bn, mun = WC.supplemental_request.munitions_usd_bn;
+    const money = spent * Math.min(1, pMoney / 0.7), askA = Math.max(0, Math.min(1, (pMoney - 0.7) / 0.3));
+    bx = row(2, '$' + money.toFixed(1) + 'bn', 'SPENT', 'PENTAGON COST · TO 21 JUL 2026', 'HE SAID FOUR TO FIVE WEEKS', pMoney);
+    const bh = Math.min(bx.h * 0.34, 56), byy = bx.y + bx.h / 2 - bh / 2 - (mobile ? 4 : 6), ux = bx.w / (spent + ask);
+    ctx.globalAlpha = Math.min(1, pMoney * 3);
+    ctx.fillStyle = '#D4A017'; ctx.fillRect(bx.x, byy, ux * money, bh);
+    ctx.font = '500 14px "IBM Plex Mono", monospace'; ctx.fillStyle = '#F7F5F0'; ctx.textAlign = 'left'; ctx.fillText('SPENT · $' + money.toFixed(1) + 'BN', bx.x, byy - 8);
+    if (askA > 0) {
+      ctx.globalAlpha = askA;
+      ctx.strokeStyle = 'rgba(247,245,240,.6)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.strokeRect(bx.x + ux * spent + 0.5, byy + 0.5, ux * ask * askA - 1, bh - 1); ctx.setLineDash([]);
+      if (askA >= 1) { ctx.fillStyle = '#0B1E3F'; ctx.fillRect(bx.x + ux * (spent + ask - mun), byy + 1, ux * mun - 1, bh - 2); }
+      ctx.fillStyle = '#F7F5F0'; ctx.textAlign = 'right'; ctx.fillText('ASKED FOR · $' + ask.toFixed(1) + 'BN MORE', bx.x + bx.w, byy - 8);
+      ctx.fillStyle = '#F7F5F0'; ctx.fillText('$' + mun + 'BN OF IT TO REPLACE MUNITIONS', bx.x + bx.w, byy + bh + 16); ctx.textAlign = 'left';
+    }
+    // 4 · the interceptors: one hundred, two thirds fade, the denial printed beside them
+    if (!mobile) {
+      const remain = WC.munitions.patriot_remaining_share, keep = Math.round(remain * 100);
+      bx = row(3, '1 in 3', 'LEFT', 'PATRIOT INTERCEPTORS LEFT · CSIS, 27 JUL', 'REBUILDING TAKES THREE YEARS OR MORE', pInt);
+      const iw = bx.w / 100, ih = Math.min(bx.h * 0.4, 64), iy = bx.y + bx.h / 2 - ih / 2 - 14, base = Math.min(1, pInt * 3);
+      for (let i = 0; i < 100; i++) { const gone = i >= keep; ctx.globalAlpha = base * (gone ? 1 - pInt * 0.85 : 1); ctx.fillStyle = gone ? 'rgba(247,245,240,.55)' : '#F7F5F0'; const x = bx.x + i * iw + iw / 2; ctx.beginPath(); ctx.moveTo(x, iy); ctx.lineTo(x + iw * 0.32, iy + ih); ctx.lineTo(x - iw * 0.32, iy + ih); ctx.closePath(); ctx.fill(); }
+      ctx.globalAlpha = Math.max(0, Math.min(1, (pInt - 0.5) * 2));
+      ctx.font = '500 15px "IBM Plex Mono", monospace'; ctx.fillStyle = '#F7F5F0'; ctx.fillText('THE SECRETARY OF DEFENSE DISPUTES THIS ESTIMATE · 5 AUG', bx.x, iy + ih + 24);
+      ctx.fillStyle = 'rgba(247,245,240,.6)'; ctx.fillText('HIS OWN BUDGET REQUEST ASKS $21BN FOR MUNITIONS TO REPLACE THEM', bx.x, iy + ih + 44);
+    }
+    ctx.globalAlpha = 1;
+    const sg = ctx.createLinearGradient(0, H * 0.62, 0, H); sg.addColorStop(0, 'rgba(110,27,39,0)'); sg.addColorStop(1, 'rgba(110,27,39,.92)');
+    ctx.fillStyle = sg; ctx.fillRect(0, H * 0.62, W, H * 0.38);
+  }
+
+  /* ---------- block 7: what it buys ---------- */
+  setupBuy() {
+    const WC = this.bill.war_cost, spent = WC.dod_cost.usd_bn * 1e9, loss = WC.aircraft.dod_loss_estimate_usd_bn * 1e9, diesel = this.prices.diesel.latest.value;
+    const PS5 = 549.99, TUITION = 11610, HOTDOG = 1.5, JET = 82.5e6, HH = 132.2e6, DAY = 3.9e6 * 42, USPOP = 340e6, AC = WC.aircraft.total_lost_or_damaged;
+    const days = Math.round(loss / diesel / DAY), dogs = Math.round(loss / HOTDOG / USPOP), hh = Math.round(HH / (loss / PS5)), S = '$' + WC.aircraft.dod_loss_estimate_usd_bn + 'BN';
+    this.buyR = { PS5, TUITION, HOTDOG, JET, HH, DAY, USPOP, days, dogs, hh, spent, loss, diesel, AC, lossBn: WC.aircraft.dod_loss_estimate_usd_bn, ratio: Math.round(spent / loss) };
+    const date = AC + ' AIRCRAFT LOST OR DAMAGED · PENTAGON ESTIMATE $' + WC.aircraft.dod_loss_estimate_usd_bn + ' BILLION';
+    this.buyBeats = [
+      { total: JET / PS5, per: 1000, label: 'PlayStation 5s', sub: 'for one F-35A · $82.5 million', each: 'EACH SQUARE IS 1,000 PLAYSTATION 5s AT $549.99', math: '$82.5M ÷ $549.99', jet: true, date: 'ONE F-35A · $82.5 MILLION · ONE WAS LOST' },
+      { total: loss / PS5, per: 1e4, label: 'PlayStation 5s', sub: 'one for every ' + hh + ' households in America', each: 'EACH SQUARE IS 10,000 PLAYSTATION 5s AT $549.99', math: S + ' ÷ $549.99', date },
+      { total: loss / diesel, per: 1e6, label: 'gallons of diesel', sub: days + ' days of every gallon America burns', each: 'EACH SQUARE IS 1 MILLION GALLONS AT $' + diesel.toFixed(2), math: S + ' ÷ $' + diesel.toFixed(2), date },
+      { total: loss / TUITION, per: 500, label: 'years of college tuition', sub: 'in-state, public four-year, at $11,610', each: 'EACH SQUARE IS 500 STUDENT-YEARS AT $11,610', math: S + ' ÷ $11,610', date },
+      { total: loss / HOTDOG, per: 5e6, label: 'Costco hot dogs', sub: dogs + ' for every American', each: 'EACH SQUARE IS 5 MILLION HOT DOGS AT $1.50', math: S + ' ÷ $1.50', date },
+    ];
+    this.buyBeats.forEach(b => { b.N = Math.round(b.total / b.per); });
+    this.BEAT = 4.7; this.SPAWN = 2.2; this.FALL = 0.5; this.FINALE = 6.8; this.buyDur = this.buyBeats.length * this.BEAT + this.FINALE;
+  }
+  buyVals() {
+    const R = this.buyR; if (!R) return { buyDays: '', buyDogs: '', buyPS5: '', buyDiesel: '', buyGallons: '', buyTuition: '', buyDogsTotal: '', buyJet: '', buyHH: '', buyRatio: '', buyLoss: '' };
+    const W = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+    return { buyDays: W[R.days] || R.days, buyDogs: W[R.dogs] || R.dogs, buyPS5: (R.loss / R.PS5 / 1e6).toFixed(1), buyDiesel: R.diesel.toFixed(2), buyGallons: Math.round(R.loss / R.diesel / 1e6), buyTuition: Math.round(R.loss / R.TUITION / 1000), buyDogsTotal: (R.loss / R.HOTDOG / 1e9).toFixed(1), buyJet: Math.round(R.JET / R.PS5).toLocaleString(), buyHH: R.hh, buyRatio: W[R.ratio] || R.ratio, buyLoss: R.lossBn };
+  }
+  /* squares fill the pile bottom-up, one row at a time, in a shuffled order within each row so the rain looks like rain */
+  buyLayout(bi, W, H, mobile, extra) {
+    const key = bi + '|' + W + '|' + H + '|' + extra;
+    if (this.buyL && this.buyL.key === key) return this.buyL;
+    const b = this.buyBeats[bi], pad = mobile ? 16 : 36;
+    const x = mobile ? pad : W * 0.46, w = W - pad - x, y = Math.max(H * 0.13, 112), hgt = Math.max(60, H * (mobile ? 0.48 : 0.55) - y);
+    const cell = Math.max(4, Math.floor(Math.sqrt(w * hgt * 0.8 / b.N))), cols = Math.max(1, Math.floor(w / cell)), N = b.N + extra;
+    const col = new Int16Array(N), row = new Int16Array(N);
+    let s = bi * 991 + 17;
+    for (let r0 = 0; r0 * cols < N; r0++) {
+      const perm = Array.from({ length: cols }, (_, i) => i);
+      for (let i = cols - 1; i > 0; i--) { const j = Math.floor(this.seeded(s++) * (i + 1)); const tmp = perm[i]; perm[i] = perm[j]; perm[j] = tmp; }
+      for (let j = 0; j < cols && r0 * cols + j < N; j++) { col[r0 * cols + j] = perm[j]; row[r0 * cols + j] = r0; }
+    }
+    return (this.buyL = { key, x, y, w, h: hgt, cell, cols, col, row, N, xoff: (w - cols * cell) / 2 });
+  }
+  stepBuy(dt, P, t) {
+    const cv = this.buyRef.current, B = this.bill; if (!cv || !B || !this.buyBeats) return;
+    const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#0B1E3F'; ctx.fillRect(0, 0, W, H);
+    const mobile = W < 640, pad = mobile ? 16 : 36, R = this.buyR, nB = this.buyBeats.length;
+    const DUR = this.buyDur, time = this.reduced ? DUR - 0.01 : (P * DUR) % DUR, bi = Math.min(nB - 1, Math.floor(time / this.BEAT)), bt = time - bi * this.BEAT, finale = time >= nB * this.BEAT;
+    const b = this.buyBeats[bi], extra = finale ? Math.round(b.N * R.spent / R.loss) : 0;
+    const L = this.buyLayout(bi, W, H, mobile, extra);
+    // the pile
+    ctx.strokeStyle = 'rgba(247,245,240,.14)'; ctx.lineWidth = 1; ctx.strokeRect(L.x + 0.5, L.y + 0.5, L.w - 1, L.h - 1);
+    let landed = 0, landedX = 0;
+    for (let i = 0; i < L.N; i++) {
+      const at = i < b.N ? (i / b.N) * this.SPAWN : this.BEAT + ((i - b.N) / extra) * 1.8;
+      const age = (bt - at) / this.FALL; if (age <= 0) break;
+      const ty = L.y + L.h - (L.row[i] + 1) * L.cell; if (ty < -L.cell) continue;
+      const e = Math.min(1, age), yy = -L.cell + (ty + L.cell) * e * e, xx = L.x + L.xoff + L.col[i] * L.cell;
+      if (e >= 1) { if (i < b.N) landed++; else landedX++; }
+      if (i < b.N) { ctx.fillStyle = (L.row[i] + L.col[i]) % 2 ? '#D4A017' : '#C2921A'; ctx.fillRect(xx + 0.5, yy + 0.5, L.cell - 1, L.cell - 1); }
+      else { ctx.strokeStyle = 'rgba(224,75,92,.9)'; ctx.strokeRect(xx + 1, yy + 1, L.cell - 2, L.cell - 2); }
+    }
+    // left of the equals sign, the same money in jets: one F-35A for the first beat, the whole war's worth after that
+    if (!mobile) {
+      const a = Math.min(1, bt * 2), jw = L.x - 44 - pad;
+      ctx.textAlign = 'center'; ctx.font = '500 14px "IBM Plex Mono", monospace';
+      if (b.jet) {
+        const jx = pad + jw * 0.5, jy = L.y + L.h * 0.46, s = Math.min(L.h * 0.36, jw * 0.3);
+        this.drawPlane(ctx, jx, jy, s, a, false);
+        ctx.globalAlpha = a; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('ONE F-35A · $82.5 MILLION', jx, L.y - 10);
+      } else {
+        const T = B.war_cost.aircraft.by_type, n = R.AC, manned = Object.entries(T).filter(([k]) => !/^MQ/.test(k)).reduce((s, [, v]) => s + v, 0);
+        const cols = 7, rows = Math.ceil(n / cols), cell = Math.min(jw / cols, L.h / rows) * 0.92, s = cell * 0.4;
+        const x0 = pad + (jw - cols * cell) / 2 + cell / 2, y0 = L.y + L.h / 2 - rows * cell / 2 + cell / 2;
+        for (let i = 0; i < n; i++) this.drawPlane(ctx, x0 + (i % cols) * cell, y0 + Math.floor(i / cols) * cell, s, a, i >= manned);
+        ctx.globalAlpha = a; ctx.fillStyle = 'rgba(247,245,240,.7)';
+        [[n + ' AIRCRAFT LOST OR DAMAGED · $' + R.lossBn + ' BILLION', L.y - 28], [manned + ' MANNED · ' + (n - manned) + ' DRONES', L.y - 10]].forEach(([s, yy]) => { let fs = 14; ctx.font = '500 14px "IBM Plex Mono", monospace'; while (fs > 10 && ctx.measureText(s).width > jw) { fs--; ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace'; } ctx.fillText(s, pad + jw / 2, yy); });
+      }
+      ctx.font = '700 ' + Math.round(L.h * 0.28) + 'px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#D4A017'; ctx.fillText('=', L.x - 22, L.y + L.h / 2 + L.h * 0.1);
+      ctx.textAlign = 'left'; ctx.globalAlpha = 1;
+    }
+    // captions on the pile
+    ctx.font = '500 14px "IBM Plex Mono", monospace'; ctx.textAlign = 'left';
+    ctx.fillStyle = finale ? '#E04B5C' : 'rgba(247,245,240,.7)'; ctx.fillText(finale ? 'IN RED, SAME SCALE: THE WHOLE WAR SO FAR · $' + (R.spent / 1e9).toFixed(1) + 'BN' : b.each, L.x, L.y - 10);
+    ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(247,245,240,.45)'; ctx.fillText(b.math, L.x + L.w, L.y + L.h + 20); ctx.textAlign = 'left';
+    const sg = ctx.createLinearGradient(0, H * 0.55, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.92)');
+    ctx.fillStyle = sg; ctx.fillRect(0, H * 0.55, W, H * 0.45);
+    // readout
+    const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
+    const v = (landed / b.N) * b.total;
+    const f = v >= 1e9 ? [(v / 1e9).toFixed(1), 'billion '] : v >= 1e6 ? [(v / 1e6).toFixed(1), 'million '] : [Math.round(v).toLocaleString(), ''];
+    const num = this.buyNumRef.current, sub = this.buySubRef.current;
+    if (finale && landedX > 0) {
+      set(this.buyNumRef, '$' + (R.spent / 1e9).toFixed(1) + 'bn'); if (num) num.style.color = '#E04B5C';
+      const html = 'the war so far<br><span style="color:rgba(247,245,240,.6)">' + R.ratio + ' times the aircraft · and he has asked for $67.1bn more</span>';
+      if (sub && sub.__html !== html) { sub.__html = html; sub.innerHTML = html; }
+    } else {
+      set(this.buyNumRef, f[0]); if (num) num.style.color = '#D4A017';
+      const html = f[1] + b.label + '<br><span style="color:rgba(247,245,240,.6)">' + b.sub + '</span>';
+      if (sub && sub.__html !== html) { sub.__html = html; sub.innerHTML = html; }
+    }
+    set(this.buyDateRef, b.date);
+  }
+
+  /* ---------- block 7: the vault ---------- */
+  stepVault(dt, P, t) {
+    const cv = this.vaultRef.current, B = this.bill; if (!cv || !B) return;
+    const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#0B1E3F'; ctx.fillRect(0, 0, W, H);
+    const mobile = W < 640, pad = mobile ? 16 : 36;
+    const N = this.vOut.length, tl = Math.max(0, Math.min(1, (P - 0.04) / 0.66));
+    const mIdx = Math.min(N, Math.floor(tl * (N + 1)));     // months completed
+    if (mIdx < this.vMonthDone) { this.vGone = []; this.vMonthDone = -1; }
+    // the cage: bars in rows, filled bottom-up
+    const cageW = mobile ? W - pad * 2 : (W - pad * 2) * 0.62, cageTop = Math.max(H * 0.14, 112), cageBot = H * (mobile ? 0.5 : 0.48);
+    const cols = mobile ? 60 : 100, bw = cageW / cols, rows = Math.ceil(this.vTotal / cols), bh = (cageBot - cageTop) / rows;
+    while (this.vMonthDone < mIdx - 1) { this.vMonthDone++; const n = this.vOut[this.vMonthDone].n; for (let i = 0; i < n; i++) this.vGone.push({ born: t + i * 12, m: this.vMonthDone }); }
+    const gone = this.vGone.length, remaining = this.vTotal - gone;
+    const ingot = (x, y, w, hh, a) => { ctx.globalAlpha = a; const i = Math.min(1.5, w * 0.14); ctx.fillStyle = '#B8871A'; ctx.beginPath(); ctx.moveTo(x, y + hh); ctx.lineTo(x + i, y); ctx.lineTo(x + w - i, y); ctx.lineTo(x + w, y + hh); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#F2C94C'; ctx.fillRect(x + i, y, Math.max(1, w - 2 * i), Math.max(1, hh * 0.32)); ctx.globalAlpha = 1; };
+    ctx.strokeStyle = 'rgba(247,245,240,.2)'; ctx.lineWidth = 1; ctx.strokeRect(pad, cageTop, cageW, cageBot - cageTop);
+    for (let x = 1; x < 12; x++) { ctx.beginPath(); ctx.moveTo(pad + cageW * x / 12, cageTop); ctx.lineTo(pad + cageW * x / 12, cageBot); ctx.stroke(); }
+    for (let i = 0; i < this.vTotal; i++) {
+      const col = i % cols, row = Math.floor(i / cols), x = pad + col * bw, y = cageBot - (row + 1) * bh;
+      const gi = i - remaining;   // bars leave from the top of the stack
+      if (gi >= 0) {
+        const g = this.vGone[gone - 1 - gi]; const age = Math.max(0, (t - g.born) / 700); if (age > 1.2) continue;
+        const e = Math.min(1, age); ingot(x + e * 260 + 1, y + 1 - e * 40, Math.max(1, bw - 2), Math.max(1, bh - 1.5), 1 - e); continue;
+      }
+      ingot(x + 0.5, y + 0.5, Math.max(1, bw - 1), Math.max(1, bh - 1.5), 1);
+    }
+    ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.textAlign = 'left';
+    ctx.fillText('FOREIGN GOLD IN THE VAULT · ' + remaining.toLocaleString() + ' TONNES', pad, cageTop - 12);
+    // beside it: Treasuries in Fed custody, a shrinking stack
+    if (!mobile) {
+      const T = B.gold.treasuries, tx = pad + cageW + 48, tw = W - pad - tx, tIdx = Math.min(T.length - 1, Math.floor(tl * T.length));
+      const vmax = Math.max(...T.map(p => p[1])), cur = T[tIdx][1];
+      ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('TREASURIES HELD FOR FOREIGN OFFICIALS', tx, cageTop - 12);
+      const hgt = (cageBot - cageTop) * (cur / vmax) * 0.96;
+      ctx.fillStyle = 'rgba(108,140,213,.25)'; ctx.fillRect(tx, cageBot - (cageBot - cageTop) * 0.96, tw, (cageBot - cageTop) * 0.96);
+      ctx.fillStyle = '#6C8CD5'; ctx.fillRect(tx, cageBot - hgt, tw, hgt);
+      for (let y = cageBot; y > cageBot - hgt; y -= 8) { ctx.fillStyle = 'rgba(11,30,63,.35)'; ctx.fillRect(tx, y - 1, tw, 1); }
+      ctx.fillStyle = '#F7F5F0'; ctx.font = '700 30px "Barlow Condensed", sans-serif'; ctx.fillText('$' + (cur / 1e6).toFixed(2) + 'tn', tx + 10, cageBot - hgt + 34);
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.fillText(new Date(T[tIdx][0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase() + ' · WAS $2.78TN IN JAN', tx, cageBot + 20);
+      // the Fed's counter-argument, in blue, at full size
+      if (tl >= 1) {
+        ctx.fillStyle = '#6C8CD5'; ctx.font = '700 20px "Barlow Condensed", sans-serif';
+        ['THE FED\u2019S ANSWER: GOLD IS DOWN A FIFTH', 'FROM ITS JANUARY RECORD, AND THE DOLLAR', 'IS UP SINCE THE WAR BEGAN.'].forEach((l, i) => ctx.fillText(l, tx, cageBot + 44 + i * 22));
+        ctx.font = '500 14px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(108,140,213,.85)';
+        ctx.fillText('FEDS NOTES · COLIN WEISS · 3 SEP 2026', tx, cageBot + 112);
+      }
+    }
+    const sg = ctx.createLinearGradient(0, H * 0.58, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.92)');
+    ctx.fillStyle = sg; ctx.fillRect(0, H * 0.58, W, H * 0.42);
+    const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
+    set(this.vaultNumRef, String(Math.round(B.gold.earmarked[0][2] - B.gold.earmarked[mIdx][2])));
+    const d = mIdx === 0 ? B.gold.earmarked[0][0] : this.vOut[mIdx - 1].date;
+    set(this.vaultDateRef, new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase() + (mIdx > 0 ? ' · −' + this.vOut[mIdx - 1].n + ' T THIS MONTH' : ''));
+  }
+
+  /* ---------- block 4: prices ---------- */
+  fmtPrice(v, unit) { const r = (x, d) => (Math.round(x * Math.pow(10, d) + 1e-6) / Math.pow(10, d)).toFixed(d); return unit === 'kwh' ? r(v * 100, 1) + '¢' : '$' + r(v, 2); }
+  receiptFor(code) {
+    const P = this.prices; if (!P) return null;
+    if (code === 'US') return { name: 'the United States', fuel: P.receipt.lines[0].monthly_usd, groceries: P.receipt.lines[1].monthly_usd, elec: P.receipt.lines[2].monthly_usd, total: P.receipt.monthly_usd, gas: null, elecSeries: null };
+    const ri = P.receipt_inputs, st = this.STATES.find(s => s.code === code);
+    const gas = ri.regions['S' + code] || ri.regions[ri.state_to_padd[code]] || ri.regions.NUS;
+    const el = ri.electricity_by_state[code];
+    const fuel = (gas.latest.value - gas.handover.value) * P.receipt.lines[0].quantity;
+    const elec = el ? (el.latest.value - el.handover.value) * P.receipt.lines[2].quantity : P.receipt.lines[2].monthly_usd;
+    const groceries = P.receipt.lines[1].monthly_usd;
+    return { name: st ? st.name : code, fuel, groceries, elec, total: fuel + groceries + elec, gas, elecSeries: el };
+  }
+  buildBoard(keepPhase) {
+    const P = this.prices, sel = this.receiptFor(this.state.state);
+    const prev = this.board || [];
+    const items = P.items.filter(i => i.key !== 'eggs').concat(P.items.filter(i => i.key === 'eggs'));
+    const rowsRaw = [{ key: 'diesel', name: 'Diesel', unit: 'per gallon, EIA weekly', start: P.diesel.handover.value, end: P.diesel.latest.value, u: 'usd', series: P.diesel.fred_id + ' · 20 Jan 2025 → 31 Aug 2026' }]
+      .concat(items.map(i => {
+        let start = i.start, end = i.end, unit = i.note.split('.')[0], series = i.fred_id + ' · Jan 2025 → Jul 2026';
+        if (sel && sel.gas && i.key === 'gasoline_ap') { start = sel.gas.handover.value; end = sel.gas.latest.value; unit = 'per gallon, ' + sel.gas.name + ', EIA weekly'; series = 'EIA ' + sel.gas.name + ' · 20 Jan 2025 → 31 Aug 2026'; }
+        if (sel && sel.elecSeries && i.key === 'electricity') { start = sel.elecSeries.handover.value; end = sel.elecSeries.latest.value; unit = 'per kWh, ' + sel.name + ', EIA monthly'; series = 'EIA residential ' + sel.name + ' · Jan 2025 → Jun 2026'; }
+        if (i.key === 'eggs') unit = 'per dozen';
+        return { key: i.key, name: i.name, unit, note: i.key === 'eggs' ? '· avian flu ended, not policy' : '', start, end, u: i.key === 'electricity' ? 'kwh' : 'usd', series };
+      }));
+    const order = ['diesel'].concat(rowsRaw.slice(1).sort((a, b) => (b.end / b.start) - (a.end / a.start)).map(r => r.key));
+    this.board = order.map(k => {
+      const r = rowsRaw.find(x => x.key === k), old = prev.find(x => x.key === k);
+      const pct = (r.end / r.start - 1) * 100;
+      const row = { ...r, startText: this.fmtPrice(r.start, r.u), endText: this.fmtPrice(r.end, r.u), up: r.end >= r.start,
+        changeText: (pct >= 0 ? '+' : '−') + Math.abs(pct).toFixed(0) + '%', phase: 'start', shown: '', flapOn: false, t: 0 };
+      row.shown = row.startText;
+      if (keepPhase && old && old.phase === 'done') { row.phase = 'done'; row.shown = row.endText; }
+      if (keepPhase && old && old.phase === 'done' && old.endText !== row.endText) { row.phase = 'flipping'; row.t = 0; row.shown = old.endText; }
+      return row;
+    });
+    const tOld = this.total;
+    this.total = { endText: '+$' + sel.total.toFixed(2), shown: '+$0.00', phase: 'start', t: 0, flapOn: false };
+    if (keepPhase && tOld && tOld.phase !== 'start') { this.total.phase = 'flipping'; this.total.shown = tOld.shown; }
+    this.forceUpdate();
+  }
+  /* split-flap: each cell cycles through the glyph set until it lands; cells settle left to right */
+  flipStep(r, dt) {
+    r.t += dt;
+    const GL = '0123456789';
+    const target = r.endText, from = r.shown;
+    const n = Math.max(target.length, from.length);
+    let out = '', done = true;
+    for (let j = 0; j < n; j++) {
+      const tc = target[j] || '', fc = from[j] || tc;
+      const settle = 0.18 + j * 0.07;
+      if (r.t >= settle || !GL.includes(tc)) { out += tc; continue; }
+      done = false;
+      const k = Math.floor(r.t / 0.045) + j;
+      out += GL[(GL.indexOf(fc) + k) % 10];
+    }
+    r.shown = out; r.flapOn = Math.floor(r.t / 0.045) % 2 === 0;
+    if (done) { r.phase = 'done'; r.shown = target; r.flapOn = false; }
+  }
+  stepPrices(dt, P4) {
+    if (!this.board) return;
+    let changed = false;
+    const N = this.board.length;
+    this.board.forEach((r, i) => {
+      const at = 0.04 + i * (0.66 / N);
+      if (P4 >= at && r.phase === 'start') { r.phase = 'flipping'; r.t = 0; r.shown = r.startText; changed = true; }
+      if (P4 < at && r.phase !== 'start') { r.phase = 'start'; r.shown = r.startText; r.flapOn = false; changed = true; }
+      if (r.phase === 'flipping') { this.flipStep(r, dt); changed = true; }
+    });
+    const T = this.total, tAt = 0.76;
+    if (P4 >= tAt && T.phase === 'start') { T.phase = 'flipping'; T.t = 0; changed = true; }
+    if (P4 < tAt && T.phase !== 'start') { T.phase = 'start'; T.shown = '+$0.00'; changed = true; }
+    if (T.phase === 'flipping') { this.flipStep(T, dt); changed = true; }
+    if (changed) { this.flipAcc = (this.flipAcc || 0) + dt; if (this.flipAcc >= 0.04) { this.flipAcc = 0; this.forceUpdate(); } }
+    // the pump: roll through every published week, 20 Jan 2025 → 31 Aug 2026, over the first 70% of the scroll
+    const pts = this.prices.diesel.points.filter(p => p[0] >= '2025-01-20');
+    const u = Math.max(0, Math.min(1, (P4 - 0.02) / 0.7)) * (pts.length - 1);
+    const i = Math.floor(u), f = u - i, a = pts[i], b = pts[Math.min(pts.length - 1, i + 1)];
+    const v = a[1] + (b[1] - a[1]) * f;
+    this.setOdometer(v);
+    const dstr = new Date(b[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+    if (this.pWeekRef.current && this.pWeekRef.current.textContent !== dstr) this.pWeekRef.current.textContent = dstr;
+    const mon = P4 < 0.04 ? 'JANUARY 2025' : P4 > 0.7 ? 'NOW · JULY / AUGUST 2026' : new Date(b[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+    if (this.pDateRef.current && this.pDateRef.current.textContent !== mon) this.pDateRef.current.textContent = mon;
+  }
+  /* mechanical odometer: the cents wheel turns continuously, each higher wheel only as the one below passes 9 */
+  setOdometer(v) {
+    let x = v * 100;  // cents
+    if (Math.abs(x - Math.round(x)) < 0.25) x = Math.round(x);   // rest on a whole cent
+    const wheels = [100, 10, 1];
+    let carry = 0;
+    const pos = wheels.map(() => 0);
+    for (let k = wheels.length - 1; k >= 0; k--) {
+      const raw = x / wheels[k];
+      const d = Math.floor(raw) % 10;
+      const frac = k === wheels.length - 1 ? raw - Math.floor(raw) : (carry >= 9 ? carry - 9 : 0);
+      pos[k] = d + frac;
+      carry = d + frac;
+    }
+    pos.forEach((p, k) => { const el = this.odoRefs[k].current; if (el) el.style.transform = 'translateY(' + (-p).toFixed(3) + 'em)'; });
+  }
+  /* Each pinned block plays on its own clock once it fills the viewport: P runs 0→1 over dur seconds,
+     holds at 1 while the block is nearby, and rewinds only once the block has fully left the screen. */
+  playProgress(sec, key, dur, t, loop) {
+    const r = sec.getBoundingClientRect(), vh = innerHeight, S = this.plays || (this.plays = {});
+    if (r.top < vh * 0.4 && r.bottom > vh * 0.6) { if (S[key] === undefined) S[key] = t; }
+    else if (r.bottom < 0 || r.top > vh) S[key] = undefined;
+    if (S[key] === undefined) return 0; const raw = (t - S[key]) / (dur * 1000); return loop ? raw : Math.min(1, raw);
+  }
+
+  async componentDidMount() {
+    const [data, land110, land50, coast, prices, crude, coastBox, bill] = await Promise.all([
+      fetch('globe-data.json').then(r => r.json()),
+      fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json').then(r => r.json()),
+      fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-50m.json').then(r => r.json()),
+      fetch('strait-coast.json').then(r => r.json()),
+      fetch('prices-data.json').then(r => r.json()),
+      fetch('crude-data.json').then(r => r.json()),
+      fetch('frontend/src/v4/hormuz/coast.json').then(r => r.json()),
+      fetch('bill-data.json').then(r => r.json()),
+    ]);
+    this.crude = crude; this.setupSeis();
+    this.coastBox = coastBox; this.strShips = []; this.strAcc = 0;
+    this.bill = bill; this.setupBill(); this.forceUpdate();
+    this.data = data;
+    // 110m for the whole globe (cheap to clip each frame); 50m only for the region the camera pushes into
+    this.land = topojson.feature(land110, land110.objects.land);
+    this.landRegion = this.clipLand(topojson.feature(land50, land50.objects.land), [22, -12, 92, 48]);
+    // the repo's coast.json (unprojected to lon/lat) supplies the real gate and Traffic Separation Scheme lane
+    this.landRegion = this.orient(this.landRegion);
+    this.gate = coast.gate; this.tss = coast.lane;
+    this.setState({
+      asOf: data.as_of,
+      rows: Object.values(data.items).map(it => ({
+        name: it.name, base: it.baseline.total_per_day.toFixed(1), now: it.recent.mean7_total.toFixed(1),
+        pct: Math.round(it.recent.pct_of_baseline) + '%',
+      })),
+    });
+    this.setupSim();
+    this.prices = prices; this.buildBoard(false); this.setupBuy();
+    this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.loop = this.loop.bind(this);
+    this.raf = requestAnimationFrame(this.loop);
+  }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); }
+
+  /* ---------- data → time ---------- */
+  setupSim() {
+    const D = this.data;
+    this.day0 = Date.UTC(2026, 0, 1);
+    this.dayOf = iso => Math.round((Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) - this.day0) / 86400000);
+    this.STRIKE = this.dayOf('2026-02-28');
+    this.LAST = this.dayOf('2026-08-30');
+    this.events = [
+      { d: this.dayOf('2026-02-28'), red: true, t: 'HE ORDERED THE STRIKE. THE STRAIT CLOSES.' },
+      { d: this.dayOf('2026-04-07'), red: false, t: 'TWO-WEEK CEASEFIRE. THE STRAIT OPENS A LITTLE.' },
+      { d: this.dayOf('2026-06-18'), red: false, t: '60-DAY CEASEFIRE. TRANSITS TRIPLE.' },
+      { d: this.dayOf('2026-07-08'), red: true, t: 'HE STRIKES AGAIN. THE CEASEFIRE IS OVER.' },
+      { d: this.dayOf('2026-08-18'), red: true, t: 'HE SAYS THE STRAIT IS "OPEN AND OPERATING".' },
+    ];
+    // Routes: [lon,lat] waypoints; choke index marks the strait itself.
+    const R = {
+      // Gulf leg follows the real Traffic Separation Scheme through the strait (repo coast.json lane)
+      hormuz:        { pts: [[49.6,28.2],[50.8,27.3],[52.4,26.6],[53.8,26.3],[54.85,26.2],[55.2,26.25],[55.6,26.3],[55.95,26.38],[56.2,26.5],[56.38,26.58],[56.5,26.6],[56.62,26.55],[56.75,26.42],[56.88,26.25],[57.0,26.05],[57.15,25.8],[57.35,25.55],[57.9,25.0],[58.8,24.2],[60.5,22.8],[63,19.5],[67,14],[71,9.5],[75,7]], choke: 10 },
+      bab_el_mandeb: { pts: [[66,9.5],[60,11.5],[54,13],[49,12.4],[45.2,12.4],[43.35,12.6],[42.3,14.5],[40.2,18.5],[38.2,22.5]], choke: 5 },
+      suez:          { pts: [[36.6,25.5],[34.6,27.8],[32.6,29.9],[32.3,31.5],[29.5,32.7],[24,34.5],[16,36.5],[8,37.8],[2,37.2],[-4,36]], choke: 2 },
+      good_hope:     { pts: [[74,6],[62,2],[54,-10],[44,-24],[32,-33.5],[19.5,-35.5],[13,-30],[9,-20],[4,-8],[-4,4],[-12,14],[-17,24],[-14,34]], choke: 5 },
+      malacca:       { pts: [[75,7],[84,5.5],[94,5.5],[99,3.6],[101.5,2.4],[103.9,1.2],[106,3.5],[110,8],[114,14],[118,20],[121,26]], choke: 4 },
+      panama:        { pts: [[-62,18],[-70,15.5],[-76,11],[-79.6,9],[-80.5,7.5],[-85,4],[-92,2],[-100,-2]], choke: 3 },
+    };
+    this.routes = {};
+    for (const k in R) {
+      const it = D.items[k];
+      const pts = R[k].pts, N = 220, path = [];
+      const segLen = pts.slice(1).map((p, i) => d3.geoDistance(pts[i], p));
+      const total = segLen.reduce((a, b) => a + b, 0);
+      let acc = 0, seg = 0;
+      for (let i = 0; i < N; i++) {
+        let s = (i / (N - 1)) * total;
+        while (seg < segLen.length - 1 && s > acc + segLen[seg]) { acc += segLen[seg]; seg++; }
+        const f = Math.max(0, Math.min(1, (s - acc) / segLen[seg]));
+        path.push(d3.geoInterpolate(pts[seg], pts[seg + 1])(f));
+      }
+      const obs = it.observations.map(([d, v]) => [this.dayOf(d), v]);
+      // where along the path the strait sits (0..1), for the slow-down on approach
+      let cs = 0; for (let i = 0; i < R[k].choke; i++) cs += segLen[i]; cs /= total;
+      this.routes[k] = { key: k, name: it.name.replace(' Strait', '').replace('Strait of ', '').replace(' Canal', '').toUpperCase(), path, choke: pts[R[k].choke], chokeS: cs, base: it.baseline.total_per_day, obs, parts: [], acc: 0, total };
+    }
+    // Hormuz daily series is complete; use it instead of the May-onward slice.
+    this.routes.hormuz.obs = D.hormuz_daily.map(([d, v]) => [this.dayOf(d), v]);
+    this.day = this.STRIKE - 1;
+  }
+  /* Sutherland–Hodgman clip of every ring to a lon/lat box. Planar is fine here: no antimeridian. */
+  clipLand(fc, [x0, y0, x1, y1]) {
+    const clipEdge = (pts, inside, cross) => {
+      const out = [];
+      for (let i = 0; i < pts.length; i++) {
+        const a = pts[(i + pts.length - 1) % pts.length], b = pts[i];
+        const ia = inside(a), ib = inside(b);
+        if (ib) { if (!ia) out.push(cross(a, b)); out.push(b); } else if (ia) out.push(cross(a, b));
+      }
+      return out;
+    };
+    const X = (a, b, x) => [x, a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0])];
+    const Y = (a, b, y) => [a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]), y];
+    const clipRing = ring => {
+      let r = ring;
+      r = clipEdge(r, p => p[0] >= x0, (a, b) => X(a, b, x0)); if (!r.length) return null;
+      r = clipEdge(r, p => p[0] <= x1, (a, b) => X(a, b, x1)); if (!r.length) return null;
+      r = clipEdge(r, p => p[1] >= y0, (a, b) => Y(a, b, y0)); if (!r.length) return null;
+      r = clipEdge(r, p => p[1] <= y1, (a, b) => Y(a, b, y1)); if (r.length < 3) return null;
+      r.push(r[0]); return r;
+    };
+    const polys = [];
+    const geoms = fc.type === 'FeatureCollection' ? fc.features.map(f => f.geometry) : [fc.geometry || fc];
+    for (const g of geoms) {
+      const list = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+      for (const poly of list) {
+        const rings = poly.map(clipRing).filter(Boolean);
+        if (rings.length) polys.push(rings);
+      }
+    }
+    return { type: 'MultiPolygon', coordinates: polys };
+  }
+  /* d3 fills the sphere to the RIGHT of a ring: outer rings must be counter-clockwise (area < 2π), holes clockwise. */
+  orient(mp) {
+    mp.coordinates = mp.coordinates.map(poly => poly.map((ring, i) => {
+      const a = d3.geoArea({ type: 'Polygon', coordinates: [ring] });
+      const wantSmall = i === 0;
+      return (a > 2 * Math.PI) === wantSmall ? ring.slice().reverse() : ring;
+    }));
+    return mp;
+  }
+  mean7(r, day) {
+    const last = Math.min(day, this.LAST);
+    const win = r.obs.filter(o => o[0] <= last && o[0] > last - 7);
+    return win.length ? win.reduce((s, o) => s + o[1], 0) / win.length : null;
+  }
+  flowAt(r, day) {
+    if (day < this.STRIKE) return r.base;
+    const m = this.mean7(r, day);
+    if (m !== null) return m;
+    // gap: pre-war mean → first observed week, drawn straight
+    const first = r.obs[0][0] + 6, fm = this.mean7(r, first);
+    return r.base + (fm - r.base) * Math.min(1, (day - this.STRIKE) / (first - this.STRIKE));
+  }
+  fmtDay(day) {
+    return new Date(this.day0 + day * 86400000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+  }
+
+  /* ---------- scroll → progress ---------- */
+  progress() {
+    const el = this.canvasRef.current && this.canvasRef.current.parentElement.parentElement;
+    if (!el) return 0;
+    const r = el.getBoundingClientRect(), vh = innerHeight;
+    return Math.max(0, Math.min(1, -r.top / Math.max(1, r.height - vh)));
+  }
+
+  loop(t) {
+    this.raf = requestAnimationFrame(this.loop);
+    const cv = this.canvasRef.current; if (!cv || !this.land) return;
+    const dt = Math.max(0, Math.min(0.05, (t - (this.lastT || t)) / 1000)); this.lastT = t;
+    const vh = innerHeight;
+    const run = (sec, key, dur, fn, loop) => {
+      if (!sec) return; const r = sec.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return;
+      const P = this.reduced ? 1 : this.playProgress(sec, key, dur, t, loop);
+      fn(P);
+      if (sec.__cue === undefined) sec.__cue = sec.querySelector('[data-cue]');
+      if (sec.__cue) sec.__cue.style.opacity = P >= 1 ? '1' : '0';
+    };
+    const secOf = ref => ref.current && ref.current.closest('section');
+    run(this.stampStageRef.current && this.stampStageRef.current.parentElement, 'stamps', 3.5, P => this.stepStamps(P));
+    run(secOf(this.seisRef), 'seis', 8, P => this.stepSeis(dt, P, t));
+    run(secOf(this.straitRef), 'strait', 9, P => this.stepStrait(dt, P, t));
+    run(secOf(this.boardRef), 'prices', 6, P => this.stepPrices(dt, P));
+    run(secOf(this.crowdRef), 'crowd', 9, P => this.stepCrowd(dt, P, t));
+    run(secOf(this.warRef), 'war', 9, P => this.stepWar(dt, P, t));
+    run(secOf(this.buyRef), 'buy', this.buyDur || 30, P => this.stepBuy(dt, P, t), true);
+    run(secOf(this.vaultRef), 'vault', 8, P => this.stepVault(dt, P, t));
+    run(secOf(this.cardRef), 'card', 3, P => this.stepCard(P));
+    // block 0
+    const p = this.reduced ? 1 : this.progress();
+    const sec = cv.parentElement.parentElement.getBoundingClientRect();
+    if (sec.bottom < -200 || sec.top > innerHeight + 200) return;
+    this.smooth = this.smooth === undefined ? p : this.smooth + (p - this.smooth) * Math.min(1, dt * 8);
+    const P = this.smooth;
+    // timeline: 0–.08 hold before the war · .08–.5 28 Feb → 30 Aug (fast) · .5–1 the camera pushes in on the shut strait
+    const tl = Math.max(0, Math.min(1, (P - 0.04) / 0.26));
+    const day = this.STRIKE - 1 + tl * (this.LAST - this.STRIKE + 1);
+    this.day = day;
+    this.stepParts(dt, day);
+    this.paint(cv, P, day, t);
+    this.readout(P, day);
+  }
+
+  stepParts(dt, day) {
+    for (const k in this.routes) {
+      const r = this.routes[k];
+      const flow = this.flowAt(r, day);
+      r.flow = flow;
+      const dur = 5.5 + r.total * 3;          // seconds to traverse; longer routes take longer
+      const rate = flow * 0.22;                // particles per second ∝ ships per day
+      r.acc += rate * dt;
+      while (r.acc >= 1 && r.parts.length < 420) { r.acc -= 1; r.parts.push({ s: Math.random() * 0.004, v: (0.85 + Math.random() * 0.35) / dur, w: 0.5 + Math.random() * 0.9, o: (Math.random() * 2 - 1) * (Math.random() < 0.5 ? 1 : 0.4) }); }
+      if (r.acc > 3) r.acc = 3;
+      /* Ships slow as the count falls: at 5% of pre-war they crawl at a third
+         of pre-war speed, and slowest on the approach to the strait itself. */
+      const frac = Math.min(1, flow / r.base);
+      const slow = 0.3 + 0.7 * Math.pow(frac, 0.6);
+      for (const q of r.parts) {
+        const near = Math.exp(-Math.pow((q.s - r.chokeS) / 0.09, 2)); // 1 at the strait, 0 far away
+        const mult = slow * (1 - near * (1 - frac) * 0.6);
+        q.s += q.v * dt * mult;
+      }
+      r.parts = r.parts.filter(q => q.s < 1);
+    }
+  }
+
+  paint(cv, P, day, t) {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    const W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const ctx = cv.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#0B1E3F'; ctx.fillRect(0, 0, W, H);
+
+    // camera: Indian Ocean wide → push in on Hormuz
+    const zoom = Math.max(0, Math.min(1, (P - 0.3) / 0.4));   // fully on the strait by 70% — before the block scrolls off
+    const ez = zoom * zoom * (3 - 2 * zoom);
+    const drift = P * 14;
+    const ezc = Math.sqrt(ez);  // the camera arrives over the strait before the zoom finishes
+    const lon = (56 + drift) * (1 - ezc) + 56.25 * ezc, lat = (2 + 5 * P) * (1 - ezc) + 26.25 * ezc;
+    const mobile = W < 640;
+    const baseR = mobile ? Math.min(W, H) * 0.6 : Math.min(W * 0.36, H * 0.44);
+    // the push-in ends with the 33 km gate roughly a fifth of the frame tall
+    const endR = (mobile ? W * 0.9 : H * 0.62) / (2.3 * Math.PI / 180);
+    const R = baseR + (endR - baseR) * ez;
+    const cx = mobile ? W * 0.5 : W * 0.6, cy = mobile ? H * 0.38 : H * 0.42;
+    const proj = d3.geoOrthographic().translate([cx, cy]).scale(R).rotate([-lon, -lat]).clipAngle(90).clipExtent([[-40, -40], [W + 40, H + 40]]);
+    const path = d3.geoPath(proj, ctx);
+    const center = [lon, lat];
+    const visible = pt => d3.geoDistance(pt, center) < 1.52;
+
+    // static layer (sphere, graticule, land) cached until the camera moves
+    const key = [lon.toFixed(3), lat.toFixed(3), R.toFixed(1), W, H, ez.toFixed(3)].join('|');
+    if (!this.bg || this.bgKey !== key) {
+      if (!this.bg || this.bg.width !== cv.width || this.bg.height !== cv.height) { this.bg = document.createElement('canvas'); this.bg.width = cv.width; this.bg.height = cv.height; }
+      const b = this.bg.getContext('2d'); b.setTransform(dpr, 0, 0, dpr, 0, 0); b.clearRect(0, 0, W, H);
+      const bpath = d3.geoPath(proj, b);
+      const og = b.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+      og.addColorStop(0, '#173261'); og.addColorStop(0.75, '#0F2550'); og.addColorStop(1, '#0A1B3A');
+      b.beginPath(); b.arc(cx, cy, R, 0, 6.2832); b.fillStyle = og; b.fill();
+      const safe = fn => { try { fn(); } catch (e) { /* d3 clip edge case at extreme zoom: skip this layer for the frame */ } };
+      if (ez < 0.5) safe(() => { b.beginPath(); bpath(d3.geoGraticule().step([15, 15])()); b.strokeStyle = 'rgba(247,245,240,.06)'; b.lineWidth = 0.6; b.stroke(); });
+      const lgr = b.createLinearGradient(cx - R, cy - R, cx + R * 0.6, cy + R);
+      lgr.addColorStop(0, '#4E5F86'); lgr.addColorStop(1, '#2F4573');  // opaque, so detail layers can overlap without seams
+      b.fillStyle = lgr; b.strokeStyle = 'rgba(247,245,240,.45)'; b.lineWidth = 0.7 + ez * 0.8;
+      if (ez < 0.6) safe(() => { b.beginPath(); bpath(this.land); b.fill(); b.stroke(); });
+      // detail layers are clipped to a box; stroke coastlines only, never the box edge
+      const onEdge = (p, q, [x0, y0, x1, y1], e) => (p[0] < x0 + e && q[0] < x0 + e) || (p[0] > x1 - e && q[0] > x1 - e) || (p[1] < y0 + e && q[1] < y0 + e) || (p[1] > y1 - e && q[1] > y1 - e);
+      const strokeCoast = (mp, box) => {
+        b.beginPath();
+        for (const poly of mp.coordinates) for (const ring of poly) {
+          let pen = false;
+          for (let i = 1; i < ring.length; i++) {
+            const p = ring[i - 1], q = ring[i];
+            if (onEdge(p, q, box, 0.06) || !visible(p) || !visible(q)) { pen = false; continue; }
+            const a = proj(p), c2 = proj(q); if (!a || !c2) { pen = false; continue; }
+            if (!pen) b.moveTo(a[0], a[1]); b.lineTo(c2[0], c2[1]); pen = true;
+          }
+        }
+        b.stroke();
+      };
+      if (ez > 0.05) {
+        // 50m detail for the region the camera is entering, over the 110m globe
+        b.globalAlpha = Math.min(1, (ez - 0.05) / 0.2);
+        safe(() => { b.fillStyle = lgr; b.beginPath(); bpath(this.landRegion); b.fill(); });
+        b.lineWidth = 0.7 + ez * 0.6; strokeCoast(this.landRegion, [22, -12, 92, 48]);
+        b.globalAlpha = 1;
+      }
+
+      b.beginPath(); b.arc(cx, cy, R, 0, 6.2832); b.strokeStyle = 'rgba(108,140,213,.5)'; b.lineWidth = 1.2; b.stroke();
+      const lg = b.createRadialGradient(cx, cy, R * 0.98, cx, cy, R * 1.08);
+      lg.addColorStop(0, 'rgba(108,140,213,.28)'); lg.addColorStop(1, 'rgba(108,140,213,0)');
+      b.beginPath(); b.arc(cx, cy, R * 1.08, 0, 6.2832); b.fillStyle = lg; b.fill();
+      this.bgKey = key;
+    }
+    ctx.drawImage(this.bg, 0, 0, W, H);
+
+    // routes: faint guide + gold particles
+    const labels = [];
+    const sc = 1 + ez * 2.2, band = (mobile ? 2.2 : 3) * sc;
+    for (const k in this.routes) {
+      const r = this.routes[k];
+      const frac = Math.min(1.15, r.flow / r.base);
+      const fade = r.key === 'hormuz' ? 1 : 1 - ez;    // the push-in keeps only Hormuz
+      if (fade <= 0.02) continue;
+      ctx.globalAlpha = fade;
+      // lane: faint band whose brightness follows the count
+      ctx.beginPath(); let pen = false;
+      for (const pt of r.path) { if (!visible(pt)) { pen = false; continue; } const [x, y] = proj(pt); pen ? ctx.lineTo(x, y) : ctx.moveTo(x, y); pen = true; }
+      ctx.strokeStyle = 'rgba(212,160,23,' + (0.04 + 0.12 * frac + 0.14 * ez).toFixed(3) + ')'; ctx.lineWidth = band * 2.4; ctx.lineCap = 'round'; ctx.stroke();
+      ctx.globalCompositeOperation = 'lighter';
+      const n = r.path.length - 1;
+      for (const q of r.parts) {
+        const i = Math.max(0, Math.min(n, Math.floor(q.s * n))), pt = r.path[i];
+        if (!pt || !visible(pt)) continue;
+        const nx = r.path[Math.min(n, i + 1)], pv = r.path[Math.max(0, i - 1)];
+        const [x0, y0] = proj(pt), [x1, y1] = proj(visible(nx) ? nx : pt), [xp, yp] = proj(visible(pv) ? pv : pt);
+        let dx = x1 - xp, dy = y1 - yp; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+        const ox = -dy * q.o * band, oy = dx * q.o * band;
+        const x = x0 + ox, y = y0 + oy;
+        ctx.globalAlpha = fade * Math.min(1, Math.min(q.s, 1 - q.s) / 0.07);
+        const tl = (7 + q.w * 6) * sc;
+        ctx.beginPath(); ctx.moveTo(x - dx * tl, y - dy * tl); ctx.lineTo(x, y);
+        ctx.strokeStyle = 'rgba(212,160,23,.10)'; ctx.lineWidth = q.w * 1.5 * sc; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x - dx * tl * 0.4, y - dy * tl * 0.4); ctx.lineTo(x, y);
+        ctx.strokeStyle = 'rgba(212,160,23,.28)'; ctx.lineWidth = q.w * 1.1 * sc; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y, (0.6 + q.w * 0.55) * sc, 0, 6.2832); ctx.fillStyle = 'rgba(242,201,76,.75)'; ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1;
+      if (visible(r.choke) && fade > 0.3) {
+        const [x, y] = proj(r.choke);
+        const closed = r.key === 'hormuz' && frac < 0.12 && day >= this.STRIKE;
+        const pulse = 0.5 + 0.5 * Math.sin(t / 420);
+        if (closed) {
+          // the gate: a red bar across the 33 km between Musandam and Larak
+          const [gx1, gy1] = proj(this.gate.top), [gx2, gy2] = proj(this.gate.bot);
+          const gl = Math.hypot(gx2 - gx1, gy2 - gy1);
+          if (gl < 14) {
+            ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.2832); ctx.fillStyle = '#B22234'; ctx.fill();
+          } else {
+            ctx.beginPath(); ctx.moveTo(gx1, gy1); ctx.lineTo(gx2, gy2);
+            ctx.strokeStyle = 'rgba(178,34,52,' + (0.35 + 0.35 * pulse).toFixed(2) + ')'; ctx.lineWidth = 10 + ez * 10; ctx.lineCap = 'butt'; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(gx1, gy1); ctx.lineTo(gx2, gy2);
+            ctx.strokeStyle = '#B22234'; ctx.lineWidth = 2.5 + ez * 2; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(gx1 - 6, gy1); ctx.lineTo(gx1 + 6, gy1); ctx.moveTo(gx2 - 6, gy2); ctx.lineTo(gx2 + 6, gy2); ctx.lineWidth = 2; ctx.stroke();
+          }
+          ctx.beginPath(); ctx.arc(x, y, 10 + pulse * 12 + ez * 20, 0, 6.2832); ctx.strokeStyle = 'rgba(178,34,52,' + (0.7 * (1 - pulse)).toFixed(2) + ')'; ctx.lineWidth = 1.5; ctx.stroke();
+        } else {
+          ctx.beginPath(); ctx.arc(x, y, 4 + ez * 6, 0, 6.2832); ctx.strokeStyle = 'rgba(247,245,240,.9)'; ctx.lineWidth = 1.2; ctx.stroke();
+        }
+        labels.push({ x, y, r, closed });
+      }
+    }
+    // strike flash on Hormuz
+    const since = day - this.STRIKE;
+    if (since >= 0 && since < 10 && visible(this.routes.hormuz.choke)) {
+      const [x, y] = proj(this.routes.hormuz.choke); const a = 1 - since / 10;
+      const fg = ctx.createRadialGradient(x, y, 0, x, y, 40 + since * 12);
+      fg.addColorStop(0, 'rgba(178,34,52,' + (0.55 * a).toFixed(2) + ')'); fg.addColorStop(1, 'rgba(178,34,52,0)');
+      ctx.beginPath(); ctx.arc(x, y, 40 + since * 12, 0, 6.2832); ctx.fillStyle = fg; ctx.fill();
+    }
+    // labels: name + current ships/day, gold digits
+    if (!mobile || ez > 0.5) {
+      ctx.textAlign = 'left';
+      for (const { x, y, r, closed } of labels) {
+        if (ez > 0.4 && r.key !== 'hormuz') continue;
+        if (x < -20 || x > W + 20 || y < -20 || y > H + 20) continue;
+        const off = r.key === 'suez' || r.key === 'bab_el_mandeb' ? -1 : 1;
+        const gap = 12 + ez * 60;
+        const lx = Math.max(8, Math.min(W - 140, x + gap * off - (off < 0 ? 96 : 0))), ly = Math.max(90, Math.min(H * 0.58, y - 6 - ez * 40));
+        ctx.font = (closed ? '700 14px' : '500 13px') + ' "IBM Plex Mono", monospace'; ctx.fillStyle = closed ? '#E04B5C' : 'rgba(247,245,240,.7)';
+        ctx.fillText(closed ? r.name + ' · CLOSED' : r.name, lx, ly);
+        ctx.font = '700 ' + (24 + ez * 10) + 'px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#D4A017';
+        ctx.fillText(Math.round(day < this.STRIKE ? r.base : r.flow) + ' / DAY', lx, ly + 18 + ez * 8);
+      }
+      if (ez > 0.6 && visible(this.gate.top)) {
+        ctx.globalAlpha = (ez - 0.6) / 0.4;
+        ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.6)';
+        const [gx, gy] = proj(this.gate.top); ctx.textAlign = 'center'; ctx.fillText('33 KM', gx, gy - 8); ctx.textAlign = 'left';
+        const [mx, my] = proj([56.2, 25.95]); ctx.fillText('MUSANDAM · OMAN', mx - 40, my);
+        const [ix, iy] = proj([56.1, 27.05]); ctx.fillText('IRAN', ix, iy);
+        const [qx, qy] = proj([55.9, 26.8]); ctx.fillText('QESHM', qx, qy);
+        ctx.globalAlpha = 1;
+      }
+    }
+    // scrims so the readouts stay legible over the globe
+    const sg = ctx.createLinearGradient(0, H * 0.45, 0, H);
+    sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.88)');
+    ctx.fillStyle = sg; ctx.fillRect(0, H * 0.45, W, H * 0.55);
+    const tg = ctx.createLinearGradient(0, 0, 0, H * 0.3);
+    tg.addColorStop(0, 'rgba(11,30,63,' + (0.7 + 0.25 * ez).toFixed(2) + ')'); tg.addColorStop(0.5, 'rgba(11,30,63,' + (0.35 + 0.4 * ez).toFixed(2) + ')'); tg.addColorStop(1, 'rgba(11,30,63,0)');
+    ctx.fillStyle = tg; ctx.fillRect(0, 0, W, H * 0.3);
+  }
+
+  readout(P, day) {
+    const h = this.routes.hormuz, m = this.flowAt(h, day);
+    const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
+    set(this.numRef, day < this.STRIKE ? String(Math.round(h.base)) : String(Math.round(m)));
+    set(this.wasRef, day < this.STRIKE ? 'before his war' : 'was 83');
+    set(this.dateRef, day < this.STRIKE ? 'BEFORE THE WAR · 1 JAN 2025 – 27 FEB 2026' : this.fmtDay(Math.round(day)));
+    let ev = null; for (const e of this.events) if (day >= e.d && day < e.d + 22) ev = e;
+    const er = this.eventRef.current;
+    if (er) { const txt = ev ? ev.t : ''; if (er.textContent !== txt) { er.textContent = txt; er.style.color = ev && ev.red ? '#B22234' : '#6C8CD5'; } }
+    if (this.cueRef.current) this.cueRef.current.style.opacity = P > 0.03 ? '0' : '1';
+    const lg = this.legendRef.current;
+    if (lg && (this.lastLegend === undefined || Math.abs(this.lastLegend - day) > 2)) {
+      this.lastLegend = day;
+      lg.innerHTML = Object.values(this.routes).filter(r => r.key !== 'hormuz').map(r =>
+        '<div><span style="color:rgba(247,245,240,.55)">' + r.name + '</span> &nbsp;<span style="color:#D4A017;font-weight:500">' + Math.round(r.flow) + '</span> <span style="color:rgba(247,245,240,.45)">/ ' + Math.round(r.base) + '</span></div>').join('');
+    }
+  }
+}
+</script>
+</body>
+</html>

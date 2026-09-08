@@ -7,6 +7,7 @@ import { useInViewOnce } from './hooks/useInViewOnce';
 import { checkSetup } from './lib/api';
 
 const LedgerPage = lazy(() => import('./pages/LedgerPage'));
+const TheBillPage = lazy(() => import('./pages/TheBillPage'));
 const ReceiptPage = lazy(() => import('./pages/ReceiptPage'));
 const BroadsheetPage = lazy(() => import('./pages/BroadsheetPage').then(m => ({ default: m.BroadsheetPage })));
 const ChartLabPage = lazy(() => import('./pages/ChartLabPage').then(m => ({ default: m.ChartLabPage })));
@@ -217,12 +218,14 @@ function DashboardContent({ eventManagerOpen, setEventManagerOpen }: DashboardCo
 }
 
 function App() {
-  // V3 ("The Receipt") is the default. The earlier views stay reachable so
+  // V5 ("The Bill") is the default. The earlier views stay reachable so
   // nothing that was linked previously breaks:
   //   /                  -> V4 ledger
   //   ?view=receipt      -> V3 receipt
   //   ?view=broadsheet   -> V2 broadsheet
   //   ?view=dashboard    -> V1 classic dashboard
+  //   ?view=ledger       -> V4 ledger (the previous default; also frozen at
+  //                          trumps-economy-ledger-v4.pages.dev)
   //   ?view=chart-lab    -> design sandbox
   // Kept as a URL flag rather than store state so a hard reload from the
   // ViewToggle cleanly resets the other view's Plotly/observer state.
@@ -233,6 +236,7 @@ function App() {
   const isChartLab = view === 'chart-lab';
   const isBroadsheet = view === 'broadsheet';
   const isReceipt = view === 'receipt';
+  const isLedger = view === 'ledger';
 
   const fallback = <div style={{ background: '#F7F5F0', minHeight: '100vh' }} />;
 
@@ -250,8 +254,10 @@ function App() {
           <Suspense fallback={fallback}><BroadsheetPage /></Suspense>
         ) : isReceipt ? (
           <Suspense fallback={fallback}><ReceiptPage /></Suspense>
-        ) : (
+        ) : isLedger ? (
           <Suspense fallback={fallback}><LedgerPage /></Suspense>
+        ) : (
+          <Suspense fallback={fallback}><TheBillPage /></Suspense>
         )}
       </QueryClientProvider>
     </ErrorBoundary>

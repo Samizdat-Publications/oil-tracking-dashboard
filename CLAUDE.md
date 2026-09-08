@@ -10,7 +10,45 @@ Oil Price Tracking Dashboard — a full-stack app that visualizes how oil price 
 **Iran War baseline date:** 2026-02-28 (constant `IRAN_WAR_DATE` in `lib/commodity-data.ts`)
 
 
-## V4 ledger (the page at `/`) — read this first
+## V5 "The Bill" (the page at `/`) — read this first
+
+The default route is `frontend/src/pages/TheBillPage.tsx`, which mounts
+`frontend/src/v5/TheBill.jsx`: an eleven-block scroll-driven data story ported from
+`docs/design-handoff/2026-09-08-the-bill/`. **It is a port, not an interpretation.**
+The logic class is Design's prototype class carried over almost line for line, and
+`render()` is its template converted mechanically by
+`frontend/scripts/template-to-jsx.py`. If a figure or a style needs to change, change
+it in the handoff and re-run the converter — do not retype markup by hand. That is
+exactly how the V4 redesign drifted.
+
+Data lives in `frontend/public/v5/*.json` (cut from `data-snapshot.json` by Design)
+plus the two bundled `world-atlas` land files. Nothing is fetched from a CDN.
+
+Three integration rules that are load-bearing, all in `src/v5/the-bill.css`:
+
+- `body.v5-bill` (added in `componentDidMount`) undoes three rules from the shared
+  `index.css` reset — `padding-top:48px`, `letter-spacing:-.01em` and font smoothing.
+  They shorten every 100vh block and retrack the type.
+- The V5 subtree is **`box-sizing: content-box`**. The prototype declares no
+  box-sizing; `index.css` forces `border-box` for the other views. Under border-box
+  the 1200x630 share card renders 1200x630 instead of the intended 1265x686.
+- Source Serif 4 is declared as an `@font-face` against the **variable** woff2
+  (`opsz` axis). The static @fontsource cut sets the same string 15% wider.
+
+Verify a change by diffing against the prototype rather than by eye:
+
+```bash
+cd docs/design-handoff/2026-09-08-the-bill && py -m http.server 4300   # the prototype
+cd frontend && npx vite preview --port 4315                            # the port
+```
+Capture both under `reducedMotion: 'reduce'` (the page maps that to P=1, every block
+at its end state) and compare. At 1440x900 the mean per-block pixel difference is
+**1.65%**; the two worst blocks (01 and 04) are sub-pixel grid-row distribution, not
+drift. Anything materially above that is a regression.
+
+The V4 ledger stays reachable at `?view=ledger`.
+
+## V4 ledger (`?view=ledger`)
 
 The default route is `frontend/src/pages/LedgerPage.tsx`, the V4 "ledger". Everything
 above about sections, Plotly, Zustand and the ticker describes the legacy V1 dashboard

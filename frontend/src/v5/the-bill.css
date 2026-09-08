@@ -1,0 +1,70 @@
+/* Ported verbatim from the prototype’s <style> block. The mobile rules
+   are Design’s untuned first pass — the one open item in the handoff. */
+
+html,body{margin:0;background:#0B1E3F;color:#F7F5F0;} html{scroll-snap-type:y proximity}
+a{color:#F7F5F0} a:hover{color:#D4A017}
+details summary::-webkit-details-marker{display:none}
+@media (max-width:640px){ .g-num{font-size:104px !important} .g-side{display:none !important} .g-sentence{font-size:19px !important} .g-bottom{padding:0 20px 28px !important} .g-top{padding:20px !important} .p-grid{grid-template-columns:minmax(0,1fr) !important;grid-template-rows:auto minmax(0,1fr);padding:8px 16px 0 !important;gap:10px 0 !important} .p-pump{order:-1;gap:6px !important;flex:none} .p-pump > div{width:100%;gap:2px !important} .p-pump > div > div:nth-child(2){font-size:64px !important;padding:4px 8px !important;justify-content:center;border-radius:6px !important} .p-pump > div > div:nth-child(1){font-size:9px !important} .p-pump > div > div:nth-child(3){font-size:9px !important} .p-sentence{font-size:14px !important;line-height:1.3 !important;max-width:none !important} .p-cell{font-size:clamp(11px,2vh,28px) !important} .p-row{font-size:12px !important} .p-bottom{padding:8px 16px 14px !important;gap:8px 16px !important;align-items:center !important;flex-wrap:nowrap !important} .p-total{font-size:34px !important} .p-total-label{display:none !important} .a-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;padding:8px 16px !important} .p-cum{display:block !important;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#D4A017;padding:0 16px 6px} .p-bottom > label{flex:0 1 auto !important;min-width:0} .p-state{min-width:0 !important;width:100%;font-size:12px !important;padding:8px 28px 8px 10px !important;max-width:140px} .p-state-label{display:none !important} }
+select option{background:#061530;color:#F7F5F0}
+
+/* ------------------------------------------------- app-shell neutraliser
+
+   V5 mounts inside the same document as the V1/V4 views, whose index.css
+   carries a global reset written for those pages. Three of its rules move the
+   design measurably, so they are undone while this route is mounted:
+
+     body{padding-top:48px}      the V1 ticker offset. Shortens every 100vh
+                                 block and, via max-height:100%, narrows the
+                                 1200x630 share card.
+     body{letter-spacing:-.01em} retracks every string on the page.
+     -webkit-font-smoothing      changes glyph weight against the prototype.
+
+   Scoped to body.v5-bill, added in componentDidMount, so the other views keep
+   the reset they were built on. */
+body.v5-bill {
+  padding-top: 0;
+  letter-spacing: normal;
+  font-family: 'Source Serif 4', Georgia, serif;
+  background-color: #0B1E3F;
+  background-image: none;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+/* scroll-behavior:smooth fights scroll-snap-type on this page. */
+html:has(body.v5-bill) { scroll-behavior: auto; }
+
+/* The prototype declares no box-sizing, so every element in it is content-box.
+   index.css applies `* { box-sizing: border-box }` for the other views. That
+   single inherited rule resizes anything with padding and an explicit width:
+   the 1200x630 share card, for instance, renders 1265x686 in the prototype
+   (1200 + 2x31.5px padding + 2px border) and 1200x630 under border-box. Restore
+   the default for this route so the ported sizes mean what they meant. */
+body.v5-bill,
+body.v5-bill *,
+body.v5-bill *::before,
+body.v5-bill *::after { box-sizing: content-box; }
+
+/* Source Serif 4, variable, optical-size axis 8..60 -- the face the prototype
+   loads from Google. Declared under the plain family name because every ported
+   inline style asks for 'Source Serif 4'; @fontsource-variable ships it as
+   'Source Serif 4 Variable', which those styles would never match. */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('@fontsource-variable/source-serif-4/files/source-serif-4-latin-opsz-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('@fontsource-variable/source-serif-4/files/source-serif-4-latin-opsz-italic.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
