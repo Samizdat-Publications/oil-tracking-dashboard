@@ -50,7 +50,7 @@ The V4 ledger stays reachable at `?view=ledger`.
 
 ## V4 ledger (`?view=ledger`)
 
-The default route is `frontend/src/pages/LedgerPage.tsx`, the V4 "ledger". Everything
+The V4 "ledger" is `frontend/src/pages/LedgerPage.tsx`, served at `?view=ledger`. Everything
 above about sections, Plotly, Zustand and the ticker describes the legacy V1 dashboard
 (`?view=dashboard`) and is kept for that view only.
 
