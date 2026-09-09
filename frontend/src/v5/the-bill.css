@@ -68,3 +68,58 @@ body.v5-bill *::after { box-sizing: content-box; }
                  U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
                  U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* =================================================== the mobile pass ======
+
+   The handoff lists exactly one open item: "a dedicated mobile pass; the
+   prototype has working max-width:640px rules but they were not tuned by hand."
+   This is that tuning. Every rule below fixes a measured violation of the
+   brief's own constraints, at 390x844 -- nothing here re-designs a block.
+
+   Audited with Playwright at 390px: 8 of 11 blocks had the SCROLL cue sitting
+   on the last line of their sentence, and 18 labels rendered below the 11px
+   floor the brief sets.                                                     */
+
+@media (max-width: 640px) {
+
+  /* 1. The SCROLL cue is absolutely positioned 14px off the bottom. On a phone
+        the bottom cluster grows to meet it, so the closing sentence of eight
+        blocks was printed underneath it. Reserve the cue's band. */
+  .v5-bill-root .g-bottom { padding-bottom: 46px !important; }
+  .v5-bill-root .p-bottom { padding-bottom: 40px !important; }
+
+  /* 2. Labels under the 11px floor. The mobile rules above set the odometer
+        captions to 9px and the board's column heads inherit down to 10px;
+        at arm's length on a phone that is not readable. */
+  .v5-bill-root .p-pump > div > div:nth-child(1),
+  .v5-bill-root .p-pump > div > div:nth-child(3) { font-size: 11px !important; }
+  .v5-bill-root .p-cum { font-size: 11px !important; }
+  /* the board's column heads: JAN 2025 / NOW / CHANGE */
+  .v5-bill-root .p-grid > div:first-child > div:first-child > div { font-size: 11px !important; }
+  /* the eggs row's blue note */
+  .v5-bill-root .p-row span { font-size: 11px !important; }
+
+  /* 3. The share card is drawn at 1200x630 because that is what Facebook
+        crops to. Scaled into a 390px viewport its tile labels computed to 7px.
+        On screen it becomes a portrait card with two columns of tiles; the
+        exported og.png is still rendered from a 1440px viewport by
+        scripts/build-og.mjs, so the shared image is untouched. */
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] {
+    aspect-ratio: auto !important;
+    max-height: 100% !important;
+    container-type: normal !important;
+  }
+  .v5-bill-root [data-screen-label^="09"] div[style*="repeat(4"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  /* Card type is sized in cqw against the card itself. At two columns on a
+     phone that puts the tile captions at 7px, so they are pinned instead. The
+     tile NUMBERS keep their cqw sizing -- they are the point of the card. */
+  .v5-bill-root [data-screen-label^="09"] div[style*="repeat(4"] > div > div:nth-child(2) {
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+  }
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] div[style*="letter-spacing"] {
+    font-size: 11px !important;
+  }
+}

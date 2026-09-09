@@ -18,6 +18,50 @@ ATTR = {'class':'className','for':'htmlFor','tabindex':'tabIndex','colspan':'col
         'srcset':'srcSet','contenteditable':'contentEditable','spellcheck':'spellCheck'}
 HOLE = re.compile(r'^\s*\{\{(.+?)\}\}\s*$', re.S)
 
+# The prototype's canvases carry no accessible name -- nine of the eleven blocks
+# are canvas, so without these a screen reader gets the readouts (which are real
+# HTML) but nothing at all for the pictographs. Applied in document order, which
+# is block order. Kept here rather than in the generated file so re-running the
+# converter against a new prototype does not silently drop them.
+CANVAS_LABELS = [
+    "A globe showing shipping through six straits. Gold particles move along each "
+    "route at a rate set by the ships counted per day. Traffic through the Strait "
+    "of Hormuz falls from 83 a day before the war to 4, while the other five "
+    "straits hold near their baselines.",
+
+    "A seismograph-style chart of the daily closing price of WTI crude through "
+    "2026. The trace runs from $57 a barrel in January to a peak of $115 five "
+    "weeks after the 28 February strike, falls back under the ceasefires, and "
+    "climbs again when strikes resume. Red marks are his acts, blue are ceasefires.",
+
+    "A map of the Strait of Hormuz with the real Traffic Separation Scheme lane "
+    "and the 33 kilometre gate between Musandam and Larak. Ship icons in the lane "
+    "thin out as the counted traffic falls. From 18 August a side-by-side compares "
+    "the claim of 30 ships a night against the counted 7-day mean.",
+
+    "Two crowds of small human figures, one figure per 10,000 jobs. The left stand "
+    "shows the 2021-25 average of 320,938 jobs a month; the right shows what has "
+    "actually been added each month since January 2025, a far smaller crowd. Below, "
+    "100 figures show the share of the unemployed out of work six months or more.",
+
+    "A four-row ledger of what the war has cost: 18 cream stars for US service "
+    "members killed, 42 aircraft silhouettes for those lost or damaged, a bar for "
+    "$37.5 billion spent against a dashed outline for the $67.1 billion more "
+    "requested, and 100 triangles showing roughly one in three Patriot interceptors "
+    "left.",
+
+    "The 42 lost aircraft beside a large equals sign, and a pile of gold squares "
+    "showing what the same money buys: PlayStation 5s, gallons of diesel, years of "
+    "in-state tuition, Costco hot dogs. The sequence ends with the whole war's "
+    "$37.5 billion as a pile roughly fourteen times larger, running off the top of "
+    "the frame.",
+
+    "A vault cage holding one gold ingot per tonne of foreign gold held at the New "
+    "York Fed. Ingots leave the stack month by month as foreign governments "
+    "withdraw, 159 tonnes over ten months with none coming in. Alongside, a falling "
+    "blue bar shows Treasuries held for foreign officials.",
+]
+
 
 def split_top(s, sep):
     """Split on `sep` only at depth 0 and outside quotes."""
@@ -78,6 +122,7 @@ class ToJSX(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.out = []
         self.stack = []      # tracks sc-for / sc-if so end tags close correctly
+        self.canvases = 0    # index into CANVAS_LABELS
 
     # ---- text -------------------------------------------------------------
     def handle_data(self, data):
@@ -121,6 +166,11 @@ class ToJSX(HTMLParser):
                 parts.append('%s={%s}' % (name, m.group(1).strip()))
             else:
                 parts.append('%s="%s"' % (name, v.replace('"', '&quot;')))
+        if tag == 'canvas' and not any(p.startswith('aria-label') for p in parts):
+            if self.canvases < len(CANVAS_LABELS):
+                label = CANVAS_LABELS[self.canvases].replace('"', '&quot;')
+                parts += ['role="img"', 'aria-label="%s"' % label]
+            self.canvases += 1
         s = ' '.join(parts)
         self.out.append('<%s%s%s>' % (tag, (' ' + s) if s else '', ' /' if tag in VOID else ''))
         if tag not in VOID: self.stack.append(tag)

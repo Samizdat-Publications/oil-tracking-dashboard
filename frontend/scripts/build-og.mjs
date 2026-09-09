@@ -2,125 +2,123 @@
  * Render the Open Graph card to a real 1200x630 PNG.
  *
  * Facebook does not execute JavaScript, so og:image must be a static file that
- * already exists at the URL. It is also rendered about 158px wide in-feed,
- * which is why this is a purpose-built card carrying one number rather than a
- * screenshot of the hero — a screenshot is illegible at that size.
+ * already exists at the URL.
  *
- * Reads the same snapshot the page reads, so the card cannot drift from the
- * page. If the snapshot is missing or malformed this exits non-zero rather than
- * shipping a card with placeholder figures.
+ * The card is block 09 of the page itself ("Your bill"), which Design drew at
+ * 1200x630 precisely so it could be the share image. Rendering the real block
+ * rather than a separate purpose-built card means the two can never disagree:
+ * there is only one card, and it is the one readers see when they scroll.
  *
- * Run after `npm run build`:  node scripts/build-og.mjs
+ * It is captured from the built site under `prefers-reduced-motion`, which the
+ * page maps to P = 1 -- every tile at its final value rather than mid-fade.
+ *
+ * Note the card's element box is 1265x686: `aspect-ratio: 1200/630` applies to
+ * its CONTENT box, and the padding and 1px border sit outside that. Cropping to
+ * the content box would cut off the red/cream stripe along the top, so the shot
+ * is letterboxed onto a 1200x630 navy field instead. 1200x630 is the ratio
+ * Facebook crops to, so nothing is lost.
+ *
+ * Runs as part of `npm run build`, after `vite build`.
  */
 
 import { chromium } from 'playwright';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { createServer } from 'node:http';
+import { readFile, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { dirname, resolve, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const SNAPSHOT = resolve(here, '../public/data-snapshot.json');
+const DIST = resolve(here, '../dist');
 const OUT = resolve(here, '../public/og.png');
-const HTML_OUT = resolve(here, '../public/og.html');
+const DIST_OUT = resolve(DIST, 'og.png');
 
-if (!existsSync(SNAPSHOT)) {
-  console.error(`og: ${SNAPSHOT} not found. Run backend/scripts/build_snapshot.py first.`);
+const GROUND = '#0B1E3F';           // must match the card, or the letterbox shows
+const W = 1200, H = 630;
+
+if (!existsSync(DIST)) {
+  console.error('og: dist/ not found. Run `vite build` first.');
   process.exit(1);
 }
 
-const snap = JSON.parse(readFileSync(SNAPSHOT, 'utf-8'));
+const TYPES = {
+  '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
+  '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml',
+  '.woff2': 'font/woff2', '.woff': 'font/woff', '.ico': 'image/x-icon',
+};
 
-// Pull every figure from the snapshot. Nothing on the card is typed by hand.
-const intl = snap.international;
-const staples = snap.staples?.items ?? [];
-const jobs = snap.jobs;
-
-const byKey = (k) => staples.find((s) => s.key === k);
-const beef = byKey('beef_ground');
-const coffee = byKey('coffee');
-
-const now = intl?.terms?.find((t) => t.in_progress);
-const biden = intl?.terms?.find((t) => t.key === 'biden');
-
-const jobsEnd = jobs?.current_term?.end ?? null;
-const asOf = jobsEnd
-  ? `through ${new Date(`${jobsEnd}T00:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
-  : 'through the latest data';
-
-const required = { intl, beef, coffee, jobs, now, biden };
-for (const [name, v] of Object.entries(required)) {
-  if (!v) {
-    console.error(`og: snapshot is missing "${name}" — refusing to render a card with gaps.`);
-    process.exit(1);
+// A static server over dist/, so the card is captured from exactly the bytes
+// that ship rather than from a dev server.
+const server = createServer(async (req, res) => {
+  try {
+    const url = decodeURIComponent(req.url.split('?')[0]);
+    let file = join(DIST, url === '/' ? 'index.html' : url);
+    if (!existsSync(file)) file = join(DIST, 'index.html');   // SPA fallback
+    const body = await readFile(file);
+    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] ?? 'application/octet-stream' });
+    res.end(body);
+  } catch (e) {
+    res.writeHead(500).end(String(e));
   }
-}
+});
 
-const fmt = (n, d = 0) => n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
-const money = (n) => `$${n.toFixed(2)}`;
-
-const html = `<!doctype html><html><head><meta charset="utf-8"><style>
-  @page { size: 1200px 630px; margin: 0 }
-  * { margin:0; padding:0; box-sizing:border-box }
-  body {
-    width:1200px; height:630px; background:#f7f5f0; color:#14171c;
-    font-family: Archivo, Helvetica, Arial, sans-serif;
-    display:flex; flex-direction:column; padding:56px 64px;
-  }
-  .kicker {
-    font-family: ui-monospace, Menlo, monospace; font-size:19px; letter-spacing:.18em;
-    text-transform:uppercase; color:#4a5058;
-    border-bottom:1px solid #d6d1c6; padding-bottom:18px; margin-bottom:34px;
-    display:flex; justify-content:space-between;
-  }
-  .kicker b { color:#9a7b2f; font-weight:600 }
-  h1 { font-size:82px; line-height:.95; letter-spacing:-.03em; font-weight:800; margin-bottom:26px }
-  .sub { font-size:27px; color:#4a5058; max-width:960px; line-height:1.35 }
-  .grid { display:flex; gap:52px; margin-top:auto; padding-top:30px; border-top:3px solid #14171c }
-  .stat { flex:1 }
-  .num {
-    font-family: ui-monospace, Menlo, monospace; font-size:52px; font-weight:700;
-    line-height:1; color:#b02f2f;
-  }
-  .num.blue { color:#2e5eaa }
-  .lbl { font-size:18px; color:#4a5058; margin-top:10px; line-height:1.3 }
-  .src {
-    font-family: ui-monospace, Menlo, monospace; font-size:15px; color:#767d87;
-    margin-top:26px;
-  }
-</style></head><body>
-  <div class="kicker"><span>A ledger &middot; ${asOf}</span><b>Every figure sourced</b></div>
-  <h1>The bill for two choices</h1>
-  <p class="sub">A war ordered in February. Tariffs imposed, struck down, re-imposed.
-     Seven months on the strait is still shut, and foreign gold is leaving the New York Fed.</p>
-  <div class="grid">
-    <div class="stat">
-      <div class="num">${money(beef.current_term.end_value)}</div>
-      <div class="lbl">a pound of ground beef,<br>from ${money(beef.current_term.start_value)} in Jan 2025</div>
-    </div>
-    <div class="stat">
-      <div class="num">${money(coffee.current_term.end_value)}</div>
-      <div class="lbl">a pound of coffee,<br>from ${money(coffee.current_term.start_value)}</div>
-    </div>
-    <div class="stat">
-      <div class="num">${fmt(jobs.current_term.mean_monthly)}</div>
-      <div class="lbl">jobs a month now,<br>down from ${fmt(jobs.previous_term.mean_monthly)}</div>
-    </div>
-    <div class="stat">
-      <div class="num blue">+${now.excess.toFixed(2)}</div>
-      <div class="lbl">points of inflation<br>no global shock explains</div>
-    </div>
-  </div>
-  <div class="src">BLS &middot; BEA &middot; Federal Reserve &middot; EIA &middot; Eurostat, via FRED</div>
-</body></html>`;
-
-writeFileSync(HTML_OUT, html, 'utf-8');
+await new Promise((r) => server.listen(0, r));
+const port = server.address().port;
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
-await page.setContent(html, { waitUntil: 'load' });
-await page.screenshot({ path: OUT, type: 'png' });
-await browser.close();
+const page = await browser.newPage({
+  viewport: { width: 1440, height: 900 },
+  deviceScaleFactor: 2,
+  reducedMotion: 'reduce',
+});
 
-console.log(`og: wrote ${OUT}`);
-console.log(`    beef ${money(beef.current_term.end_value)} · coffee ${money(coffee.current_term.end_value)} · ` +
-            `jobs ${fmt(jobs.current_term.mean_monthly)} · excess +${now.excess.toFixed(2)}`);
+const fail = async (msg) => {
+  console.error(`og: ${msg}`);
+  await browser.close();
+  server.close();
+  process.exit(1);
+};
+
+try {
+  await page.goto(`http://localhost:${port}/`, { waitUntil: 'networkidle' });
+  await page.evaluate(() => document.fonts.ready);
+
+  const found = await page.evaluate(() => {
+    const s = [...document.querySelectorAll('[data-screen-label]')]
+      .find((x) => x.getAttribute('data-screen-label').startsWith('09'));
+    if (!s) return false;
+    s.scrollIntoView();
+    return true;
+  });
+  if (!found) await fail('block 09 not found on the page.');
+  await page.waitForTimeout(2500);
+
+  const card = page.locator('[data-screen-label^="09"] div[style*="aspect-ratio"]').first();
+  const box = await card.boundingBox();
+  if (!box || box.width < 600) await fail(`card measured ${JSON.stringify(box)}; expected ~1265 wide.`);
+
+  // Refuse to ship a card whose figures never rendered.
+  const text = (await card.innerText()).trim();
+  if (text.length < 40 || /NaN|undefined/.test(text)) {
+    await fail(`card text looks wrong: ${JSON.stringify(text.slice(0, 120))}`);
+  }
+
+  const shot = await card.screenshot();
+
+  // Letterbox onto exactly 1200x630 on the card's own ground.
+  const pad = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
+  await pad.setContent(
+    `<style>html,body{margin:0;height:100%;background:${GROUND}}` +
+    `img{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;display:block}</style>` +
+    `<img src="data:image/png;base64,${shot.toString('base64')}">`
+  );
+  await pad.waitForTimeout(150);
+  const png = await pad.screenshot({ type: 'png' });
+
+  await writeFile(OUT, png);
+  await writeFile(DIST_OUT, png);   // dist is already built; keep the two in step
+  console.log(`og: wrote ${W}x${H} from block 09 (card ${Math.round(box.width)}x${Math.round(box.height)})`);
+} finally {
+  await browser.close();
+  server.close();
+}

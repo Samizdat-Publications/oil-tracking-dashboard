@@ -1,17 +1,19 @@
 # Rebuild the data snapshot from FRED, EIA, Treasury and IMF PortWatch, gate it,
 # build the site, deploy to Cloudflare Pages, and commit the snapshot back.
 #
-# Runs weekdays at 13:00 UTC (09:00 ET), after FRED's morning update and after
-# EIA's Monday/Wednesday weeklies. The validate gate means a failed upstream
-# leaves the previous deploy live rather than shipping a page full of dashes.
+# On demand only. The page is published once and then updated after events that
+# actually move it -- a strike, a ceasefire, a jobs print, a tariff ruling --
+# rather than on a clock. Run it from the Actions tab ("Run workflow"), or
+# locally with `backend/scripts/refresh.sh`.
+#
+# The validate gate means a failed upstream leaves the previous deploy live
+# rather than shipping a page full of dashes.
 #
 # Secrets required (Settings -> Secrets and variables -> Actions):
 #   FRED_API_KEY, EIA_API_KEY, CLOUDFLARE_API_TOKEN (Pages: Edit), CLOUDFLARE_ACCOUNT_ID
 name: refresh-and-deploy
 
 on:
-  schedule:
-    - cron: "0 13 * * 1-5"
   workflow_dispatch: {}
 
 concurrency:
@@ -51,6 +53,12 @@ jobs:
         working-directory: backend
         run: python scripts/validate_snapshot.py ../frontend/public/data-snapshot.json
 
+      # The V5 page reads its own cut of the snapshot. Without this the deploy
+      # ships fresh data behind a page still showing Design's original figures.
+      - name: Cut the V5 data files
+        working-directory: backend
+        run: python scripts/build_v5_data.py
+
       - name: Backend tests
         working-directory: backend
         run: python -m pytest tests -q
@@ -82,7 +90,7 @@ jobs:
         run: |
           git config user.name "snapshot-bot"
           git config user.email "snapshot-bot@users.noreply.github.com"
-          git add frontend/public/data-snapshot.json frontend/public/og.png frontend/public/og.html
+          git add frontend/public/data-snapshot.json frontend/public/og.png frontend/public/og.html frontend/public/v5
           if git diff --cached --quiet; then
             echo "snapshot unchanged"
           else

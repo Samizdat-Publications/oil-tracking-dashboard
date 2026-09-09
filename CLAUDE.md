@@ -46,6 +46,16 @@ at its end state) and compare. At 1440x900 the mean per-block pixel difference i
 **1.65%**; the two worst blocks (01 and 04) are sub-pixel grid-row distribution, not
 drift. Anything materially above that is a regression.
 
+`og.png` is block 09 rendered from the built site by `frontend/scripts/build-og.mjs`,
+not a separate card -- Design drew that block at 1200x630 so it could be the share
+image, and rendering the real block means the two can never disagree.
+
+**The mobile pass** (`@media (max-width: 640px)` at the foot of `the-bill.css`) is the
+one item Design left open. Every rule in it fixes a measured violation of the brief's
+own constraints at 390x844 -- the SCROLL cue printing over the closing sentence of
+eight blocks, and labels under the 11px floor -- rather than re-designing a block. Re-audit
+after any layout change; both were found by measuring, not by looking.
+
 The V4 ledger stays reachable at `?view=ledger`.
 
 ## V4 ledger (`?view=ledger`)
@@ -80,12 +90,26 @@ transits})`. `EVENTS` and `RISK_READ` are dated ISO strings; day offsets are der
 `SPAN` is `export let` and extends to the latest close / transit / event. Do not rewrite
 the drawing maths or coastline arrays.
 
-**Refresh is automated.** `.github/workflows/refresh-and-deploy.yml` rebuilds the snapshot,
-gates it (`backend/scripts/validate_snapshot.py`), tests, builds, deploys to Pages and commits
-the snapshot back every weekday 13:00 UTC. Needs repo secrets FRED_API_KEY, EIA_API_KEY,
-CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. Locally the same sequence is:
-`py scripts/build_snapshot.py && py scripts/validate_snapshot.py ../frontend/public/data-snapshot.json`,
-then `npm test && npm run build`, then the wrangler deploy.
+**Refresh is on demand, not scheduled.** There is no cron. The page is published
+once and updated after events that actually move it -- a strike, a ceasefire, a jobs
+print, a tariff ruling. Two equivalent ways to run it:
+
+```bash
+bash backend/scripts/refresh.sh          # snapshot, gate, V5 cut, tests, build, deploy, commit
+bash backend/scripts/refresh.sh --dry    # everything except publishing
+```
+
+or the `refresh-and-deploy` workflow from the Actions tab (`workflow_dispatch` only).
+Both need FRED_API_KEY and EIA_API_KEY; the workflow also needs CLOUDFLARE_API_TOKEN
+and CLOUDFLARE_ACCOUNT_ID.
+
+`backend/scripts/build_v5_data.py` is the step that matters for V5: it cuts
+`frontend/public/v5/{globe,crude,prices,bill}-data.json` out of the snapshot. Without
+it a refresh ships fresh data behind a page still showing Design's original figures.
+`--check` compares without writing, and against the snapshot Design worked from all
+four files come back identical -- that is the test that the cut is faithful. The
+other three V5 files (strait-coast, hormuz-coast, the two world-atlas land files) are
+fixed geography and are never rewritten.
 
 **Schema v2 blocks (Sept 2026):** `eia` (services/eia.py: SPR, refinery utilisation, crude
 exports, gasoline for 29 areas, diesel by PADD, residential electricity by state),

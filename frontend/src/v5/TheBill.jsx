@@ -950,12 +950,16 @@ export default class TheBill extends React.Component {
     const cv = this.canvasRef.current; if (!cv || !this.land) return;
     const dt = Math.max(0, Math.min(0.05, (t - (this.lastT || t)) / 1000)); this.lastT = t;
     const vh = innerHeight;
-    const run = (sec, key, dur, fn, loop) => {
+    // cueAt: the progress at which the SCROLL affordance appears. It is 1 for
+    // every block that plays once. Block 07 loops, so its P never settles at 1
+    // and the reader would be held for a full 30.3s cycle before the page
+    // admitted they could move on -- see the call below.
+    const run = (sec, key, dur, fn, loop, cueAt = 1) => {
       if (!sec) return; const r = sec.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return;
       const P = this.reduced ? 1 : this.playProgress(sec, key, dur, t, loop);
       fn(P);
       if (sec.__cue === undefined) sec.__cue = sec.querySelector('[data-cue]');
-      if (sec.__cue) sec.__cue.style.opacity = P >= 1 ? '1' : '0';
+      if (sec.__cue) sec.__cue.style.opacity = P >= cueAt ? '1' : '0';
     };
     const secOf = ref => ref.current && ref.current.closest('section');
     run(this.stampStageRef.current && this.stampStageRef.current.parentElement, 'stamps', 3.5, P => this.stepStamps(P));
@@ -964,7 +968,12 @@ export default class TheBill extends React.Component {
     run(secOf(this.boardRef), 'prices', 6, P => this.stepPrices(dt, P));
     run(secOf(this.crowdRef), 'crowd', 9, P => this.stepCrowd(dt, P, t));
     run(secOf(this.warRef), 'war', 9, P => this.stepWar(dt, P, t));
-    run(secOf(this.buyRef), 'buy', this.buyDur || 30, P => this.stepBuy(dt, P, t), true);
+    // The loop runs five 4.7s beats then a finale. Two beats -- the F-35A and
+    // the first of the four comparisons -- is where the argument has landed, and
+    // it matches the 9s the neighbouring blocks take. The loop still runs for
+    // anyone who stays; this only stops the cue being withheld for 30.3s.
+    run(secOf(this.buyRef), 'buy', this.buyDur || 30, P => this.stepBuy(dt, P, t), true,
+        9.4 / (this.buyDur || 30));
     run(secOf(this.vaultRef), 'vault', 8, P => this.stepVault(dt, P, t));
     run(secOf(this.cardRef), 'card', 3, P => this.stepCard(P));
     // block 0
@@ -1196,11 +1205,11 @@ export default class TheBill extends React.Component {
     const V = this.renderVals();
     const { aheYoy, aircraftList, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
     return (
-<div style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
+<div className="v5-bill-root" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
 
   <section data-screen-label="00 The globe" style={{position: "relative", height: "160vh", scrollSnapAlign: "start"}}>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
-      <canvas ref={canvasRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}}></canvas>
+      <canvas ref={canvasRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="A globe showing shipping through six straits. Gold particles move along each route at a rate set by the ships counted per day. Traffic through the Strait of Hormuz falls from 83 a day before the war to 4, while the other five straits hold near their baselines."></canvas>
 
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div style={{display: "flex", flexDirection: "column", gap: "6px"}}>
@@ -1275,7 +1284,7 @@ export default class TheBill extends React.Component {
   <section data-screen-label="02 Oil doubled" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={seisRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}}></canvas>
+      <canvas ref={seisRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="A seismograph-style chart of the daily closing price of WTI crude through 2026. The trace runs from $57 a barrel in January to a peak of $115 five weeks after the 28 February strike, falls back under the ceasefires, and climbs again when strikes resume. Red marks are his acts, blue are ceasefires."></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={seisDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>2 JAN 2026</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>CRUDE OIL · A BARREL · EVERY DAILY CLOSE<br />WTI CUSHING SPOT · FRED</div>
@@ -1307,7 +1316,7 @@ export default class TheBill extends React.Component {
   <section data-screen-label="03 The strait" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={straitRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}}></canvas>
+      <canvas ref={straitRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="A map of the Strait of Hormuz with the real Traffic Separation Scheme lane and the 33 kilometre gate between Musandam and Larak. Ship icons in the lane thin out as the counted traffic falls. From 18 August a side-by-side compares the claim of 30 ships a night against the counted 7-day mean."></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", bottom: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div style={{display: "flex", flexDirection: "column", gap: "6px"}}>
           <div ref={strDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>1 JAN 2026</div>
@@ -1463,7 +1472,7 @@ export default class TheBill extends React.Component {
   <section data-screen-label="05 Nobody is hiring" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={crowdRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}}></canvas>
+      <canvas ref={crowdRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="Two crowds of small human figures, one figure per 10,000 jobs. The left stand shows the 2021-25 average of 320,938 jobs a month; the right shows what has actually been added each month since January 2025, a far smaller crowd. Below, 100 figures show the share of the unemployed out of work six months or more."></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={crowdDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>JANUARY 2025</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>JOBS ADDED EACH MONTH · ONE FIGURE IS 10,000 PEOPLE<br />BLS PAYROLLS</div>
@@ -1496,7 +1505,7 @@ export default class TheBill extends React.Component {
   <section data-screen-label="06 What the war cost" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#6E1B27"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={warRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}}></canvas>
+      <canvas ref={warRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="A four-row ledger of what the war has cost: 18 cream stars for US service members killed, 42 aircraft silhouettes for those lost or damaged, a bar for $37.5 billion spent against a dashed outline for the $67.1 billion more requested, and 100 triangles showing roughly one in three Patriot interceptors left."></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>28 FEB 2026 → NOW · SEVEN MONTHS</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>HE SAID FOUR TO FIVE WEEKS<br />PENTAGON · CRS · NBC NEWS · CSIS</div>
@@ -1526,7 +1535,7 @@ export default class TheBill extends React.Component {
   <section data-screen-label="07 What it buys" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={buyRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}}></canvas>
+      <canvas ref={buyRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="The 42 lost aircraft beside a large equals sign, and a pile of gold squares showing what the same money buys: PlayStation 5s, gallons of diesel, years of in-state tuition, Costco hot dogs. The sequence ends with the whole war's $37.5 billion as a pile roughly fourteen times larger, running off the top of the frame."></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={buyDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>42 AIRCRAFT LOST OR DAMAGED · PENTAGON ESTIMATE $2.6 BILLION</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>WHAT HE LOST, PRICED IN THINGS YOU BUY<br />CRS · SONY · EIA · COLLEGE BOARD · COSTCO</div>
@@ -1568,7 +1577,7 @@ export default class TheBill extends React.Component {
   <section data-screen-label="08 The world backs away" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={vaultRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}}></canvas>
+      <canvas ref={vaultRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="A vault cage holding one gold ingot per tonne of foreign gold held at the New York Fed. Ingots leave the stack month by month as foreign governments withdraw, 159 tonnes over ten months with none coming in. Alongside, a falling blue bar shows Treasuries held for foreign officials."></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={vaultDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>AUGUST 2025</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>ONE BAR IS ONE TONNE · FEDERAL RESERVE TABLE 3.13</div>
