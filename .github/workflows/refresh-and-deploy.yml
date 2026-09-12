@@ -77,7 +77,17 @@ jobs:
           npm test --if-present
           npm run build
 
-      - name: Deploy to Cloudflare Pages
+      # Two projects serve the same V5 build: the original URL, which readers
+      # may already have, and the dedicated one. V4 is a separate frozen
+      # project and is deliberately not touched here.
+      - name: Deploy to Cloudflare Pages (dedicated URL)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy frontend/dist --project-name trumps-economy-the-bill --branch main --commit-dirty=true
+
+      - name: Deploy to Cloudflare Pages (original URL)
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

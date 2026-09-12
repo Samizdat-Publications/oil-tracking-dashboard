@@ -67,7 +67,17 @@ own constraints at 390x844 -- the SCROLL cue printing over the closing sentence 
 eight blocks, and labels under the 11px floor -- rather than re-designing a block. Re-audit
 after any layout change; both were found by measuring, not by looking.
 
-The V4 ledger stays reachable at `?view=ledger`.
+**Where it is deployed.** Two Pages projects serve the same V5 build, and a third
+holds V4. None are git-connected; `backend/scripts/refresh.sh` and the workflow
+deploy to both V5 projects and never touch V4.
+
+| URL | What | Project |
+|---|---|---|
+| https://trumps-economy-the-bill.pages.dev | V5, the dedicated URL | `trumps-economy-the-bill` |
+| https://trumps-economy-ledger.pages.dev | V5, the original URL | `trumps-economy-ledger` |
+| https://trumps-economy-ledger-v4.pages.dev | V4, frozen at `v4-frozen` | `trumps-economy-ledger-v4` |
+
+The V4 ledger is also reachable from either V5 URL at `?view=ledger`.
 
 ## V4 ledger (`?view=ledger`)
 

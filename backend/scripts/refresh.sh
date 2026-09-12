@@ -44,9 +44,15 @@ if [[ $DRY == 1 ]]; then
   exit 0
 fi
 
+# Two projects serve the same V5 build: the original URL, which readers may
+# already have, and the dedicated one. V4 is a separate frozen project and is
+# deliberately not touched here.
 step "Deploying to Cloudflare Pages"
-npx --prefix frontend wrangler pages deploy frontend/dist \
-  --project-name trumps-economy-ledger --branch main --commit-dirty=true
+for project in trumps-economy-the-bill trumps-economy-ledger; do
+  echo "  -> $project"
+  npx --prefix frontend wrangler pages deploy frontend/dist \
+    --project-name "$project" --branch main --commit-dirty=true
+done
 
 step "Committing the refreshed data"
 git add frontend/public/data-snapshot.json frontend/public/v5 \
@@ -58,4 +64,5 @@ else
   git push
 fi
 
-printf '\n\033[1mLive:\033[0m https://trumps-economy-ledger.pages.dev\n'
+printf '\n\033[1mLive:\033[0m https://trumps-economy-the-bill.pages.dev\n'
+printf '       https://trumps-economy-ledger.pages.dev\n'
