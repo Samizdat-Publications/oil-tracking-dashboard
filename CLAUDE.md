@@ -336,5 +336,7 @@ deployable regardless of the V5 redesign. To redeploy it:
     cd frontend && npm ci && npm run build
     npx wrangler pages deploy dist --project-name trumps-economy-ledger-v4 --branch v4-frozen
 
-V5 (Design's animated rebuild) lands as a separate page/project; `main` and the daily
-refresh workflow keep serving V4 at trumps-economy-ledger.pages.dev until V5 is accepted.
+V5 was accepted on 2026-09-11 and is now what `main` builds. It serves from two
+projects -- `trumps-economy-the-bill` and `trumps-economy-ledger` -- and the refresh
+deploys to both. V4 is untouched by that path; it only moves if you redeploy it by
+hand from `v4-frozen`, as above.
