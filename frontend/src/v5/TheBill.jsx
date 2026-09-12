@@ -42,6 +42,25 @@ import './the-bill.css';
 
 const V5 = '/v5/';
 
+/**
+ * The mark red, lifted off Old Glory Red.
+ *
+ * Design specified #B22234 -- the actual US flag red -- for every red mark:
+ * the strike ticks on the seismograph, the closed-gate bar in the strait, the
+ * event dots on the globe, the kicker squares, and the two dates on the share
+ * card. All of them sit on the navy ground, where #B22234 measures 2.49:1
+ * against #0B1E3F. That is under the 3:1 floor for non-text contrast, which
+ * made the red marks the least legible element on a page whose argument is
+ * "every red mark on this page traces back to these two dates".
+ *
+ * #D93B4A measures 3.68:1 on the same ground and sits between Old Glory Red
+ * and the #E04B5C the palette already uses for bright red text.
+ *
+ * This is a deliberate deviation from the handoff, and the only one that
+ * changes a colour. To revert, set this back to MARK_RED.
+ */
+const MARK_RED = '#D93B4A';
+
 /* The prototype called these as d3.<fn> and topojson.<fn> off CDN globals. */
 const d3 = { geoArea, geoDistance, geoGraticule, geoInterpolate, geoOrthographic, geoPath };
 const topojson = { feature };
@@ -189,7 +208,7 @@ export default class TheBill extends React.Component {
     ctx.strokeStyle = 'rgba(247,245,240,.85)'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(needleX, ny); ctx.stroke();
     ctx.fillStyle = '#F7F5F0'; ctx.beginPath(); ctx.arc(px, py, 5, 0, 6.2832); ctx.fill();
-    ctx.fillStyle = '#B22234'; ctx.beginPath(); ctx.arc(needleX, ny, 3.5, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = MARK_RED; ctx.beginPath(); ctx.arc(needleX, ny, 3.5, 0, 6.2832); ctx.fill();
     // the strike: a red flash across the paper for the first days
     const since = day - this.sStrike;
     if (since >= 0 && since < 6) { ctx.fillStyle = 'rgba(178,34,52,' + (0.25 * (1 - since / 6)).toFixed(3) + ')'; ctx.fillRect(0, top - 30, W, bot - top + 60); }
@@ -273,7 +292,7 @@ export default class TheBill extends React.Component {
     if (closed) {
       const pulse = 0.5 + 0.5 * Math.sin(t / 420);
       ctx.strokeStyle = 'rgba(178,34,52,' + (0.3 + 0.3 * pulse).toFixed(2) + ')'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
-      ctx.strokeStyle = '#B22234'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
+      ctx.strokeStyle = MARK_RED; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
       ctx.fillStyle = '#E04B5C'; ctx.font = '700 14px "IBM Plex Mono", monospace'; ctx.fillText('CLOSED', gx + 10, (gt + gb) / 2 + 4);
     } else { ctx.strokeStyle = 'rgba(247,245,240,.4)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke(); }
     ctx.fillStyle = 'rgba(247,245,240,.6)'; ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; ctx.fillText('33 KM', gx, gt - 8); ctx.textAlign = 'left';
@@ -322,7 +341,7 @@ export default class TheBill extends React.Component {
       { num: Math.round(B.jobs.curr.mean_monthly / 1000) + ',000', label: 'new jobs a month · was ' + Math.round(B.jobs.prev.mean_monthly / 1000) + ',000', color: '#D4A017' },
       { num: B.war_cost.casualties.us_killed + ' dead', label: B.war_cost.aircraft.total_lost_or_damaged + ' aircraft · $' + B.war_cost.dod_cost.usd_bn + 'bn spent', color: '#F7F5F0' },
       { num: B.gold.tonnes_out.toFixed(0) + ' t', label: 'gold out of the New York Fed · ten months', color: '#D4A017' },
-      { num: '28 Feb · 24 Feb', label: 'he ordered the strike · he re-imposed the tariffs', color: '#B22234' },
+      { num: '28 Feb · 24 Feb', label: 'he ordered the strike · he re-imposed the tariffs', color: MARK_RED },
     ].map((c, i) => ({ ...c, ref: R[i] }));
   }
   stepCard(P) {
@@ -1127,12 +1146,12 @@ export default class TheBill extends React.Component {
           const [gx1, gy1] = proj(this.gate.top), [gx2, gy2] = proj(this.gate.bot);
           const gl = Math.hypot(gx2 - gx1, gy2 - gy1);
           if (gl < 14) {
-            ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.2832); ctx.fillStyle = '#B22234'; ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, 5, 0, 6.2832); ctx.fillStyle = MARK_RED; ctx.fill();
           } else {
             ctx.beginPath(); ctx.moveTo(gx1, gy1); ctx.lineTo(gx2, gy2);
             ctx.strokeStyle = 'rgba(178,34,52,' + (0.35 + 0.35 * pulse).toFixed(2) + ')'; ctx.lineWidth = 10 + ez * 10; ctx.lineCap = 'butt'; ctx.stroke();
             ctx.beginPath(); ctx.moveTo(gx1, gy1); ctx.lineTo(gx2, gy2);
-            ctx.strokeStyle = '#B22234'; ctx.lineWidth = 2.5 + ez * 2; ctx.stroke();
+            ctx.strokeStyle = MARK_RED; ctx.lineWidth = 2.5 + ez * 2; ctx.stroke();
             ctx.beginPath(); ctx.moveTo(gx1 - 6, gy1); ctx.lineTo(gx1 + 6, gy1); ctx.moveTo(gx2 - 6, gy2); ctx.lineTo(gx2 + 6, gy2); ctx.lineWidth = 2; ctx.stroke();
           }
           ctx.beginPath(); ctx.arc(x, y, 10 + pulse * 12 + ez * 20, 0, 6.2832); ctx.strokeStyle = 'rgba(178,34,52,' + (0.7 * (1 - pulse)).toFixed(2) + ')'; ctx.lineWidth = 1.5; ctx.stroke();
@@ -1191,7 +1210,7 @@ export default class TheBill extends React.Component {
     set(this.dateRef, day < this.STRIKE ? 'BEFORE THE WAR · 1 JAN 2025 – 27 FEB 2026' : this.fmtDay(Math.round(day)));
     let ev = null; for (const e of this.events) if (day >= e.d && day < e.d + 22) ev = e;
     const er = this.eventRef.current;
-    if (er) { const txt = ev ? ev.t : ''; if (er.textContent !== txt) { er.textContent = txt; er.style.color = ev && ev.red ? '#B22234' : '#6C8CD5'; } }
+    if (er) { const txt = ev ? ev.t : ''; if (er.textContent !== txt) { er.textContent = txt; er.style.color = ev && ev.red ? MARK_RED : '#6C8CD5'; } }
     if (this.cueRef.current) this.cueRef.current.style.opacity = P > 0.03 ? '0' : '1';
     const lg = this.legendRef.current;
     if (lg && (this.lastLegend === undefined || Math.abs(this.lastLegend - day) > 2)) {
@@ -1221,7 +1240,7 @@ export default class TheBill extends React.Component {
 
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "32px", pointerEvents: "none"}}>
         <div style={{display: "flex", flexDirection: "column", gap: "2px", minWidth: "0"}}>
-          <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#B22234", flex: "none"}}></span>HIS WAR SHUT THE STRAIT OF HORMUZ</div>
+          <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>HIS WAR SHUT THE STRAIT OF HORMUZ</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
             <div className="g-num" ref={numRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,240px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>83</div>
             <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>ships a day<br />through Hormuz<br /><span ref={wasRef} style={{color: "rgba(247,245,240,.6)"}}>before his war</span></div>
@@ -1290,7 +1309,7 @@ export default class TheBill extends React.Component {
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>CRUDE OIL · A BARREL · EVERY DAILY CLOSE<br />WTI CUSHING SPOT · FRED</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#B22234", flex: "none"}}></span>OIL DOUBLED IN FIVE WEEKS</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>OIL DOUBLED IN FIVE WEEKS</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={seisNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>$57</div>
           <div ref={seisSubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>a barrel<br /><span style={{color: "rgba(247,245,240,.6)"}}>in January</span></div>
@@ -1325,7 +1344,7 @@ export default class TheBill extends React.Component {
         <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7", position: "absolute", right: "36px", bottom: "40px"}}>SHIPS COUNTED FROM SATELLITE · IMF PORTWATCH · POSITIONS ARE A MODEL</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#B22234", flex: "none"}}></span>HE SAYS IT IS OPEN. THE SATELLITES SAY NO.</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>HE SAYS IT IS OPEN. THE SATELLITES SAY NO.</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={strNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,240px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>83</div>
           <div ref={strSubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>ships a day<br /><span style={{color: "rgba(247,245,240,.6)"}}>before his war</span></div>
@@ -1478,7 +1497,7 @@ export default class TheBill extends React.Component {
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>JOBS ADDED EACH MONTH · ONE FIGURE IS 10,000 PEOPLE<br />BLS PAYROLLS</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#B22234", flex: "none"}}></span>HIRING HAS NEARLY STOPPED</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>HIRING HAS NEARLY STOPPED</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={crowdNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>42,000</div>
           <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>new jobs a month<br />since he took office<br /><span style={{color: "rgba(247,245,240,.6)"}}>was 321,000</span></div>
@@ -1541,7 +1560,7 @@ export default class TheBill extends React.Component {
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>WHAT HE LOST, PRICED IN THINGS YOU BUY<br />CRS · SONY · EIA · COLLEGE BOARD · COSTCO</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#B22234", flex: "none"}}></span>WHAT THE LOST AIRCRAFT COST</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>WHAT THE LOST AIRCRAFT COST</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={buyNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>0</div>
           <div ref={buySubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>PlayStation 5s<br /><span style={{color: "rgba(247,245,240,.6)"}}>for one F-35A</span></div>
@@ -1583,7 +1602,7 @@ export default class TheBill extends React.Component {
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>ONE BAR IS ONE TONNE · FEDERAL RESERVE TABLE 3.13</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#B22234", flex: "none"}}></span>THE WORLD IS TAKING ITS GOLD HOME</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>THE WORLD IS TAKING ITS GOLD HOME</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={vaultNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>0</div>
           <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>tonnes of gold<br />taken out of New York<br /><span style={{color: "rgba(247,245,240,.6)"}}>ten months · none came in</span></div>
@@ -1617,7 +1636,7 @@ export default class TheBill extends React.Component {
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#F7F5F0", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(11,30,63,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
       <div ref={cardRef} style={{width: "min(1200px,100%)", aspectRatio: "1200/630", maxHeight: "100%", background: "#0B1E3F", border: "1px solid rgba(247,245,240,.25)", borderRadius: "8px", position: "relative", overflow: "hidden", boxShadow: "0 40px 120px rgba(0,0,0,.5)", display: "grid", gridTemplateRows: "auto minmax(0,1fr) auto", padding: "clamp(14px,3vmin,40px) clamp(16px,3.5vmin,48px)", gap: "clamp(6px,1.5vmin,18px)", containerType: "inline-size"}}>
-        <div style={{position: "absolute", left: "0", right: "0", top: "0", height: "6px", background: "repeating-linear-gradient(90deg,#B22234 0 7.69%,#F7F5F0 7.69% 15.38%)"}}></div>
+        <div style={{position: "absolute", left: "0", right: "0", top: "0", height: "6px", background: `repeating-linear-gradient(90deg,${MARK_RED} 0 7.69%,#F7F5F0 7.69% 15.38%)`}}></div>
         <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "16px", paddingTop: "6px"}}>
           <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(20px,4.2cqw,54px)", lineHeight: "1", letterSpacing: ".02em", textTransform: "uppercase", color: "#F7F5F0"}}>The Bill</div>
           <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(8px,1.1cqw,13px)", letterSpacing: ".14em", color: "rgba(247,245,240,.6)", textAlign: "right"}}>{cardDate}</div>
@@ -1631,7 +1650,7 @@ export default class TheBill extends React.Component {
           </React.Fragment>))}
         </div>
         <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "16px", borderTop: "1px solid rgba(247,245,240,.2)", paddingTop: "clamp(6px,1.2cqw,14px)"}}>
-          <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(16px,3cqw,38px)", lineHeight: "1", letterSpacing: ".02em", textTransform: "uppercase"}}><span style={{color: "#B22234"}}>Ordered by Trump.</span> <span style={{color: "#F7F5F0"}}>Paid by you.</span></div>
+          <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(16px,3cqw,38px)", lineHeight: "1", letterSpacing: ".02em", textTransform: "uppercase"}}><span style={{color: MARK_RED}}>Ordered by Trump.</span> <span style={{color: "#F7F5F0"}}>Paid by you.</span></div>
           <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(7px,1cqw,12px)", letterSpacing: ".14em", color: "rgba(247,245,240,.6)", textAlign: "right"}}>GOVERNMENT DATA · EVERY SOURCE BELOW</div>
         </div>
       </div>

@@ -123,3 +123,27 @@ body.v5-bill *::after { box-sizing: content-box; }
     font-size: 11px !important;
   }
 }
+
+@media (max-width: 640px) {
+  /* The total's label is hidden on mobile, which leaves "+$83.13" sitting next
+     to a US state picker saying nothing about what it is. The label is three
+     lines plus the cumulative, which is why it was dropped -- so it comes back
+     at 12px keeping Design's own line breaks, with its last two spans hidden
+     because .p-cum already prints the cumulative just above. (Collapsing the
+     <br>s instead runs the words together: browsers give no reliable way to
+     substitute a space for a removed <br>.) */
+  /* Design's mobile rule pins this row to flex-wrap:nowrap, so the label has to
+     be given its own line or it runs under the state picker. */
+  .v5-bill-root .p-bottom { flex-wrap: wrap !important; }
+  .v5-bill-root .p-bottom > div:first-child { order: 1; }
+  .v5-bill-root .p-bottom > label { order: 2; }
+  .v5-bill-root .p-total-label {
+    display: block !important;
+    order: 3;
+    flex: 1 1 100%;
+    font-size: 12px !important;
+    line-height: 1.25 !important;
+    margin-top: 2px;
+  }
+  .v5-bill-root .p-total-label span:nth-last-child(-n + 2) { display: none !important; }
+}

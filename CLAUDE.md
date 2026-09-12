@@ -43,8 +43,19 @@ cd frontend && npx vite preview --port 4315                            # the por
 ```
 Capture both under `reducedMotion: 'reduce'` (the page maps that to P=1, every block
 at its end state) and compare. At 1440x900 the mean per-block pixel difference is
-**1.65%**; the two worst blocks (01 and 04) are sub-pixel grid-row distribution, not
-drift. Anything materially above that is a regression.
+**~1.9%**. Anything materially above that is a regression. What makes up the residual:
+
+- blocks 01 and 04 are sub-pixel grid-row distribution, not drift;
+- block 04 also drifts a little run to run because the split-flap advances on real
+  elapsed time rather than on P, so it does not always settle on the same frame;
+- block 09 carries the one deliberate colour deviation, below.
+
+**The one colour deviation.** `MARK_RED` at the top of `TheBill.jsx` is `#D93B4A`,
+not the `#B22234` Design specified. Every red mark on the page sits on the navy
+ground, where Old Glory Red measures 2.49:1 -- under the 3:1 floor for non-text
+contrast, which made the red marks the least legible thing on a page arguing that
+"every red mark on this page traces back to these two dates". `#D93B4A` measures
+3.68:1. To revert, set that one constant back.
 
 `og.png` is block 09 rendered from the built site by `frontend/scripts/build-og.mjs`,
 not a separate card -- Design drew that block at 1200x630 so it could be the share
