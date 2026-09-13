@@ -116,8 +116,8 @@ once and updated after events that actually move it -- a strike, a ceasefire, a 
 print, a tariff ruling. Two equivalent ways to run it:
 
 ```powershell
-.\oil-dashboardackend\scriptsefresh.ps1        # snapshot, gate, V5 cut, tests, build, deploy, commit
-.\oil-dashboardackend\scriptsefresh.ps1 -Dry   # everything except publishing
+.\oil-dashboardackend\scriptsefresh.ps1        # snapshot, gate, V5 cut, tests, build, deploy, commit
+.\oil-dashboardackend\scriptsefresh.ps1 -Dry   # everything except publishing
 ```
 
 **Use the `.ps1` on this machine, not the `.sh`.** PowerShell here resolves `bash` to
