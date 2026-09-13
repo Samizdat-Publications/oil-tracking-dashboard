@@ -5,6 +5,9 @@
 #   bash backend/scripts/refresh.sh          # refresh, build, deploy, commit
 #   bash backend/scripts/refresh.sh --dry    # refresh and build, publish nothing
 #
+# On Windows use refresh.ps1 instead: PowerShell there resolves `bash` to WSL's
+# bash.exe, which has no distribution installed, so this file never runs.
+#
 # There is no schedule. The GitHub workflow does the same steps and is
 # dispatch-only; this is the local equivalent so a refresh does not require the
 # Actions tab.

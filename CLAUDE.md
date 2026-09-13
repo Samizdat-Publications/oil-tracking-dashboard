@@ -115,10 +115,22 @@ the drawing maths or coastline arrays.
 once and updated after events that actually move it -- a strike, a ceasefire, a jobs
 print, a tariff ruling. Two equivalent ways to run it:
 
-```bash
-bash backend/scripts/refresh.sh          # snapshot, gate, V5 cut, tests, build, deploy, commit
-bash backend/scripts/refresh.sh --dry    # everything except publishing
+```powershell
+.\oil-dashboardackend\scriptsefresh.ps1        # snapshot, gate, V5 cut, tests, build, deploy, commit
+.\oil-dashboardackend\scriptsefresh.ps1 -Dry   # everything except publishing
 ```
+
+**Use the `.ps1` on this machine, not the `.sh`.** PowerShell here resolves `bash` to
+WSL's `bash.exe`, and no WSL distribution is installed, so `bash ...refresh.sh` fails
+with "Windows Subsystem for Linux has no installed distributions" -- it never reaches
+Git Bash. `refresh.sh` is kept as the POSIX equivalent for Linux. Both scripts locate
+the repo from their own path, so neither cares which directory you are in.
+
+Two PowerShell 5.1 traps the `.ps1` works around, worth knowing before editing it:
+a failing native exe does not stop the script on its own (every external command goes
+through `Invoke-Step`, which checks `$LASTEXITCODE`), and piping a native command's
+stderr with `2>&1` turns ordinary build warnings into terminating `NativeCommandError`s
+-- so do not wrap the script in a pipe to filter its output.
 
 or the `refresh-and-deploy` workflow from the Actions tab (`workflow_dispatch` only).
 Both need FRED_API_KEY and EIA_API_KEY; the workflow also needs CLOUDFLARE_API_TOKEN
