@@ -116,8 +116,9 @@ once and updated after events that actually move it -- a strike, a ceasefire, a 
 print, a tariff ruling. Two equivalent ways to run it:
 
 ```powershell
-.\oil-dashboard\backend\scripts\refresh.ps1        # snapshot, gate, V5 cut, tests, build, deploy, commit
-.\oil-dashboard\backend\scripts\refresh.ps1 -Dry   # everything except publishing
+.\oil-dashboard\backend\scripts\refresh.ps1            refresh and publish V5 and V4
+.\oil-dashboard\backend\scripts\refresh.ps1 -SkipV4    V5 only
+.\oil-dashboard\backend\scripts\refresh.ps1 -Dry       build everything, publish nothing
 ```
 
 **Use the `.ps1` on this machine, not the `.sh`.** PowerShell here resolves `bash` to
@@ -135,6 +136,27 @@ stderr with `2>&1` turns ordinary build warnings into terminating `NativeCommand
 or the `refresh-and-deploy` workflow from the Actions tab (`workflow_dispatch` only).
 Both need FRED_API_KEY and EIA_API_KEY; the workflow also needs CLOUDFLARE_API_TOKEN
 and CLOUDFLARE_ACCOUNT_ID.
+
+**Every refresh is recorded.** `backend/scripts/record_refresh.py` appends a row to
+`docs/refresh-history.csv`: crude, the Hormuz seven-day mean, diesel, the staples,
+jobs a month, long-term unemployment, the household receipt, the US-specific
+inflation excess and the Pentagon figure. The sites only ever show the latest
+numbers, so that file is the only place the history exists. It also prints what
+moved since the previous row, which is the part worth reading.
+
+**V4 refreshes in the same run.** `frontend/src/v4` and the backend services are
+identical on `main` and `v4-frozen`, so V4 reads the current schema v2 snapshot with
+no code change. The script carries the snapshot across, rebuilds, deploys to
+`trumps-economy-ledger-v4`, commits on that branch and returns to where it started.
+Uncommitted work is stashed for the switch and popped afterwards.
+
+**Check series keys against the snapshot, not against what the block is called.**
+`build_v5_data.py` originally looked for `long_term_unemployed_share` and `ahe_yoy`;
+the real keys are `ltu_share` and `ahe`. The missing-series fallback then kept the
+values Design shipped, so the file still looked right and `--check` still passed
+while block 05 could never refresh. A missing series now warns on stderr. `pay` is
+derived in `pay_block()` rather than read, and its twelve-month change is matched by
+calendar date, never by position.
 
 `backend/scripts/build_v5_data.py` is the step that matters for V5: it cuts
 `frontend/public/v5/{globe,crude,prices,bill}-data.json` out of the snapshot. Without
