@@ -39,14 +39,19 @@ AREA_NAMES = {
 # The globe's ship trails start here; earlier history is not drawn.
 HORMUZ_DAILY_FROM = "2025-12-01"
 
-# Series behind block 05's readouts, keyed by the name bill-data uses.
+# Series behind block 05's readouts, keyed by the name bill-data uses. The names
+# on the right are macro.series keys, and they are not guesses: check them
+# against the snapshot rather than against what the block is called. "ltu" reads
+# ltu_share, not long_term_unemployed_share, and getting that wrong silently
+# froze the long-term-unemployment readout at the value Design shipped.
+#
+# "pay" is not in here because it is not a series. It is derived, in pay_block().
 BILL_SERIES = {
-    "ltu": "long_term_unemployed_share",
+    "ltu": "ltu_share",
     "u6": "u6",
     "unemployment": "unemployment",
     "hires": "hires_rate",
     "quits": "quits_rate",
-    "pay": "ahe_yoy",
 }
 
 
@@ -165,8 +170,11 @@ def bill_data(sn, old):
     for key, src in BILL_SERIES.items():
         s = ms.get(src)
         if s is None:
-            # Keep whatever Design shipped rather than blank a readout. A missing
-            # series is a snapshot problem; it should not silently empty a block.
+            # Keep whatever Design shipped rather than blank a readout, but say
+            # so loudly. Falling back quietly is how the ltu mapping stayed
+            # wrong: the file still looked right because it held the old values.
+            print("  WARNING: macro.series.%s is missing; bill-data.%s keeps its "
+                  "previous values and will not refresh." % (src, key), file=sys.stderr)
             out[key] = old.get(key)
             continue
         out[key] = {
@@ -175,6 +183,7 @@ def bill_data(sn, old):
             "prewar": s.get("prewar"), "fred_id": s.get("fred_id"),
             "points": [[p["date"], p["value"]] for p in s.get("points", [])],
         }
+    out["pay"] = pay_block(ms, old.get("pay"))
     out["war_cost"] = ctx["war_cost"]
     out["gold"] = gold(ctx["gold"])
     out["against"] = old.get("against")
@@ -187,6 +196,77 @@ def bill_data(sn, old):
     out["international"] = {"peers": intl.get("peers"),
                             "latest": (intl.get("series") or [])[-3:]}
     return out
+
+
+def yoy_pct(points, latest_date):
+    """Twelve-month percent change, matched by calendar date, not by position.
+
+    Position arithmetic breaks the moment a month is missing from the series,
+    and one has been: the October 2025 CPI was never collected during the
+    shutdown, so `points[-1] / points[-13]` silently spans thirteen months.
+    """
+    by_date = {p["date"]: p["value"] for p in points if p.get("value") is not None}
+    now = by_date.get(latest_date)
+    if now is None:
+        return None
+    year, month, _ = latest_date.split("-")
+    prior = "%04d-%s-01" % (int(year) - 1, month)
+    then = by_date.get(prior)
+    if not then:
+        return None
+    return (now / then - 1.0) * 100.0
+
+
+def pay_block(ms, previous):
+    """Block 05's pay readout: earnings against prices, both ways.
+
+    Derived rather than read: the snapshot carries average hourly earnings and
+    CPI as levels, and this block wants the real change since the handover and
+    the real change over the last year. Both CPI figures use CPIAUCNS, the
+    not-seasonally-adjusted series, because that is what the page cites.
+    """
+    ahe, cpi = ms.get("ahe"), ms.get("cpi_headline_nsa")
+    if not ahe or not cpi:
+        print("  WARNING: ahe or cpi_headline_nsa missing; bill-data.pay keeps its "
+              "previous values and will not refresh.", file=sys.stderr)
+        return previous
+
+    ahe0 = dig(ahe, "handover", "value")
+    ahe1 = dig(ahe, "latest", "value")
+    cpi0 = dig(cpi, "handover", "value")
+    cpi1 = dig(cpi, "latest", "value")
+    if None in (ahe0, ahe1, cpi0, cpi1):
+        print("  WARNING: pay inputs incomplete; bill-data.pay keeps its previous "
+              "values.", file=sys.stderr)
+        return previous
+
+    ahe_yoy = yoy_pct(ahe.get("points", []), ahe["latest"]["date"])
+    cpi_yoy = yoy_pct(cpi.get("points", []), cpi["latest"]["date"])
+    if ahe_yoy is None or cpi_yoy is None:
+        print("  WARNING: not enough history for a 12-month pay comparison; "
+              "bill-data.pay keeps its previous values.", file=sys.stderr)
+        return previous
+
+    # Real change is the ratio of the two ratios, not the difference of the two
+    # percentages. At these sizes the two nearly agree, which is exactly why the
+    # wrong one survives review.
+    return {
+        "ahe0": ahe0, "ahe1": ahe1, "cpi0": cpi0, "cpi1": cpi1,
+        "real_since_handover_pct": ((ahe1 / ahe0) / (cpi1 / cpi0) - 1.0) * 100.0,
+        "ahe_yoy_pct": ahe_yoy,
+        "cpi_yoy_pct": cpi_yoy,
+        "real_yoy_pct": ((1 + ahe_yoy / 100.0) / (1 + cpi_yoy / 100.0) - 1.0) * 100.0,
+        "ahe_id": ahe.get("fred_id"), "cpi_id": cpi.get("fred_id"),
+    }
+
+
+def dig(obj, *path):
+    for key in path:
+        try:
+            obj = obj[key]
+        except (KeyError, IndexError, TypeError):
+            return None
+    return obj
 
 
 def gold(g):
