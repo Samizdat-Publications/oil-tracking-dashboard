@@ -4,36 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Oil Price Tracking Dashboard — a full-stack app that visualizes how oil price increases from the 2026 Iran War impact downstream consumer goods. Built for a general audience to understand "kitchen table economics" — how oil prices affect everyday costs like groceries, gas, and airline tickets.
+"The Bill": a public, static data story on what the 2026 Iran war and the tariffs cost
+an American household, measured only in government series and cited, tiered figures.
+Live at https://trumps-economy-the-bill.pages.dev; the landing page about the project is
+https://samizdat-publications.github.io/oil-tracking-dashboard/ (`docs/index.html`,
+GitHub Pages from `/docs`).
 
 **Repo:** github.com/Samizdat-Publications/oil-tracking-dashboard
-**Iran War baseline date:** 2026-02-28 (constant `IRAN_WAR_DATE` in `lib/commodity-data.ts`)
+**Two dates:** tariffs re-imposed 2026-02-24, the strike 2026-02-28.
+**Working copy:** `C:\Users\stewa\dev\oil-tracking-dashboard`, never the OneDrive copy
+(see Conventions).
 
+## V5 "The Bill" (the page at `/`) -- read this first
 
-## V5 "The Bill" (the page at `/`) — read this first
-
-The default route is `frontend/src/pages/TheBillPage.tsx`, which mounts
+`frontend/src/main.tsx` picks the page from `?view=` (only `ledger` means anything now)
+and mounts `frontend/src/pages/TheBillPage.tsx`, which mounts
 `frontend/src/v5/TheBill.jsx`: an eleven-block scroll-driven data story ported from
 `docs/design-handoff/2026-09-08-the-bill/`. **It is a port, not an interpretation.**
 The logic class is Design's prototype class carried over almost line for line, and
 `render()` is its template converted mechanically by
-`frontend/scripts/template-to-jsx.py`. If a figure or a style needs to change, change
-it in the handoff and re-run the converter — do not retype markup by hand. That is
-exactly how the V4 redesign drifted.
+`frontend/scripts/template-to-jsx.py`. If markup or copy needs to change, change it in
+the handoff and re-run the converter; logic changes go into both the port and the
+handoff class. Do not retype markup by hand. That is exactly how the V4 redesign drifted.
 
-Data lives in `frontend/public/v5/*.json` (cut from `data-snapshot.json` by Design)
-plus the two bundled `world-atlas` land files. Nothing is fetched from a CDN.
+Data lives in `frontend/public/v5/*.json`, cut from `data-snapshot.json` by
+`backend/scripts/build_v5_data.py`, plus the two `world-atlas` land files (land-50m is
+clipped to the Gulf by `scripts/clip-land.mjs`). Nothing is fetched from a CDN, and V5
+loads no Tailwind, no `index.css` and no Google Fonts: those belong to V4 only.
 
-Three integration rules that are load-bearing, all in `src/v5/the-bill.css`:
-
-- `body.v5-bill` (added in `componentDidMount`) undoes three rules from the shared
-  `index.css` reset — `padding-top:48px`, `letter-spacing:-.01em` and font smoothing.
-  They shorten every 100vh block and retrack the type.
-- The V5 subtree is **`box-sizing: content-box`**. The prototype declares no
-  box-sizing; `index.css` forces `border-box` for the other views. Under border-box
-  the 1200x630 share card renders 1200x630 instead of the intended 1265x686.
-- Source Serif 4 is declared as an `@font-face` against the **variable** woff2
-  (`opsz` axis). The static @fontsource cut sets the same string 15% wider.
+Source Serif 4 is declared as an `@font-face` against the **variable** woff2 (`opsz`
+axis) in `the-bill.css`. The static @fontsource cut sets the same string 15% wider.
 
 Verify a change by diffing against the prototype rather than by eye:
 
@@ -41,14 +41,12 @@ Verify a change by diffing against the prototype rather than by eye:
 cd docs/design-handoff/2026-09-08-the-bill && py -m http.server 4300   # the prototype
 cd frontend && npx vite preview --port 4315                            # the port
 ```
-Capture both under `reducedMotion: 'reduce'` (the page maps that to P=1, every block
-at its end state) and compare. At 1440x900 the mean per-block pixel difference is
-**~1.9%**. Anything materially above that is a regression. What makes up the residual:
-
-- blocks 01 and 04 are sub-pixel grid-row distribution, not drift;
-- block 04 also drifts a little run to run because the split-flap advances on real
-  elapsed time rather than on P, so it does not always settle on the same frame;
-- block 09 carries the one deliberate colour deviation, below.
+Capture both under `reducedMotion: 'reduce'` (the page maps that to P=1, every block at
+its end state) and compare. Since `index.css` left V5 (2026-09-23), 8 of 11 blocks match
+at 0.00 to 0.44%. The residual: block 09 carries the deliberate red below; blocks 02 and
+04 move a little run to run (the seismograph paper and the split-flap run on elapsed
+time, not on P); and the computed copy of 2026-09-23 differs from Design's typed text on
+purpose.
 
 **The one colour deviation.** `MARK_RED` at the top of `TheBill.jsx` is `#D93B4A`,
 not the `#B22234` Design specified. Every red mark on the page sits on the navy
@@ -140,9 +138,9 @@ The V4 ledger is also reachable from either V5 URL at `?view=ledger`.
 
 ## V4 ledger (`?view=ledger`)
 
-The V4 "ledger" is `frontend/src/pages/LedgerPage.tsx`, served at `?view=ledger`. Everything
-above about sections, Plotly, Zustand and the ticker describes the legacy V1 dashboard
-(`?view=dashboard`) and is kept for that view only.
+The V4 "ledger" is `frontend/src/pages/LedgerPage.tsx`, served at `?view=ledger`. It is the
+only page that loads `index.css` (Tailwind). The V1 dashboard and the V2/V3 views called a
+FastAPI backend that was never deployed; they were removed on 2026-09-23.
 
 **Nothing on the V4 page is typed in.** `frontend/src/v4/ledger-data.ts` derives a
 `Figures` object from `frontend/public/data-snapshot.json`; the page renders it. To update
@@ -250,178 +248,48 @@ $114.58 on 7 Apr 2026 (the series), not $114.01.
 
 ## Commands
 
-**Backend (FastAPI, port 8000):**
 ```bash
 cd backend
-py -m uvicorn main:app --reload --port 8000
+py scripts/build_snapshot.py            # every source -> frontend/public/data-snapshot.json
+py scripts/validate_snapshot.py ../frontend/public/data-snapshot.json
+py scripts/build_v5_data.py             # the four V5 files; exits 2 if a block kept old values
+py -m pytest tests -q
+
+cd frontend
+npx vite --port 5173                    # dev server
+npm run build                           # tsc, vite, og.png from block 09
+npm test                                # vitest (the receipt pin)
+npm run lint                            # eslint, including TheBill.jsx
 ```
 
-**Frontend (Vite dev server, port 5173):**
-```bash
-cd frontend
-npx vite --port 5173        # dev server (proxies /api/* to :8000)
-npx tsc --noEmit             # type check only
-npm run build                # tsc + vite production build
-npm run lint                 # eslint
-```
+Or the whole thing, deploy and commit included: `.\backend\scripts\refresh.ps1` (see
+"Refresh is on demand" above).
 
 Python is `py` on this Windows system (not `python` or `python3`).
 PowerShell uses `;` not `&&` for command chaining.
 `export PATH="$PATH:/c/Program Files/GitHub CLI"` needed before `gh` / `git push`.
 
-## Architecture
-
-```
-frontend/          React 19 + TypeScript + Vite + Tailwind v4
-  src/
-    App.tsx        Main orchestrator — renders all sections in order
-    index.css      Design system, CSS animations (tickerScroll, milestoneReveal, todayPulse)
-    components/
-      layout/      EditorialLayout, KitchenTableTicker (sticky marquee), ScrollProgress
-      hero/        Hero section with fan chart
-      charts/      HeroFanChart (Plotly), VolatilityChart, DistributionChart
-      sections/    StatsBand, ForecastSection, PredictionMarketsSection, RiskSection,
-                   SupplyChainSection, WarTimelineSection, DownstreamSection,
-                   CrisisComparisonSection
-      ui/          SectionErrorBoundary (per-section error boundary), collapsible-section
-      predictions/ MarketSentimentCard (CategoryCard + FedDistribution)
-      supply-chain/ OilSourceNode, FlowConnector, BranchGrid, CommodityDetailPanel
-      timeline/    TimelineMilestone (per-card IntersectionObserver)
-    hooks/         React Query hooks: useOilPrices, useSimulation, useDownstream,
-                   useMilestones, usePolymarket
-    stores/        Zustand store (dashboardStore.ts) — single store for all UI state
-    lib/           api.ts, commodity-data.ts, constants.ts, plotly.ts
-    types/         TypeScript interfaces
-
-backend/           FastAPI + Python
-    main.py        App entry, CORS, lifespan
-    routers/       prices, simulation, correlations, milestones, polymarket, crisis
-    services/      fred_client, monte_carlo, polymarket_client, statistics, cache
-    models/        Pydantic schemas
-    data/          cache.db (SQLite), war_milestones.json, default_events.json
-```
-
-## Section Flow (top to bottom)
-
-1. **KitchenTableTicker** — Sticky marquee (outside EditorialLayout, fixed top, z-110). 9 commodities with prices.
-2. **HeroSection** — Full-viewport fan chart (WTI/Brent), date picker, Monte Carlo overlay.
-3. **ForecastSection** — Simulation controls, scenario tabs, SMA/ERA toggles.
-4. **PredictionMarketsSection** — Polymarket war-economy markets (recession, Fed, geopolitical).
-5. **StatsBand** — Thin stats bar (prices, spreads, volatility).
-6. **RiskSection** — Volatility chart + simulated price distribution (VaR/CVaR).
-7. **SupplyChainSection** — Animated oil -> downstream flow with detail panels.
-8. **WarTimelineSection** — Vertical timeline (editorial + auto-detected milestones).
-9. **CrisisComparisonSection** — "How Bad Is It?" 7 oil crises since 1973, animated bars, metric toggle, expandable trajectory charts.
-10. **DownstreamSection** — "Ripple Effect" correlation charts for 13 commodities.
-11. **Raw Data** — Collapsible DataTable.
-
-## Data Flow
-
-**FRED API** → `fred_client.py` (async httpx) → SQLite cache (24h TTL) → FastAPI endpoints → React Query → Plotly/CSS charts
-
-**Polymarket Gamma API** → `polymarket_client.py` (scans 1000 markets, categorizes by keyword) → SQLite cache (10min TTL) → `/api/polymarket/summary` → React Query → CategoryCards
-
-## 13 Downstream Commodities
-
-Defined in `lib/commodity-data.ts`, keyed by backend FRED series ID:
-- **Transportation:** gasoline, diesel, airline_fares
-- **Food & Agriculture:** fertilizer, eggs_meat, food_at_home, natural_gas, food_index
-- **Materials & Energy:** plastics, aluminum, cpi_energy, cotton, cpi_all
-
-## Key Patterns
-
-**Vite proxy:** `frontend/vite.config.ts` proxies `/api/*` to `http://localhost:8000`. Both servers must run.
-
-**State management:** Single Zustand store (`dashboardStore.ts`) — series selection, date range, simulation params, event visibility, SMA toggles, supply chain panel state.
-
-**Data hooks:** TanStack React Query hooks in `hooks/`. `useDownstream()` is shared between DownstreamSection and SupplyChainSection (React Query deduplicates).
-
-**Shared commodity data:** `lib/commodity-data.ts` has `COMMODITY_DATA`, `COMMODITY_CATEGORIES`, `IRAN_WAR_DATE`, and utility functions (`alignSeries`, `computeCorrelation`, `getValueBeforeDate`, `hasDataAfter`).
-
-**Section pattern:** All sections use `useScrollReveal()` hook, `scroll-reveal` class, `section-wide` container, `section-number` + `editorial-header` + `editorial-subhead` + `section-rule`. All wrapped in `<SectionErrorBoundary>` in App.tsx. Below-fold sections are lazy-loaded via `React.lazy()` + `<Suspense>`.
-
-**Code splitting:** HeroSection, KitchenTableTicker, and EditorialLayout are eagerly imported. All other sections (ForecastSection, PredictionMarketsSection, StatsBand, RiskSection, SupplyChainSection, WarTimelineSection, CrisisComparisonSection, DownstreamSection, DataTable, EventManager, CommodityDetailPanel, CollapsibleSection) are lazy-loaded.
-
-**Error handling:** Each section shows a visible error/empty state (never returns `null`). `SectionErrorBoundary` catches render crashes per-section. `fetchJson()` has 30s timeout via AbortController.
-
-**Ticker positioning:** Rendered BEFORE `<EditorialLayout>` in App.tsx. Body has `padding-top: 36px`. Fixed-position overlays must be at App level (CSS transforms create containing blocks).
-
-**Simulation engine:** `services/monte_carlo.py` — GBM and jump-diffusion models. Parameter estimation from historical returns with jump detection (>3σ). 7 percentile bands over 126 trading days.
-
-## Design System — "War Room Broadsheet"
-
-Dark theme, editorial newspaper aesthetic. Two-temperature color system: warm editorial + cool data.
-
-**Color Tiers** (Tailwind v4 CSS custom properties in `index.css`):
-- Background: `#04060C`, Surface: `#0A0E18`, Card: `#0C1220`
-- Editorial accent (gold): `#D4A012` — headlines, rules, section markers, borders (`--color-accent`)
-- Data accent (cyan): `#00F0FF` — charts, numerical values, interactive controls (`--color-data`)
-- War/alert red: `#CC2936` — LIVE indicator, war events, bearish scenarios
-- Stabilizing green: `#5DB075` — positive indicators, bullish scenarios
-- Borders/chrome use warm gold tint: `rgba(212, 160, 18, x%)`
-
-**Typography**:
-- Display: **Instrument Serif** (editorial headlines — serif on dark = distinctive)
-- Body: **Plus Jakarta Sans** (warm geometric sans)
-- Data: **JetBrains Mono** (technical monospace for numbers/labels)
-- Referenced via: `font-[family-name:var(--font-display)]`, `var(--font-mono)`, etc.
-
-**Editorial Elements**:
-- Section numbers: `<span className="section-number">01 / Forecast</span>` before headers
-- Pull quotes: `<div className="pull-quote">` with gold left border (Instrument Serif italic)
-- Dateline in hero: wire-service format (`APR 5, 2026 — WTI CRUDE OIL`)
-- Editorial lede: auto-generated sentence below price in hero
-- Source attributions: `<p className="source-attribution">` (italic serif)
-- Section rules: left-aligned gold gradient (asymmetric, not centered)
-- LIVE indicator: red pulse (war urgency), not green (generic status)
-
-**Textures**:
-- Grain overlay: 0.035 opacity (visible analog texture)
-- No scan-line effects (removed — was gratuitous)
-- Background: warm gold/red radial gradients (not cyan/green)
-- Crosshatch utility: `.crosshatch-bg` for military-map texture on risk sections
-
-## Performance
-
-**LCP optimized to ~2.3s** (down from 3.8s):
-- `checkSetup()` no longer blocks initial render — dashboard renders immediately
-- 12 below-fold sections lazy-loaded via `React.lazy()` + `<Suspense>` in App.tsx
-- Font preloads removed (font swap handles it; new fonts from Google Fonts with `display=swap`)
-- Changing `@theme` in `index.css` requires Vite dev server restart (Tailwind v4 caching)
+`backend/main.py` and `backend/routers/` are the old FastAPI app. Nothing deployed uses
+them; `build_snapshot.py` calls the `services/` modules directly.
 
 ## Conventions
 
-- All emoji in TypeScript: Unicode escapes (`'\u{1F6E2}\uFE0F'`), never literal — literals break JSON serialization.
 - All emoji in Python: `\U000XXXXX` format (e.g., `\U0001F4C9`).
-- Tailwind v4 arbitrary values: bracket syntax `duration-[350ms]` not `duration-350`.
-- Fixed-position overlays at App level, not inside `scroll-reveal` sections.
-- Geopolitical events in `lib/constants.ts` (20 events, 1973-2026) with category-based colors.
-- **Update memory files at every git commit** — user frequently starts new sessions.
+- **Update memory files at every git commit**: the user frequently starts new sessions.
+- **Never use an em dash** in anything written here (code, comments, copy, commits).
 - **Work from `C:\Users\stewa\dev\oil-tracking-dashboard`, not the OneDrive copy.**
   On 2026-09-23 the OneDrive checkout's `.git` had hundreds of unreadable loose objects
   (`fatal: mmap failed`) and OneDrive refused reads on dozens of working files. GitHub
   was complete, so a fresh clone outside OneDrive replaced it. `backend/.env` and
   `backend/data/cache.db` are untracked: copy them across by hand.
-- **Do NOT use git worktrees** — OneDrive sync locks `.git/worktrees/` metadata and causes persistent permission issues. Work directly on main branch.
-- **cache.db is critical** — if deleted, must re-configure FRED API key via `/api/setup/configure` or restart backend with `.env` present. Without it, all data endpoints return null.
+- **Do NOT use git worktrees.** Work directly on main.
 - **Always run dev servers from main repo**, not worktrees. Vite HMR only picks up changes in the directory it was started from.
 
-## FRED API Series IDs
+## Series IDs
 
-Source of truth: `services/fred_client.py`. Key mapping: `wti` → `DCOILWTICO`, `brent` → `DCOILBRENTEU`, `diesel` → `DSDSEL`, `gasoline` → `GASREGW`, etc. Frontend display names in `lib/commodity-data.ts` must stay in sync.
-
-## API Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/prices/summary` | GET | Current WTI, Brent, diesel prices |
-| `/api/prices/downstream` | GET | WTI + all 13 downstream series (20Y) |
-| `/api/prices/{series}` | GET | Single series with date range |
-| `/api/simulation` | POST | Monte Carlo forecast |
-| `/api/correlations` | GET | Rolling correlations |
-| `/api/milestones` | GET | Editorial + auto-detected war milestones |
-| `/api/polymarket/summary` | GET | War-economy prediction markets |
-| `/api/crisis/comparison` | GET | Historical crisis comparison (7 crises) |
+FRED series are listed where they are fetched: `backend/services/macro.py`
+(`MACRO_SERIES`), `services/series_catalog.py` and `services/chain.py`. Check a key
+against the snapshot before wiring it to a block (see "Check series keys" above).
 
 ## Frozen V4 (do not break)
 
@@ -435,6 +303,6 @@ deployable regardless of the V5 redesign. To redeploy it:
     npx wrangler pages deploy dist --project-name trumps-economy-ledger-v4 --branch v4-frozen
 
 V5 was accepted on 2026-09-11 and is now what `main` builds. It serves from two
-projects -- `trumps-economy-the-bill` and `trumps-economy-ledger` -- and the refresh
-deploys to both. V4 is untouched by that path; it only moves if you redeploy it by
-hand from `v4-frozen`, as above.
+projects, `trumps-economy-the-bill` and `trumps-economy-ledger`, and the refresh
+deploys to both. `refresh.ps1` also carries the new snapshot to `v4-frozen` and
+redeploys V4 (skip with `-SkipV4`); V4's code only changes by hand on that branch.
