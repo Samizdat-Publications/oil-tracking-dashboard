@@ -20,10 +20,18 @@ import json
 import math
 import os
 import sys
+import tempfile
 import time
 from datetime import date
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# A refresh must see today's data. The shared backend/data/cache.db keeps FRED
+# responses for 24 hours (attribution results longer), so the second refresh on
+# 23 Sep reused the morning's crude series and reported "nothing moved" after
+# FRED had posted four new closes. Each build gets a throwaway cache, as CI
+# already does; set CACHE_DB_PATH to reuse one on purpose.
+os.environ.setdefault("CACHE_DB_PATH", os.path.join(tempfile.mkdtemp(prefix="snapshot-"), "cache.db"))
 
 import numpy as np  # noqa: E402
 
