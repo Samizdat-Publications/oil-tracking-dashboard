@@ -117,7 +117,12 @@ try {
 
   await writeFile(OUT, png);
   await writeFile(DIST_OUT, png);   // dist is already built; keep the two in step
-  console.log(`og: wrote ${W}x${H} from block 09 (card ${Math.round(box.width)}x${Math.round(box.height)})`);
+  const kb = Math.round(png.length / 1024);
+  console.log(`og: wrote ${W}x${H}, ${kb} KB, from block 09 (card ${Math.round(box.width)}x${Math.round(box.height)})`);
+  // The flat navy card compresses to about 100 KB. It shipped at 512 KB while
+  // index.css still loaded on V5: its fixed grain overlay put noise in every
+  // pixel. A jump like that means something is painting over the card again.
+  if (kb > 300) console.warn(`og: ${kb} KB is far over the ~100 KB the card should be; look for an overlay on V5.`);
 } finally {
   await browser.close();
   server.close();

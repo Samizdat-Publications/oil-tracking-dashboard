@@ -20,4 +20,23 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // The ported JS modules. Plain JS gets no type check, so this is the only
+    // thing that catches an undefined name or a dead import in them.
+    files: ['src/**/*.{js,jsx}'],
+    // TheBill.jsx is generated from Design's template by
+    // scripts/template-to-jsx.py; it is brought under lint separately.
+    ignores: ['src/v5/TheBill.jsx'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: globals.browser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+  },
 ])

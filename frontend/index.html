@@ -4,33 +4,75 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The Bill — what Trump's war and tariffs cost you</title>
+    <title>The Bill: what Trump's war and tariffs cost you</title>
     <meta name="description" content="The Iran war and the re-imposed tariffs, priced in government data: ships through Hormuz, crude oil, fourteen household prices, hiring, and what the Pentagon spent. Every figure sourced, every block shows its work." />
 
+    <!-- The same build is served at trumps-economy-ledger.pages.dev too; this
+         origin is the one shares and search results should consolidate on. -->
+    <link rel="canonical" href="https://trumps-economy-the-bill.pages.dev/" />
+
     <!-- Open Graph. Facebook does not execute JS, so these tags and og:image are
-         the entire preview. og:url and og:image must be absolute and must be
-         updated to the production origin before sharing; localhost previews
-         will render as a bare link. -->
+         the entire preview. og:url and og:image must be absolute. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The Bill" />
-    <meta property="og:title" content="The Bill — what Trump's war and tariffs cost you" />
-    <meta property="og:description" content="Ordered by Trump. Paid by you. Crude $57 to $115. Diesel {{og.diesel}} a gallon{{og.diesel_record}}. Hormuz down from 83 ships a day to {{og.hormuz_now}}. Job creation 321,000 a month to {{og.jobs_now}}. 18 dead, 42 aircraft, $37.5bn spent, and 159 tonnes of foreign gold out of the New York Fed." />
-    <meta property="og:url" content="https://trumps-economy-ledger.pages.dev/" />
-    <meta property="og:image" content="https://trumps-economy-ledger.pages.dev/og.png" />
+    <meta property="og:title" content="The Bill: what Trump's war and tariffs cost you" />
+    <meta property="og:description" content="Ordered by Trump. Paid by you. Crude {{og.crude_start}} to {{og.crude_peak}}. Diesel {{og.diesel}} a gallon{{og.diesel_record}}. Hormuz down from {{og.hormuz_base}} ships a day to {{og.hormuz_now}}. Job creation {{og.jobs_prev}} a month to {{og.jobs_now}}. {{og.us_killed}} dead, {{og.aircraft}} aircraft, {{og.dod_bn}} spent, and {{og.gold_out}} tonnes of foreign gold out of the New York Fed." />
+    <meta property="og:url" content="https://trumps-economy-the-bill.pages.dev/" />
+    <meta property="og:image" content="https://trumps-economy-the-bill.pages.dev/og.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="The Bill: eight figures on a navy card — household cost, crude oil, ships through Hormuz, diesel, jobs a month, 18 dead, gold out of New York, and the two dates it traces to." />
+    <meta property="og:image:alt" content="The Bill: eight figures on a navy card: household cost, crude oil, ships through Hormuz, diesel, jobs a month, {{og.us_killed}} dead, gold out of New York, and the two dates it traces to." />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Legacy views (?view=broadsheet, ?view=dashboard) still use these. The V5
-         page at / and the V4 page at ?view=ledger both self-host their fonts via
-         @fontsource and do not depend on this link. -->
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "The Bill: what Trump's war and tariffs cost you",
+      "description": "The Iran war and the re-imposed tariffs, priced in government data: ships through Hormuz, crude oil, fourteen household prices, hiring, and what the Pentagon spent. Every figure sourced, every block shows its work.",
+      "url": "https://trumps-economy-the-bill.pages.dev/",
+      "mainEntityOfPage": "https://trumps-economy-the-bill.pages.dev/",
+      "image": "https://trumps-economy-the-bill.pages.dev/og.png",
+      "dateModified": "{{og.date_modified}}",
+      "inLanguage": "en-US",
+      "author": { "@type": "Organization", "name": "Samizdat Publications" },
+      "publisher": { "@type": "Organization", "name": "Samizdat Publications" }
+    }
+    </script>
+
+    <!-- The summary in #root is for crawlers and screen readers until React
+         replaces it on mount; without JS it is the page, so it is shown. -->
+    <style>
+      .seo-summary { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    </style>
+    <noscript>
+      <style>
+        .seo-summary { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal;
+          max-width: 40rem; margin: 0 auto; padding: 48px 20px; font: 18px/1.5 Georgia, serif; color: #F7F5F0; }
+        html, body { margin: 0; background: #0B1E3F; }
+        .seo-summary a { color: #F7F5F0; }
+      </style>
+    </noscript>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="seo-summary">
+        <h1>The Bill</h1>
+        <p>The Iran war and the re-imposed tariffs, priced in government data: ships through Hormuz, crude oil, fourteen household prices, hiring, and what the Pentagon spent. Every figure is sourced, and every block of the page shows its work.</p>
+        <ul>
+          <li>Household cost: {{og.receipt_month}} a month, {{og.receipt_total}} since 20 January 2025.</li>
+          <li>Crude oil: {{og.crude_start}} a barrel in January 2026, {{og.crude_peak}} at the peak.</li>
+          <li>Strait of Hormuz: {{og.hormuz_base}} ships a day before the war, {{og.hormuz_now}} now (IMF PortWatch, seven-day mean).</li>
+          <li>Diesel: {{og.diesel}} a gallon{{og.diesel_record}} (EIA weekly national average).</li>
+          <li>Jobs: {{og.jobs_prev}} a month in the previous term, {{og.jobs_now}} a month since.</li>
+          <li>The war: {{og.us_killed}} Americans dead, {{og.aircraft}} aircraft lost or damaged, {{og.dod_bn}} spent.</li>
+          <li>Gold: {{og.gold_out}} tonnes of foreign gold taken out of the New York Fed in ten months.</li>
+        </ul>
+        <p>Updated {{og.date_modified}}. Published by Samizdat Publications.</p>
+        <noscript><p>The charts, the globe and the strait simulation need JavaScript. The figures above are current as of the last refresh.</p></noscript>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,2 +1,14 @@
-# Single-page app: every path renders index.html, which reads ?view= itself.
-/*  /index.html  200
+# No rules. Routing is Cloudflare Pages' own, and _redirects cannot do it:
+#
+# - SPA fallback: with no top-level 404.html, Pages serves index.html (200) for
+#   any path that is not a file. index.html reads ?view= itself. A `/* /index.html
+#   200` rule here is rejected as an infinite loop, so the fallback never came
+#   from this file.
+# - Real 404s under /v5/, /api/ and /assets/: Pages serves the NEAREST 404.html
+#   with a 404 status, so public/{v5,api,assets}/404.html turn misses there into
+#   404s instead of index.html with a 200, which fetch().json() and the module
+#   loader would choke on with a misleading error. `/v5/* /404.html 404` rules
+#   are not supported on Pages (rewrites with other status codes are rejected).
+#
+# Never add a top-level public/404.html: Pages would then 404 every unknown path
+# and drop the SPA fallback. Checked with `wrangler pages dev` on 2026-09-23.

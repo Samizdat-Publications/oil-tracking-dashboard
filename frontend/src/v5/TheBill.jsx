@@ -28,6 +28,11 @@ import React from 'react';
 import { geoArea, geoDistance, geoGraticule, geoInterpolate, geoOrthographic, geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
 
+// The Gulf region the camera pushes into, [west, south, east, north]. Also BOX in
+// scripts/clip-land.mjs, which trims land-50m.json to it: widen both, restore the
+// full world-atlas land-50m.json, and re-run that script.
+const REGION = [22, -12, 92, 48];
+
 import '@fontsource/barlow-condensed/600.css';
 import '@fontsource/barlow-condensed/700.css';
 // Source Serif 4 is declared in the-bill.css, not imported here: the prototype
@@ -1016,12 +1021,6 @@ export default class TheBill extends React.Component {
   }
 
   async componentDidMount() {
-    // The app shell's index.css sets body{padding-top:48px} for the V1 ticker,
-    // plus letter-spacing and font-smoothing. Those shorten every 100vh block
-    // and shift the type metrics the prototype was measured against, which is
-    // enough to change the share card's computed width. Tag the body so
-    // the-bill.css can undo them for this route only.
-    document.body.classList.add('v5-bill');
     // Each file loads on its own. With Promise.all, one missing file left every
     // canvas blank and no message: the rejection escaped the error boundary
     // because this method is async, and the loop never started. Now each block
@@ -1044,7 +1043,7 @@ export default class TheBill extends React.Component {
     if (data && land110 && land50 && coast) safe('globe and strait', () => {
       // 110m for the whole globe (cheap to clip each frame); 50m only for the region the camera pushes into
       this.land = topojson.feature(land110, land110.objects.land);
-      this.landRegion = this.clipLand(topojson.feature(land50, land50.objects.land), [22, -12, 92, 48]);
+      this.landRegion = this.clipLand(topojson.feature(land50, land50.objects.land), REGION);
       // the repo's coast.json (unprojected to lon/lat) supplies the real gate and Traffic Separation Scheme lane
       this.landRegion = this.orient(this.landRegion);
       this.gate = coast.gate; this.tss = coast.lane;
@@ -1076,7 +1075,7 @@ export default class TheBill extends React.Component {
   }
   componentWillUnmount() {
     if (this.motionQuery) this.motionQuery.removeEventListener('change', this.onMotion);
-    document.body.classList.remove('v5-bill'); cancelAnimationFrame(this.raf); }
+    cancelAnimationFrame(this.raf); }
 
   /* ---------- data → time ---------- */
   setupSim() {
@@ -1322,7 +1321,7 @@ export default class TheBill extends React.Component {
         // 50m detail for the region the camera is entering, over the 110m globe
         b.globalAlpha = Math.min(1, (ez - 0.05) / 0.2);
         safe(() => { b.fillStyle = lgr; b.beginPath(); bpath(this.landRegion); b.fill(); });
-        b.lineWidth = 0.7 + ez * 0.6; strokeCoast(this.landRegion, [22, -12, 92, 48]);
+        b.lineWidth = 0.7 + ez * 0.6; strokeCoast(this.landRegion, REGION);
         b.globalAlpha = 1;
       }
 

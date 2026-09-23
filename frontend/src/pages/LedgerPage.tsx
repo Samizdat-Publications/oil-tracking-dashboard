@@ -33,6 +33,10 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+// The legacy global reset and Tailwind preflight this page was built on. It
+// used to load from main.tsx for every view; imported here, first, it keeps
+// the same cascade position for V4 and no longer render-blocks V5.
+import '../index.css';
 import HormuzSimulation from '../v4/HormuzSimulation';
 // @ts-expect-error — ported JS module, no types by design
 import { Reveal, ImperativeText, prepareStroke, drawStroke } from '../v4/reveal.js';

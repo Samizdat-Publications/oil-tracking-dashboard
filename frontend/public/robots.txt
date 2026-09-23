@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://trumps-economy-the-bill.pages.dev/sitemap.xml
