@@ -276,7 +276,7 @@ select option{background:#061530;color:#F7F5F0}
           </sc-for>
         </div>
         <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">The total.</strong> {{ receiptMethod }} Fuel: {{ receiptFuel }}. Groceries: {{ receiptGroceries }}. Electricity: {{ receiptElectricity }}. The grocery line uses the median move across ten tracked staples, which ignores the largest increases on purpose. Household consumption varies enormously; these are national averages.</p>
-        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">Your state.</strong> The running total under the monthly figure multiplies that month by the 17.3 months elapsed, as the published receipt does; prices moved through that window, notably falling back during the June ceasefire, so it is an approximation. Picking a state swaps the fuel and electricity rows and re-totals: gasoline from EIA's weekly state or PADD-region series ({{ gasThrough }} against 20 January 2025), electricity from EIA's monthly state residential price ({{ elecThrough }} against January 2025). The grocery line stays national. The US row uses the published receipt, which is built on the BLS national series, so the two fuel figures differ by a few cents.</p>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">Your state.</strong> The running total under the monthly figure multiplies that month by the {{ receiptMonths }} months elapsed, as the published receipt does; prices moved through that window, notably falling back during the June ceasefire, so it is an approximation. Picking a state swaps the fuel and electricity rows and re-totals: gasoline from EIA's weekly state or PADD-region series ({{ gasThrough }} against 20 January 2025), electricity from EIA's monthly state residential price ({{ elecThrough }} against January 2025). The grocery line stays national. The US row uses the published receipt, which is built on the BLS national series, so the two fuel figures differ by a few cents.</p>
         <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">{{ dieselHead }}</strong> {{ dieselNote }} <strong style="font-weight:600">Eggs.</strong> The fall is real and it is not policy: the 2022–25 spike was avian influenza, and prices came back down as the outbreak ended.</p>
         <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: BLS Average Price Data via FRED (series listed above) · EIA Weekly Retail Gasoline and Diesel Prices · EIA Electric Power Monthly · USDA Food Plans · EPA fleet fuel economy · EIA Residential Energy Consumption Survey.
         </p>
@@ -327,7 +327,7 @@ select option{background:#061530;color:#F7F5F0}
         <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">HE SAID FOUR TO FIVE WEEKS<br>PENTAGON · CRS · NBC NEWS · CSIS</div>
       </div>
       <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#F7F5F0;flex:none"></span>SEVEN MONTHS IN. HE SAID FIVE WEEKS.</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#F7F5F0;flex:none"></span>{{ warMonthsCaps }} IN. HE SAID FIVE WEEKS.</div>
         <p class="g-sentence" style="margin:0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:760px;text-wrap:pretty;color:#F7F5F0">He said four to five weeks. {{ warMonths }} on, the Navy resupplies from 2,200 miles away, and by one estimate a third of the missile interceptors are left. His Secretary of Defense disputes that number. His own budget request asks for $21 billion to replace them.</p>
       </div>
     </div>
@@ -415,7 +415,7 @@ select option{background:#061530;color:#F7F5F0}
         <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · THE VAULT
       </summary>
       <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
-        <p style="margin:0;text-wrap:pretty">The Federal Reserve publishes gold held under earmark for foreign and international accounts, valued at the statutory $42.22 an ounce, unchanged since 1973. Because the price is fixed, a change in that row is a change in ounces, not in value: tonnes = millions of dollars ÷ 42.22 × 31.1035. That gives {{ vaultStart }} tonnes in August 2025 and {{ vaultEnd }} tonnes in June 2026, the latest provisional release: {{ vaultOut }} tonnes out, no month with an inflow.</p>
+        <p style="margin:0;text-wrap:pretty">The Federal Reserve publishes gold held under earmark for foreign and international accounts, valued at the statutory $42.22 an ounce, unchanged since 1973. Because the price is fixed, a change in that row is a change in ounces, not in value: tonnes = millions of dollars ÷ 42.22 × 31.1035. That gives {{ vaultStart }} tonnes in {{ vaultFrom }} and {{ vaultEnd }} tonnes in {{ vaultTo }}, the latest provisional release: {{ vaultOut }} tonnes out, no month with an inflow.</p>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.02em">
           <sc-for list="{{ vaultRows }}" as="r" hint-placeholder-count="11">
             <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(11,30,63,.15);padding:4px 0"><span style="color:rgba(11,30,63,.6)">{{ r.m }}</span><span style="color:#8a6a0c;font-weight:500">{{ r.t }}</span></div>
@@ -423,7 +423,7 @@ select option{background:#061530;color:#F7F5F0}
         </div>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Who, and why.</strong> De Nederlandsche Bank moved 86 tonnes out of New York and Ottawa to London between March and August 2026, "in view of increasing geopolitical unrest," cutting New York's share of Dutch reserves from 31.3% to 18.5% (announced 2 September). The Banque de France moved 129 tonnes' worth from New York to Paris between July 2025 and January 2026 by selling older bars in New York and buying in Paris; no bar was shipped. The Reserve Bank of India brought its share held abroad from 55% to 22%, though from London and Basel rather than New York. Germany, with 1,236 tonnes in New York, is under pressure to repatriate and has no formal plan.</p>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The Fed's counter-argument, at full size.</strong> Colin Weiss (Federal Reserve Board, FEDS Notes, 3 September 2026): gold's apparent overtaking of Treasuries as a reserve asset is a valuation effect from private ETF demand, not central-bank buying; five legacy holders own 52% of official gold and have not added since the 1970s; foreign officials bought about $200bn of Treasuries net from 2022 to April 2026. Gold itself is down about a fifth from its January record ($5,589 to $4,471 an ounce), and the dollar index is up since the war began. {{ treasSentence }} total foreign Treasury holdings (TIC) were $9.3tn in June, the largest on record bar February.</p>
-        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: Federal Reserve International Summary Statistics, Table 3.13 (July 2026 release, provisional) · DNB press release 2 Sep 2026 · Bloomberg / Yahoo Finance 17 Jun 2026 · RBI half-yearly report · FEDS Notes 3 Sep 2026 · US Treasury TIC · Trading Economics for the gold price.
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: Federal Reserve International Summary Statistics, Table 3.13 (latest release, provisional) · DNB press release 2 Sep 2026 · Bloomberg / Yahoo Finance 17 Jun 2026 · RBI half-yearly report · FEDS Notes 3 Sep 2026 · US Treasury TIC · Trading Economics for the gold price.
         </p>
       </div>
     </details>
@@ -538,6 +538,7 @@ class Component extends DCLogic {
       placeName: sel ? sel.name : 'the United States',
       cumulativeText: rc && sel ? '$' + Math.round(sel.total * rc.months_elapsed).toLocaleString() + ' over ' + rc.months_elapsed.toFixed(1) + ' months' : '',
       workPrices: (this.board || []).map(r => ({ name: r.name, unit: r.unit, start: r.startText, end: r.endText, change: r.changeText, series: r.series })),
+      receiptMonths: rc ? rc.months_elapsed.toFixed(1) : '',
       receiptMethod: rc ? `Published receipt: $${rc.monthly_usd.toFixed(2)} a month, $${Math.round(rc.cumulative_usd).toLocaleString()} over the ${rc.months_elapsed.toFixed(1)} months since 20 January 2025.` : '',
       receiptFuel: rc ? rc.lines[0].arithmetic : '', receiptGroceries: rc ? rc.lines[1].arithmetic : '', receiptElectricity: rc ? rc.lines[2].arithmetic : '',
     };
@@ -794,7 +795,7 @@ class Component extends DCLogic {
   // figures; "Diesel has not cost this much since 2022" outlived diesel's record
   // and "it is $91 now" outlived the price.
   headVals() {
-    const C = this.crude, P = this.prices, B = this.bill, D = this.data, keys = 'crudeNow dieselVerdict pricesDown warMonths aircraftWord lossBn suppBn'.split(' ');
+    const C = this.crude, P = this.prices, B = this.bill, D = this.data, keys = 'crudeNow dieselVerdict pricesDown warMonths warMonthsCaps vaultFrom vaultTo aircraftWord lossBn suppBn'.split(' ');
     if (!C || !P || !B || !D) return Object.fromEntries(keys.map(k => [k, '']));
     const cap = s => s[0].toUpperCase() + s.slice(1), R = P.diesel.record, W = B.war_cost;
     let dieselVerdict = '';
@@ -808,6 +809,8 @@ class Component extends DCLogic {
       dieselVerdict,
       pricesDown: down ? cap(this.words(down)) + ' went down; we show ' + (down === 1 ? 'that' : 'those') + ' too.' : 'None went down.',
       warMonths: cap(this.words(months)) + ' month' + (months === 1 ? '' : 's'),
+      warMonthsCaps: (this.words(months) + ' month' + (months === 1 ? '' : 's')).toUpperCase(),
+      vaultFrom: this.monthLong(B.gold.earmarked[0][0]), vaultTo: this.monthLong(B.gold.earmarked.at(-1)[0]),
       aircraftWord: cap(this.words(W.aircraft.total_lost_or_damaged)),
       lossBn: '$' + W.aircraft.dod_loss_estimate_usd_bn + ' billion',
       suppBn: '$' + W.supplemental_request.usd_bn + ' billion',
