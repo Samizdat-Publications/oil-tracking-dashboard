@@ -16,6 +16,12 @@ VOID = {'br','img','input','link','meta','hr','source','area','base','col','embe
 ATTR = {'class':'className','for':'htmlFor','tabindex':'tabIndex','colspan':'colSpan',
         'rowspan':'rowSpan','maxlength':'maxLength','autocomplete':'autoComplete',
         'srcset':'srcSet','contenteditable':'contentEditable','spellcheck':'spellCheck'}
+# HTMLParser lowercases attribute names, so the prototype's onChange arrives as
+# `onchange`. React silently ignores lowercase on* props: the state picker
+# shipped dead that way. Event handlers are camel-cased here instead.
+EVENTS = {'onchange':'onChange','oninput':'onInput','onclick':'onClick','onkeydown':'onKeyDown',
+          'onkeyup':'onKeyUp','onsubmit':'onSubmit','onfocus':'onFocus','onblur':'onBlur',
+          'onmouseenter':'onMouseEnter','onmouseleave':'onMouseLeave','onpointerdown':'onPointerDown'}
 HOLE = re.compile(r'^\s*\{\{(.+?)\}\}\s*$', re.S)
 
 # The prototype's canvases carry no accessible name -- nine of the eleven blocks
@@ -156,7 +162,9 @@ class ToJSX(HTMLParser):
         parts = []
         for k, v in attrs:
             if k.startswith('hint-'): continue          # prototype authoring hints
-            name = ATTR.get(k, k)
+            name = ATTR.get(k) or EVENTS.get(k, k)
+            if name.startswith('on') and name == name.lower():
+                sys.exit('unmapped event attribute %r: add it to EVENTS' % name)
             if v is None:
                 parts.append(name); continue
             m = HOLE.match(v)

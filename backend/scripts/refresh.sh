@@ -34,6 +34,11 @@ step "Validating"
 step "Cutting the V5 data files"
 (cd backend && py scripts/build_v5_data.py)
 
+# The site only ever shows the latest numbers. This is the only place the
+# history is kept, so it goes in before anything is published.
+step "Recording the figures"
+(cd backend && py scripts/record_refresh.py)
+
 step "Tests"
 (cd backend && py -m pytest tests -q)
 (cd frontend && npm test --if-present)
@@ -59,7 +64,7 @@ done
 
 step "Committing the refreshed data"
 git add frontend/public/data-snapshot.json frontend/public/v5 \
-        frontend/public/og.png frontend/public/og.html
+        frontend/public/og.png frontend/public/og.html docs/refresh-history.csv
 if git diff --cached --quiet; then
   echo "data unchanged, nothing to commit"
 else

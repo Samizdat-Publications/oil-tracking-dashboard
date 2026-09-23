@@ -67,6 +67,25 @@ own constraints at 390x844 -- the SCROLL cue printing over the closing sentence 
 eight blocks, and labels under the 11px floor -- rather than re-designing a block. Re-audit
 after any layout change; both were found by measuring, not by looking.
 
+**Copy that states a verdict about a moving number is computed, never typed**
+(2026-09-23). Design's prototype typed "Diesel at $5.60 is the highest since 2022,
+not a record"; EIA's weekly diesel passed its 2022 peak ($5.81) on 7 Sep 2026 and
+the page kept saying "not a record" for two refreshes. Now:
+`series_record()` in `services/macro.py` runs on the whole GASDESW history (from
+1994) in `build_snapshot.py` and lands as `diesel.record` in `prices-data.json`;
+`dieselVals()` / `hormuzNow()` in `TheBill.jsx` (mirrored in the handoff
+`The Bill.dc.html`, whose template now has `{{ dieselHead }}`, `{{ dieselNote }}`,
+`{{ dieselHeadPolicy }}`, `{{ hormuzNow }}` holes) build the sentences, the card
+date reads `globe-data.as_of`, and the strait/globe timeline ends at the last
+PortWatch day instead of a typed 30 Aug. The share text in `index.html` uses
+`{{og.*}}` holes filled by the `ogFigures` plugin in `vite.config.ts`. Before adding
+any sentence with a number in it, ask whether the next refresh can make it false.
+
+**The converter camel-cases event attributes.** HTMLParser lowercases `onChange` to
+`onchange`, which React ignores silently: the state picker shipped dead until
+2026-09-23. `EVENTS` in `template-to-jsx.py` maps them and the script exits on an
+unmapped lowercase `on*`. ESLint does not cover `.jsx`, so nothing else catches this.
+
 **Where it is deployed.** Two Pages projects serve the same V5 build, and a third
 holds V4. None are git-connected; `backend/scripts/refresh.sh` and the workflow
 deploy to both V5 projects and never touch V4.
@@ -338,6 +357,11 @@ Dark theme, editorial newspaper aesthetic. Two-temperature color system: warm ed
 - Fixed-position overlays at App level, not inside `scroll-reveal` sections.
 - Geopolitical events in `lib/constants.ts` (20 events, 1973-2026) with category-based colors.
 - **Update memory files at every git commit** — user frequently starts new sessions.
+- **Work from `C:\Users\stewa\dev\oil-tracking-dashboard`, not the OneDrive copy.**
+  On 2026-09-23 the OneDrive checkout's `.git` had hundreds of unreadable loose objects
+  (`fatal: mmap failed`) and OneDrive refused reads on dozens of working files. GitHub
+  was complete, so a fresh clone outside OneDrive replaced it. `backend/.env` and
+  `backend/data/cache.db` are untracked: copy them across by hand.
 - **Do NOT use git worktrees** — OneDrive sync locks `.git/worktrees/` metadata and causes persistent permission issues. Work directly on main branch.
 - **cache.db is critical** — if deleted, must re-configure FRED API key via `/api/setup/configure` or restart backend with `.env` present. Without it, all data endpoints return null.
 - **Always run dev servers from main repo**, not worktrees. Vite HMR only picks up changes in the directory it was started from.

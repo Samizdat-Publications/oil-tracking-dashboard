@@ -110,6 +110,33 @@ def yoy_by_calendar_month(points: list[dict]) -> list[dict]:
     return out
 
 
+def series_record(points: list[dict], window_start: str) -> dict | None:
+    """Whether the latest print is a record for the WHOLE series.
+
+    The page draws diesel from 2025 on, so the drawn points cannot say whether
+    today's price is a record. The copy said "not a record" for two refreshes
+    after it became one, because that verdict was typed rather than computed.
+    `points` must be the full history. `last_higher` is the most recent earlier
+    print at or above the latest -- what "highest since" means -- and is None
+    when the latest is the series high.
+    """
+    pts = [p for p in points if p.get("value") is not None]
+    before = [p for p in pts if p["date"] < window_start]
+    if not pts or not before:
+        return None
+    prior = max(before, key=lambda p: p["value"])
+    latest = pts[-1]
+    first_break = next((p for p in pts if p["date"] >= window_start and p["value"] > prior["value"]), None)
+    higher = [p for p in pts[:-1] if p["value"] >= latest["value"]]
+    return {
+        "series_start": pts[0]["date"],
+        "prior_peak": {"date": prior["date"], "value": prior["value"]},
+        "first_record": first_break and {"date": first_break["date"], "value": first_break["value"]},
+        "is_record": not higher,
+        "last_higher": higher[-1] if higher else None,
+    }
+
+
 async def macro_snapshot() -> dict:
     """Latest, handover and pre-war values for every series in MACRO_SERIES."""
 

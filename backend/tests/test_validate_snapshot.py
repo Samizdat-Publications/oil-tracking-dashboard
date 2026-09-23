@@ -31,10 +31,15 @@ def _good() -> dict:
                   "yoy": yoy},
         "crude_daily": {"observations": [mk("2026-09-01", 91.48)]},
         "receipt": {"monthly_usd": 83.18, "lines": [{}, {}, {}]},
-        "eia": {"series": {"spr": {"latest": mk("2026-08-28", 286604)}}},
-        "fiscal": {"debt": {"latest": mk("2026-09-03", 4.01e13)}},
-        "chain": {"chains": []},
-        "receipt_inputs": {"national": {}},
+        "eia": {"series": {"spr": {"latest": mk("2026-08-28", 286604)}},
+                "gasoline_by_area": {"NUS": {}}, "diesel_by_area": {"NUS": {}},
+                "electricity_by_state": {"OH": {}}},
+        "fiscal": {"debt": {"latest": mk("2026-09-03", 4.01e13)},
+                   "customs": {"latest": mk("2026-07-01", 2.1e10)},
+                   "interest": {"latest": mk("2026-07-31", 1.2e12)}},
+        "chain": {"chains": [{"key": "diesel_to_food", "nodes": [{"key": "wti"}]}], "errors": {}},
+        "receipt_inputs": {"national": {"gasoline": {}}, "staple_moves": {"items": [{}]},
+                           "regions": {"NUS": {}}},
         "hormuz_transits": None, "chokepoints": None, "nowcast": None, "polymarket": None,
     }
 
@@ -76,6 +81,40 @@ def test_og_inputs_are_checked():
     snap = _good()
     snap["staples"]["items"] = [{"key": "beef_ground"}]
     assert any("coffee" in x for x in validate(snap, today=TODAY))
+
+
+def test_fully_failed_chain_fails_despite_normal_shape():
+    # chain_snapshot() never sets a top-level "error"; a total FRED outage
+    # returns chains with no nodes and the reasons under "errors".
+    snap = _good()
+    snap["chain"] = {"chains": [{"key": "diesel_to_food", "nodes": [], "edges": []}],
+                     "errors": {"wti": "timeout"}}
+    assert any(x.startswith("chain:") for x in validate(snap, today=TODAY))
+
+
+def test_one_failed_eia_part_fails():
+    # A single failed leg of the EIA gather leaves the block without a
+    # top-level error; the receipt picker would then read {"error": ...}.
+    snap = _good()
+    snap["eia"]["gasoline_by_area"] = {"error": "HTTP 503"}
+    snap["receipt_inputs"]["regions"] = {}
+    v = validate(snap, today=TODAY)
+    assert "eia.gasoline_by_area missing or errored" in v
+    assert "receipt_inputs.regions missing or errored" in v
+
+
+def test_empty_receipt_inputs_fail():
+    snap = _good()
+    snap["receipt_inputs"] = {"national": {}, "staple_moves": {"items": []}, "regions": {}}
+    v = validate(snap, today=TODAY)
+    assert "receipt_inputs.national is empty" in v
+    assert "receipt_inputs.staple_moves has no items" in v
+
+
+def test_stale_customs_fails():
+    snap = _good()
+    snap["fiscal"]["customs"]["latest"]["date"] = "2026-05-01"
+    assert any(x.startswith("stale: fiscal.customs") for x in validate(snap, today=TODAY))
 
 
 def test_real_snapshot_if_present():

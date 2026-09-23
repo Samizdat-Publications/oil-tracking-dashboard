@@ -134,6 +134,7 @@ def prices_data(sn, old=None):
         "diesel": {
             "latest": dw["latest"], "handover": dw["handover"], "prewar": dw["prewar"],
             "max": max(p[1] for p in pts), "points": pts, "fred_id": dw["fred_id"],
+            "record": dw.get("record"),
         },
         "receipt": {
             "monthly_usd": rc["monthly_usd"], "cumulative_usd": rc["cumulative_usd"],

@@ -41,6 +41,10 @@ FRESHNESS: list[tuple[str, int]] = [
     ("macro.series.cpi_headline_nsa.latest.date", 80),
     ("eia.series.spr.latest.date", 14),
     ("fiscal.debt.latest.date", 7),
+    # Monthly Treasury Statement: month M is dated the 1st (customs) or the last
+    # day (interest) of M and published about the eighth business day of M+1.
+    ("fiscal.customs.latest.date", 75),
+    ("fiscal.interest.latest.date", 50),
 ]
 
 MACRO_YOY_KEYS = ["cpi_energy", "cpi_gasoline", "cpi_airfares", "cpi_food_home",
@@ -85,6 +89,27 @@ def validate(snap: dict, *, today: date | None = None) -> list[str]:
             v.append(f"missing critical block: {key}")
         elif isinstance(block, dict) and block.get("error") and len(block) <= 3:
             v.append(f"critical block errored: {key}: {block.get('error')}")
+
+    # Blocks that report partial failure inside themselves rather than with a
+    # top-level `error`. Fully failed, each still has its normal shape and
+    # passes the check above.
+    if version >= 2:
+        chain = snap.get("chain") or {}
+        if not any(c.get("nodes") for c in chain.get("chains") or []):
+            v.append(f"chain: no chain has any series: {chain.get('errors')}")
+        eia = snap.get("eia") or {}
+        for sub in ("gasoline_by_area", "diesel_by_area", "electricity_by_state"):
+            part = eia.get(sub)
+            if not isinstance(part, dict) or not part or part.get("error"):
+                v.append(f"eia.{sub} missing or errored")
+        ri = snap.get("receipt_inputs") or {}
+        if not ri.get("national"):
+            v.append("receipt_inputs.national is empty")
+        if not (ri.get("staple_moves") or {}).get("items"):
+            v.append("receipt_inputs.staple_moves has no items")
+        regions = ri.get("regions")
+        if not isinstance(regions, dict) or not regions or "error" in regions:
+            v.append("receipt_inputs.regions missing or errored")
 
     for key in SOFT:
         if snap.get(key) is None:

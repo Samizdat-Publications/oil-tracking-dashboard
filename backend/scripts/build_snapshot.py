@@ -33,7 +33,7 @@ from services.chain import chain_snapshot  # noqa: E402
 from services.eia import eia_snapshot  # noqa: E402
 from services.fiscal import fiscal_snapshot  # noqa: E402
 from services.fred_client import get_series  # noqa: E402
-from services.macro import macro_snapshot  # noqa: E402
+from services.macro import macro_snapshot, series_record  # noqa: E402
 from services.nowcast import cleveland_nowcast  # noqa: E402
 from services.odds import odds_snapshot  # noqa: E402
 from services.portwatch import chokepoints_snapshot, get_hormuz_transits  # noqa: E402
@@ -106,9 +106,13 @@ async def build() -> dict:
     # The receipt picker needs regional prices; merge them in from EIA so the
     # frontend has one block to read.
     eia = snap.get("eia") or {}
+    # Each EIA part can fail on its own (the block then carries {"error": ...}
+    # for that part only), so check the part, not just the block.
+    ok = lambda part: isinstance(part, dict) and not part.get("error")  # noqa: E731
     if isinstance(snap.get("receipt_inputs"), dict) and not eia.get("error"):
-        snap["receipt_inputs"]["regions"] = eia.get("gasoline_by_area", {})
-        snap["receipt_inputs"]["electricity_by_state"] = eia.get("electricity_by_state", {})
+        snap["receipt_inputs"]["regions"] = eia["gasoline_by_area"] if ok(eia.get("gasoline_by_area")) else {}
+        snap["receipt_inputs"]["electricity_by_state"] = (
+            eia["electricity_by_state"] if ok(eia.get("electricity_by_state")) else {})
         snap["receipt_inputs"]["state_to_padd"] = eia.get("state_to_padd", {})
 
     # Soft blocks: useful, not load-bearing. A failure here is logged, the block
@@ -148,6 +152,17 @@ async def build() -> dict:
                  "$114.01 on 6 Apr, which is the previous day's close."),
         "observations": obs,
     }
+
+    # Whether diesel is a record is a fact about the whole series (from 1994),
+    # not the window the page draws. Absent rather than guessed if the fetch
+    # fails: the page then states the price and makes no record claim.
+    print("  diesel_record ...", flush=True)
+    dw = ((snap.get("macro") or {}).get("series") or {}).get("diesel_weekly")
+    if isinstance(dw, dict) and not dw.get("error"):
+        try:
+            dw["record"] = series_record(await get_series("GASDESW", "1994-01-01"), "2025-01-01")
+        except Exception as exc:
+            print(f"    diesel history unavailable: {exc}", flush=True)
 
     # IMF PortWatch: measured daily transits. This is what turns the vessel layer
     # from illustrative into a real series. Failure here is loud, not silent --

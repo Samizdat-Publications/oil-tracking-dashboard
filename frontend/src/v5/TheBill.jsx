@@ -107,7 +107,9 @@ export default class TheBill extends React.Component {
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
-      cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS · 6 SEP 2026',
+      cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
+      hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
+      ...this.dieselVals(),
       crudeCount: this.crude ? this.crude.observations.length : '', crudeLast: this.crude ? this.fmtISO(this.crude.observations.at(-1)[0]).replace(' 2026', '') : '',
       rows, totalCells, digits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
       odo: [{ digit: true, ref: this.odoRefs[0] }, { dot: true }, { digit: true, ref: this.odoRefs[1] }, { digit: true, ref: this.odoRefs[2] }],
@@ -250,7 +252,7 @@ export default class TheBill extends React.Component {
     const cv = this.straitRef.current, CB = this.coastBox; if (!cv || !CB || !this.routes) return;
     const h = this.routes.hormuz;
     const tl = Math.max(0, Math.min(1, (P - 0.02) / 0.6));
-    const day = tl * this.LAST;                          // 1 Jan → 30 Aug 2026 (same day0 as the globe)
+    const day = tl * this.LAST;                          // 1 Jan → last counted day (same day0 as the globe)
     const flow = this.flowAt(h, day), frac = Math.min(1, flow / h.base), closed = day >= this.STRIKE && frac < 0.12;
     // ships: spawn ∝ the day's count, crawl when the count is low
     const rate = Math.max(0.2, flow) * 0.12;
@@ -328,6 +330,41 @@ export default class TheBill extends React.Component {
     if (sub) { const html = day < this.STRIKE ? 'ships a day<br><span style="color:rgba(247,245,240,.6)">before his war</span>' : closed ? 'ships a day<br><span style="color:#E04B5C">the strait is shut · was 83</span>' : 'ships a day<br><span style="color:rgba(247,245,240,.6)">was 83</span>'; if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; } }
   }
 
+  /* ---------- computed copy ----------
+   * Sentences that state a verdict about a moving number are built from the
+   * data, never typed. "Not a record" stayed on the page for two refreshes after
+   * EIA's weekly diesel passed its 2022 peak on 7 Sep 2026. The record test runs
+   * on the whole series (from 1994) in build_snapshot.py; with no history the
+   * copy states the price and claims nothing either way. */
+  hormuzNow(mean7) {
+    const n = Math.round(mean7), W = ['none', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+    return 'Now ' + (W[n] || String(n)) + (n === 1 ? ' does.' : ' do.');
+  }
+  dieselVals() {
+    const D = this.prices && this.prices.diesel, R = D && D.record;
+    const none = { dieselLabel: 'diesel a gallon · EIA weekly', dieselHead: 'Diesel.', dieselHeadPolicy: 'Diesel, and eggs.', dieselNote: '' };
+    if (!D) return none;
+    const usd = v => '$' + v.toFixed(2);
+    const day = iso => { const [d, m, y] = this.fmtISO(iso).split(' '); return d + ' ' + m[0] + m.slice(1).toLowerCase() + ' ' + y; };
+    const now = usd(D.latest.value) + ' (EIA weekly, ' + day(D.latest.date) + ')';
+    if (!R) return { ...none, dieselNote: 'Diesel is ' + now + '.' };
+    const prior = usd(R.prior_peak.value) + ' on ' + day(R.prior_peak.date);
+    if (R.is_record) return {
+      dieselLabel: 'diesel a gallon · a record', dieselHead: 'A record.', dieselHeadPolicy: 'A record, and a fall that is not policy.',
+      dieselNote: 'Diesel at ' + now + ' is the highest in a series that begins in ' + R.series_start.slice(0, 4) + '. It first passed the previous peak, ' + prior + ', in the week of ' + day(R.first_record.date) + '.',
+    };
+    const high = D.points.reduce((a, p) => (p[1] > a[1] ? p : a));
+    if (R.last_higher.date >= D.points[0][0]) return {
+      dieselLabel: 'diesel a gallon · record ' + usd(R.first_record ? high[1] : R.prior_peak.value),
+      dieselHead: 'Below the record.', dieselHeadPolicy: 'Below the record, and not policy.',
+      dieselNote: 'Diesel at ' + now + ' is below its ' + day(high[0]) + ' high of ' + usd(high[1]) + (R.first_record ? ', the series record; the previous peak was ' + prior + '.' : '. The series record is ' + prior + '.'),
+    };
+    return {
+      dieselLabel: 'diesel a gallon · highest since ' + R.last_higher.date.slice(0, 4), dieselHead: 'Not a record.', dieselHeadPolicy: 'Not a record, and not policy.',
+      dieselNote: 'Diesel at ' + now + ' is the highest since ' + day(R.last_higher.date) + ', not a record: EIA’s national weekly average reached ' + prior + '.',
+    };
+  }
+
   /* ---------- block 9: the bill ---------- */
   cardItems() {
     const B = this.bill, P = this.prices, D = this.data, C = this.crude, R = this.cardItemRefs;
@@ -337,7 +374,7 @@ export default class TheBill extends React.Component {
       { num: '+$' + Math.round(P.receipt.monthly_usd), label: 'a month for a household · $' + Math.round(P.receipt.cumulative_usd).toLocaleString() + ' since 20 Jan 2025', color: '#D4A017' },
       { num: '$' + Math.round(C.observations[0][1]) + ' → $' + Math.round(C.peak.value), label: 'crude oil · January to the peak, five weeks after his strike', color: '#D4A017' },
       { num: Math.round(h.recent.mean7_total) + ' / day', label: 'ships through Hormuz · was ' + Math.round(h.baseline.total_per_day), color: '#D4A017' },
-      { num: '$' + P.diesel.latest.value.toFixed(2), label: 'diesel a gallon · highest since 2022', color: '#D4A017' },
+      { num: '$' + P.diesel.latest.value.toFixed(2), label: this.dieselVals().dieselLabel, color: '#D4A017' },
       { num: Math.round(B.jobs.curr.mean_monthly / 1000) + ',000', label: 'new jobs a month · was ' + Math.round(B.jobs.prev.mean_monthly / 1000) + ',000', color: '#D4A017' },
       { num: B.war_cost.casualties.us_killed + ' dead', label: B.war_cost.aircraft.total_lost_or_damaged + ' aircraft · $' + B.war_cost.dod_cost.usd_bn + 'bn spent', color: '#F7F5F0' },
       { num: B.gold.tonnes_out.toFixed(0) + ' t', label: 'gold out of the New York Fed · ten months', color: '#D4A017' },
@@ -858,7 +895,9 @@ export default class TheBill extends React.Component {
     this.day0 = Date.UTC(2026, 0, 1);
     this.dayOf = iso => Math.round((Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) - this.day0) / 86400000);
     this.STRIKE = this.dayOf('2026-02-28');
-    this.LAST = this.dayOf('2026-08-30');
+    // The last counted day, not a typed date: a fixed 30 Aug left the globe
+    // reading an older 7-day mean than the card beside it after every refresh.
+    this.LAST = this.dayOf(D.hormuz_daily.at(-1)[0]);
     this.events = [
       { d: this.dayOf('2026-02-28'), red: true, t: 'HE ORDERED THE STRIKE. THE STRAIT CLOSES.' },
       { d: this.dayOf('2026-04-07'), red: false, t: 'TWO-WEEK CEASEFIRE. THE STRAIT OPENS A LITTLE.' },
@@ -1222,7 +1261,7 @@ export default class TheBill extends React.Component {
 
   render() {
     const V = this.renderVals();
-    const { aheYoy, aircraftList, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
+    const { aheYoy, aircraftList, dieselHead, dieselHeadPolicy, dieselNote, hormuzNow, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
     return (
 <div className="v5-bill-root" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
 
@@ -1245,7 +1284,7 @@ export default class TheBill extends React.Component {
             <div className="g-num" ref={numRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,240px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>83</div>
             <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>ships a day<br />through Hormuz<br /><span ref={wasRef} style={{color: "rgba(247,245,240,.6)"}}>before his war</span></div>
           </div>
-          <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>Before his war, eighty-three ships a day came through the Strait of Hormuz. Now four do. The oil goes the long way round Africa.</p>
+          <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>Before his war, eighty-three ships a day came through the Strait of Hormuz. {hormuzNow} The oil goes the long way round Africa.</p>
         </div>
         <div className="g-side" ref={legendRef} style={{display: "flex", flexDirection: "column", gap: "6px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".08em", color: "rgba(247,245,240,.75)", textAlign: "right", flex: "none"}}></div>
       </div>
@@ -1446,7 +1485,7 @@ export default class TheBill extends React.Component {
         </div>
         <label style={{display: "flex", flexDirection: "column", gap: "6px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", flex: "none"}}>
           <span className="p-state-label">YOUR STATE · RE-FLIPS FUEL, POWER AND THE TOTAL</span>
-          <select className="p-state" value={state} onchange={onState} style={{appearance: "none", WebkitAppearance: "none", background: "#061530", color: "#F7F5F0", border: "1px solid rgba(247,245,240,.25)", borderRadius: "4px", padding: "10px 40px 10px 14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".06em", minWidth: "260px", cursor: "pointer", backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23D4A017' stroke-width='1.5'/></svg>\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center"}}>
+          <select className="p-state" value={state} onChange={onState} style={{appearance: "none", WebkitAppearance: "none", background: "#061530", color: "#F7F5F0", border: "1px solid rgba(247,245,240,.25)", borderRadius: "4px", padding: "10px 40px 10px 14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".06em", minWidth: "260px", cursor: "pointer", backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23D4A017' stroke-width='1.5'/></svg>\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 14px center"}}>
             {(stateOptions || []).map((o, _i6) => (<React.Fragment key={_i6}>
               <option value={o.code}>{o.name}</option>
             </React.Fragment>))}
@@ -1481,7 +1520,7 @@ export default class TheBill extends React.Component {
         </div>
         <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The total.</strong> {receiptMethod} Fuel: {receiptFuel}. Groceries: {receiptGroceries}. Electricity: {receiptElectricity}. The grocery line uses the median move across ten tracked staples, which ignores the largest increases on purpose. Household consumption varies enormously; these are national averages.</p>
         <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Your state.</strong> The running total under the monthly figure multiplies that month by the 17.3 months elapsed, as the published receipt does; prices moved through that window, notably falling back during the June ceasefire, so it is an approximation. Picking a state swaps the fuel and electricity rows and re-totals: gasoline from EIA's weekly state or PADD-region series (31 August 2026 against 20 January 2025), electricity from EIA's monthly state residential price (June 2026 against January 2025). The grocery line stays national. The US row uses the published receipt, which is built on the BLS national series, so the two fuel figures differ by a few cents.</p>
-        <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Not a record.</strong> Diesel at $5.60 is the highest since 2022, not a record: EIA's national weekly average reached $5.82 in June 2022. <strong style={{fontWeight: "600"}}>Eggs.</strong> The fall is real and it is not policy: the 2022–25 spike was avian influenza, and prices came back down as the outbreak ended.</p>
+        <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{dieselHead}</strong> {dieselNote} <strong style={{fontWeight: "600"}}>Eggs.</strong> The fall is real and it is not policy: the 2022–25 spike was avian influenza, and prices came back down as the outbreak ended.</p>
         <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: BLS Average Price Data via FRED (series listed above) · EIA Weekly Retail Gasoline and Diesel Prices · EIA Electric Power Monthly · USDA Food Plans · EPA fleet fuel economy · EIA Residential Energy Consumption Survey.
         </p>
       </div>
@@ -1663,7 +1702,7 @@ export default class TheBill extends React.Component {
       <p style={{margin: "0", textWrap: "pretty", fontSize: "20px"}}>Every number on this page comes from the government's own tables or a named source, and every block has a "Show the work" panel above with the series, the dates and the method. What follows is what the numbers can and cannot say.</p>
       <div style={{display: "flex", flexDirection: "column", gap: "18px"}}>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The missing month.</strong> The October 2025 Consumer Price Index was never collected. Every twelve-month comparison on this page runs month to month across that gap rather than by counting observations.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Not a record, and not policy.</strong> Diesel at $5.60 is the highest since 2022, not a record: EIA's national weekly average reached $5.82 in June 2022. Eggs cost half what they did in January 2025 because the 2022–25 avian influenza outbreak ended; that fall is real and it is not policy. The oil peak is the daily spot close, $114.58 on 7 April, the day the first ceasefire was announced.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{dieselHeadPolicy}</strong> {dieselNote} Eggs cost half what they did in January 2025 because the 2022–25 avian influenza outbreak ended; that fall is real and it is not policy. The oil peak is the daily spot close, $114.58 on 7 April, the day the first ceasefire was announced.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What the counts are, and are not.</strong> PortWatch ship counts come from satellite AIS positions; ships transmitting no position are not counted, so every figure is a floor and none is a queue count. Ship and particle positions on the globe and the strait are a model; the counts driving them are not. Household costs are national averages built from stated quantities, and the running total assumes the current monthly gap applied evenly since 20 January 2025. The war-cost casualty figure is a news organisation's count, and a higher tally exists. Gold tonnage is derived from the Fed's statutory valuation, which fixes the price and so isolates the ounces. The "what the lost aircraft cost" comparisons divide one Pentagon figure by one list price each; they are scale, not a proposal for how the money should have been spent.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What we will not do.</strong> War and tariff effects are never summed. Odds are odds. No queue count is published because none exists at any tier. The word "cover-up" does not appear; where an estimate is disputed, the denial is printed beside it.</p>
       </div>

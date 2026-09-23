@@ -8,7 +8,7 @@ after the gap. That error reached a design brief once (3.73% instead of 3.53%).
 
 from __future__ import annotations
 
-from services.macro import nearest_on_or_before, usd_m_to_tonnes_check, yoy_by_calendar_month
+from services.macro import nearest_on_or_before, series_record, usd_m_to_tonnes_check, yoy_by_calendar_month
 
 
 def _idx(dates_values):
@@ -54,3 +54,27 @@ def test_statutory_gold_conversion_matches_frontend():
     # the Fed's dollar figure with the same arithmetic; keep them in step.
     assert abs(usd_m_to_tonnes_check(7818) - 5759.5) < 1.0
     assert abs(usd_m_to_tonnes_check(8034) - 5918.6) < 1.0
+
+
+def test_series_record_when_latest_beats_the_prior_peak():
+    # GASDESW as of 21 Sep 2026: the 2022 peak was passed on 7 Sep.
+    pts = _idx([("2022-06-20", 5.81), ("2024-01-01", 4.0), ("2025-01-06", 3.56),
+                ("2026-08-31", 5.66), ("2026-09-07", 5.967), ("2026-09-21", 6.529)])
+    r = series_record(pts, "2025-01-01")
+    assert r["prior_peak"] == {"date": "2022-06-20", "value": 5.81}
+    assert r["first_record"] == {"date": "2026-09-07", "value": 5.967}
+    assert r["is_record"] is True and r["last_higher"] is None
+
+
+def test_series_record_highest_since_is_the_last_higher_print():
+    # $5.60 is below the 2022 peak: "highest since June 2022", not a record.
+    pts = _idx([("2022-06-20", 5.81), ("2022-07-04", 5.70), ("2022-11-07", 5.33),
+                ("2025-01-06", 3.56), ("2026-08-24", 5.60)])
+    r = series_record(pts, "2025-01-01")
+    assert r["is_record"] is False and r["first_record"] is None
+    assert r["last_higher"] == {"date": "2022-07-04", "value": 5.70}
+
+
+def test_series_record_needs_history_before_the_window():
+    # Only the drawn window: no basis for a verdict either way.
+    assert series_record(_idx([("2025-01-06", 3.56), ("2026-09-21", 6.53)]), "2025-01-01") is None
