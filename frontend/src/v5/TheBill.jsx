@@ -106,7 +106,7 @@ export default class TheBill extends React.Component {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
-      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), againstRows: this.againstRows(),
+      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.freshVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -115,6 +115,7 @@ export default class TheBill extends React.Component {
       crudeCount: this.crude ? this.crude.observations.length : '', crudeLast: this.crude ? this.fmtISO(this.crude.observations.at(-1)[0]).replace(' 2026', '') : '',
       rows, totalCells, digits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
       odo: [{ digit: true, ref: this.odoRefs[0] }, { dot: true }, { digit: true, ref: this.odoRefs[1] }, { digit: true, ref: this.odoRefs[2] }],
+      loadError: (this.state.loadError || []).join(', '),
       state: this.state.state, onState: e => this.setState({ state: e.target.value }, () => this.buildBoard(true)),
       stateOptions: [{ code: 'US', name: 'United States' }].concat(this.STATES),
       placeName: sel ? sel.name : 'the United States',
@@ -350,6 +351,17 @@ export default class TheBill extends React.Component {
   // The canvases' accessible descriptions carry the same figures the canvas
   // draws, so they are built from the data too (see CANVAS_LABELS in
   // scripts/template-to-jsx.py, which reads these names).
+  // When the page was rebuilt, and how far each kind of figure runs. A reader
+  // should not have to open "Show the work" to learn the page is current.
+  freshVals() {
+    const D = this.data, C = this.crude, P = this.prices, M = this.cMonths, keys = 'updated updatedCaps freshNote'.split(' ');
+    if (!D || !C || !P || !M) return Object.fromEntries(keys.map(k => [k, '']));
+    const day = iso => this.dayLong(iso), W = this.bill.war_cost;
+    return {
+      updated: day(D.as_of), updatedCaps: 'UPDATED ' + this.fmtISO(D.as_of),
+      freshNote: 'Rebuilt from the sources on ' + day(D.as_of) + '. The latest figures run to: crude oil ' + day(C.observations.at(-1)[0]) + ', ship counts ' + day(D.hormuz_daily.at(-1)[0]) + ', pump prices ' + day(P.diesel.latest.date) + ', shop prices ' + this.monthLong(P.items.map(i => i.end_date).sort().at(-1)) + ', jobs ' + this.monthLong(M.at(-1)[0]) + ', the Pentagon’s cost ' + day(W.dod_cost.as_of) + '. Each series is published on its own schedule, so they do not all end on the same day.',
+    };
+  }
   labelVals() {
     const D = this.data, B = this.bill, C = this.crude, keys = 'hormuzMean straitRange crudeLastText casN aircraftN suppText patriotPct vaultMonths'.split(' ');
     if (!D || !B || !C) return Object.fromEntries(keys.map(k => [k, '']));
@@ -989,35 +1001,44 @@ export default class TheBill extends React.Component {
     // enough to change the share card's computed width. Tag the body so
     // the-bill.css can undo them for this route only.
     document.body.classList.add('v5-bill');
-    const [data, land110, land50, coast, prices, crude, coastBox, bill] = await Promise.all([
-      fetch(V5+'globe-data.json').then(r => r.json()),
-      fetch(V5+'land-110m.json').then(r => r.json()),
-      fetch(V5+'land-50m.json').then(r => r.json()),
-      fetch(V5+'strait-coast.json').then(r => r.json()),
-      fetch(V5+'prices-data.json').then(r => r.json()),
-      fetch(V5+'crude-data.json').then(r => r.json()),
-      fetch(V5+'hormuz-coast.json').then(r => r.json()),
-      fetch(V5+'bill-data.json').then(r => r.json()),
-    ]);
-    this.crude = crude; this.setupSeis();
+    // Each file loads on its own. With Promise.all, one missing file left every
+    // canvas blank and no message: the rejection escaped the error boundary
+    // because this method is async, and the loop never started. Now each block
+    // sets up from what arrived, and a notice names what did not.
+    const get = async f => {
+      const r = await fetch(V5 + f + '.json');
+      if (!r.ok || !/json/.test(r.headers.get('content-type') || '')) throw new Error(f + ' ' + r.status);
+      return r.json();
+    };
+    const FILES = ['globe-data', 'land-110m', 'land-50m', 'strait-coast', 'prices-data', 'crude-data', 'hormuz-coast', 'bill-data'];
+    const got = await Promise.allSettled(FILES.map(f => get(f).catch(() => get(f))));
+    const [data, land110, land50, coast, prices, crude, coastBox, bill] = got.map(g => (g.status === 'fulfilled' ? g.value : null));
+    const missing = FILES.filter((f, k) => got[k].status !== 'fulfilled');
+    const safe = (what, fn) => { try { fn(); } catch (e) { console.error('The Bill: ' + what, e); missing.push(what); } };
+    if (crude) safe('crude chart', () => { this.crude = crude; this.setupSeis(); });
     this.coastBox = coastBox; this.strShips = []; this.strAcc = 0;
-    this.bill = bill; this.setupBill(); this.forceUpdate();
+    if (bill) safe('jobs, war and gold', () => { this.bill = bill; this.setupBill(); });
+    this.forceUpdate();
     this.data = data;
-    // 110m for the whole globe (cheap to clip each frame); 50m only for the region the camera pushes into
-    this.land = topojson.feature(land110, land110.objects.land);
-    this.landRegion = this.clipLand(topojson.feature(land50, land50.objects.land), [22, -12, 92, 48]);
-    // the repo's coast.json (unprojected to lon/lat) supplies the real gate and Traffic Separation Scheme lane
-    this.landRegion = this.orient(this.landRegion);
-    this.gate = coast.gate; this.tss = coast.lane;
-    this.setState({
-      asOf: data.as_of,
-      rows: Object.values(data.items).map(it => ({
-        name: it.name, base: it.baseline.total_per_day.toFixed(1), now: it.recent.mean7_total.toFixed(1),
-        pct: Math.round(it.recent.pct_of_baseline) + '%',
-      })),
+    if (data && land110 && land50 && coast) safe('globe and strait', () => {
+      // 110m for the whole globe (cheap to clip each frame); 50m only for the region the camera pushes into
+      this.land = topojson.feature(land110, land110.objects.land);
+      this.landRegion = this.clipLand(topojson.feature(land50, land50.objects.land), [22, -12, 92, 48]);
+      // the repo's coast.json (unprojected to lon/lat) supplies the real gate and Traffic Separation Scheme lane
+      this.landRegion = this.orient(this.landRegion);
+      this.gate = coast.gate; this.tss = coast.lane;
+      this.setState({
+        asOf: data.as_of,
+        rows: Object.values(data.items).map(it => ({
+          name: it.name, base: it.baseline.total_per_day.toFixed(1), now: it.recent.mean7_total.toFixed(1),
+          pct: Math.round(it.recent.pct_of_baseline) + '%',
+        })),
+      });
+      this.setupSim();
     });
-    this.setupSim();
-    this.prices = prices; this.buildBoard(false); this.setupBuy();
+    if (prices) safe('prices', () => { this.prices = prices; this.buildBoard(false); });
+    if (prices && bill) safe('what it buys', () => this.setupBuy());
+    if (missing.length) this.setState({ loadError: missing });
     // Reduced motion: every block at its end state (P = 1), and once the first
     // frames have placed the particles and ships, nothing drifts or pulses.
     // Read live, so turning the setting on mid-visit takes effect.
@@ -1149,7 +1170,7 @@ export default class TheBill extends React.Component {
 
   loop(t) {
     this.raf = requestAnimationFrame(this.loop);
-    const cv = this.canvasRef.current; if (!cv || !this.land) return;
+    const cv = this.canvasRef.current;
     const still = this.reduced && t > this.settleAt;
     const dt = still ? 0 : Math.max(0, Math.min(0.05, (t - (this.lastT || t)) / 1000)); this.lastT = t;
     const vh = innerHeight;
@@ -1180,6 +1201,7 @@ export default class TheBill extends React.Component {
     run(secOf(this.vaultRef), 'vault', 8, P => this.stepVault(dt, P, t));
     run(secOf(this.cardRef), 'card', 3, P => this.stepCard(P));
     // block 0
+    if (!cv || !this.land || !this.routes) return;
     const p = this.reduced ? 1 : this.progress();
     const sec = cv.parentElement.parentElement.getBoundingClientRect();
     if (sec.bottom < -200 || sec.top > innerHeight + 200) return;
@@ -1406,11 +1428,14 @@ export default class TheBill extends React.Component {
 
   render() {
     const V = this.renderVals();
-    const { aheYoy, aircraftList, aircraftN, casN, crudeLastText, hormuzMean, patriotPct, straitRange, suppText, vaultMonths, casAlt, casDate, casHead, warAsOf, warCite, warHead, warNote, warSpent, warWho, babPct, capePct, dieselFrom, dieselThrough, elecThrough, gasThrough, globeThrough, pricesMonth, treasSentence, againstRows, claimsNote, jobsLatest, jobsNeg, layoffs, ltuWhen, payMonth, unempDir, strNowWord, dieselHead, dieselHeadPolicy, dieselNote, hormuzNow, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
+    const { aheYoy, aircraftList, loadError, freshNote, updatedCaps, aircraftN, casN, crudeLastText, hormuzMean, patriotPct, straitRange, suppText, vaultMonths, casAlt, casDate, casHead, warAsOf, warCite, warHead, warNote, warSpent, warWho, babPct, capePct, dieselFrom, dieselThrough, elecThrough, gasThrough, globeThrough, pricesMonth, treasSentence, againstRows, claimsNote, jobsLatest, jobsNeg, layoffs, ltuWhen, payMonth, unempDir, strNowWord, dieselHead, dieselHeadPolicy, dieselNote, hormuzNow, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
     return (
 <div className="v5-bill-root" role="main" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
 
   <h1 className="v5-sr">The Bill: what Trump’s war and tariffs cost you</h1>
+  {(loadError) ? (<>
+    <div role="alert" style={{position: "fixed", top: "12px", left: "50%", transform: "translateX(-50%)", zIndex: "50", background: "#F7F5F0", color: "#0B1E3F", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".04em", lineHeight: "1.5", padding: "10px 16px", border: "1px solid #0B1E3F", maxWidth: "calc(100% - 32px)"}}>Part of this page's data did not load ({loadError}). The blocks that need it are blank. Reload to try again.</div>
+  </>) : null}
   <section data-screen-label="00 The globe" style={{position: "relative", height: "160vh", scrollSnapAlign: "start"}}>
     <h2 className="v5-sr">The globe</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
@@ -1421,7 +1446,7 @@ export default class TheBill extends React.Component {
           <div ref={dateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}></div>
           <div ref={eventRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", fontWeight: "500", letterSpacing: ".06em", maxWidth: "460px", lineHeight: "1.5", textWrap: "pretty", textShadow: "0 1px 6px rgba(11,30,63,.9)"}}></div>
         </div>
-        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>SHIPS A DAY THROUGH SIX STRAITS<br />COUNTED FROM SATELLITE · IMF PORTWATCH</div>
+        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>SHIPS A DAY THROUGH SIX STRAITS<br />COUNTED FROM SATELLITE · IMF PORTWATCH<br />{updatedCaps}</div>
       </div>
 
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "32px", pointerEvents: "none"}}>
@@ -1865,6 +1890,7 @@ export default class TheBill extends React.Component {
         </React.Fragment>))}
       </div>
       <div style={{display: "flex", flexDirection: "column", gap: "18px"}}>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>How fresh this is.</strong> {freshNote}</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The missing month.</strong> The October 2025 Consumer Price Index was never collected. Every twelve-month comparison on this page runs month to month across that gap rather than by counting observations.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{dieselHeadPolicy}</strong> {dieselNote} Eggs cost half what they did in January 2025 because the 2022–25 avian influenza outbreak ended; that fall is real and it is not policy. The oil peak is the daily spot close, $114.58 on 7 April, the day the first ceasefire was announced.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What the counts are, and are not.</strong> PortWatch ship counts come from satellite AIS positions; ships transmitting no position are not counted, so every figure is a floor and none is a queue count. Ship and particle positions on the globe and the strait are a model; the counts driving them are not. Household costs are national averages built from stated quantities, and the running total assumes the current monthly gap applied evenly since 20 January 2025. The war-cost casualty figure is a news organisation's count, and a higher tally exists. Gold tonnage is derived from the Fed's statutory valuation, which fixes the price and so isolates the ounces. The "what the lost aircraft cost" comparisons divide one Pentagon figure by one list price each; they are scale, not a proposal for how the money should have been spent.</p>

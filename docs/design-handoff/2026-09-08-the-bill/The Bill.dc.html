@@ -20,6 +20,7 @@ select option{background:#061530;color:#F7F5F0}
 </style>
 </helmet>
 <div style="font-family:'Source Serif 4',Georgia,serif;background:#0B1E3F;color:#F7F5F0;overflow:clip">
+  <sc-if value="{{ loadError }}"><div role="alert" style="position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;background:#F7F5F0;color:#0B1E3F;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.04em;line-height:1.5;padding:10px 16px;border:1px solid #0B1E3F;max-width:calc(100% - 32px)">Part of this page's data did not load ({{ loadError }}). The blocks that need it are blank. Reload to try again.</div></sc-if>
 
   <section data-screen-label="00 The globe" style="position:relative;height:160vh;scroll-snap-align:start">
     <div style="position:sticky;top:0;height:100vh;overflow:hidden;background:#0B1E3F">
@@ -30,7 +31,7 @@ select option{background:#061530;color:#F7F5F0}
           <div ref="{{ dateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85"></div>
           <div ref="{{ eventRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:500;letter-spacing:.06em;max-width:460px;line-height:1.5;text-wrap:pretty;text-shadow:0 1px 6px rgba(11,30,63,.9)"></div>
         </div>
-        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">SHIPS A DAY THROUGH SIX STRAITS<br>COUNTED FROM SATELLITE · IMF PORTWATCH</div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">SHIPS A DAY THROUGH SIX STRAITS<br>COUNTED FROM SATELLITE · IMF PORTWATCH<br>{{ updatedCaps }}</div>
       </div>
 
       <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;justify-content:space-between;align-items:flex-end;gap:32px;pointer-events:none">
@@ -462,6 +463,7 @@ select option{background:#061530;color:#F7F5F0}
         <sc-for list="{{ againstRows }}" as="r"><p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">{{ r.head }}</strong> {{ r.text }}</p></sc-for>
       </div>
       <div style="display:flex;flex-direction:column;gap:18px">
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">How fresh this is.</strong> {{ freshNote }}</p>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The missing month.</strong> The October 2025 Consumer Price Index was never collected. Every twelve-month comparison on this page runs month to month across that gap rather than by counting observations.</p>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">{{ dieselHeadPolicy }}</strong> {{ dieselNote }} Eggs cost half what they did in January 2025 because the 2022–25 avian influenza outbreak ended; that fall is real and it is not policy. The oil peak is the daily spot close, $114.58 on 7 April, the day the first ceasefire was announced.</p>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">What the counts are, and are not.</strong> PortWatch ship counts come from satellite AIS positions; ships transmitting no position are not counted, so every figure is a floor and none is a queue count. Ship and particle positions on the globe and the strait are a model; the counts driving them are not. Household costs are national averages built from stated quantities, and the running total assumes the current monthly gap applied evenly since 20 January 2025. The war-cost casualty figure is a news organisation's count, and a higher tally exists. Gold tonnage is derived from the Fed's statutory valuation, which fixes the price and so isolates the ounces. The "what the lost aircraft cost" comparisons divide one Pentagon figure by one list price each; they are scale, not a proposal for how the money should have been spent.</p>
@@ -519,7 +521,7 @@ class Component extends DCLogic {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
-      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), againstRows: this.againstRows(),
+      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.freshVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -528,6 +530,7 @@ class Component extends DCLogic {
       crudeCount: this.crude ? this.crude.observations.length : '', crudeLast: this.crude ? this.fmtISO(this.crude.observations.at(-1)[0]).replace(' 2026', '') : '',
       rows, totalCells, digits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
       odo: [{ digit: true, ref: this.odoRefs[0] }, { dot: true }, { digit: true, ref: this.odoRefs[1] }, { digit: true, ref: this.odoRefs[2] }],
+      loadError: (this.state.loadError || []).join(', '),
       state: this.state.state, onState: e => this.setState({ state: e.target.value }, () => this.buildBoard(true)),
       stateOptions: [{ code: 'US', name: 'United States' }].concat(this.STATES),
       placeName: sel ? sel.name : 'the United States',
@@ -763,6 +766,17 @@ class Component extends DCLogic {
   // The canvases' accessible descriptions carry the same figures the canvas
   // draws, so they are built from the data too (see CANVAS_LABELS in
   // scripts/template-to-jsx.py, which reads these names).
+  // When the page was rebuilt, and how far each kind of figure runs. A reader
+  // should not have to open "Show the work" to learn the page is current.
+  freshVals() {
+    const D = this.data, C = this.crude, P = this.prices, M = this.cMonths, keys = 'updated updatedCaps freshNote'.split(' ');
+    if (!D || !C || !P || !M) return Object.fromEntries(keys.map(k => [k, '']));
+    const day = iso => this.dayLong(iso), W = this.bill.war_cost;
+    return {
+      updated: day(D.as_of), updatedCaps: 'UPDATED ' + this.fmtISO(D.as_of),
+      freshNote: 'Rebuilt from the sources on ' + day(D.as_of) + '. The latest figures run to: crude oil ' + day(C.observations.at(-1)[0]) + ', ship counts ' + day(D.hormuz_daily.at(-1)[0]) + ', pump prices ' + day(P.diesel.latest.date) + ', shop prices ' + this.monthLong(P.items.map(i => i.end_date).sort().at(-1)) + ', jobs ' + this.monthLong(M.at(-1)[0]) + ', the Pentagon’s cost ' + day(W.dod_cost.as_of) + '. Each series is published on its own schedule, so they do not all end on the same day.',
+    };
+  }
   labelVals() {
     const D = this.data, B = this.bill, C = this.crude, keys = 'hormuzMean straitRange crudeLastText casN aircraftN suppText patriotPct vaultMonths'.split(' ');
     if (!D || !B || !C) return Object.fromEntries(keys.map(k => [k, '']));
