@@ -66,7 +66,9 @@ const d3 = { geoArea, geoDistance, geoGraticule, geoInterpolate, geoOrthographic
 const topojson = { feature };
 
 export default class TheBill extends React.Component {
-  state = { rows: [], asOf: '', prows: [], totalCells: [], state: 'US', tick: 0 };
+  // ?state=CA opens the receipt on that state, so a reader can share their own bill;
+  // an unknown code falls back to the US once the state list is known (setupStateParam)
+  state = { rows: [], asOf: '', prows: [], totalCells: [], state: (() => { try { const q = (new URLSearchParams(location.search).get('state') || '').toUpperCase(); return /^[A-Z]{2}$/.test(q) ? q : 'US'; } catch (e) { return 'US'; } })(), tick: 0 };
   canvasRef = React.createRef(); dateRef = React.createRef(); eventRef = React.createRef();
   numRef = React.createRef(); wasRef = React.createRef(); legendRef = React.createRef(); cueRef = React.createRef();
   boardRef = React.createRef(); pDateRef = React.createRef(); pWeekRef = React.createRef();
@@ -116,7 +118,7 @@ export default class TheBill extends React.Component {
       rows, totalCells, digits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
       odo: [{ digit: true, ref: this.odoRefs[0] }, { dot: true }, { digit: true, ref: this.odoRefs[1] }, { digit: true, ref: this.odoRefs[2] }],
       loadError: (this.state.loadError || []).join(', '),
-      state: this.state.state, onState: e => this.setState({ state: e.target.value }, () => this.buildBoard(true)),
+      state: this.state.state, onState: e => this.setState({ state: e.target.value }, () => { this.buildBoard(true); this.stateToUrl(); }),
       stateOptions: [{ code: 'US', name: 'United States' }].concat(this.STATES),
       placeName: sel ? sel.name : 'the United States',
       cumulativeText: rc && sel ? '$' + Math.round(sel.total * rc.months_elapsed).toLocaleString() + ' over ' + rc.months_elapsed.toFixed(1) + ' months' : '',
@@ -385,6 +387,14 @@ export default class TheBill extends React.Component {
       suppText: '$' + W.supplemental_request.usd_bn + ' billion', patriotPct: String(Math.round(W.munitions.patriot_remaining_share * 100)),
       vaultMonths: this.words(B.gold.earmarked.length - 1),
     };
+  }
+  // keep ?state= in step with the picker, without adding history entries
+  stateToUrl() {
+    try {
+      const u = new URL(location.href), s = this.state.state;
+      if (s === 'US') u.searchParams.delete('state'); else u.searchParams.set('state', s);
+      history.replaceState(null, '', u);
+    } catch (e) { /* a sandboxed preview may refuse; the picker still works */ }
   }
   /* ---------- computed copy ----------
    * Sentences that state a verdict about a moving number are built from the
@@ -1047,7 +1057,10 @@ export default class TheBill extends React.Component {
       });
       this.setupSim();
     });
-    if (prices) safe('prices', () => { this.prices = prices; this.buildBoard(false); });
+    if (prices) safe('prices', () => {
+      if (!this.STATES.some(x => x.code === this.state.state)) this.state.state = 'US';   // an unknown ?state= before the first board
+      this.prices = prices; this.buildBoard(false);
+    });
     if (prices && bill) safe('what it buys', () => this.setupBuy());
     if (missing.length) this.setState({ loadError: missing });
     // Reduced motion: every block at its end state (P = 1), and once the first

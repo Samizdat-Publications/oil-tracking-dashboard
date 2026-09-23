@@ -81,6 +81,46 @@ PortWatch day instead of a typed 30 Aug. The share text in `index.html` uses
 `{{og.*}}` holes filled by the `ogFigures` plugin in `vite.config.ts`. Before adding
 any sentence with a number in it, ask whether the next refresh can make it false.
 
+The same pass (2026-09-23) moved every other moving figure onto the data, in these
+render-value methods (all mirrored in the handoff): `jobsVals` (negative-month count,
+"the best month in N" and the bright month, "the highest of his term" only while
+true, the pay month, the jobless-claims note), `againstRows` (block 10's "What cuts
+against this page": stocks, mortgages, layoffs, the latest jobs month, core CPI,
+customs receipts, falling oil; each row drops out when it stops being true),
+`dateVals` (series labels, "now" month, globe through-date, Cape and Bab el-Mandeb
+percentages, the Treasuries sentence), `warVals` (Pentagon cost and its history via
+`who`/`cite` fields in `context_figures.json`, casualty count and date, the
+Washington Post count beside the denial), `labelVals` (canvas aria-labels: the
+converter's `CANVAS_LABELS` take `${name}` holes), `freshVals` ("UPDATED" in the
+globe header and "How fresh this is" in block 10). `bill-data.against` is now built
+from the snapshot by `against()` in `build_v5_data.py`; it used to be copied forward
+from Design's file and never refreshed.
+
+**The strait (block 03) is two states, not a replay.** Before (pre-war mean) and now
+(latest 7-day mean), with one ship on screen per ship a day and a short fall between.
+Replaying the daily counts made the number bounce and left pre-war ships crawling
+through a gate marked CLOSED. Surplus ships fade out; the survivors are spread along
+the lane and crawl, so the few left stay in view. The globe (block 00) still replays
+the daily series, which suits its scroll-driven timeline.
+
+**Resilience and accessibility.** The eight V5 JSON files load independently
+(`allSettled`, content-type check, one retry); each block sets up from what arrived and
+a `role="alert"` notice names what failed. The root is `role="main"` with an h1, each
+block has a visually hidden h2 (`.v5-sr`), all emitted by the converter. Under reduced
+motion nothing drifts or pulses once the first frames have placed particles and ships.
+
+**Build strictness.** `build_v5_data.py` exits 2 when a block keeps its previous values
+(pass `--allow-stale` to publish anyway). `validate_snapshot.py` also fails a fully
+failed `chain`, an errored EIA part, empty `receipt_inputs`, and stale MTS customs or
+interest. `build_snapshot.py` builds with a throwaway cache (`CACHE_DB_PATH` to
+override): the shared 24h cache made a same-day second refresh report "nothing moved".
+
+**Screenshots and clips** for the README and the landing page (`docs/index.html`, served
+by GitHub Pages from `/docs`): `npx vite preview --port 4315`, then
+`node scripts/shoot-v5.mjs http://localhost:4315/ ../docs/screens` and
+`py scripts/frames-to-media.py ../docs/screens`. Clips are stepped on Playwright's fake
+clock, so frames are even; output is GIF for the README and animated WebP for the page.
+
 **The converter camel-cases event attributes.** HTMLParser lowercases `onChange` to
 `onchange`, which React ignores silently: the state picker shipped dead until
 2026-09-23. `EVENTS` in `template-to-jsx.py` maps them and the script exits on an
