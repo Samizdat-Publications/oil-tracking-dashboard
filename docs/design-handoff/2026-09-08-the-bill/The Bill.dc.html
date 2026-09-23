@@ -110,7 +110,7 @@ select option{background:#061530;color:#F7F5F0}
           <div class="g-num" ref="{{ seisNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,200px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">$57</div>
           <div ref="{{ seisSubRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">a barrel<br><span style="color:rgba(247,245,240,.6)">in January</span></div>
         </div>
-        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:640px;text-wrap:pretty;color:#F7F5F0">Crude was $57 in January. Five weeks after his strike it was $115. It fell to $70 when he agreed a ceasefire, and it is $91 now that he has broken it.</p>
+        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:640px;text-wrap:pretty;color:#F7F5F0">Crude was $57 in January. Five weeks after his strike it was $115. It fell to $70 when he agreed a ceasefire, and it is {{ crudeNow }} now that he has broken it.</p>
       </div>
     </div>
   </section>
@@ -222,7 +222,7 @@ select option{background:#061530;color:#F7F5F0}
             </div>
             <div style="display:flex;justify-content:space-between;gap:24px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;color:rgba(247,245,240,.55)"><span>WAS $3.72 WHEN HE TOOK OFFICE</span><span ref="{{ pWeekRef }}" style="color:#F7F5F0">20 JAN 2025</span></div>
           </div>
-          <p class="g-sentence p-sentence" style="margin:0;font-size:24px;line-height:1.35;max-width:520px;text-wrap:pretty;color:#F7F5F0">Fourteen things you buy, January 2025 against now. Diesel has not cost this much since 2022. Four went down; we show those too. Eggs fell because the avian flu outbreak ended, not because of anything his administration did.</p>
+          <p class="g-sentence p-sentence" style="margin:0;font-size:24px;line-height:1.35;max-width:520px;text-wrap:pretty;color:#F7F5F0">Fourteen things you buy, January 2025 against now. {{ dieselVerdict }} {{ pricesDown }} Eggs fell because the avian flu outbreak ended, not because of anything his administration did.</p>
         </div>
       </div>
 
@@ -298,7 +298,7 @@ select option{background:#061530;color:#F7F5F0}
           <div class="g-num" ref="{{ crowdNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,200px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">42,000</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">new jobs a month<br>since he took office<br><span style="color:rgba(247,245,240,.6)">was 321,000</span></div>
         </div>
-        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:680px;text-wrap:pretty;color:#F7F5F0">Few people are being fired, but if you lose your job you stay out longer than at any point since he took office, and your paycheck buys less than it did a year ago.</p>
+        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:680px;text-wrap:pretty;color:#F7F5F0">{{ jobsSentence }}</p>
       </div>
     </div>
   </section>
@@ -328,7 +328,7 @@ select option{background:#061530;color:#F7F5F0}
       </div>
       <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
         <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#F7F5F0;flex:none"></span>SEVEN MONTHS IN. HE SAID FIVE WEEKS.</div>
-        <p class="g-sentence" style="margin:0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:760px;text-wrap:pretty;color:#F7F5F0">He said four to five weeks. Seven months on, the Navy resupplies from 2,200 miles away, and by one estimate a third of the missile interceptors are left. His Secretary of Defense disputes that number. His own budget request asks for $21 billion to replace them.</p>
+        <p class="g-sentence" style="margin:0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:760px;text-wrap:pretty;color:#F7F5F0">He said four to five weeks. {{ warMonths }} on, the Navy resupplies from 2,200 miles away, and by one estimate a third of the missile interceptors are left. His Secretary of Defense disputes that number. His own budget request asks for $21 billion to replace them.</p>
       </div>
     </div>
   </section>
@@ -362,7 +362,7 @@ select option{background:#061530;color:#F7F5F0}
           <div class="g-num" ref="{{ buyNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,200px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">0</div>
           <div ref="{{ buySubRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">PlayStation 5s<br><span style="color:rgba(247,245,240,.6)">for one F-35A</span></div>
         </div>
-        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:760px;text-wrap:pretty;color:#F7F5F0">Forty-two aircraft lost or damaged, at the Pentagon's own estimate of $2.6 billion: that is {{ buyPS5 }} million PlayStation 5s, or {{ buyDays }} days of every gallon of diesel the country burns, or {{ buyDogs }} Costco hot dogs for every American. The war itself has cost {{ buyRatio }} times that, and he has asked Congress for $67.1 billion more.</p>
+        <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:760px;text-wrap:pretty;color:#F7F5F0">{{ aircraftWord }} aircraft lost or damaged, at the Pentagon's own estimate of {{ lossBn }}: that is {{ buyPS5 }} million PlayStation 5s, or {{ buyDays }} days of every gallon of diesel the country burns, or {{ buyDogs }} Costco hot dogs for every American. The war itself has cost {{ buyRatio }} times that, and he has asked Congress for {{ suppBn }} more.</p>
       </div>
     </div>
   </section>
@@ -523,7 +523,7 @@ class Component extends DCLogic {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
-      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.freshVals(), againstRows: this.againstRows(),
+      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.headVals(), ...this.freshVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -790,6 +790,29 @@ class Component extends DCLogic {
       freshNote: 'Rebuilt from the sources on ' + day(D.as_of) + '. The latest figures run to: crude oil ' + day(C.observations.at(-1)[0]) + ', ship counts ' + day(D.hormuz_daily.at(-1)[0]) + ', pump prices ' + day(P.diesel.latest.date) + ', shop prices ' + this.monthLong(P.items.map(i => i.end_date).sort().at(-1)) + ', jobs ' + this.monthLong(M.at(-1)[0]) + ', the Pentagon’s cost ' + day(W.dod_cost.as_of) + '. Each series is published on its own schedule, so they do not all end on the same day.',
     };
   }
+  // The headline sentences under each block's big number. Design typed their
+  // figures; "Diesel has not cost this much since 2022" outlived diesel's record
+  // and "it is $91 now" outlived the price.
+  headVals() {
+    const C = this.crude, P = this.prices, B = this.bill, D = this.data, keys = 'crudeNow dieselVerdict pricesDown warMonths aircraftWord lossBn suppBn'.split(' ');
+    if (!C || !P || !B || !D) return Object.fromEntries(keys.map(k => [k, '']));
+    const cap = s => s[0].toUpperCase() + s.slice(1), R = P.diesel.record, W = B.war_cost;
+    let dieselVerdict = '';
+    if (R && R.is_record) dieselVerdict = 'Diesel has never cost this much.';
+    else if (R && R.last_higher && R.last_higher.date < P.diesel.points[0][0]) dieselVerdict = 'Diesel has not cost this much since ' + R.last_higher.date.slice(0, 4) + '.';
+    else if (R) dieselVerdict = 'Diesel is below its ' + this.monthLong(P.diesel.points.reduce((a, p) => (p[1] > a[1] ? p : a))[0]).split(' ')[0] + ' high.';
+    const down = (this.board || []).filter(r => !r.up).length;
+    const months = Math.round((Date.parse(D.as_of) - Date.parse('2026-02-28')) / (30.44 * 86400000));
+    return {
+      crudeNow: '$' + Math.round(C.observations.at(-1)[1]),
+      dieselVerdict,
+      pricesDown: down ? cap(this.words(down)) + ' went down; we show ' + (down === 1 ? 'that' : 'those') + ' too.' : 'None went down.',
+      warMonths: cap(this.words(months)) + ' month' + (months === 1 ? '' : 's'),
+      aircraftWord: cap(this.words(W.aircraft.total_lost_or_damaged)),
+      lossBn: '$' + W.aircraft.dod_loss_estimate_usd_bn + ' billion',
+      suppBn: '$' + W.supplemental_request.usd_bn + ' billion',
+    };
+  }
   labelVals() {
     const D = this.data, B = this.bill, C = this.crude, keys = 'hormuzMean straitRange crudeLastText casN aircraftN suppText patriotPct vaultMonths'.split(' ');
     if (!D || !B || !C) return Object.fromEntries(keys.map(k => [k, '']));
@@ -902,7 +925,7 @@ class Component extends DCLogic {
     };
   }
   jobsVals() {
-    const B = this.bill, keys = 'jobsNeg jobsLatest ltuWhen unempDir layoffs payMonth claimsNote'.split(' ');
+    const B = this.bill, keys = 'jobsNeg jobsLatest ltuWhen unempDir layoffs payMonth claimsNote jobsSentence'.split(' ');
     if (!B || !this.cMonths) return Object.fromEntries(keys.map(k => [k, '']));
     const M = this.cMonths, last = M.at(-1), run = this.bestRun(M), n = v => Math.round(v).toLocaleString();
     const ltuTerm = B.ltu.points.filter(p => p[0] >= '2025-01-01').map(p => p[1]);
@@ -921,6 +944,9 @@ class Component extends DCLogic {
       layoffs: B.layoffs ? B.layoffs.latest.value.toFixed(1) : '',
       payMonth: B.pay.ahe_date ? this.monthLong(B.pay.ahe_date) : 'the latest month',
       claimsNote,
+      // block 05's sentence: "longer than at any point since he took office" only while it is
+      jobsSentence: 'Few people are being fired, but if you lose your job you stay out longer than ' + (B.ltu.latest.value >= Math.max(...ltuTerm) ? 'at any point since he took office' : 'when he took office')
+        + (B.pay.real_yoy_pct < 0 ? ', and your paycheck buys less than it did a year ago.' : ', though your paycheck buys a little more than it did a year ago.'),
     };
   }
   againstRows() {
