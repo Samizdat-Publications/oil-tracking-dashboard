@@ -205,7 +205,9 @@ moved since the previous row, which is the part worth reading.
 identical on `main` and `v4-frozen`, so V4 reads the current schema v2 snapshot with
 no code change. The script carries the snapshot across, rebuilds, deploys to
 `trumps-economy-ledger-v4`, commits on that branch and returns to where it started.
-Uncommitted work is stashed for the switch and popped afterwards.
+Uncommitted work is stashed for the switch and popped afterwards. The two branches have different `package.json`s since 2026-09-23 (main dropped the V1
+packages), so the pass runs `npm ci` on each side of the switch; stop any `vite preview`
+running from `frontend/` first, or Windows locks a native module and `npm ci` fails.
 
 **Check series keys against the snapshot, not against what the block is called.**
 `build_v5_data.py` originally looked for `long_term_unemployed_share` and `ahe_yoy`;

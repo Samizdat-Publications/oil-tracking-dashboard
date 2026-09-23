@@ -150,6 +150,10 @@ if (-not $SkipV4) {
         if ($LASTEXITCODE -ne 0) { throw 'could not check out v4-frozen' }
 
         Copy-Item $carried (Join-Path $Frontend 'public/data-snapshot.json') -Force
+        # The two branches no longer share dependencies: main dropped the V1
+        # packages V4's build still imports. Install v4-frozen's own set first;
+        # the finally block puts main's back.
+        Invoke-Step $Frontend 'npm' @('ci', '--no-audit', '--no-fund')
         Invoke-Step $Frontend 'npm' @('run', 'build')
         Write-Host '  -> trumps-economy-ledger-v4'
         Invoke-Step $Root 'npx' @('--prefix', 'frontend', 'wrangler', 'pages', 'deploy',
@@ -171,7 +175,15 @@ if (-not $SkipV4) {
     finally {
         # Always come back, even if the V4 pass failed part way: restore the
         # branch, the stash and a dist/ that matches where you are standing.
+        # A pass that failed before its commit leaves the carried snapshot
+        # modified, and git refuses to switch over it; it is main's snapshot,
+        # already committed there, so dropping v4-frozen's copy loses nothing.
+        & git checkout -q -- frontend/public/data-snapshot.json frontend/public/og.png frontend/public/og.html
         & git checkout -q $startBranch
+        if ($LASTEXITCODE -ne 0) { Write-Warning "could not return to $startBranch; run: git checkout $startBranch" }
+        Push-Location $Frontend
+        & npm ci --no-audit --no-fund | Out-Null
+        Pop-Location
         if ($stashed) {
             & git stash pop
             if ($LASTEXITCODE -ne 0) {
