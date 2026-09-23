@@ -179,8 +179,8 @@ def bill_data(sn, old):
             # Keep whatever Design shipped rather than blank a readout, but say
             # so loudly. Falling back quietly is how the ltu mapping stayed
             # wrong: the file still looked right because it held the old values.
-            print("  WARNING: macro.series.%s is missing; bill-data.%s keeps its "
-                  "previous values and will not refresh." % (src, key), file=sys.stderr)
+            stale("macro.series.%s is missing; bill-data.%s keeps its "
+                  "previous values and will not refresh." % (src, key))
             out[key] = old.get(key)
             continue
         out[key] = {
@@ -202,6 +202,17 @@ def bill_data(sn, old):
     out["international"] = {"peers": intl.get("peers"),
                             "latest": (intl.get("series") or [])[-3:]}
     return out
+
+
+#: Every fallback to a previous value is collected here. A fallback means a
+#: block did not refresh; the build fails on it unless --allow-stale is given,
+#: because a warning on stderr is how the ltu_share mapping stayed wrong.
+STALE: list[str] = []
+
+
+def stale(msg):
+    print("  WARNING: " + msg, file=sys.stderr)
+    STALE.append(msg)
 
 
 def against(sn):
@@ -271,8 +282,8 @@ def pay_block(ms, previous):
     """
     ahe, cpi = ms.get("ahe"), ms.get("cpi_headline_nsa")
     if not ahe or not cpi:
-        print("  WARNING: ahe or cpi_headline_nsa missing; bill-data.pay keeps its "
-              "previous values and will not refresh.", file=sys.stderr)
+        stale("ahe or cpi_headline_nsa missing; bill-data.pay keeps its "
+              "previous values and will not refresh.")
         return previous
 
     ahe0 = dig(ahe, "handover", "value")
@@ -280,15 +291,15 @@ def pay_block(ms, previous):
     cpi0 = dig(cpi, "handover", "value")
     cpi1 = dig(cpi, "latest", "value")
     if None in (ahe0, ahe1, cpi0, cpi1):
-        print("  WARNING: pay inputs incomplete; bill-data.pay keeps its previous "
-              "values.", file=sys.stderr)
+        stale("pay inputs incomplete; bill-data.pay keeps its previous "
+              "values.")
         return previous
 
     ahe_yoy = yoy_pct(ahe.get("points", []), ahe["latest"]["date"])
     cpi_yoy = yoy_pct(cpi.get("points", []), cpi["latest"]["date"])
     if ahe_yoy is None or cpi_yoy is None:
-        print("  WARNING: not enough history for a 12-month pay comparison; "
-              "bill-data.pay keeps its previous values.", file=sys.stderr)
+        stale("not enough history for a 12-month pay comparison; "
+              "bill-data.pay keeps its previous values.")
         return previous
 
     # Real change is the ratio of the two ratios, not the difference of the two
@@ -360,6 +371,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true",
                     help="compare against what is on disk; do not write")
+    ap.add_argument("--allow-stale", action="store_true",
+                    help="write even if a block had to keep its previous values")
     args = ap.parse_args()
 
     sn = json.loads(SNAPSHOT.read_text(encoding="utf-8"))
@@ -388,6 +401,11 @@ def main():
             print("  %-14s%9s bytes  %s" % (name, format(len(text), ","),
                                             "unchanged" if same else "updated"))
 
+    if STALE and not args.allow_stale:
+        print("\n%d block(s) kept their previous values and did not refresh. Fix the "
+              "series mapping, or pass --allow-stale to publish them anyway." % len(STALE),
+              file=sys.stderr)
+        return 2
     if args.check and drift:
         print("\n%d file(s) differ from the snapshot." % drift, file=sys.stderr)
         return 1
