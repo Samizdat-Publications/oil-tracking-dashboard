@@ -518,9 +518,11 @@ now come from the series, not from this table, so this cannot recur.
 
 - Gasoline (EIA weekly, GASREGW): **$4.071** on 31 Aug, from $3.109 at the handover.
   AAA: **$4.15 on 4 Sep, the first Labor Day above $4** (TIER 2).
-- Diesel (EIA weekly, GASDESW): **$5.599** on 31 Aug; **$5.652 on 24 Aug is a series
-  record**. GasBuddy's daily tracker printed $5.85 on 4 Sep, above the June 2022 record
-  (TIER 2). Diesel is the price of moving everything else; it is on the shelf now.
+- Diesel (EIA weekly, GASDESW): **$5.599** on 31 Aug, $5.652 on 24 Aug. **Correction
+  (23 Sep):** this line originally called $5.652 "a series record". It was not: the series
+  peak was $5.810 on 20 Jun 2022. The EIA series first passed it in the week of 7 Sep 2026
+  (see Update III). GasBuddy's daily tracker printed $5.85 on 4 Sep, above the June 2022
+  record (TIER 2). Diesel is the price of moving everything else; it is on the shelf now.
 - Jet fuel USGC $3.72/gal (28 Aug) from $2.41 at the handover.
 - Airline fares CPI **+25.5% y/y** (Jul, NSA). IATA cut 2026 industry profit from $41bn
   to **$23bn** on a jet-fuel assumption of $152/bbl vs $90 in 2025 (TIER 2).
@@ -717,13 +719,13 @@ base, not normal traffic. Say so.
 |---|---|---|---|---|
 | WTI → diesel | **0.38** (0.22–0.54) | 0 wk | 1,094 | diesel +51% |
 | Diesel → truck-transport PPI | **0.13** (0.07–0.19) | 0 mo | 244 | PPI +8.2% |
-| Truck PPI → food at home | **0.42** (0.27–0.56) | **~4 months** | 244 | food at home +2.7% |
+| Truck PPI → food at home | **0.42** (0.27–0.56) | **~4 months** | 244 | food at home +2.2% (Aug; +2.7% Jul) |
 | WTI → jet fuel | **0.65** (0.48–0.83) | 0 wk | 1,095 | jet +83% |
 | Jet fuel → airline fares | **0.18** (0.04–0.31) | 0 mo | 243 | fares +25.5% |
 | EU gas → nitrogen fertiliser PPI | **0.30** (0.19–0.42) | **~2 months** | 245 | fertiliser +45%, gas +56% |
 
 Every link is significant at 5% on data that end before the war. The four-month lag from
-freight to the shelf means the diesel record of late August reaches grocery prices around
+freight to the shelf means the diesel surge of late August (a record on the EIA series from 7 Sep) reaches grocery prices around
 the turn of the year; the two-month lag from gas to fertiliser is already in the July PPI.
 These are reduced-form associations and the page says so; they are not structural parameters.
 
@@ -776,3 +778,227 @@ receipt is now recomputed in the browser (`frontend/src/v4/receipt.ts`) from
 `receipt_inputs`, pinned to the Python arithmetic by a shared fixture, with a state picker
 that swaps in EIA regional gasoline and state electricity. Debt-to-the-penny and the Hormuz
 count are fetched live in the browser from keyless, CORS-open endpoints and marked LIVE.
+
+
+---
+
+## Update III (23 Sep 2026): the Fed hikes, diesel sets a record, and the first talks in weeks
+
+**Written 2026-09-23.** Same rule as updates I and II: every figure is a FRED/EIA/Treasury
+series in the snapshot or an entry in `backend/data/context_figures.json` with source, URL
+and tier; FRED wins any disagreement. Entries replaced by newer readings keep their keys
+(the V4 ledger reads them by name) and carry `superseded_by`. War and tariff effects are
+still never summed.
+
+### What cuts against us this month (read this first)
+
+These stay at full size on the page, next to the rows they complicate.
+
+- **Brent futures fell below $100 on talks.** After the first reported US-Iran meeting in
+  weeks (22 Sep, mediated, UN sidelines), Brent futures settled **$99.25** after five losing
+  sessions, WTI **$94.59** (CNBC, TIER 2). Physical Brent was still $114.89 (below), but
+  the direction is de-escalation and the market priced it.
+- **Customs receipts turned positive in August.** MTS net customs duties **+$12.8bn** after
+  three net-negative months (May -$0.04bn, Jun -$25.6bn, Jul -$8.5bn). FYTD **$167.3bn vs
+  $165.2bn** a year earlier: slightly *above* last year (Treasury `mts_table_9`, TIER 1).
+  "Refunds exceed collections" was true for three months; it is not true now.
+- **Food at home was flat in August** (0.0% m/m), **+2.2% y/y**, down from 2.7% in July
+  (BLS, TIER 1). The chain's four-month freight-to-shelf lag says this is early, not wrong,
+  but the shelf has not moved yet.
+- **Low claims and a small benchmark revision.** Initial claims **196,000** (week to 12
+  Sep; 4-week average 203,250). The preliminary benchmark revision to March 2026 payrolls
+  was **-79,000 (-0.1%)**, smaller than the 0.2% ten-year absolute average BLS cites
+  (BLS/DOL, TIER 1). Neither supports "the labour market is breaking" or "the job numbers
+  were inflated".
+- **Core CPI 2.4%**, down from 2.5% (BLS, TIER 1). The inflation is energy.
+- **The FOMC statement does not blame energy.** It names no oil, energy or Iran effect; it
+  says "Inflation remains elevated" and cites "geopolitical developments" only as a source
+  of uncertainty, next to "domestic spending has been resilient" (Fed, TIER 1).
+- **Foreign official Treasuries in Fed custody rose in July**, +$18.1bn to $2,634.2bn, the
+  first monthly rise since April (Fed Table 3.13, TIER 1).
+- **More flow is moving under escort.** IEA refers to "US military escorts protecting flows
+  through Hormuz"; Lloyd's List counts rose from 83 to at least 97 non-Iranian-linked
+  transits a week. LLI's own verdict is still "no suggestion of a Hormuz revival".
+- **Gasoline is below its 2026 high.** AAA **$4.43** on 17 Sep against **$4.56** on 21 May
+  (AAA, TIER 2).
+
+### The war and the strait
+
+- **8 Sep:** CENTCOM says US forces destroyed **five Iranian tankers** after two IRGC
+  ballistic-missile attacks on a US warship; Iran fired **20 ballistic missiles** at a US
+  base near Al Azraq, Jordan, of which Jordan says 18 were intercepted, no casualties. The
+  IRGC's claim to have attacked ten ships is unverified (Al Jazeera citing CENTCOM and the
+  Jordanian Armed Forces, TIER 2).
+- **10 Sep:** Saudi Arabia's **East-West pipeline**, the main route around Hormuz (up to
+  7 mb/d capacity to Yanbu), shut after a drone attack Saudi Arabia blames on Iranian-backed
+  militias in Iraq; two regional officials told AP repairs could take **3-5 weeks**. It
+  resumed on 22 Sep at a lower pumping rate (AP via PBS 14 Sep; The National 23 Sep, TIER 2).
+  How much crude was flowing through it when hit is not published by AP and is not recorded.
+- **21 Sep:** two tankers hit by unknown projectiles or debris in the strait, two crew with
+  minor injuries; not attributed (UKMTO via France 24, TIER 2).
+- **22 Sep:** US and Iranian delegations met on the UN sidelines with Qatar and Pakistan
+  mediating; accounts of the format differ. A senior Iranian official told Reuters Iran
+  could reopen Hormuz **within seven days** if the US eased military pressure and lifted its
+  blockade. That is a claim with conditions attached (lifting the blockade, unfreezing
+  assets) and is labelled as one (Al Jazeera 23 Sep; CNBC 22 Sep, TIER 2).
+- **Transits.** Lloyd's List Intelligence (own data, 16 Sep brief): **83** non-Iranian-linked
+  transits 31 Aug-6 Sep, **at least 97** for 7-13 Sep (preliminary; "likely to rise further
+  as additional dark transits are verified"), roughly 12 and 14 a day against ~100 before the
+  war. CENTCOM says **103** vessels have been redirected by its blockade of Iranian ports (a
+  claim, quoted by LLI). **LLI and PortWatch measure different things:** LLI verifies
+  AIS-dark transits; PortWatch counts only AIS and is a floor. Neither is wrong; the page
+  labels which is which.
+- **Mines, re-sourced.** The "over 100 suspected mines" figure now cites **Axios, 25 Aug
+  2026**, two US officials: the Navy cleared the Traffic Separation Scheme and underwater
+  drones had located more than 100 suspected mines. The President's statement that "all
+  mines" were removed is labelled a claim; Bloomberg reported on 26 Aug that US allies cast
+  doubt on it (TIER 2). The Wikipedia citation is gone from `war.mines_cleared` and from
+  the `mines-cleared` milestone. This closes the first item of update I's "still to verify".
+- **IEA September OMR (11 Sep, TIER 1)** supersedes August: world demand **-2.5 mb/d** in
+  2026 (a further 940 kb/d cut), **+2.6 mb/d** in 2027; supply **100.7 mb/d**, down 5.7;
+  **more than 10 mb/d** of Gulf output shut in; observed stocks drawn **507 mb** since
+  February (2.8 mb/d); Dated Brent **$91.00** August average, **$113.48** on 9 Sep; diesel
+  above **$200/bbl** in early September, 94% above pre-war.
+
+### Prices: spot and futures are both right
+
+| 2026 | Brent futures (settle) | EIA Brent spot | WTI futures (settle) | WTI Cushing spot |
+|---|---|---|---|---|
+| 15 Sep | **$108.75** | **$130.80** | $105.83 | $107.02 |
+| 22 Sep | **$99.25** | **$114.89** | $94.59 | $96.41 |
+
+Futures: CNBC settlement reports (TIER 2). Spot: EIA via FRED `DCOILBRENTEU`,
+`DCOILWTICO` (TIER 1). These are different instruments, not a data error: the physical
+cargo traded $22 above the futures contract on 15 Sep, the same kind of paper-physical gap the IEA
+recorded in April. **"Oil below $100" is true of Brent futures only.** The page's price
+series is FRED spot and no sentence mixes the two. WTI spot peaked at $107.02 on 15 Sep,
+below the $114.58 war peak of 7 Apr, so the masthead peak is unchanged.
+
+- **Diesel set an all-time record on the EIA series.** Weekly retail diesel (FRED `GASDESW`,
+  from 1994) first passed its 20 Jun 2022 peak of **$5.810** in the week of **7 Sep
+  ($5.967)**, then $6.285 (14 Sep) and **$6.529 (21 Sep)**. AAA's daily average reached a
+  record $6.51 on 21 Sep (NPR, TIER 2). The page computes the record flag from the series
+  (`series_record()`), so the verdict cannot go stale again.
+- Gasoline: EIA weekly **$4.478** (21 Sep); AAA **$4.43** (17 Sep), still below May's $4.56.
+
+### Inflation: August
+
+| Measure (Aug 2026) | y/y | m/m (SA) | Source |
+|---|---|---|---|
+| Headline CPI | **3.4%** | +0.4 | BLS, TIER 1 |
+| Core CPI | **2.4%** | +0.3 | BLS, TIER 1 |
+| Energy | **+16.3%** | +2.1 | BLS, TIER 1 |
+| Gasoline | **+27.4%** | +3.9 | BLS, TIER 1 |
+| Fuel oil | **+52.0%** | +10.1 | BLS, TIER 1 |
+| Airline fares | +23.4% | +2.7 | BLS, TIER 1 |
+| Food (all, incl. restaurants) | +2.7% | +0.1 | BLS, TIER 1 |
+| **Food at home** | **+2.2%** | **0.0** | BLS, TIER 1 |
+| Shelter | +3.0% | +0.3 | BLS, TIER 1 |
+| Real avg hourly earnings | **-0.3%** | | BLS Real Earnings, TIER 1 |
+| Euro area HICP (final) | **3.2%** (flash 3.3%), energy +14.3% | | Eurostat 17 Sep, TIER 1 |
+
+- **Food vs food at home.** In August, all-food is 2.7% and food at home 2.2%. The chain
+  table in update II read "food at home +2.7%": that was the correct **July** figure (FRED
+  `CUUR0000SAF11`, 2.68%), not a mislabel, but it is now stale and has been changed to the
+  August reading. Anywhere a number sits next to "food at home", it must be the SAF11 series,
+  not all-food.
+- **Euro area final August 3.2%**, a tenth below the flash; energy unchanged at 14.3%. On
+  published headlines the US-euro gap is about 0.2pp (3.4 vs 3.2). Europe is catching the
+  same energy shock; this still weakens any "America-specific excess" reading for 2026.
+  `inflation.euro_area_flash_august` keeps the flash in `headline_pct` because the V4 ledger
+  labels it as the flash; the final is in `euro_area_august_final`.
+- **Michigan, preliminary September: 47.8** (August 51.7); year-ahead expectations **4.6%**
+  (from 4.0%), long-run **3.4%** (from 3.3%) (TIER 1). Final due 25 Sep.
+
+### The Fed hiked
+
+- **16 Sep: +25bp to 3.75-4.00%, 12-0**, the first hike since 2023 (meeting 15-16 Sep).
+  `rates.fedwatch_september_hike` is resolved and superseded by
+  `rates.fomc_september_decision`.
+- **SEP medians (June in brackets):** fed funds end-2026 **4.1%** (3.8), end-2027 **4.1%**
+  (3.6); PCE 2026 **3.7%** (3.6); core PCE **3.4%** (3.3); unemployment **4.1%** (4.3); GDP
+  **2.3%** (2.2) (TIER 1). The committee raised growth and lowered unemployment while
+  hiking: it sees resilient demand, not only an oil shock. Say so.
+- Statement wording is quoted exactly in the context entry; it does not attribute inflation
+  to energy. The page must not imply the Fed blamed the war.
+
+### Labour
+
+- Initial claims **196,000** (w/e 12 Sep), 4-week average **203,250**; continued claims
+  **1.73M** (w/e 5 Sep) (DOL via FRED, TIER 1).
+- Preliminary benchmark **-79,000 (-0.1%)** to March 2026, private -178,000; final in
+  February 2027 (BLS, 28 Aug, TIER 1).
+- The frame that goes with both: layoffs rate **1.0%**, hires **3.2%** (July JOLTS);
+  long-term unemployed **27.0%** of the jobless in August vs **21.1%** in January 2025
+  (FRED `JTSLDR`, `JTSHIR`, `LNS13025703`, TIER 1). Low claims mean few people are being
+  let go, not that the jobless are finding work. Both halves are shown.
+
+### Tariffs: customs receipts
+
+See the first list. The MTS series is the net-of-refunds headline in update II's metrics
+table; August is the first positive month since April, and FYTD receipts are $2.1bn above
+last year. The receipt block and any "refunds exceed collections" copy must read the live
+series, not a typed month.
+
+### Gold: July points added
+
+Fed Table 3.13, August release (July provisional, TIER 1): earmarked gold **$7,812m**
+(about **5,755 t**) from $7,818m in June. Aug 2025 to Jul 2026 is now **about 164 t out**
+(was 159 t to June); the row has still not risen in any month. Custody Treasuries **up**
+to $2,634,150m (see the first list). The share-card text that says "159 tonnes" is typed,
+not computed, and will need the new figure when that file is next rebuilt.
+
+### What the war cost America: updates since 5 Sep
+
+- **Pentagon: $43.6bn** as of 3 Sep, the highest official estimate so far: $11.2bn
+  obligated for operations plus $32.4bn unfunded replacement (munitions, damaged aircraft,
+  other assets), excluding damage to US facilities in eight countries. The document is not
+  public; the figure is as reported by Roll Call (18 Sep), so **TIER 2**. It replaces $37.5bn
+  (Hegseth, 21 Jul, kept as `prior`). The $67.1bn supplemental request is unchanged.
+- **CBO (15 Sep): about $38bn through 1 Aug**, plus **$2-3bn a month**; munitions
+  replacement $21.7bn (interceptors $13.1bn); equipment lost $1.9bn, or $3.3bn to replace
+  with current platforms; 42 planes and one radar system lost. CBO: the US has probably used
+  one-half to two-thirds of certain interceptor inventories since June 2025, and rebuilding
+  would probably take at least five years. Breakdown as reported by Breaking Defense (the
+  CBO PDF could not be retrieved to check line by line), so **TIER 2**.
+- **Lives:** the headline stays the official **18**. The Washington Post (18 Sep, six
+  officials) reported **at least 22** military deaths, a sixth official saying 23 including
+  deaths not directly connected to the fighting. Hegseth: "DISGUSTING and FAKE. A complete
+  LIE." Shown as a reported alternative with the denial, not as the count.
+- **Aircraft:** headline **42** stands (CRS to 13 May; CBO's count to 1 Aug agrees). The
+  DoD Lead Inspector General's quarterly report (released 9 Sep, to 30 Jun) gives "as many
+  as 30" MQ-9s destroyed (CRS 24) and lists AH-6, AH-64 and MH-60S losses not in CRS; its
+  counts are ranges, so the per-type list is not changed to mix sources.
+- **Patriot interceptors:** no newer Tier 1/2 count since CSIS (27 Jul). Unchanged.
+
+### Event study: eight events added, none in the study
+
+`data/war_milestones.json` gains eight dated entries (7 Sep diesel record, 8 Sep tankers and
+Jordan, 10 Sep pipeline, 11 Sep CPI, 11 Sep IEA, 16 Sep Fed, 21 Sep tankers, 22 Sep talks),
+all `study: false`. The 22 Sep talks carry **sign -1** (de-escalation) and sit on the
+seismograph as `kind: war` next to the strikes, because they cut against the escalation
+story. None enter the test: adding events after seeing the price path is exactly what the
+test is meant to rule out. The count stays 5 of 7.
+
+### Corrections made in this update
+
+- Update I called EIA's $5.652 (24 Aug) "a series record". It was below the $5.810 peak of
+  20 Jun 2022; corrected in place, and in `prices.diesel_record`'s note.
+- Update II's chain table showed July food at home (2.7%) as "latest"; now August, 2.2%.
+- Update II said "the diesel record of late August"; the EIA record came on 7 Sep.
+
+### Left out, or still to verify
+
+- AAA diesel **$6.06 on 11 Sep**: not found in a Tier 1/2 source; left out.
+- "First US-Iran contact **since July**": sources say "weeks without direct contact"; the
+  page says "in weeks", not "since July".
+- East-West pipeline throughput at the time of the attack (the "4-5 mb/d" figure): AP gives
+  capacity only; left out.
+- The CBO PDF line items, to lift `war_cost.cbo_estimate` to TIER 1.
+- UMich final September (25 Sep) replaces the preliminary reading.
+
+### Next dates
+
+- **2 Oct**: September jobs report (BLS).
+- **14 Oct**: September CPI (BLS).
+- **28 Oct**: FOMC decision (meeting 27-28 Oct, no SEP).

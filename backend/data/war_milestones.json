@@ -236,9 +236,9 @@
     "kind": "policy",
     "sign": -1,
     "study": false,
-    "headline": "US Navy says it has cleared mines from the strait",
-    "description": "Officials confirm underwater drones identified more than 100 suspected mines. Transits do not recover: PortWatch counts four vessels that day.",
-    "source_url": "https://en.wikipedia.org/wiki/2026_Iran_war",
+    "headline": "The President says all mines have been removed from the strait",
+    "description": "A claim. Two US officials told Axios the Navy had cleared the central shipping lane and that underwater drones had located more than 100 suspected mines; US allies cast doubt on the claim the next day (Bloomberg). Transits do not recover: PortWatch counts four vessels that day.",
+    "source_url": "https://www.axios.com/2026/08/25/hormuz-mines-remove-oil-iran-trump",
     "source_tier": 2
   },
   {
@@ -297,6 +297,17 @@
     "source_tier": 1
   },
   {
+    "id": "diesel-record-eia",
+    "date": "2026-09-07",
+    "kind": "context",
+    "sign": 0,
+    "study": false,
+    "headline": "EIA weekly diesel passes its 2022 record: $5.967 a gallon",
+    "description": "The EIA's weekly retail diesel survey (FRED GASDESW, from 1994) moves above its previous peak of $5.810 set on 20 June 2022 for the first time. It keeps climbing: $6.285 on 14 Sep and $6.529 on 21 Sep, an all-time high for the series.",
+    "source_url": "https://fred.stlouisfed.org/series/GASDESW",
+    "source_tier": 1
+  },
+  {
     "id": "canada-retaliates",
     "date": "2026-09-08",
     "kind": "tariff",
@@ -305,6 +316,83 @@
     "headline": "Canada's dollar-for-dollar counter-tariffs take effect on C$27.6 billion of US goods",
     "description": "Steel, dairy, appliances, agricultural equipment, pulp and paper, electronics. Carney: talks will not resume until the US changes its approach.",
     "source_url": "https://www.aljazeera.com/news/2026/8/23/canada-to-hit-us-with-retaliatory-tariffs-as-trade-war-escalates",
+    "source_tier": 2
+  },
+  {
+    "id": "iranian-tankers-jordan",
+    "date": "2026-09-08",
+    "kind": "war",
+    "sign": 1,
+    "study": false,
+    "headline": "US destroys five Iranian tankers; Iran fires 20 ballistic missiles at a US base in Jordan",
+    "description": "CENTCOM says the strikes followed two IRGC ballistic-missile attacks on a US Navy warship in two days; the tanker crews were warned to abandon ship. Jordan's armed forces say 18 of the 20 missiles aimed at the base near Al Azraq were intercepted and two fell in unpopulated areas, with no casualties. The IRGC's claim to have attacked ten ships is unverified.",
+    "source_url": "https://www.aljazeera.com/news/2026/9/9/us-destroys-five-iranian-tankers-iran-retaliates-with-attacks-on-jordan-base",
+    "source_tier": 2
+  },
+  {
+    "id": "east-west-pipeline",
+    "date": "2026-09-10",
+    "kind": "war",
+    "sign": 1,
+    "study": false,
+    "headline": "Saudi East-West pipeline, the main route around Hormuz, shut after a drone attack",
+    "description": "Saudi Arabia blames drones from Iranian-backed militias in Iraq. The 1,200 km line to Yanbu on the Red Sea can carry up to 7 million barrels a day; two regional officials told AP repairs could take three to five weeks. It resumed on 22 Sep at a lower pumping rate. EIA Brent spot reaches $130.80 on 15 Sep.",
+    "source_url": "https://www.pbs.org/newshour/world/saudi-oil-pipeline-hit-in-strikes-will-be-mostly-out-of-service-for-several-weeks",
+    "source_tier": 2
+  },
+  {
+    "id": "august-cpi",
+    "date": "2026-09-11",
+    "kind": "context",
+    "sign": 0,
+    "study": false,
+    "headline": "August CPI: 3.4% headline, 2.4% core, energy +16.3%, gasoline +27.4%",
+    "description": "Headline rises 0.4% on the month, core 0.3%. Energy is the story: fuel oil +52.0% and airfares +23.4% on the year. Food at home is flat on the month and +2.2% on the year, down from 2.7% in July. Real average hourly earnings -0.3% y/y.",
+    "source_url": "https://www.bls.gov/news.release/cpi.nr0.htm",
+    "source_tier": 1
+  },
+  {
+    "id": "iea-september",
+    "date": "2026-09-11",
+    "kind": "context",
+    "sign": 1,
+    "study": false,
+    "headline": "IEA: world oil demand to fall 2.5 mb/d in 2026; more than 10 mb/d of Gulf output shut in",
+    "description": "The September Oil Market Report cuts 2026 demand by a further 940 kb/d and puts supply at 100.7 mb/d, down 5.7 mb/d. Observed stocks have drawn 507 million barrels since February. Dated Brent averaged $91.00 in August and hit $113.48 on 9 Sep; diesel passed $200 a barrel in early September.",
+    "source_url": "https://www.iea.org/reports/oil-market-report-september-2026",
+    "source_tier": 1
+  },
+  {
+    "id": "fed-hike-september",
+    "date": "2026-09-16",
+    "kind": "policy",
+    "sign": 0,
+    "study": false,
+    "headline": "Fed raises rates a quarter point to 3.75-4.00%, 12-0",
+    "description": "The first increase since 2023. The statement says 'Inflation remains elevated' and names no energy, oil or Iran effect; it cites 'geopolitical developments' only as a source of uncertainty. Median projections: fed funds 4.1% at end-2026 and end-2027, PCE inflation 3.7% and core 3.4% this year, unemployment 4.1%.",
+    "source_url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm",
+    "source_tier": 1
+  },
+  {
+    "id": "two-tankers-september",
+    "date": "2026-09-21",
+    "kind": "war",
+    "sign": 1,
+    "study": false,
+    "headline": "Two tankers hit by unknown projectiles in the strait; two crew injured",
+    "description": "UKMTO reports a crude tanker entering the strait struck by an unknown projectile, with two crew slightly injured, and an outbound LPG carrier hit by debris. Neither attack was attributed.",
+    "source_url": "https://www.france24.com/en/middle-east/20260921-projectile-hits-tanker-as-it-enters-the-strait-of-hormuz",
+    "source_tier": 2
+  },
+  {
+    "id": "unga-talks",
+    "date": "2026-09-22",
+    "kind": "war",
+    "sign": -1,
+    "study": false,
+    "headline": "US and Iran hold mediated talks at the UN; Brent futures settle below $100",
+    "description": "Qatar and Pakistan mediate on the sidelines of the General Assembly; the President calls it a 'very good' three-hour meeting. A senior Iranian official tells Reuters Iran could reopen Hormuz within seven days if the US lifts its blockade: a claim, with conditions. Brent futures settle $99.25 after five losing sessions, but EIA Brent spot is still $114.89.",
+    "source_url": "https://www.cnbc.com/2026/09/22/oil-iran-us-bessent-un-crude.html",
     "source_tier": 2
   }
 ]

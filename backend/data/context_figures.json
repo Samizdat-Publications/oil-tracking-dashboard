@@ -1,18 +1,20 @@
 {
   "_meta": {
-    "as_of": "2026-09-05",
-    "note": "Figures the page uses that do not live on FRED. Every entry carries a source, a URL, a tier and an as-of date, and is mirrored in docs/THESIS.md (section 'September 2026 update'). TIER 1 = official statistics, central banks, IEA, IMF, WTO, Fed research. TIER 2 = Reuters, Bloomberg, FT, CNBC, S&P Global, Lloyd's List, Kpler, major outlets. TIER 3 is never load-bearing and does not appear here.",
-    "rule": "If a figure here disagrees with a FRED series in the snapshot, the FRED series wins and this entry must be corrected."
+    "as_of": "2026-09-23",
+    "note": "Figures the page uses that do not live on FRED. Every entry carries a source, a URL, a tier and an as-of date, and is mirrored in docs/THESIS.md (sections 'September 2026 update', 'update II' and 'Update III (23 Sep 2026)'). TIER 1 = official statistics, central banks, IEA, IMF, WTO, Fed research. TIER 2 = Reuters, Bloomberg, FT, CNBC, S&P Global, Lloyd's List, Kpler, major outlets. TIER 3 is never load-bearing and does not appear here.",
+    "rule": "If a figure here disagrees with a FRED series in the snapshot, the FRED series wins and this entry must be corrected.",
+    "superseded": "An entry replaced by a newer reading keeps its key, because older views (the V4 ledger) read it by name, and gains `superseded_by` naming the key that replaces it. Read the newer key for anything current."
   },
 
   "gold": {
     "fed_earmarked_gold": {
       "name": "Gold held under earmark at the New York Fed for foreign and international accounts",
-      "source": "Federal Reserve, International Summary Statistics, Table 3.13 'Selected Foreign Official Assets Held at Federal Reserve Banks' (July 2026 release, provisional)",
-      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260731.htm",
+      "source": "Federal Reserve, International Summary Statistics, Table 3.13 'Selected Foreign Official Assets Held at Federal Reserve Banks' (August 2026 release; July 2026 point provisional)",
+      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260831.htm",
       "tier": 1,
+      "as_of": "2026-07",
       "unit": "millions of US dollars at the statutory $42.22 per fine troy ounce",
-      "note": "The statutory valuation has not changed since 1973, so a change in this row is a change in OUNCES, not in price. Tonnes = usd_m / 42.22 * 31.1034768 / 1000.",
+      "note": "The statutory valuation has not changed since 1973, so a change in this row is a change in OUNCES, not in price. Tonnes = usd_m / 42.22 * 31.1034768 / 1000. July 2026 ($7,812m, about 5,755 t) is marked provisional by the Fed. Aug 2025 to Jul 2026: about 164 t out; the row fell or held flat in every month and rose in none.",
       "points": [
         { "date": "2025-08-01", "usd_m": 8034 },
         { "date": "2025-09-01", "usd_m": 7986 },
@@ -24,15 +26,18 @@
         { "date": "2026-03-01", "usd_m": 7872 },
         { "date": "2026-04-01", "usd_m": 7852 },
         { "date": "2026-05-01", "usd_m": 7839 },
-        { "date": "2026-06-01", "usd_m": 7818 }
+        { "date": "2026-06-01", "usd_m": 7818 },
+        { "date": "2026-07-01", "usd_m": 7812 }
       ]
     },
     "fed_custody_treasuries": {
       "name": "US Treasury securities held in custody at the Federal Reserve for foreign official and international accounts",
-      "source": "Federal Reserve, Table 3.13 (July 2026 release)",
-      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260731.htm",
+      "source": "Federal Reserve, Table 3.13 (August 2026 release; July 2026 point provisional)",
+      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260831.htm",
       "tier": 1,
+      "as_of": "2026-07",
       "unit": "millions of US dollars, face value",
+      "note": "CUTS AGAINST the custody-flight reading: July rose $18.1bn on the month to $2,634,150m, the first monthly rise since April. Still $148bn below the January 2026 high.",
       "points": [
         { "date": "2025-12-01", "usd_m": 2713888 },
         { "date": "2026-01-01", "usd_m": 2782557 },
@@ -40,7 +45,8 @@
         { "date": "2026-03-01", "usd_m": 2717909 },
         { "date": "2026-04-01", "usd_m": 2725241 },
         { "date": "2026-05-01", "usd_m": 2665990 },
-        { "date": "2026-06-01", "usd_m": 2616059 }
+        { "date": "2026-06-01", "usd_m": 2616059 },
+        { "date": "2026-07-01", "usd_m": 2634150 }
       ]
     },
     "historical_custody": {
@@ -181,13 +187,47 @@
       "regional_exports_mbd": 15,
       "stock_draw_feb_to_jul_mb": 410,
       "stock_draw_feb_to_jul_mbd": 2.7,
-      "dated_brent_end_july_usd": 96.80,
+      "dated_brent_end_july_usd": 96.8,
       "dated_brent_spike_23_july_usd": 105,
       "diesel_export_disruption_mbd": 1.3,
       "jet_export_disruption_mbd": 0.67,
       "note": "The strait was 'effectively closed again in early July'. Demand contracted 4.9 mb/d year on year in Q2 and 2.8 mb/d in Q3.",
       "source": "IEA",
       "url": "https://www.iea.org/reports/oil-market-report-august-2026",
+      "tier": 1,
+      "superseded_by": "trade.iea_september_omr"
+    },
+    "iea_september_omr": {
+      "name": "IEA Oil Market Report, September 2026",
+      "release": "2026-09-11",
+      "world_demand_change_2026_mbd": -2.5,
+      "world_demand_change_2026_revision_kbd": -940,
+      "world_demand_change_2027_mbd": 2.6,
+      "world_supply_2026_mbd": 100.7,
+      "world_supply_change_2026_mbd": -5.7,
+      "gulf_shut_in_mbd_more_than": 10,
+      "stock_draw_since_feb_mb": 507,
+      "stock_draw_since_feb_mbd": 2.8,
+      "dated_brent_aug_avg_usd": 91.0,
+      "dated_brent_9_sep_usd": 113.48,
+      "diesel_early_sep_usd_bbl_above": 200,
+      "diesel_vs_prewar_pct": 94,
+      "note": "More than 10 mb/d of Gulf output remains 'shut in amid heightened security risks'. The 2027 rebound of 2.6 mb/d 'narrowly' offsets this year's loss. IEA refers to 'US military escorts protecting flows through Hormuz'. Dated Brent is the physical North Sea price, not the futures contract.",
+      "source": "IEA",
+      "url": "https://www.iea.org/reports/oil-market-report-september-2026",
+      "tier": 1
+    },
+    "customs_duties_mts_august": {
+      "name": "Customs duties, net of refunds, Monthly Treasury Statement",
+      "release": "2026-09",
+      "month": "2026-08",
+      "net_usd_bn": 12.84,
+      "prior_months_net_usd_bn": { "2026-05": -0.04, "2026-06": -25.56, "2026-07": -8.55 },
+      "fytd_usd_bn": 167.3,
+      "prior_fytd_usd_bn": 165.2,
+      "note": "CUTS AGAINST the 'refunds now exceed collections' reading. After three net-negative months (May, June, July) as IEEPA refunds were paid out, net customs receipts turned POSITIVE again in August, and fiscal-year-to-date receipts ($167.3bn) are now slightly ABOVE the same point a year earlier ($165.2bn). Figures computed from mts_table_9, 'Customs Duties' row, current month and FYTD columns.",
+      "source": "US Treasury, Fiscal Data, Monthly Treasury Statement Table 9 (mts_table_9), August 2026",
+      "url": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/",
       "tier": 1
     },
     "drewry_wci": {
@@ -238,12 +278,21 @@
       "tier": 2
     },
     "transits_lloyds": {
-      "week_ending": "2026-09-01",
-      "avg_transits_per_day": 12,
+      "week_ending": "2026-09-13",
+      "weekly_transits": 97,
+      "weekly_transits_preliminary": true,
+      "prior_week_ending": "2026-09-06",
+      "prior_weekly_transits": 83,
+      "avg_transits_per_day": 13.9,
+      "prior_avg_transits_per_day": 11.9,
       "prewar_transits_per_day": 100,
       "prewar_oil_mbd": 20,
-      "source": "Lloyd's List Intelligence, as reported by Al Jazeera, 3 September 2026",
-      "url": "https://www.aljazeera.com/news/2026/9/3/how-much-oil-is-going-through-hormuz-how-data-doesnt-match-us-claims",
+      "prewar_source": "Lloyd's List Intelligence, as reported by Al Jazeera, 3 September 2026",
+      "centcom_vessels_redirected_claim": 103,
+      "quote": "there is no suggestion of a Hormuz revival",
+      "note": "Counts are non-Iranian-linked transits (defined by ownership, trade exposure or sanctions status): at least 97 for 7-13 Sep (preliminary, 'likely to rise further as additional dark transits are verified') against 83 for 31 Aug-6 Sep. Per-day averages are the weekly count divided by seven, computed here. LLI verifies AIS-dark transits, so its counts run above IMF PortWatch, which is AIS-only and therefore a floor; the two measure different things and neither is wrong. The 103 vessels redirected is CENTCOM's own figure for its blockade of Iranian ports, as quoted by LLI, and is labelled a claim. Previous reading: about 12 a day in the week to 1 Sep (Al Jazeera, 3 Sep).",
+      "source": "Lloyd's List Intelligence, Strait of Hormuz brief, 16 September 2026 (own data)",
+      "url": "https://www.lloydslistintelligence.com/resources/blog/strait-of-hormuz-brief-16-september-2026",
       "tier": 2
     },
     "us_claims": {
@@ -268,9 +317,57 @@
     "mines_cleared": {
       "date": "2026-08-25",
       "suspected_mines_identified": 100,
-      "note": "US officials confirmed the Navy had cleared mines from the strait; underwater drones identified more than 100 suspected mines.",
-      "source": "US officials, as summarised from contemporaneous CNN/Reuters reporting",
-      "url": "https://en.wikipedia.org/wiki/2026_Iran_war",
+      "suspected_mines_qualifier": "more than",
+      "president_claim": "all mines have been removed from the Strait of Hormuz",
+      "note": "OFFICIAL CLAIMS, labelled as such. The President announced that all mines had been removed. Two US officials with direct knowledge told Axios the Navy had cleared the Traffic Separation Scheme (the median shipping lane between Oman and Iran), and that over several months US Navy underwater drones had located more than 100 objects suspected to be mines, with private contractors hired to remove or detonate them. Bloomberg reported on 26 Aug that US allies cast doubt on the claim that the strait had been demined. Transits did not recover: IMF PortWatch counted four vessels on 25 Aug.",
+      "source": "Axios, 25 August 2026, citing two US officials; Bloomberg, 26 August 2026",
+      "url": "https://www.axios.com/2026/08/25/hormuz-mines-remove-oil-iran-trump",
+      "counter_url": "https://www.bloomberg.com/news/articles/2026-08-26/us-allies-cast-doubt-on-trump-s-claim-hormuz-has-been-demined",
+      "tier": 2
+    },
+    "september_escalation": {
+      "date": "2026-09-08",
+      "iranian_tankers_destroyed_by_us": 5,
+      "tanker_names": ["Kivik", "Charminar", "Horizon 1", "Riesco", "Derya"],
+      "missiles_at_jordan": 20,
+      "missiles_intercepted_by_jordan": 18,
+      "casualties_reported": 0,
+      "iran_claim_ships_attacked": 10,
+      "note": "CENTCOM said US forces destroyed five Iranian tankers late on Tuesday 8 Sep after the IRGC fired ballistic missiles at a US Navy warship twice in two days; crews were warned to abandon ship first. Iran fired 20 ballistic missiles at a US base near Al Azraq, Jordan; Jordan's armed forces said 18 were intercepted and two fell in unpopulated areas, with no casualties. The IRGC's claim to have attacked 10 ships (two American vessels, eight tankers) is Iran's own and was not independently verified.",
+      "source": "Al Jazeera, 9 September 2026, citing CENTCOM and the Jordanian Armed Forces; Euronews, 9 September 2026",
+      "url": "https://www.aljazeera.com/news/2026/9/9/us-destroys-five-iranian-tankers-iran-retaliates-with-attacks-on-jordan-base",
+      "tier": 2
+    },
+    "east_west_pipeline": {
+      "shut": "2026-09-10",
+      "capacity_mbd_up_to": 7,
+      "repair_weeks": "3-5",
+      "restarted": "2026-09-22",
+      "restart_rate": "lower rate of pumping",
+      "note": "Saudi Arabia's 1,200 km East-West pipeline, which carries crude from the Gulf coast to Yanbu on the Red Sea and so bypasses Hormuz, was shut on Thursday 10 Sep after an attack Saudi Arabia blamed on drones from Iranian-backed militias in Iraq. Two regional officials told AP repairs could take three to five weeks and that the line might work partially meanwhile. It resumed operations on 22 Sep at a lower pumping rate (The National, 23 Sep). Capacity is AP's 'up to 7 million barrels of oil a day'; how much was flowing at the time of the attack is not given by AP and is not recorded here.",
+      "source": "Associated Press via PBS NewsHour, 14 September 2026; The National, 23 September 2026",
+      "url": "https://www.pbs.org/newshour/world/saudi-oil-pipeline-hit-in-strikes-will-be-mostly-out-of-service-for-several-weeks",
+      "restart_url": "https://www.thenationalnews.com/business/energy/2026/09/23/oil-at-100-a-barrel-as-focus-remains-on-iran-peace-talks-and-saudi-supply-recovery/",
+      "tier": 2
+    },
+    "tankers_21_sep": {
+      "date": "2026-09-21",
+      "vessels_hit": 2,
+      "crew_injured": 2,
+      "note": "UKMTO reported a crude tanker entering the strait hit by an 'unknown projectile' (two crew with minor injuries) and an outbound LPG carrier hit by debris from unknown projectiles (no casualties). Neither UKMTO nor France 24 attributed the attacks.",
+      "source": "France 24, 21 September 2026, citing UKMTO",
+      "url": "https://www.france24.com/en/middle-east/20260921-projectile-hits-tanker-as-it-enters-the-strait-of-hormuz",
+      "tier": 2
+    },
+    "us_iran_talks": {
+      "date": "2026-09-22",
+      "venue": "Sidelines of the UN General Assembly, New York",
+      "mediators": ["Qatar", "Pakistan"],
+      "president_claim": "a 'very good' three-hour meeting",
+      "iran_claim": "Iran could reopen Hormuz within seven days if the US eased military pressure and lifted its blockade",
+      "note": "CUTS AGAINST the escalation reading, and the market treated it that way: Brent futures fell below $100 (see prices.crude_spot_vs_futures). Accounts of the format differ: US envoy Witkoff said mediators 'shuttled between' delegations; the President described a three-hour meeting; Iranian state media reported a meeting between Foreign Minister Araghchi and Witkoff. Al Jazeera describes it as following weeks without direct contact. The seven-day reopening offer is a senior Iranian official speaking to Reuters and is a claim; Iran's stated conditions include lifting the naval blockade and unfreezing assets.",
+      "source": "Al Jazeera, 23 September 2026; CNBC, 22 September 2026",
+      "url": "https://www.aljazeera.com/news/2026/9/23/us-iran-hold-mediated-unga-talks-on-ending-war-opening-strait-of-hormuz",
       "tier": 2
     },
     "war_risk_premium": {
@@ -307,10 +404,71 @@
       "usd_per_gal": 5.85,
       "prior_record_usd": 5.82,
       "prior_record_date": "2022-06",
-      "note": "GasBuddy daily tracker. The EIA weekly survey (FRED GASDESW), which the page uses for the bar, read $5.65 on 24 August, itself a series record.",
+      "note": "GasBuddy daily tracker. CORRECTION (23 Sep 2026): an earlier version of this note called the EIA weekly reading of $5.652 on 24 August 'a series record'. It was not: the EIA weekly series (FRED GASDESW, from 1994) peaked at $5.810 on 20 June 2022, and $5.652 is below it. The EIA series first passed that peak in the week of 7 September 2026 ($5.967); see prices.diesel_record_eia.",
       "source": "GasBuddy, via Yahoo Finance, 4 September 2026",
       "url": "https://finance.yahoo.com/energy/articles/national-diesel-price-reaches-time-163250834.html",
+      "tier": 2,
+      "superseded_by": "prices.diesel_record_eia"
+    },
+    "diesel_record_eia": {
+      "date": "2026-09-21",
+      "usd_per_gal": 6.529,
+      "is_series_record": true,
+      "prior_record_usd": 5.81,
+      "prior_record_date": "2022-06-20",
+      "first_week_above_prior_record": "2026-09-07",
+      "first_week_above_prior_record_usd": 5.967,
+      "weekly_points": [
+        { "date": "2026-08-24", "usd_per_gal": 5.652 },
+        { "date": "2026-08-31", "usd_per_gal": 5.599 },
+        { "date": "2026-09-07", "usd_per_gal": 5.967 },
+        { "date": "2026-09-14", "usd_per_gal": 6.285 },
+        { "date": "2026-09-21", "usd_per_gal": 6.529 }
+      ],
+      "aaa_date": "2026-09-21",
+      "aaa_usd_per_gal": 6.51,
+      "note": "EIA weekly retail diesel (FRED GASDESW, series from 1994) set an all-time record of $6.529 in the week of 21 Sep. The FRED series is canonical and the page computes the record flag from it (series_record in services/macro.py); this entry is the citation. AAA's daily national average, a different survey, reached a record $6.51 on 21 Sep (NPR, Tier 2).",
+      "source": "US EIA, Gasoline and Diesel Fuel Update, weekly, via FRED GASDESW; AAA via NPR, 21 September 2026",
+      "url": "https://fred.stlouisfed.org/series/GASDESW",
+      "aaa_url": "https://www.npr.org/2026/09/21/nx-s1-5975468/diesel-the-fuel-the-u-s-economy-runs-on-hits-record-high",
+      "tier": 1
+    },
+    "aaa_mid_september": {
+      "date": "2026-09-17",
+      "usd_per_gal": 4.43,
+      "week_change_cents": 16,
+      "year_change": "more than one dollar higher than a year ago",
+      "peak_2026_usd": 4.56,
+      "peak_2026_date": "2026-05-21",
+      "note": "Regular gasoline is still BELOW its 2026 high of $4.56 on 21 May; recorded because it cuts against any 'record gasoline' framing. EIA weekly (FRED GASREGW) read $4.478 on 21 Sep.",
+      "source": "AAA Newsroom, 17 September 2026",
+      "url": "https://newsroom.aaa.com/2026/09/pump-prices-keep-climbing-as-crude-oil-remains-high-2/",
       "tier": 2
+    },
+    "crude_spot_vs_futures": {
+      "name": "Crude, September 2026: physical spot vs front-month futures",
+      "futures": {
+        "brent_15_sep_usd": 108.75,
+        "wti_15_sep_usd": 105.83,
+        "brent_22_sep_usd": 99.25,
+        "wti_22_sep_usd": 94.59,
+        "losing_sessions_to_22_sep": 5,
+        "source": "CNBC, 15 and 22 September 2026 (settlement prices)",
+        "url": "https://www.cnbc.com/2026/09/22/oil-iran-us-bessent-un-crude.html",
+        "url_15_sep": "https://www.cnbc.com/2026/09/15/oil-extends-gains-following-houthi-strikes-on-saudi-arabia.html",
+        "tier": 2
+      },
+      "spot": {
+        "brent_15_sep_usd": 130.8,
+        "brent_22_sep_usd": 114.89,
+        "wti_cushing_15_sep_usd": 107.02,
+        "wti_cushing_22_sep_usd": 96.41,
+        "source": "US EIA spot prices via FRED DCOILBRENTEU (Europe Brent spot FOB) and DCOILWTICO (Cushing, OK)",
+        "url": "https://fred.stlouisfed.org/series/DCOILBRENTEU",
+        "tier": 1
+      },
+      "note": "Both sets of numbers are real; they are different instruments. The ICE Brent futures contract settled $108.75 on 15 Sep while EIA's Brent spot series printed $130.80 the same day: a $22 physical premium, the same kind of paper-physical gap the IEA recorded in April (a record $35 then). After five losing sessions on news of US-Iran talks, Brent FUTURES settled $99.25 on 22 Sep, below $100, but Brent SPOT was still $114.89. 'Oil below $100' is true of futures only. WTI spot peaked at $107.02 on 15 Sep, below the $114.58 war peak of 7 Apr. The page's price series is FRED spot; never mix the two in one line.",
+      "tier": 1
     }
   },
 
@@ -322,7 +480,40 @@
       "note": "Probability of a 25bp increase at the September FOMC after Chair Kevin Warsh's Jackson Hole remarks that underlying inflation had not 'meaningfully improved'.",
       "source": "CME FedWatch, as reported by ATFX / Marketplace, late August 2026",
       "url": "https://www.marketplace.org/story/2026/08/31/will-the-fed-raise-rates-at-september-fomc-meeting",
-      "tier": 2
+      "tier": 2,
+      "resolved": "The FOMC raised rates 25bp on 16 September 2026.",
+      "superseded_by": "rates.fomc_september_decision"
+    },
+    "fomc_september_decision": {
+      "meeting": "2026-09-15/16",
+      "announced": "2026-09-16",
+      "change_bp": 25,
+      "target_range_pct": [3.75, 4.0],
+      "vote": "12-0",
+      "first_hike_since": "2023",
+      "statement_inflation": "Inflation remains elevated.",
+      "statement_geopolitics": "While uncertainty remains elevated owing, in part, to geopolitical developments, domestic spending has been resilient.",
+      "statement_mentions_energy_or_oil": false,
+      "sep_medians": {
+        "fed_funds_end_2026_pct": 4.1,
+        "fed_funds_end_2026_june_pct": 3.8,
+        "fed_funds_end_2027_pct": 4.1,
+        "fed_funds_end_2027_june_pct": 3.6,
+        "pce_2026_pct": 3.7,
+        "pce_2026_june_pct": 3.6,
+        "core_pce_2026_pct": 3.4,
+        "core_pce_2026_june_pct": 3.3,
+        "unemployment_2026_pct": 4.1,
+        "unemployment_2026_june_pct": 4.3,
+        "gdp_2026_pct": 2.3,
+        "gdp_2026_june_pct": 2.2
+      },
+      "next_meeting": "2026-10-27/28",
+      "note": "CUTS AGAINST a 'the Fed blames the war' reading: the statement names neither energy, oil nor Iran; its only nod is 'geopolitical developments' as a source of uncertainty, alongside 'domestic spending has been resilient'. The SEP raised the 2026 growth median and lowered the unemployment median. The median puts end-2026 and end-2027 both at 4.1%, above the new range's 3.875% midpoint. The October meeting carries no SEP.",
+      "source": "Federal Reserve, FOMC statement and Summary of Economic Projections, 16 September 2026",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm",
+      "sep_url": "https://www.federalreserve.gov/monetarypolicy/fomcprojtabl20260916.htm",
+      "tier": 1
     }
   },
 
@@ -347,8 +538,41 @@
       "openings_m": 7.27,
       "hires_rate_pct": 3.2,
       "quits_rate_pct": 1.9,
+      "layoffs_rate_pct": 1.0,
+      "note": "Layoffs and discharges rate 1.0% (FRED JTSLDR) against hires 3.2%: low-fire, low-hire.",
       "source": "BLS, Job Openings and Labor Turnover, July 2026",
       "url": "https://www.bls.gov/news.release/jolts.nr0.htm",
+      "tier": 1
+    },
+    "claims_mid_september": {
+      "week_ending": "2026-09-12",
+      "initial_claims": 196000,
+      "initial_claims_4wk_avg": 203250,
+      "continued_claims_week_ending": "2026-09-05",
+      "continued_claims": 1730000,
+      "note": "CUTS AGAINST a 'labour market is breaking' reading: initial claims are low and continued claims are below their August level. Recorded alongside the context that frames them: layoffs are low (1.0%) but so is hiring (3.2%), and the long-term unemployed were 27.0% of the jobless in August against 21.1% in January 2025 (FRED LNS13025703). Low claims mean few people are being let go, not that the jobless are finding work.",
+      "source": "US Department of Labor, Unemployment Insurance Weekly Claims, via FRED ICSA, IC4WSA, CCSA",
+      "url": "https://fred.stlouisfed.org/series/ICSA",
+      "tier": 1
+    },
+    "benchmark_prelim_2026": {
+      "release": "2026-08-28",
+      "reference_month": "2026-03",
+      "total_nonfarm_revision": -79000,
+      "total_nonfarm_revision_pct": -0.1,
+      "private_revision": -178000,
+      "ten_year_absolute_average_pct": 0.2,
+      "note": "CUTS AGAINST a 'the job numbers were inflated' reading: the preliminary benchmark revision to March 2026 payrolls was -79,000 (-0.1%), smaller than the 0.2% ten-year absolute average BLS cites. Private employment was revised down 178,000. Final revision due February 2027.",
+      "source": "BLS, CES Preliminary Benchmark (National) Summary, 28 August 2026",
+      "url": "https://www.bls.gov/news.release/prebmk.nr0.htm",
+      "tier": 1
+    },
+    "real_earnings_august": {
+      "release": "2026-09-11",
+      "real_ahe_yoy_pct": -0.3,
+      "note": "Real average hourly earnings, all employees, seasonally adjusted, August 2025 to August 2026. Wages are behind prices; July was -0.2%.",
+      "source": "BLS, Real Earnings, August 2026",
+      "url": "https://www.bls.gov/news.release/realer.nr0.htm",
       "tier": 1
     }
   },
@@ -366,6 +590,22 @@
       "quote": "sentiment declines in August were seen for all political groups and were particularly acute among Republicans",
       "source": "University of Michigan Surveys of Consumers, final August 2026",
       "url": "https://www.sca.isr.umich.edu/",
+      "tier": 1,
+      "superseded_by": "sentiment.umich_september_prelim"
+    },
+    "umich_september_prelim": {
+      "release": "2026-09-11",
+      "index": 47.8,
+      "prior_month_index": 51.7,
+      "expectations_1y_pct": 4.6,
+      "expectations_1y_prior_pct": 4.0,
+      "expectations_long_run_pct": 3.4,
+      "expectations_long_run_prior_pct": 3.3,
+      "quote": "Consumer sentiment receded less than 4 index points for the second consecutive month of decreases.",
+      "final_release_due": "2026-09-25",
+      "note": "Preliminary. Replace with the final reading on 25 Sep.",
+      "source": "University of Michigan Surveys of Consumers, preliminary September 2026",
+      "url": "https://www.sca.isr.umich.edu/",
       "tier": 1
     }
   },
@@ -377,8 +617,29 @@
       "july_pct": 2.9,
       "energy_pct": 14.3,
       "energy_july_pct": 10.3,
-      "source": "Eurostat flash estimate",
+      "final_release": "2026-09-17",
+      "final_headline_pct": 3.2,
+      "final_energy_pct": 14.3,
+      "final_url": "https://ec.europa.eu/eurostat/web/products-euro-indicators/w/2-17092026-ap",
+      "note": "headline_pct stays the FLASH (3.3%) because the V4 ledger labels it as the flash. Eurostat's final August figure, published 17 Sep, is 3.2% (revised down a tenth); energy unchanged at 14.3%. Use the final_* fields, or inflation.euro_area_august_final, for anything current.",
+      "source": "Eurostat flash estimate, 1 September 2026; final, 17 September 2026",
       "url": "https://ec.europa.eu/eurostat/web/products-euro-indicators/w/2-01092026-ap",
+      "tier": 1,
+      "superseded_by": "inflation.euro_area_august_final"
+    },
+    "euro_area_august_final": {
+      "release": "2026-09-17",
+      "headline_pct": 3.2,
+      "flash_pct": 3.3,
+      "july_pct": 2.9,
+      "energy_pct": 14.3,
+      "energy_july_pct": 10.3,
+      "energy_contribution_pp": 1.29,
+      "services_pct": 3.0,
+      "services_contribution_pp": 1.43,
+      "note": "Final August HICP, revised down from the 3.3% flash. US headline CPI in August was 3.4%, so the US-euro gap is about 0.2pp on the headline figures: Europe is catching the same energy shock.",
+      "source": "Eurostat, 'Annual inflation up to 3.2% in the euro area', 17 September 2026",
+      "url": "https://ec.europa.eu/eurostat/web/products-euro-indicators/w/2-17092026-ap",
       "tier": 1
     },
     "us_july_cpi": {
@@ -387,6 +648,32 @@
       "core_pct": 2.5,
       "energy_pct": 14.7,
       "source": "BLS, Consumer Price Index, July 2026",
+      "url": "https://www.bls.gov/news.release/cpi.nr0.htm",
+      "tier": 1,
+      "superseded_by": "inflation.us_august_cpi"
+    },
+    "us_august_cpi": {
+      "release": "2026-09-11",
+      "headline_pct": 3.4,
+      "headline_mom_pct": 0.4,
+      "core_pct": 2.4,
+      "core_mom_pct": 0.3,
+      "energy_pct": 16.3,
+      "energy_mom_pct": 2.1,
+      "gasoline_pct": 27.4,
+      "gasoline_mom_pct": 3.9,
+      "fuel_oil_pct": 52.0,
+      "fuel_oil_mom_pct": 10.1,
+      "airline_fares_pct": 23.4,
+      "airline_fares_mom_pct": 2.7,
+      "food_pct": 2.7,
+      "food_mom_pct": 0.1,
+      "food_at_home_pct": 2.2,
+      "food_at_home_mom_pct": 0.0,
+      "shelter_pct": 3.0,
+      "shelter_mom_pct": 0.3,
+      "note": "12-month changes are not seasonally adjusted; monthly changes are seasonally adjusted. Energy drives the headline: core is 2.4%, down from 2.5% in July. CUTS AGAINST a 'the war is already on the grocery shelf' reading: food at home was FLAT on the month and 2.2% on the year (down from 2.7% in July). Do not confuse 'food' (2.7%, includes restaurants) with 'food at home' (2.2%).",
+      "source": "BLS, Consumer Price Index, August 2026",
       "url": "https://www.bls.gov/news.release/cpi.nr0.htm",
       "tier": 1
     },
@@ -402,30 +689,95 @@
 
   "war_cost": {
     "dod_cost": {
-      "usd_bn": 37.5, "as_of": "2026-07-21",
-      "prior": { "usd_bn": 29, "as_of": "2026-05-12", "source": "Acting Pentagon Comptroller Jules Hurst, House hearing" },
-      "source": "Defense Secretary Pete Hegseth, Senate Appropriations Committee testimony, 21 July 2026",
-      "url": "https://www.defensenews.com/news/pentagon-congress/2026/07/21/cost-of-iran-war-rises-to-375-billion-pentagon-requests-671-billion-more/",
-      "tier": 1
+      "usd_bn": 43.6,
+      "as_of": "2026-09-03",
+      "reported": "2026-09-18",
+      "obligated_operating_usd_bn": 11.2,
+      "unfunded_replacement_usd_bn": 32.4,
+      "note": "The Pentagon's own estimate, submitted to Congress's defense oversight panels and the highest official figure to date: $11.2bn already obligated for operations plus $32.4bn in unfunded replacement costs for munitions, damaged aircraft and other assets. It excludes damage to US facilities in eight Middle East countries. The Pentagon document itself is not public; the figure is as reported by Roll Call, hence Tier 2.",
+      "prior": {
+        "usd_bn": 37.5,
+        "as_of": "2026-07-21",
+        "source": "Defense Secretary Pete Hegseth, Senate Appropriations Committee testimony",
+        "url": "https://www.defensenews.com/news/pentagon-congress/2026/07/21/cost-of-iran-war-rises-to-375-billion-pentagon-requests-671-billion-more/",
+        "tier": 1,
+        "who": "the Defense Secretary's testimony to the Senate Appropriations Committee",
+        "cite": "Defense News, 21 Jul 2026"
+      },
+      "prior_2": {
+        "usd_bn": 29,
+        "as_of": "2026-05-12",
+        "source": "Acting Pentagon Comptroller Jules Hurst, House hearing",
+        "who": "the acting Pentagon Comptroller at a House hearing"
+      },
+      "source": "Pentagon estimate to congressional defense committees, as reported by Roll Call (John M. Donnelly), 18 September 2026",
+      "url": "https://rollcall.com/2026/09/18/pentagons-latest-iran-war-cost-estimate-43-6-billion/",
+      "tier": 2,
+      "who": "the Pentagon's own estimate to Congress's defense committees",
+      "cite": "Roll Call, 18 Sep 2026"
+    },
+    "cbo_estimate": {
+      "release": "2026-09-15",
+      "usd_bn": 38,
+      "through": "2026-08-01",
+      "monthly_going_forward_usd_bn": "2-3",
+      "munitions_replacement_usd_bn": 21.7,
+      "interceptors_usd_bn": 13.1,
+      "flying_hours_usd_bn": 10.4,
+      "fuel_usd_bn": 2.7,
+      "equipment_lost_usd_bn": 1.9,
+      "equipment_lost_modern_replacement_usd_bn": 3.3,
+      "other_usd_bn": 1.5,
+      "aircraft_lost": "42 planes and one radar system",
+      "interceptor_finding": "The US has probably used between one-half and two-thirds of its inventory of certain interceptors since June 2025; rebuilding those inventories would probably take at least five years.",
+      "note": "CBO's independent estimate, not the Pentagon's. The $1.9bn counts only hardware the department would have to change its plans to replace; replacing everything with platforms available today would cost $3.3bn. CBO notes a Pentagon Inspector General total of $33.4bn through 30 June, consistent with its own once two further months at about $3bn are added. Figures here are as reported by Breaking Defense; the CBO PDF could not be retrieved to check line by line, hence Tier 2 for the breakdown.",
+      "source": "Congressional Budget Office, 'Estimating the Cost of Combat Operations Against Iran', September 2026, as reported by Breaking Defense, 15 September 2026",
+      "url": "https://breakingdefense.com/2026/09/iran-war-costs-38b-plus-2-3b-per-month-going-forward-cbo-says/",
+      "cbo_url": "https://www.cbo.gov/system/files/2026-09/62756-Iran.pdf",
+      "tier": 2
     },
     "supplemental_request": {
-      "usd_bn": 67.1, "munitions_usd_bn": 21,
+      "usd_bn": 67.1,
+      "munitions_usd_bn": 21,
       "note": "Single biggest item is $21bn for munitions to rebuild stockpiles expended in the opening months.",
       "source": "DoD FY2026 supplemental request; CSIS analysis",
       "url": "https://www.csis.org/analysis/war-costs-make-third-876-billion-supplemental-request",
       "tier": 1
     },
     "casualties": {
-      "us_killed": 18, "us_injured": "hundreds", "as_of": "2026-08-28",
+      "us_killed": 18,
+      "us_injured": "hundreds",
+      "as_of": "2026-08-28",
       "alt_count": { "killed": 20, "injured": 762, "source": "Wikipedia tally of contemporaneous reporting", "tier": 3 },
+      "wapo_count": {
+        "killed_at_least": 22,
+        "reported": "2026-09-18",
+        "officials_cited": 6,
+        "note": "The Washington Post cited six US officials: five put military fatalities at 'at least 22', four more than the Pentagon's public database (18); a sixth put it at 23, including personnel deployed to the region whose deaths were not directly connected to the fighting. Defense Secretary Hegseth called the report 'DISGUSTING and FAKE. A complete LIE.' Shown as a reported alternative next to the official 18, with the denial; the headline number stays the official count.",
+        "source": "Washington Post, 18 September 2026, as summarised by The Times of Israel and US News",
+        "url": "https://www.washingtonpost.com/national-security/2026/09/18/more-us-troops-have-died-amid-iran-war-than-pentagon-has-disclosed-publicly/",
+        "tier": 2
+      },
       "source": "NBC News data desk, updated 28 August 2026",
       "url": "https://www.nbcnews.com/data-graphics/iran-war-data-cost-death-toll-oil-gas-prices-strikes-trump-rcna588554",
       "tier": 2
     },
     "aircraft": {
-      "as_of": "2026-05-13", "total_lost_or_damaged": 42, "dod_loss_estimate_usd_bn": 2.6,
-      "by_type": { "F-15E": 4, "F-35A": 1, "A-10": 1, "KC-135": 7, "E-3": 1, "MC-130J": 2, "HH-60W": 1, "MQ-9": 24, "MQ-4C": 1 },
-      "note": "Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. Count is as of the CRS report and will be updated from any later official tally.",
+      "as_of": "2026-05-13",
+      "total_lost_or_damaged": 42,
+      "dod_loss_estimate_usd_bn": 2.6,
+      "by_type": {
+        "F-15E": 4,
+        "F-35A": 1,
+        "A-10": 1,
+        "KC-135": 7,
+        "E-3": 1,
+        "MC-130J": 2,
+        "HH-60W": 1,
+        "MQ-9": 24,
+        "MQ-4C": 1
+      },
+      "note": "Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. Count is as of the CRS report and will be updated from any later official tally. UPDATE 23 Sep 2026: CBO (15 Sep) also counts 42 planes plus one radar system lost through 1 August, so the headline 42 stands. The DoD Lead Inspector General's quarterly report on Operation Epic Fury (released 9 Sep, covering to 30 Jun) gives 'as many as 30' MQ-9s destroyed (CRS: 24) and adds four AH-6s, an AH-64 and an MH-60S not in the CRS list; its counts are 'at least' / 'as many as' ranges, so by_type is NOT changed to mix the two sources (Al Jazeera, 15 Sep, summarising the IG report; IG report https://media.defense.gov/2026/Sep/09/2003993626/-1/-1/1/OEF_Q3_JUN2026_FINAL_508%20SECURE.PDF).",
       "source": "Congressional Research Service, IN12692, 'U.S. Aircraft Combat Losses in Operation Epic Fury'",
       "url": "https://www.congress.gov/crs-product/IN12692",
       "tier": 1
@@ -440,46 +792,142 @@
       "tier": 2
     },
     "munitions": {
-      "patriot_remaining_share": 0.33, "thaad_used_share": 0.8, "patriot_used_share": 0.5,
-      "rebuild_years": 3, "as_of": "2026-07-27",
+      "patriot_remaining_share": 0.33,
+      "thaad_used_share": 0.8,
+      "patriot_used_share": 0.5,
+      "rebuild_years": 3,
+      "as_of": "2026-07-27",
       "denial": "Defense Secretary Hegseth disputed the reports (5 August); the President demanded answers on the shortages (3 September).",
-      "note": "CSIS estimated roughly a third of Patriot interceptors remained as of 27 July and that rebuilding to pre-war levels would take at least three years. CNN reported about 80% of THAAD and half of Patriot stocks used. The $21bn munitions line in the supplemental is consistent with the estimates the Secretary disputes.",
+      "note": "CSIS estimated roughly a third of Patriot interceptors remained as of 27 July and that rebuilding to pre-war levels would take at least three years. CNN reported about 80% of THAAD and half of Patriot stocks used. The $21bn munitions line in the supplemental is consistent with the estimates the Secretary disputes. No newer Tier 1/2 Patriot count found as of 23 Sep. CBO (15 Sep) separately estimates the US has probably used between one-half and two-thirds of its inventory of certain interceptors since June 2025 and that rebuilding would probably take at least five years (see war_cost.cbo_estimate).",
       "source": "CSIS analysis, 27 July 2026; CNN; Stars and Stripes 5 Aug; Axios 3 Sep",
       "url": "https://www.stripes.com/theaters/us/2026-08-05/us-missile-defense-stockpile-dangerously-low-22462099.html",
       "tier": 2
     },
     "imagery": {
-      "date": "2026-04-05", "retroactive_to": "2026-03-09",
+      "date": "2026-04-05",
+      "retroactive_to": "2026-03-09",
       "note": "Planet Labs suspended distribution of satellite imagery of Iran and the wider conflict zone indefinitely 'following a direct request from the United States government'. Other providers curbed Middle East access from March.",
       "source": "CBS News; Washington Post 11 March; NPR 10 April; SatNews 5 April",
       "url": "https://www.cbsnews.com/news/iran-war-satellite-companies-curb-access-mideast-imagery/",
       "tier": 2
     },
-    "moodys_domestic_cost": { "usd_bn": 150, "source": "Moody's Analytics estimate including higher energy prices, via NBC News", "tier": 2 },
-    "trump_quote": { "text": "four to five weeks", "date": "2026-02-28", "context": "The President's stated expectation for the war's duration on the day it began.", "source": "NBC News", "tier": 2 }
+    "moodys_domestic_cost": {
+      "usd_bn": 150,
+      "source": "Moody's Analytics estimate including higher energy prices, via NBC News",
+      "tier": 2
+    },
+    "trump_quote": {
+      "text": "four to five weeks",
+      "date": "2026-02-28",
+      "context": "The President's stated expectation for the war's duration on the day it began.",
+      "source": "NBC News",
+      "tier": 2
+    }
   },
 
   "trade_disputes": {
     "canada": {
       "timeline": [
-        { "date": "2026-07-20", "event": "Three Section 338 proclamations: 50% tariffs on Canadian motor vehicles, alcoholic beverages and dairy, about C$27.6bn of exports. Energy, potash, Section 232 goods, fish and critical minerals excluded.", "tier": 1, "url": "https://www.whitehouse.gov/fact-sheets/2026/07/fact-sheet-president-donald-j-trump-imposes-additional-tariffs-on-canada/" },
-        { "date": "2026-08-18", "event": "Three-day suspension for talks in Washington.", "tier": 1, "url": "https://www.whitehouse.gov/presidential-actions/2026/08/temporary-suspension-of-additional-duties-to-offset-canadian-discrimination-against-the-commerce-of-the-united-states-with-respect-to-alcoholic-beverages-dairy-and-motor-vehicles/" },
-        { "date": "2026-08-22", "event": "Talks collapse; Carney recalls the negotiating team; 50% duties enter into force at 12:01 a.m.", "tier": 2, "url": "https://www.aljazeera.com/news/2026/8/22/carney-canada-will-enact-retaliatory-us-tariffs-starting-september-8" },
-        { "date": "2026-09-08", "event": "Canada's dollar-for-dollar counter-tariffs on C$27.6bn of US goods take effect: steel, dairy, appliances, agricultural equipment, pulp and paper, electronics.", "tier": 2, "url": "https://www.aljazeera.com/news/2026/8/23/canada-to-hit-us-with-retaliatory-tariffs-as-trade-war-escalates" }
+        {
+          "date": "2026-07-20",
+          "event": "Three Section 338 proclamations: 50% tariffs on Canadian motor vehicles, alcoholic beverages and dairy, about C$27.6bn of exports. Energy, potash, Section 232 goods, fish and critical minerals excluded.",
+          "tier": 1,
+          "url": "https://www.whitehouse.gov/fact-sheets/2026/07/fact-sheet-president-donald-j-trump-imposes-additional-tariffs-on-canada/"
+        },
+        {
+          "date": "2026-08-18",
+          "event": "Three-day suspension for talks in Washington.",
+          "tier": 1,
+          "url": "https://www.whitehouse.gov/presidential-actions/2026/08/temporary-suspension-of-additional-duties-to-offset-canadian-discrimination-against-the-commerce-of-the-united-states-with-respect-to-alcoholic-beverages-dairy-and-motor-vehicles/"
+        },
+        {
+          "date": "2026-08-22",
+          "event": "Talks collapse; Carney recalls the negotiating team; 50% duties enter into force at 12:01 a.m.",
+          "tier": 2,
+          "url": "https://www.aljazeera.com/news/2026/8/22/carney-canada-will-enact-retaliatory-us-tariffs-starting-september-8"
+        },
+        {
+          "date": "2026-09-08",
+          "event": "Canada's dollar-for-dollar counter-tariffs on C$27.6bn of US goods take effect: steel, dairy, appliances, agricultural equipment, pulp and paper, electronics.",
+          "tier": 2,
+          "url": "https://www.aljazeera.com/news/2026/8/23/canada-to-hit-us-with-retaliatory-tariffs-as-trade-war-escalates"
+        }
       ],
       "usmca": "The White House states the USMCA will not be renewed in its current form.",
       "tier": 1
     },
     "actions_since_june": [
-      { "date": "2026-06-01", "authority": "Section 301", "target": "Brazil", "action": "USTR notice proposing action on digital-trade and market-access policies", "tier": 2 },
-      { "date": "2026-07-22", "authority": "Section 301", "target": "Brazil", "rate": "25%", "action": "Tariffs implemented", "tier": 1 },
-      { "date": "2026-07-24", "authority": "Section 301 (forced labour)", "target": "All trading partners", "rate": "10% standard; 12.5% for 46 economies incl. China, Japan, Korea, Australia", "action": "Replaces the expired Section 122 surcharge the same day", "tier": 1 },
-      { "date": "2026-07-28", "authority": "Section 301", "target": "European Union", "rate": "10%", "action": "Implemented", "tier": 2 },
-      { "date": "2026-07-31", "authority": "Section 232", "target": "Pharmaceuticals", "rate": "0-100% tiered; generics exempt", "action": "Implemented", "tier": 1 },
-      { "date": "2026-08-22", "authority": "Section 338", "target": "Canada", "rate": "50%", "action": "Vehicles, alcohol, dairy in force", "tier": 1 },
-      { "date": "2026-09-03", "authority": "Section 232", "target": "Unmanned aircraft systems", "rate": "25-100%", "action": "Implemented", "tier": 2 },
-      { "date": "2026-11-10", "authority": "Section 301", "target": "China (cranes, cargo-handling equipment)", "rate": "100%", "action": "Delayed to this date", "tier": 2 },
-      { "date": "2026-12-04", "authority": "Section 232", "target": "Polysilicon, wafers, cells, modules", "rate": "10-15% plus minimum import prices", "action": "Scheduled", "tier": 2 }
+      {
+        "date": "2026-06-01",
+        "authority": "Section 301",
+        "target": "Brazil",
+        "action": "USTR notice proposing action on digital-trade and market-access policies",
+        "tier": 2
+      },
+      {
+        "date": "2026-07-22",
+        "authority": "Section 301",
+        "target": "Brazil",
+        "rate": "25%",
+        "action": "Tariffs implemented",
+        "tier": 1
+      },
+      {
+        "date": "2026-07-24",
+        "authority": "Section 301 (forced labour)",
+        "target": "All trading partners",
+        "rate": "10% standard; 12.5% for 46 economies incl. China, Japan, Korea, Australia",
+        "action": "Replaces the expired Section 122 surcharge the same day",
+        "tier": 1
+      },
+      {
+        "date": "2026-07-28",
+        "authority": "Section 301",
+        "target": "European Union",
+        "rate": "10%",
+        "action": "Implemented",
+        "tier": 2
+      },
+      {
+        "date": "2026-07-31",
+        "authority": "Section 232",
+        "target": "Pharmaceuticals",
+        "rate": "0-100% tiered; generics exempt",
+        "action": "Implemented",
+        "tier": 1
+      },
+      {
+        "date": "2026-08-22",
+        "authority": "Section 338",
+        "target": "Canada",
+        "rate": "50%",
+        "action": "Vehicles, alcohol, dairy in force",
+        "tier": 1
+      },
+      {
+        "date": "2026-09-03",
+        "authority": "Section 232",
+        "target": "Unmanned aircraft systems",
+        "rate": "25-100%",
+        "action": "Implemented",
+        "tier": 2
+      },
+      {
+        "date": "2026-11-10",
+        "authority": "Section 301",
+        "target": "China (cranes, cargo-handling equipment)",
+        "rate": "100%",
+        "action": "Delayed to this date",
+        "tier": 2
+      },
+      {
+        "date": "2026-12-04",
+        "authority": "Section 232",
+        "target": "Polysilicon, wafers, cells, modules",
+        "rate": "10-15% plus minimum import prices",
+        "action": "Scheduled",
+        "tier": 2
+      }
     ],
     "source": "Federal Register proclamations (Tier 1); Trade Compliance Resource Hub tracker 2 Sep 2026; Tax Foundation tracker (Tier 2)",
     "url": "https://www.tradecomplianceresourcehub.com/2026/09/02/trump-2-0-tariff-tracker/"
@@ -493,7 +941,9 @@
       "tier": 2
     },
     "fertilizer": {
-      "urea_peak_usd_t": 850, "urea_peak_month": "2026-04", "urea_rise_since_feb_pct": 80,
+      "urea_peak_usd_t": 850,
+      "urea_peak_month": "2026-04",
+      "urea_rise_since_feb_pct": 80,
       "urea_above_precrisis_through_autumn_pct": "35-56",
       "ras_laffan_repair_years": "3-5",
       "us_farmers_nitrogen_secured_pct": 60,
@@ -504,7 +954,8 @@
       "tier": 1
     },
     "eu_gas": {
-      "ttf_rise_ytd_pct": 130, "ttf_eur_mwh_20_aug": 65,
+      "ttf_rise_ytd_pct": 130,
+      "ttf_eur_mwh_20_aug": 65,
       "note": "Dutch TTF more than doubled in 2026; Oxford Economics puts euro-area headline inflation near 3.5% in H2 2026 on current gas pricing.",
       "source": "Euronews 20 Aug 2026",
       "url": "https://www.euronews.com/business/2026/08/20/europes-gas-prices-have-doubled-with-the-worst-yet-to-come",
@@ -514,7 +965,11 @@
 
   "freight": {
     "van_fuel_surcharge_cents_per_mile": { "before": 41, "now": 61, "change_pct": 50 },
-    "cass_freight_index": { "shipments_pct": -2.9, "expenditures_pct": 1.2, "note": "Fewer shipments, higher spend: rates up, volumes down." },
+    "cass_freight_index": {
+      "shipments_pct": -2.9,
+      "expenditures_pct": 1.2,
+      "note": "Fewer shipments, higher spend: rates up, volumes down."
+    },
     "diesel_june_yoy_pct": 25.2,
     "note": "Diesel moves everything on the shelf. Fuel surcharges are passed to shippers within weeks; shelf prices follow with a lag the chain block estimates.",
     "source": "Cass Information Systems; TheTrucker.com June/August 2026 market reports; C.H. Robinson",
@@ -543,8 +998,11 @@
 
   "interest_cbo": {
     "fy2026_projection_usd_tn": 1.0,
-    "fytd_10_months_usd_bn": 963, "fytd_prior_usd_bn": 846, "fytd_change_pct": 14,
-    "share_of_revenue_pct": 18.5, "share_of_gdp_pct": 3.3,
+    "fytd_10_months_usd_bn": 963,
+    "fytd_prior_usd_bn": 846,
+    "fytd_change_pct": 14,
+    "share_of_revenue_pct": 18.5,
+    "share_of_gdp_pct": 3.3,
     "note": "Interest is the fastest-growing line in the budget. The live monthly total is in the `fiscal` block; this entry carries CBO's full-year projection and the record-share context.",
     "source": "CBO; Peter G. Peterson Foundation interest tracker; Fortune 24 Aug 2026",
     "url": "https://www.pgpf.org/programs-and-projects/fiscal-policy/monthly-interest-tracker-national-debt/",
@@ -552,11 +1010,44 @@
   },
 
   "farm_income": {
-    "net_farm_income_2026_usd_bn": 158.4, "change_nominal_pct": -2.6, "change_real_pct": -5.5,
+    "net_farm_income_2026_usd_bn": 158.4,
+    "change_nominal_pct": -2.6,
+    "change_real_pct": -5.5,
     "soybeans": "China halted US soybean purchases in 2025 during tariff talks and resumed under a commitment of at least 25 million tonnes a year through 2028.",
     "source": "USDA ERS Farm Income Forecast, September 2026; American Farm Bureau; South Dakota Searchlight",
     "url": "https://www.fb.org/intel/markets/usda-revises-farm-income-higher-but-costs-still-bite",
     "tier": 1
+  },
+
+  "calendar": {
+    "as_of": "2026-09-23",
+    "upcoming": [
+      {
+        "date": "2026-09-25",
+        "event": "University of Michigan final September sentiment",
+        "url": "https://www.sca.isr.umich.edu/",
+        "tier": 1
+      },
+      {
+        "date": "2026-10-02",
+        "event": "Employment Situation, September 2026",
+        "url": "https://www.bls.gov/news.release/empsit.nr0.htm",
+        "tier": 1
+      },
+      {
+        "date": "2026-10-14",
+        "event": "Consumer Price Index, September 2026",
+        "url": "https://www.bls.gov/news.release/cpi.nr0.htm",
+        "tier": 1
+      },
+      {
+        "date": "2026-10-28",
+        "event": "FOMC decision (meeting 27-28 Oct; no SEP)",
+        "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+        "tier": 1
+      }
+    ],
+    "source": "BLS release schedules stated in the August releases; Federal Reserve FOMC calendar; University of Michigan"
   },
 
   "research": {

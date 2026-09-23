@@ -70,7 +70,7 @@ select option{background:#061530;color:#F7F5F0}
             </div>
           </sc-for>
         </div>
-        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty">"Before the war" is the mean of daily counts from 1 January 2025 to 27 February 2026 (423 days). "Last 7 days" is the trailing mean ending 30 August 2026. Before the strike every strait is held at its pre-war mean. From 28 February, Hormuz follows its daily series day by day. For the other five straits the snapshot carries daily counts from 3 May 2026; between the strike and that date the globe draws a straight line from the pre-war mean to the first observed week, and says so here. The routes the dots follow are drawn schematically through each strait; ship positions are a model, the counts are not. "The long way round Africa" rests on Cape of Good Hope traffic at 103% of its pre-war mean while Bab el-Mandeb sits at 78%.</p>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty">"Before the war" is the mean of daily counts from 1 January 2025 to 27 February 2026 (423 days). "Last 7 days" is the trailing mean ending {{ globeThrough }}. Before the strike every strait is held at its pre-war mean. From 28 February, Hormuz follows its daily series day by day. For the other five straits the snapshot carries daily counts from 3 May 2026; between the strike and that date the globe draws a straight line from the pre-war mean to the first observed week, and says so here. The routes the dots follow are drawn schematically through each strait; ship positions are a model, the counts are not. "The long way round Africa" rests on Cape of Good Hope traffic at {{ capePct }} of its pre-war mean while Bab el-Mandeb sits at {{ babPct }}.</p>
         <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Source: IMF PortWatch (IMF / University of Oxford), AIS-based estimates, as of {{ asOf }} · <a href="https://portwatch.imf.org/" target="_blank" rel="noopener" style="color:#0B1E3F">portwatch.imf.org</a><br>Coastlines: Natural Earth via world-atlas, 1:110m for the globe and 1:50m for the Gulf region. The lane through the strait is the real Traffic Separation Scheme; the 33 km gate runs between Musandam and Larak.
         </p>
       </div>
@@ -257,7 +257,7 @@ select option{background:#061530;color:#F7F5F0}
         <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · YOUR PRICES
       </summary>
       <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
-        <p style="margin:0;text-wrap:pretty">Thirteen of the fourteen prices are the Bureau of Labor Statistics' average prices for US cities, January 2025 against the latest month, July 2026. Diesel is the Energy Information Administration's weekly national average, 20 January 2025 (the week he took office) against 31 August 2026. Each board row flips from the first price to the second; nothing in between is shown. The pump rolls through every published week.</p>
+        <p style="margin:0;text-wrap:pretty">Thirteen of the fourteen prices are the Bureau of Labor Statistics' average prices for US cities, January 2025 against the latest month, {{ pricesMonth }}. Diesel is the Energy Information Administration's weekly national average, {{ dieselFrom }} (the week he took office) against {{ dieselThrough }}. Each board row flips from the first price to the second; nothing in between is shown. The pump rolls through every published week.</p>
         <div style="display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr)) minmax(0,1.3fr);gap:8px 14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.02em">
           <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25)">ITEM</div>
           <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">JAN 2025</div>
@@ -275,7 +275,7 @@ select option{background:#061530;color:#F7F5F0}
           </sc-for>
         </div>
         <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">The total.</strong> {{ receiptMethod }} Fuel: {{ receiptFuel }}. Groceries: {{ receiptGroceries }}. Electricity: {{ receiptElectricity }}. The grocery line uses the median move across ten tracked staples, which ignores the largest increases on purpose. Household consumption varies enormously; these are national averages.</p>
-        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">Your state.</strong> The running total under the monthly figure multiplies that month by the 17.3 months elapsed, as the published receipt does; prices moved through that window, notably falling back during the June ceasefire, so it is an approximation. Picking a state swaps the fuel and electricity rows and re-totals: gasoline from EIA's weekly state or PADD-region series (31 August 2026 against 20 January 2025), electricity from EIA's monthly state residential price (June 2026 against January 2025). The grocery line stays national. The US row uses the published receipt, which is built on the BLS national series, so the two fuel figures differ by a few cents.</p>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">Your state.</strong> The running total under the monthly figure multiplies that month by the 17.3 months elapsed, as the published receipt does; prices moved through that window, notably falling back during the June ceasefire, so it is an approximation. Picking a state swaps the fuel and electricity rows and re-totals: gasoline from EIA's weekly state or PADD-region series ({{ gasThrough }} against 20 January 2025), electricity from EIA's monthly state residential price ({{ elecThrough }} against January 2025). The grocery line stays national. The US row uses the published receipt, which is built on the BLS national series, so the two fuel figures differ by a few cents.</p>
         <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty"><strong style="font-weight:600">{{ dieselHead }}</strong> {{ dieselNote }} <strong style="font-weight:600">Eggs.</strong> The fall is real and it is not policy: the 2022–25 spike was avian influenza, and prices came back down as the outbreak ended.</p>
         <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: BLS Average Price Data via FRED (series listed above) · EIA Weekly Retail Gasoline and Diesel Prices · EIA Electric Power Monthly · USDA Food Plans · EPA fleet fuel economy · EIA Residential Energy Consumption Survey.
         </p>
@@ -338,11 +338,11 @@ select option{background:#061530;color:#F7F5F0}
         <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · WHAT THE WAR COST
       </summary>
       <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
-        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Eighteen stars.</strong> US service members killed, NBC News data desk count as of 28 August 2026. A Wikipedia tally of contemporaneous reporting gives 20 killed and 762 injured; the lower, sourced figure is used. Injured: "hundreds."</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">{{ casHead }}</strong> US service members killed, NBC News data desk count as of {{ casDate }}. A Wikipedia tally of contemporaneous reporting gives 20 killed and 762 injured; the lower, sourced figure is used.{{ casAlt }} Injured: "hundreds."</p>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Forty-two aircraft.</strong> Congressional Research Service IN12692, "U.S. Aircraft Combat Losses in Operation Epic Fury," as of 13 May 2026: {{ aircraftList }}. Seventeen were manned aircraft and twenty-five were drones, drawn in outline. Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. DoD's loss estimate is $2.6bn.</p>
-        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">$37.5 billion.</strong> Defense Secretary Hegseth to the Senate Appropriations Committee, 21 July 2026, up from $29bn on 12 May. The bar then extends by $67.1bn, the FY2026 supplemental request, of which $21bn is munitions to rebuild stockpiles. Iran struck the Navy's Bahrain logistics hub on the first day; 228 structures were damaged and the fleet resupplies at sea from Diego Garcia, 2,200 miles away.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">{{ warHead }}</strong> {{ warNote }} The bar then extends by $67.1bn, the FY2026 supplemental request, of which $21bn is munitions to rebuild stockpiles. Iran struck the Navy's Bahrain logistics hub on the first day; 228 structures were damaged and the fleet resupplies at sea from Diego Garcia, 2,200 miles away.</p>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The interceptors, and the denial.</strong> CSIS estimated roughly a third of Patriot interceptors remained as of 27 July and that rebuilding would take at least three years; CNN reported about 80% of THAAD and half of Patriot stocks used. Secretary Hegseth disputed the reports on 5 August. The President demanded answers on the shortages on 3 September. The $21bn munitions line is consistent with the estimates the Secretary disputes. Both are printed on the screen.</p>
-        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: Defense News, 21 Jul 2026 · CRS IN12692 · NBC News data desk · Washington Post, Stars and Stripes on Bahrain · CSIS, CNN on munitions.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: {{ warCite }} · CRS IN12692 · NBC News data desk · Washington Post, Stars and Stripes on Bahrain · CSIS, CNN on munitions.</p>
       </div>
     </details>
   </section>
@@ -372,7 +372,7 @@ select option{background:#061530;color:#F7F5F0}
         <span style="display:inline-block;width:10px;height:10px;background:#D4A017"></span>SHOW THE WORK · WHAT IT BUYS
       </summary>
       <div style="padding-top:28px;display:flex;flex-direction:column;gap:22px;font-size:17px;line-height:1.5">
-        <p style="margin:0;text-wrap:pretty">Every comparison divides one figure, the Department of Defense's $2.6 billion estimate for the 42 aircraft lost or damaged (Congressional Research Service, 13 May 2026), by one published price. The prices are list or national-average prices at the dates given, not what any particular buyer paid, and none is adjusted for what buying millions of anything would do to its price. Each square on the screen stands for a stated quantity; to the left of the equals sign are the aircraft themselves, manned aircraft filled and drones in outline. The squares drawn in red at the end are the war's $37.5 billion cost to 21 July 2026 at the same scale; they run off the top of the screen because at that scale they do.</p>
+        <p style="margin:0;text-wrap:pretty">Every comparison divides one figure, the Department of Defense's $2.6 billion estimate for the 42 aircraft lost or damaged (Congressional Research Service, 13 May 2026), by one published price. The prices are list or national-average prices at the dates given, not what any particular buyer paid, and none is adjusted for what buying millions of anything would do to its price. Each square on the screen stands for a stated quantity; to the left of the equals sign are the aircraft themselves, manned aircraft filled and drones in outline. The squares drawn in red at the end are the war's {{ warSpent }} cost to {{ warAsOf }} at the same scale; they run off the top of the screen because at that scale they do.</p>
         <div style="display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:8px 16px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.02em">
           <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25)">THING</div>
           <div style="color:rgba(11,30,63,.6);padding-bottom:6px;border-bottom:1px solid rgba(11,30,63,.25);text-align:right">PRICE</div>
@@ -383,8 +383,8 @@ select option{background:#061530;color:#F7F5F0}
           <div>Costco hot dog and soda</div><div style="text-align:right">$1.50</div><div style="text-align:right;color:#8a6a0c;font-weight:500">{{ buyDogsTotal }} billion</div>
           <div>One F-35A</div><div style="text-align:right">$82.5 million</div><div style="text-align:right;color:#8a6a0c;font-weight:500">{{ buyJet }} PlayStation 5s each</div>
         </div>
-        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty">"One for every {{ buyHH }} households" is {{ buyPS5 }} million consoles against about 132 million US households. "{{ buyDays }} days of diesel" divides {{ buyGallons }} million gallons by the roughly 164 million gallons of distillate fuel the United States burns each day (3.9 million barrels). "{{ buyDogs }} for every American" is {{ buyDogsTotal }} billion hot dogs against a population of about 340 million. The $2.6 billion is the Pentagon's own loss estimate reported by CRS; the war's running cost, $37.5 billion, is the Defense Secretary's figure of 21 July 2026. Sony raised the US price of the PlayStation 5 from $499.99 to $549.99 on 21 August 2025, citing "a challenging economic environment"; the comparison uses the higher price.</p>
-        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: CRS IN12692 (aircraft and the DoD loss estimate) · Defense Secretary testimony, Senate Appropriations, 21 Jul 2026 · Sony Interactive Entertainment, US list price, 21 Aug 2025 · EIA Weekly Retail Diesel, 31 Aug 2026; EIA distillate consumption, 2024 · College Board, Trends in College Pricing 2024–25 · Costco, $1.50 hot dog and soda, unchanged since 1985 · US Census Bureau, households and population, 2024 · F-35A unit cost, Lots 15–17, F-35 Joint Program Office.</p>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:rgba(11,30,63,.8);text-wrap:pretty">"One for every {{ buyHH }} households" is {{ buyPS5 }} million consoles against about 132 million US households. "{{ buyDays }} days of diesel" divides {{ buyGallons }} million gallons by the roughly 164 million gallons of distillate fuel the United States burns each day (3.9 million barrels). "{{ buyDogs }} for every American" is {{ buyDogsTotal }} billion hot dogs against a population of about 340 million. The $2.6 billion is the Pentagon's own loss estimate reported by CRS; the war's running cost, {{ warSpent }}, is {{ warWho }} as of {{ warAsOf }}. Sony raised the US price of the PlayStation 5 from $499.99 to $549.99 on 21 August 2025, citing "a challenging economic environment"; the comparison uses the higher price.</p>
+        <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: CRS IN12692 (aircraft and the DoD loss estimate) · {{ warCite }} · Sony Interactive Entertainment, US list price, 21 Aug 2025 · EIA Weekly Retail Diesel, {{ dieselThrough }}; EIA distillate consumption, 2024 · College Board, Trends in College Pricing 2024–25 · Costco, $1.50 hot dog and soda, unchanged since 1985 · US Census Bureau, households and population, 2024 · F-35A unit cost, Lots 15–17, F-35 Joint Program Office.</p>
       </div>
     </details>
   </section>
@@ -421,7 +421,7 @@ select option{background:#061530;color:#F7F5F0}
           </sc-for>
         </div>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Who, and why.</strong> De Nederlandsche Bank moved 86 tonnes out of New York and Ottawa to London between March and August 2026, "in view of increasing geopolitical unrest," cutting New York's share of Dutch reserves from 31.3% to 18.5% (announced 2 September). The Banque de France moved 129 tonnes' worth from New York to Paris between July 2025 and January 2026 by selling older bars in New York and buying in Paris; no bar was shipped. The Reserve Bank of India brought its share held abroad from 55% to 22%, though from London and Basel rather than New York. Germany, with 1,236 tonnes in New York, is under pressure to repatriate and has no formal plan.</p>
-        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The Fed's counter-argument, at full size.</strong> Colin Weiss (Federal Reserve Board, FEDS Notes, 3 September 2026): gold's apparent overtaking of Treasuries as a reserve asset is a valuation effect from private ETF demand, not central-bank buying; five legacy holders own 52% of official gold and have not added since the 1970s; foreign officials bought about $200bn of Treasuries net from 2022 to April 2026. Gold itself is down about a fifth from its January record ($5,589 to $4,471 an ounce), and the dollar index is up since the war began. Treasuries in Fed custody for foreign officials fell from $2.78tn in January to $2.62tn in June; total foreign Treasury holdings (TIC) were $9.3tn in June, the largest on record bar February.</p>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The Fed's counter-argument, at full size.</strong> Colin Weiss (Federal Reserve Board, FEDS Notes, 3 September 2026): gold's apparent overtaking of Treasuries as a reserve asset is a valuation effect from private ETF demand, not central-bank buying; five legacy holders own 52% of official gold and have not added since the 1970s; foreign officials bought about $200bn of Treasuries net from 2022 to April 2026. Gold itself is down about a fifth from its January record ($5,589 to $4,471 an ounce), and the dollar index is up since the war began. {{ treasSentence }} total foreign Treasury holdings (TIC) were $9.3tn in June, the largest on record bar February.</p>
         <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: Federal Reserve International Summary Statistics, Table 3.13 (July 2026 release, provisional) · DNB press release 2 Sep 2026 · Bloomberg / Yahoo Finance 17 Jun 2026 · RBI half-yearly report · FEDS Notes 3 Sep 2026 · US Treasury TIC · Trading Economics for the gold price.
         </p>
       </div>
@@ -469,7 +469,7 @@ select option{background:#061530;color:#F7F5F0}
       </div>
       <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.75);line-height:1.8;border-top:1px solid rgba(11,30,63,.25);padding-top:18px">
         <div style="letter-spacing:.16em;color:rgba(11,30,63,.55);margin-bottom:6px">SOURCES</div>
-        IMF PortWatch (IMF / University of Oxford), chokepoint transit estimates, as of {{ asOf }} · FRED: DCOILWTICO, GASDESW, PAYEMS, CPIAUCNS, CES0500000003, LNS13025703, U6RATE, JTSHIR, JTSQUR, SP500, MORTGAGE30US, DTWEXBGS, and the BLS average-price series listed on the board · EIA weekly retail gasoline and diesel, Electric Power Monthly, Weekly Petroleum Status Report · Federal Reserve International Summary Statistics Table 3.13; FEDS Notes, 3 Sep 2026 · De Nederlandsche Bank press release, 2 Sep 2026 · Banque de France via Bloomberg, 17 Jun 2026 · Reserve Bank of India half-yearly report · Congressional Research Service IN12692 · Defense Secretary testimony, Senate Appropriations, 21 Jul 2026; DoD FY2026 supplemental request · NBC News data desk, 28 Aug 2026 · CSIS; CNN on munitions · Washington Post; Stars and Stripes on Bahrain · Supreme Court, <em>Learning Resources v. Trump</em>, 20 Feb 2026; Dallas Fed, Jun 2026 · Natural Earth coastlines via world-atlas · USDA Food Plans; EPA fleet fuel economy; EIA RECS · Sony Interactive Entertainment US list price, 21 Aug 2025; College Board Trends in College Pricing 2024–25; Costco; US Census Bureau households and population; F-35 Joint Program Office unit cost.
+        IMF PortWatch (IMF / University of Oxford), chokepoint transit estimates, as of {{ asOf }} · FRED: DCOILWTICO, GASDESW, PAYEMS, CPIAUCNS, CES0500000003, LNS13025703, U6RATE, JTSHIR, JTSQUR, SP500, MORTGAGE30US, DTWEXBGS, and the BLS average-price series listed on the board · EIA weekly retail gasoline and diesel, Electric Power Monthly, Weekly Petroleum Status Report · Federal Reserve International Summary Statistics Table 3.13; FEDS Notes, 3 Sep 2026 · De Nederlandsche Bank press release, 2 Sep 2026 · Banque de France via Bloomberg, 17 Jun 2026 · Reserve Bank of India half-yearly report · Congressional Research Service IN12692 · {{ warCite }}; DoD FY2026 supplemental request · NBC News data desk, {{ casDate }} · CSIS; CNN on munitions · Washington Post; Stars and Stripes on Bahrain · Supreme Court, <em>Learning Resources v. Trump</em>, 20 Feb 2026; Dallas Fed, Jun 2026 · Natural Earth coastlines via world-atlas · USDA Food Plans; EPA fleet fuel economy; EIA RECS · Sony Interactive Entertainment US list price, 21 Aug 2025; College Board Trends in College Pricing 2024–25; Costco; US Census Bureau households and population; F-35 Joint Program Office unit cost.
       </div>
     </div>
   </section>
@@ -519,7 +519,7 @@ class Component extends DCLogic {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
-      ...this.jobsVals(), againstRows: this.againstRows(),
+      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -808,6 +808,48 @@ class Component extends DCLogic {
     for (let i = months.length - 2; i >= 0 && months[i][1] < last[1]; i--) k++;
     return k;
   }
+  // "Jan 2025": the board's series labels
+  monShort(iso) { return new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+  // Dates in the method notes that move with the data. Typed, they said "30 August"
+  // and "July 2026" after the series had moved on, and the strait percentages
+  // were a week-one reading (Cape 103%, Bab el-Mandeb 78%).
+  dateVals() {
+    const D = this.data, P = this.prices, B = this.bill, keys = 'globeThrough capePct babPct pricesMonth dieselFrom dieselThrough gasThrough elecThrough treasSentence'.split(' ');
+    if (!D || !P || !B) return Object.fromEntries(keys.map(k => [k, '']));
+    const ends = P.items.map(i => i.end_date).sort(), anyState = Object.values(P.receipt_inputs.electricity_by_state)[0], us = P.receipt_inputs.regions.NUS || Object.values(P.receipt_inputs.regions)[0];
+    const T = B.gold.treasuries, jan = T.find(p => p[0].slice(5, 7) === '01') || T[0], last = T.at(-1), tn = v => '$' + (v / 1e6).toFixed(2) + 'tn';
+    return {
+      globeThrough: this.dayLong(D.hormuz_daily.at(-1)[0]),
+      capePct: Math.round(D.items.good_hope.recent.pct_of_baseline) + '%', babPct: Math.round(D.items.bab_el_mandeb.recent.pct_of_baseline) + '%',
+      pricesMonth: this.monthLong(ends.at(-1)),
+      dieselFrom: this.dayLong(P.diesel.handover.date), dieselThrough: this.dayLong(P.diesel.latest.date),
+      gasThrough: us ? this.dayLong(us.latest.date) : '', elecThrough: anyState ? this.monthLong(anyState.latest.date) : '',
+      treasSentence: 'Treasuries in Fed custody for foreign officials went from ' + tn(jan[1]) + ' in ' + this.monthLong(jan[0]).split(' ')[0] + ' to ' + tn(last[1]) + ' in ' + this.monthLong(last[0]).split(' ')[0] + (last[1] > T.at(-2)[1] ? ', up on the month before' : '') + ';',
+    };
+  }
+  // 0-99 in words, for counts that open a sentence ("Eighteen stars")
+  words(n) {
+    const u = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+    const t = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    return n < 20 ? u[n] : n < 100 ? t[Math.floor(n / 10)] + (n % 10 ? '-' + u[n % 10] : '') : String(n);
+  }
+  // The war's cost and toll, from war_cost in the data. The page typed "$37.5
+  // billion ... 21 July 2026" in five places; the Pentagon's own estimate moved
+  // to $43.6bn and the copy would have disagreed with the bar beside it.
+  warVals() {
+    const W = this.bill && this.bill.war_cost, keys = 'warHead warNote warCite warSpent warAsOf warWho casHead casDate casAlt'.split(' ');
+    if (!W) return Object.fromEntries(keys.map(k => [k, '']));
+    const d = W.dod_cost, p = d.prior, p2 = d.prior_2, c = W.casualties, wp = c.wapo_count, day = iso => this.dayLong(iso);
+    const cap = s => s[0].toUpperCase() + s.slice(1);
+    return {
+      warHead: '$' + d.usd_bn + ' billion.',
+      warNote: cap(d.who || 'the latest official estimate') + ', as of ' + day(d.as_of) + (d.reported ? ' and reported ' + day(d.reported) : '') + (p ? ', up from $' + p.usd_bn + 'bn in ' + (p.who || 'an earlier estimate') + ' on ' + day(p.as_of) : '') + (p2 ? ' and $' + p2.usd_bn + 'bn on ' + day(p2.as_of) : '') + '.' + (d.tier > 1 ? ' It is reported rather than published, so it counts as Tier 2.' : ''),
+      warCite: (d.cite || d.source) + (p && p.cite ? ' · earlier: ' + p.cite : ''),
+      warSpent: '$' + d.usd_bn + ' billion', warAsOf: day(d.as_of), warWho: d.who || 'the latest official estimate',
+      casHead: cap(this.words(c.us_killed)) + ' stars.', casDate: day(c.as_of),
+      casAlt: wp ? ' The Washington Post reported on ' + day(wp.reported) + ', citing ' + this.words(wp.officials_cited) + ' US officials, at least ' + wp.killed_at_least + ' deaths; the Defense Secretary called the report false. The official count is drawn, and both are printed here.' : '',
+    };
+  }
   jobsVals() {
     const B = this.bill, keys = 'jobsNeg jobsLatest ltuWhen unempDir layoffs payMonth claimsNote'.split(' ');
     if (!B || !this.cMonths) return Object.fromEntries(keys.map(k => [k, '']));
@@ -865,7 +907,7 @@ class Component extends DCLogic {
       { num: '$' + P.diesel.latest.value.toFixed(2), label: this.dieselVals().dieselLabel, color: '#D4A017' },
       { num: Math.round(B.jobs.curr.mean_monthly / 1000) + ',000', label: 'new jobs a month · was ' + Math.round(B.jobs.prev.mean_monthly / 1000) + ',000', color: '#D4A017' },
       { num: B.war_cost.casualties.us_killed + ' dead', label: B.war_cost.aircraft.total_lost_or_damaged + ' aircraft · $' + B.war_cost.dod_cost.usd_bn + 'bn spent', color: '#F7F5F0' },
-      { num: B.gold.tonnes_out.toFixed(0) + ' t', label: 'gold out of the New York Fed · ten months', color: '#D4A017' },
+      { num: B.gold.tonnes_out.toFixed(0) + ' t', label: 'gold out of the New York Fed · ' + this.words(B.gold.earmarked.length - 1) + ' months', color: '#D4A017' },
       { num: '28 Feb · 24 Feb', label: 'he ordered the strike · he re-imposed the tariffs', color: '#B22234' },
     ].map((c, i) => ({ ...c, ref: R[i] }));
   }
@@ -971,7 +1013,7 @@ class Component extends DCLogic {
       for (let i = 0; i < 100; i++) { const lit = i < Math.round(ltuNow); ctx.fillStyle = lit ? '#F7F5F0' : 'rgba(247,245,240,.18)'; const x = pad + i * fw + fw / 2; ctx.beginPath(); ctx.arc(x, ry + 4, 2, 0, 6.2832); ctx.fill(); ctx.fillRect(x - 1.4, ry + 7, 2.8, 7); }
       // the paycheck, under the right-hand crowd
       const px = pad + stadW + gap, py = ry;
-      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('YOUR RAISE, AFTER PRICES · YEAR TO JULY 2026', px, py - 10);
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('YOUR RAISE, AFTER PRICES · YEAR TO ' + (B.pay.ahe_date ? this.monthLong(B.pay.ahe_date).toUpperCase() : 'THE LATEST MONTH'), px, py - 10);
       ctx.font = '700 30px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#F7F5F0'; ctx.fillText((B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%', px, py + 22); const pw = ctx.measureText((B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%').width;
       ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.fillText('PAY +' + B.pay.ahe_yoy_pct.toFixed(1) + '% · PRICES +' + B.pay.cpi_yoy_pct.toFixed(1) + '%', px + pw + 14, py + 22);
     }
@@ -1027,21 +1069,21 @@ class Component extends DCLogic {
     };
     // 1 · the dead: eighteen stars
     const killed = WC.casualties.us_killed, lit = pStars * killed;
-    let bx = row(0, String(Math.round(lit)), 'DEAD', 'US SERVICE MEMBERS KILLED', 'NBC NEWS · 28 AUG 2026 · INJURED: HUNDREDS', pStars);
+    let bx = row(0, String(Math.round(lit)), 'DEAD', 'US SERVICE MEMBERS KILLED', 'NBC NEWS · ' + this.fmtISO(B.war_cost.casualties.as_of) + ' · INJURED: ' + String(B.war_cost.casualties.us_injured).toUpperCase(), pStars);
     const perRow = 9, sR = Math.min(bx.h * 0.2, bx.w / (perRow * 2.5)), sStep = sR * 2.5;
     const sx0 = bx.x + sR * 1.2, sy0 = bx.y + bx.h / 2 - sStep / 2;
     for (let i = 0; i < killed; i++) { const a = Math.max(0, Math.min(1, lit - i)); if (a <= 0) continue; this.drawStar(ctx, sx0 + (i % perRow) * sStep, sy0 + Math.floor(i / perRow) * sStep, sR * (0.7 + 0.3 * a), a); }
     // 2 · the aircraft: manned filled, drones in outline
     const types = Object.entries(WC.aircraft.by_type), total = WC.aircraft.total_lost_or_damaged, shown = pPlanes * total;
     const manned = types.filter(([k]) => !/^MQ/.test(k)).reduce((s, [, v]) => s + v, 0), drones = total - manned;
-    bx = row(1, String(Math.round(shown)), 'AIRCRAFT', 'LOST OR DAMAGED · ' + manned + ' MANNED · ' + drones + ' DRONES', 'CRS · 13 MAY 2026', pPlanes);
+    bx = row(1, String(Math.round(shown)), 'AIRCRAFT', 'LOST OR DAMAGED · ' + manned + ' MANNED · ' + drones + ' DRONES', 'CRS · ' + this.fmtISO(B.war_cost.aircraft.as_of), pPlanes);
     const pRow = mobile ? 14 : 21, pRows = Math.ceil(total / pRow), ps = Math.min(bx.h * 0.36 / pRows, bx.w / (pRow * 2.3)), pStep = ps * 2.3;
     const px0 = bx.x + ps, py0 = bx.y + bx.h / 2 - (pRows - 1) * pStep / 2;
     for (let i = 0; i < total; i++) { const a = Math.max(0, Math.min(1, shown - i)); if (a <= 0) continue; this.drawPlane(ctx, px0 + (i % pRow) * pStep, py0 + Math.floor(i / pRow) * pStep, ps, a, i >= manned); }
     // 3 · the money: spent in gold; what he has asked for on top, dashed; the munitions slice in red
     const spent = WC.dod_cost.usd_bn, ask = WC.supplemental_request.usd_bn, mun = WC.supplemental_request.munitions_usd_bn;
     const money = spent * Math.min(1, pMoney / 0.7), askA = Math.max(0, Math.min(1, (pMoney - 0.7) / 0.3));
-    bx = row(2, '$' + money.toFixed(1) + 'bn', 'SPENT', 'PENTAGON COST · TO 21 JUL 2026', 'HE SAID FOUR TO FIVE WEEKS', pMoney);
+    bx = row(2, '$' + money.toFixed(1) + 'bn', 'SPENT', 'PENTAGON COST · TO ' + this.fmtISO(B.war_cost.dod_cost.as_of), 'HE SAID FOUR TO FIVE WEEKS', pMoney);
     const bh = Math.min(bx.h * 0.34, 56), byy = bx.y + bx.h / 2 - bh / 2 - (mobile ? 4 : 6), ux = bx.w / (spent + ask);
     ctx.globalAlpha = Math.min(1, pMoney * 3);
     ctx.fillStyle = '#D4A017'; ctx.fillRect(bx.x, byy, ux * money, bh);
@@ -1210,7 +1252,7 @@ class Component extends DCLogic {
       ctx.fillStyle = '#6C8CD5'; ctx.fillRect(tx, cageBot - hgt, tw, hgt);
       for (let y = cageBot; y > cageBot - hgt; y -= 8) { ctx.fillStyle = 'rgba(11,30,63,.35)'; ctx.fillRect(tx, y - 1, tw, 1); }
       ctx.fillStyle = '#F7F5F0'; ctx.font = '700 30px "Barlow Condensed", sans-serif'; ctx.fillText('$' + (cur / 1e6).toFixed(2) + 'tn', tx + 10, cageBot - hgt + 34);
-      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.fillText(new Date(T[tIdx][0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase() + ' · WAS $2.78TN IN JAN', tx, cageBot + 20);
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.fillText(new Date(T[tIdx][0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase() + ' · WAS $' + (T[0][1] / 1e6).toFixed(2) + 'TN IN ' + new Date(T[0][0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }).toUpperCase(), tx, cageBot + 20);
       // the Fed's counter-argument, in blue, at full size
       if (tl >= 1) {
         ctx.fillStyle = '#6C8CD5'; ctx.font = '700 20px "Barlow Condensed", sans-serif';
@@ -1244,11 +1286,11 @@ class Component extends DCLogic {
     const P = this.prices, sel = this.receiptFor(this.state.state);
     const prev = this.board || [];
     const items = P.items.filter(i => i.key !== 'eggs').concat(P.items.filter(i => i.key === 'eggs'));
-    const rowsRaw = [{ key: 'diesel', name: 'Diesel', unit: 'per gallon, EIA weekly', start: P.diesel.handover.value, end: P.diesel.latest.value, u: 'usd', series: P.diesel.fred_id + ' · 20 Jan 2025 → 31 Aug 2026' }]
+    const rowsRaw = [{ key: 'diesel', name: 'Diesel', unit: 'per gallon, EIA weekly', start: P.diesel.handover.value, end: P.diesel.latest.value, u: 'usd', series: P.diesel.fred_id + ' · ' + this.dayLong(P.diesel.handover.date) + ' → ' + this.dayLong(P.diesel.latest.date) }]
       .concat(items.map(i => {
-        let start = i.start, end = i.end, unit = i.note.split('.')[0], series = i.fred_id + ' · Jan 2025 → Jul 2026';
-        if (sel && sel.gas && i.key === 'gasoline_ap') { start = sel.gas.handover.value; end = sel.gas.latest.value; unit = 'per gallon, ' + sel.gas.name + ', EIA weekly'; series = 'EIA ' + sel.gas.name + ' · 20 Jan 2025 → 31 Aug 2026'; }
-        if (sel && sel.elecSeries && i.key === 'electricity') { start = sel.elecSeries.handover.value; end = sel.elecSeries.latest.value; unit = 'per kWh, ' + sel.name + ', EIA monthly'; series = 'EIA residential ' + sel.name + ' · Jan 2025 → Jun 2026'; }
+        let start = i.start, end = i.end, unit = i.note.split('.')[0], series = i.fred_id + ' · ' + this.monShort(i.start_date) + ' → ' + this.monShort(i.end_date);
+        if (sel && sel.gas && i.key === 'gasoline_ap') { start = sel.gas.handover.value; end = sel.gas.latest.value; unit = 'per gallon, ' + sel.gas.name + ', EIA weekly'; series = 'EIA ' + sel.gas.name + ' · ' + this.dayLong(sel.gas.handover.date) + ' → ' + this.dayLong(sel.gas.latest.date); }
+        if (sel && sel.elecSeries && i.key === 'electricity') { start = sel.elecSeries.handover.value; end = sel.elecSeries.latest.value; unit = 'per kWh, ' + sel.name + ', EIA monthly'; series = 'EIA residential ' + sel.name + ' · ' + this.monShort(sel.elecSeries.handover.date) + ' → ' + this.monShort(sel.elecSeries.latest.date); }
         if (i.key === 'eggs') unit = 'per dozen';
         return { key: i.key, name: i.name, unit, note: i.key === 'eggs' ? '· avian flu ended, not policy' : '', start, end, u: i.key === 'electricity' ? 'kwh' : 'usd', series };
       }));
@@ -1309,7 +1351,7 @@ class Component extends DCLogic {
     this.setOdometer(v);
     const dstr = new Date(b[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
     if (this.pWeekRef.current && this.pWeekRef.current.textContent !== dstr) this.pWeekRef.current.textContent = dstr;
-    const mon = P4 < 0.04 ? 'JANUARY 2025' : P4 > 0.7 ? 'NOW · JULY / AUGUST 2026' : new Date(b[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+    const mon = P4 < 0.04 ? 'JANUARY 2025' : P4 > 0.7 ? 'NOW · ' + this.monthLong(this.prices.items.map(i => i.end_date).sort().at(-1)).toUpperCase() : new Date(b[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
     if (this.pDateRef.current && this.pDateRef.current.textContent !== mon) this.pDateRef.current.textContent = mon;
   }
   /* mechanical odometer: the cents wheel turns continuously, each higher wheel only as the one below passes 9 */
