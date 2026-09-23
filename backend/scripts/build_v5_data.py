@@ -228,6 +228,8 @@ def against(sn):
     eggs = next((i for i in sn["staples"]["items"] if i["key"] == "eggs"), None)
     months = sn["jobs"].get("monthly_changes") or []
     customs = (sn.get("fiscal") or {}).get("customs") or {}
+    rates = ((sn.get("context") or {}).get("rates") or {})
+    fomc = [v for k, v in rates.items() if k.startswith("fomc_") and isinstance(v, dict) and v.get("announced")]
     crude = [o for o in sn["crude_daily"]["observations"] if o.get("value") is not None]
     last = crude[-1] if crude else None
     month_ago = None
@@ -250,6 +252,9 @@ def against(sn):
             "latest": {k: customs["latest"][k] for k in ("date", "value")},
             "months_negative": customs.get("months_negative") or []},
         "crude": last and {"latest": last, "month_ago": month_ago},
+        # The latest recorded rate decision: core CPI near target is not the whole
+        # story when the Fed is raising rates because "inflation remains elevated".
+        "fomc": max(fomc, key=lambda v: v["announced"]) if fomc else None,
     }
 
 

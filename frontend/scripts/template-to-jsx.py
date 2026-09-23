@@ -66,12 +66,12 @@ CANVAS_LABELS = [
     "war's ${warSpent} as a pile roughly ${buyRatio} times larger, running off the top "
     "of the frame.",
 
-    "A vault cage holding one gold ingot per tonne of foreign gold held at the New "
-    "York Fed. Ingots leave the stack month by month as foreign governments "
-    "withdraw, ${vaultOut} tonnes over ${vaultMonths} months with none coming in. "
-    "Alongside, a blue bar shows Treasuries held for foreign officials. The Fed's "
-    "own answer is printed beside it: gold is down a fifth from its January record, "
-    "and the dollar is up since the war began.",
+    "A pile of gold bars that grows month by month: only the gold taken out of the "
+    "New York Fed, one icon for every ten 400-ounce bars, ${vaultBars} bars or "
+    "${vaultOut} tonnes over ${vaultMonths} months with none coming in. Beside it, who "
+    "moved theirs and why, including Germany's gold still there, and the Fed's own "
+    "answer: gold is down a fifth from its January record, and the dollar is up "
+    "since the war began.",
 ]
 
 

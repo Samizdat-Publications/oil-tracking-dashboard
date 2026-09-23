@@ -396,13 +396,13 @@ select option{background:#061530;color:#F7F5F0}
       <canvas ref="{{ vaultRef }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
       <div class="g-top" style="position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:28px 36px;pointer-events:none">
         <div ref="{{ vaultDateRef }}" style="font-family:'IBM Plex Mono',monospace;font-size:14px;letter-spacing:.14em;color:#F7F5F0;opacity:.85">AUGUST 2025</div>
-        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">ONE BAR IS ONE TONNE · FEDERAL RESERVE TABLE 3.13</div>
+        <div class="g-side" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(247,245,240,.55);text-align:right;line-height:1.7">ONE ICON IS TEN 400-OUNCE BARS · FEDERAL RESERVE TABLE 3.13</div>
       </div>
       <div class="g-bottom" style="position:absolute;left:0;right:0;bottom:0;padding:0 36px 36px;display:flex;flex-direction:column;gap:2px;pointer-events:none">
         <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(15px,2.2vh,21px);letter-spacing:.12em;text-transform:uppercase;color:#F7F5F0;margin-bottom:clamp(4px,1vh,10px);display:flex;align-items:center;gap:10px"><span style="display:inline-block;width:9px;height:9px;background:#B22234;flex:none"></span>THE WORLD IS TAKING ITS GOLD HOME</div>
         <div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap">
           <div class="g-num" ref="{{ vaultNumRef }}" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(88px,22vh,200px);line-height:.86;letter-spacing:-.02em;color:#D4A017;font-variant-numeric:tabular-nums;text-shadow:0 0 40px rgba(212,160,23,.35)">0</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">tonnes of gold<br>taken out of New York<br><span style="color:rgba(247,245,240,.6)">ten months · none came in</span></div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:clamp(18px,3.6vh,34px);line-height:1.05;text-transform:uppercase;letter-spacing:.02em;color:#F7F5F0;text-wrap:balance">gold bars<br>taken out of New York<br><span style="color:rgba(247,245,240,.6)">{{ vaultSub }}</span></div>
         </div>
         <p class="g-sentence" style="margin:clamp(8px,2vh,18px) 0 0;font-size:clamp(16px,2.7vh,24px);line-height:1.35;max-width:720px;text-wrap:pretty;color:#F7F5F0">Ships go the long way round Africa now. Central banks are taking their gold out of the New York Fed, month after month, and the ones that say why say "geopolitical unrest."</p>
       </div>
@@ -421,6 +421,7 @@ select option{background:#061530;color:#F7F5F0}
             <div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(11,30,63,.15);padding:4px 0"><span style="color:rgba(11,30,63,.6)">{{ r.m }}</span><span style="color:#8a6a0c;font-weight:500">{{ r.t }}</span></div>
           </sc-for>
         </div>
+        <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The scale.</strong> {{ vaultScaleNote }}</p>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">Who, and why.</strong> De Nederlandsche Bank moved 86 tonnes out of New York and Ottawa to London between March and August 2026, "in view of increasing geopolitical unrest," cutting New York's share of Dutch reserves from 31.3% to 18.5% (announced 2 September). The Banque de France moved 129 tonnes' worth from New York to Paris between July 2025 and January 2026 by selling older bars in New York and buying in Paris; no bar was shipped. The Reserve Bank of India brought its share held abroad from 55% to 22%, though from London and Basel rather than New York. Germany, with 1,236 tonnes in New York, is under pressure to repatriate and has no formal plan.</p>
         <p style="margin:0;text-wrap:pretty"><strong style="font-weight:600">The Fed's counter-argument, at full size.</strong> Colin Weiss (Federal Reserve Board, FEDS Notes, 3 September 2026): gold's apparent overtaking of Treasuries as a reserve asset is a valuation effect from private ETF demand, not central-bank buying; five legacy holders own 52% of official gold and have not added since the 1970s; foreign officials bought about $200bn of Treasuries net from 2022 to April 2026. Gold itself is down about a fifth from its January record ($5,589 to $4,471 an ounce), and the dollar index is up since the war began. {{ treasSentence }} total foreign Treasury holdings (TIC) were $9.3tn in June, the largest on record bar February.</p>
         <p style="margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.04em;color:rgba(11,30,63,.7);line-height:1.7">Sources: Federal Reserve International Summary Statistics, Table 3.13 (latest release, provisional) · DNB press release 2 Sep 2026 · Bloomberg / Yahoo Finance 17 Jun 2026 · RBI half-yearly report · FEDS Notes 3 Sep 2026 · US Treasury TIC · Trading Economics for the gold price.
@@ -523,7 +524,7 @@ class Component extends DCLogic {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
-      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.headVals(), ...this.freshVals(), againstRows: this.againstRows(),
+      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.headVals(), ...this.goldVals(), ...this.freshVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -816,6 +817,40 @@ class Component extends DCLogic {
       suppBn: '$' + W.supplemental_request.usd_bn + ' billion',
     };
   }
+  // A London Good Delivery bar is about 400 troy ounces, 12.44 kg: the unit central
+  // banks actually move. Block 8 counts in these, because in tonnes against the
+  // whole vault 164 t read as a sliver of 5,900 and said nothing about the scale.
+  get BAR_T() { return 400 * 31.1034768 / 1e6; }
+  // The named moves out of New York, from context_figures.json. France's is shown
+  // as what it was: bars sold in New York and bought in Paris, none shipped.
+  goldMoves(moves) {
+    return moves.map(m => {
+      if (m.tonnes_at_new_york) return { name: m.country.toUpperCase(), t: m.tonnes_at_new_york.toLocaleString() + ' T STILL THERE', route: m.total_reserves_tonnes ? 'OF ' + m.total_reserves_tonnes.toLocaleString() + ' T IN ALL' : '', why: (m.status || '').toUpperCase(), still: true };
+      if (!/New York/.test(m.from || '') || !m.tonnes) return null;
+      const ny = m.total_reserves_tonnes && m.before_share_new_york_pct != null && m.after_share_new_york_pct != null
+        ? m.total_reserves_tonnes * (m.before_share_new_york_pct - m.after_share_new_york_pct) / 100 : m.tonnes;
+      const to = (m.to || '').replace(/^.*,\s*/, '').toUpperCase(), shipped = !/No bar was physically shipped/i.test(m.note || '');
+      return {
+        name: m.country.toUpperCase(), t: Math.round(ny) + ' T OUT OF NEW YORK' + (Math.round(ny) !== m.tonnes ? ' (' + m.tonnes + ' T IN ALL)' : ''),
+        route: 'NEW YORK \u2192 ' + to + (m.period ? ' \u00b7 ' + m.period.toUpperCase() : ''),
+        why: m.quote ? '\u201C' + m.quote.toUpperCase() + '\u201D' : shipped ? '' : 'SOLD IN NEW YORK, BOUGHT IN ' + to + ': NO BAR WAS SHIPPED',
+      };
+    }).filter(Boolean);
+  }
+  goldVals() {
+    const B = this.bill, keys = 'vaultSub vaultScaleNote vaultBars'.split(' ');
+    if (!B || !this.vOut) return Object.fromEntries(keys.map(k => [k, '']));
+    const E = B.gold.earmarked, out = E[0][2] - E.at(-1)[2], bars = Math.round(out / this.BAR_T), N = this.vOut.length;
+    const days = (Date.parse(E.at(-1)[0]) - Date.parse(E[0][0])) / 86400000, gp = B.gold.gold_price && B.gold.gold_price.latest;
+    const noneIn = this.vOut.every(o => o.t >= 0);
+    return {
+      vaultSub: Math.round(out) + ' tonnes · ' + this.words(N) + ' months' + (noneIn ? ' \u00b7 none came in' : ''),
+      vaultBars: bars.toLocaleString(),
+      vaultScaleNote: 'At about 400 troy ounces to a London Good Delivery bar, the unit central banks hold and move, ' + Math.round(out) + ' tonnes is about ' + bars.toLocaleString() + ' bars, or about ' + Math.round(bars / days) + ' a day over those ' + this.words(N) + ' months.'
+        + (gp ? ' At $' + Math.round(gp.usd_oz).toLocaleString() + ' an ounce (' + this.dayLong(gp.date) + '; Tier 2, because no FRED series carries the gold price) it is worth about $' + (out * 1e6 / 31.1034768 * gp.usd_oz / 1e9).toFixed(1) + ' billion.' : '')
+        + ' The Fed\u2019s own row is kept at the statutory price precisely so that it counts ounces, not value: of the ' + Math.round(E[0][2]).toLocaleString() + ' tonnes held for foreign accounts in ' + this.monthLong(E[0][0]) + ', ' + (100 * out / E[0][2]).toFixed(1) + '% has gone.',
+    };
+  }
   labelVals() {
     const D = this.data, B = this.bill, C = this.crude, keys = 'hormuzMean straitRange crudeLastText casN aircraftN suppText patriotPct vaultMonths'.split(' ');
     if (!D || !B || !C) return Object.fromEntries(keys.map(k => [k, '']));
@@ -963,8 +998,25 @@ class Component extends DCLogic {
     if (B.claims && B.layoffs) rows.push({ head: 'Almost nobody is being laid off.', text: 'New jobless claims were ' + n(B.claims.latest.value) + ' in the week to ' + day(B.claims.latest.date) + ', and ' + B.layoffs.latest.value.toFixed(1) + '% of workers were laid off in ' + month(B.layoffs.latest.date) + '. What this page says about jobs is about hiring, not firing.' });
     const j = A.latest_jobs;
     if (j && j.value > A.jobs_mean) rows.push({ head: 'The latest month was better.', text: 'Payrolls rose ' + n(j.value) + ' in ' + month(j.date) + ', above the ' + n(A.jobs_mean) + ' a month since January 2025. One month moves that average little, and it does not move the hires rate.' });
-    const c = A.core_cpi_yoy, h = A.headline_yoy;
-    if (c && h && c.value < h.value) rows.push({ head: 'Inflation outside energy is modest.', text: 'Core CPI, which leaves out food and energy, rose ' + c.value.toFixed(1) + '% in the year to ' + month(c.date) + ', against ' + h.value.toFixed(1) + '% for everything.' });
+    // Core CPI below the headline cuts against the page, but calling it modest would
+    // hide the rest: the Fed's own target measure is well above 2%, and the Fed is
+    // raising rates. The row prints all three.
+    const c = A.core_cpi_yoy, h = A.headline_yoy, pce = A.core_pce_yoy, F = A.fomc;
+    if (c && h && c.value < h.value) {
+      let fed = '';
+      if (F && F.change_bp > 0) {
+        const r = F.target_range_pct, mid = (r[0] + r[1]) / 2, end = F.sep_medians && F.sep_medians.fed_funds_end_2026_pct;
+        const more = end ? Math.round((end - mid) / 0.25) : 0;
+        fed = ' On ' + day(F.announced) + ' the Fed raised its rate to ' + r[0].toFixed(2) + '-' + r[1].toFixed(2) + '%' + (F.first_hike_since ? ', its first increase since ' + F.first_hike_since : '')
+          + (F.statement_inflation ? ', saying \u201C' + F.statement_inflation.replace(/\.$/, '').toLowerCase() + '\u201D' : '') + '.'
+          + (more > 0 ? ' Its median projection has ' + (more === 1 ? 'one more increase' : this.words(more) + ' more increases') + ' this year.' : '');
+      }
+      rows.push({
+        head: 'Core CPI is lower. The Fed is not reassured.',
+        text: 'Core CPI, which leaves out food and energy, rose ' + c.value.toFixed(1) + '% in the year to ' + month(c.date) + ', against ' + h.value.toFixed(1) + '% for everything.'
+          + (pce ? ' The measure the Fed targets, core PCE, rose ' + pce.value.toFixed(1) + '% in the year to ' + month(pce.date) + ', against a goal of 2%.' : '') + fed,
+      });
+    }
     const cu = A.customs;
     if (cu && cu.latest.value > 0 && cu.months_negative.length && cu.months_negative.at(-1) < cu.latest.date) {
       const names = cu.months_negative.map(d => month(d).split(' ')[0]);
@@ -1025,10 +1077,13 @@ class Component extends DCLogic {
     this.cLeft = []; this.cRight = []; this.cMonthDone = -1;
     // the latest month is drawn brighter only while it is the best of at least three
     this.cBright = this.bestRun(this.cMonths) >= 3 ? this.cMonths.at(-1)[0] : null;
-    // block 7: the vault — one bar per tonne, removed month by month
+    // block 8: only the gold that left, in 400-ounce bars, one icon for ten bars
     const E = B.gold.earmarked;
     this.vTotal = Math.round(E[0][2]);
-    this.vOut = E.slice(1).map((p, i) => ({ date: p[0], n: Math.round(E[i][2] - p[2]) }));
+    this.vOut = E.slice(1).map((p, i) => ({ date: p[0], n: Math.round(E[i][2] - p[2]), t: E[i][2] - p[2] }));
+    this.vIcons = this.vOut.map(o => Math.max(0, Math.round(o.t / this.BAR_T / 10)));
+    this.vIconTotal = this.vIcons.reduce((a, b) => a + b, 0);
+    this.vMoves = this.goldMoves(B.gold.moves || []);
     this.vBars = []; this.vGone = []; this.vMonthDone = -1;
   }
   seeded(i) { const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }
@@ -1299,54 +1354,59 @@ class Component extends DCLogic {
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
     const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#0B1E3F'; ctx.fillRect(0, 0, W, H);
-    const mobile = W < 640, pad = mobile ? 16 : 36;
+    const mobile = W < 640, pad = mobile ? 16 : 36, E = B.gold.earmarked;
     const N = this.vOut.length, tl = Math.max(0, Math.min(1, (P - 0.04) / 0.66));
     const mIdx = Math.min(N, Math.floor(tl * (N + 1)));     // months completed
     if (mIdx < this.vMonthDone) { this.vGone = []; this.vMonthDone = -1; }
-    // the cage: bars in rows, filled bottom-up
-    const cageW = mobile ? W - pad * 2 : (W - pad * 2) * 0.62, cageTop = Math.max(H * 0.14, 112), cageBot = H * (mobile ? 0.5 : 0.48);
-    const cols = mobile ? 60 : 100, bw = cageW / cols, rows = Math.ceil(this.vTotal / cols), bh = (cageBot - cageTop) / rows;
-    while (this.vMonthDone < mIdx - 1) { this.vMonthDone++; const n = this.vOut[this.vMonthDone].n; for (let i = 0; i < n; i++) this.vGone.push({ born: t + i * 12, m: this.vMonthDone }); }
-    const gone = this.vGone.length, remaining = this.vTotal - gone;
-    const ingot = (x, y, w, hh, a) => { ctx.globalAlpha = a; const i = Math.min(1.5, w * 0.14); ctx.fillStyle = '#B8871A'; ctx.beginPath(); ctx.moveTo(x, y + hh); ctx.lineTo(x + i, y); ctx.lineTo(x + w - i, y); ctx.lineTo(x + w, y + hh); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#F2C94C'; ctx.fillRect(x + i, y, Math.max(1, w - 2 * i), Math.max(1, hh * 0.32)); ctx.globalAlpha = 1; };
-    ctx.strokeStyle = 'rgba(247,245,240,.2)'; ctx.lineWidth = 1; ctx.strokeRect(pad, cageTop, cageW, cageBot - cageTop);
-    for (let x = 1; x < 12; x++) { ctx.beginPath(); ctx.moveTo(pad + cageW * x / 12, cageTop); ctx.lineTo(pad + cageW * x / 12, cageBot); ctx.stroke(); }
-    for (let i = 0; i < this.vTotal; i++) {
-      const col = i % cols, row = Math.floor(i / cols), x = pad + col * bw, y = cageBot - (row + 1) * bh;
-      const gi = i - remaining;   // bars leave from the top of the stack
-      if (gi >= 0) {
-        const g = this.vGone[gone - 1 - gi]; const age = Math.max(0, (t - g.born) / 700); if (age > 1.2) continue;
-        const e = Math.min(1, age); ingot(x + e * 260 + 1, y + 1 - e * 40, Math.max(1, bw - 2), Math.max(1, bh - 1.5), 1 - e); continue;
-      }
-      ingot(x + 0.5, y + 0.5, Math.max(1, bw - 1), Math.max(1, bh - 1.5), 1);
-    }
-    ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.textAlign = 'left';
-    ctx.fillText('FOREIGN GOLD IN THE VAULT · ' + remaining.toLocaleString() + ' TONNES', pad, cageTop - 12);
-    // beside it: Treasuries in Fed custody, a shrinking stack
+    while (this.vMonthDone < mIdx - 1) { this.vMonthDone++; const k = this.vMonthDone; for (let i = 0; i < this.vIcons[k]; i++) this.vGone.push({ born: t + i * 4, m: k }); }
+    // The pile: only what left New York, one icon for ten real 400-ounce bars, a month
+    // at a time in alternating shades so the steady pace shows. Sized to fill the frame.
+    const top = Math.max(H * (mobile ? 0.14 : 0.17), mobile ? 112 : 136), bot = H * (mobile ? 0.4 : 0.5), pileW = mobile ? W - pad * 2 : (W - pad * 2) * 0.54;
+    const cols = Math.max(12, Math.ceil(Math.sqrt(this.vIconTotal * pileW / (1.8 * (bot - top))))), bw = pileW / cols;
+    const bh = Math.min(bw / 1.8, (bot - top) / Math.ceil(this.vIconTotal / cols));
+    const ingot = (x, y, w, hh, a, alt) => { ctx.globalAlpha = a; const i = Math.min(2, w * 0.14); ctx.fillStyle = alt ? '#9C7014' : '#B8871A'; ctx.beginPath(); ctx.moveTo(x, y + hh); ctx.lineTo(x + i, y); ctx.lineTo(x + w - i, y); ctx.lineTo(x + w, y + hh); ctx.closePath(); ctx.fill(); ctx.fillStyle = alt ? '#DDB13E' : '#F2C94C'; ctx.fillRect(x + i, y, Math.max(1, w - 2 * i), Math.max(1, hh * 0.32)); ctx.globalAlpha = 1; };
+    ctx.strokeStyle = 'rgba(247,245,240,.25)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pad, bot + 0.5); ctx.lineTo(pad + pileW, bot + 0.5); ctx.stroke();
+    this.vGone.forEach((g, i) => {
+      const col = i % cols, row = Math.floor(i / cols), e = Math.max(0, Math.min(1, (t - g.born) / 380)), ee = 1 - Math.pow(1 - e, 3);
+      ingot(pad + col * bw + 0.5, bot - (row + 1) * bh + 0.5 - (1 - ee) * 60, Math.max(1, bw - 1.5), Math.max(1, bh - 1.5), ee, g.m % 2);
+    });
+    const outNow = E[0][2] - E[mIdx][2], barsNow = Math.round(outNow / this.BAR_T), gp = B.gold.gold_price && B.gold.gold_price.latest;
+    const lf = mobile ? '500 11px "IBM Plex Mono", monospace' : '500 13px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'left'; ctx.font = lf; ctx.fillStyle = 'rgba(247,245,240,.75)';
+    ctx.fillText(mobile ? barsNow.toLocaleString() + ' BARS OUT OF THE NEW YORK FED' : 'GOLD TAKEN OUT OF THE NEW YORK FED \u00b7 ' + barsNow.toLocaleString() + ' BARS OF 400 OUNCES', pad, top - 30);
+    ctx.fillStyle = 'rgba(247,245,240,.5)';
+    ctx.fillText(mobile ? Math.round(outNow) + ' T · ' + (100 * outNow / E[0][2]).toFixed(1) + '% OF THE FOREIGN GOLD THERE' : Math.round(outNow) + ' T' + (gp ? ' \u00b7 ABOUT $' + (outNow * 1e6 / 31.1034768 * gp.usd_oz / 1e9).toFixed(1) + 'BN AT $' + Math.round(gp.usd_oz).toLocaleString() + ' AN OUNCE' : '') + ' \u00b7 ' + (100 * outNow / E[0][2]).toFixed(1) + '% OF THE FOREIGN GOLD HELD THERE', pad, top - 12);
+    // beside it: who moved theirs, and why, then the pace, then the Fed's answer at full size
     if (!mobile) {
-      const T = B.gold.treasuries, tx = pad + cageW + 48, tw = W - pad - tx, tIdx = Math.min(T.length - 1, Math.floor(tl * T.length));
-      const vmax = Math.max(...T.map(p => p[1])), cur = T[tIdx][1];
-      ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('TREASURIES HELD FOR FOREIGN OFFICIALS', tx, cageTop - 12);
-      const hgt = (cageBot - cageTop) * (cur / vmax) * 0.96;
-      ctx.fillStyle = 'rgba(108,140,213,.25)'; ctx.fillRect(tx, cageBot - (cageBot - cageTop) * 0.96, tw, (cageBot - cageTop) * 0.96);
-      ctx.fillStyle = '#6C8CD5'; ctx.fillRect(tx, cageBot - hgt, tw, hgt);
-      for (let y = cageBot; y > cageBot - hgt; y -= 8) { ctx.fillStyle = 'rgba(11,30,63,.35)'; ctx.fillRect(tx, y - 1, tw, 1); }
-      ctx.fillStyle = '#F7F5F0'; ctx.font = '700 30px "Barlow Condensed", sans-serif'; ctx.fillText('$' + (cur / 1e6).toFixed(2) + 'tn', tx + 10, cageBot - hgt + 34);
-      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.fillText(new Date(T[tIdx][0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase() + ' · WAS $' + (T[0][1] / 1e6).toFixed(2) + 'TN IN ' + new Date(T[0][0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', timeZone: 'UTC' }).toUpperCase(), tx, cageBot + 20);
-      // the Fed's counter-argument, in blue, at full size
+      const tx = pad + pileW + 56, tw = W - pad - tx;
+      const wrap = (s, font, max) => { ctx.font = font; const out = []; let line = ''; for (const w of s.split(' ')) { const tst = line ? line + ' ' + w : w; if (ctx.measureText(tst).width > max && line) { out.push(line); line = w; } else line = tst; } if (line) out.push(line); return out; };
+      ctx.fillStyle = 'rgba(247,245,240,.75)'; ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillText('WHO MOVED IT, AND WHY', tx, top - 12);
+      let y = top + 18;
+      this.vMoves.forEach((m, i) => {
+        const a = Math.max(0, Math.min(1, (tl - 0.15 - i * 0.14) / 0.12)); if (!a) return;
+        ctx.globalAlpha = a;
+        ctx.fillStyle = m.still ? '#F7F5F0' : '#D4A017'; ctx.font = '700 24px "Barlow Condensed", sans-serif'; ctx.fillText(m.name + ' \u00b7 ' + m.t, tx, y);
+        ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.font = '500 12px "IBM Plex Mono", monospace'; ctx.fillText(m.route, tx, y + 19);
+        let yy = y + 36;
+        if (m.why) wrap(m.why, '500 12px "IBM Plex Mono", monospace', tw).forEach(l => { ctx.fillStyle = m.why[0] === '\u201C' ? '#E0B43C' : 'rgba(247,245,240,.55)'; ctx.fillText(l, tx, yy); yy += 16; });
+        y = yy + 14; ctx.globalAlpha = 1;
+      });
       if (tl >= 1) {
-        ctx.fillStyle = '#6C8CD5'; ctx.font = '700 20px "Barlow Condensed", sans-serif';
-        ['THE FED\u2019S ANSWER: GOLD IS DOWN A FIFTH', 'FROM ITS JANUARY RECORD, AND THE DOLLAR', 'IS UP SINCE THE WAR BEGAN.'].forEach((l, i) => ctx.fillText(l, tx, cageBot + 44 + i * 22));
-        ctx.font = '500 14px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(108,140,213,.85)';
-        ctx.fillText('FEDS NOTES · COLIN WEISS · 3 SEP 2026', tx, cageBot + 112);
+        const days = (Date.parse(E.at(-1)[0]) - Date.parse(E[0][0])) / 86400000, perDay = Math.round((E[0][2] - E.at(-1)[2]) / this.BAR_T / days);
+        ctx.fillStyle = '#F7F5F0'; ctx.font = '700 22px "Barlow Condensed", sans-serif';
+        wrap('ABOUT ' + perDay + ' BARS A DAY, EVERY DAY, FOR ' + this.words(N).toUpperCase() + ' MONTHS.', '700 22px "Barlow Condensed", sans-serif', tw).forEach(l => { ctx.fillText(l, tx, y + 6); y += 24; });
+        y += 14; ctx.fillStyle = '#6C8CD5';
+        wrap('THE FED\u2019S ANSWER: GOLD IS DOWN A FIFTH FROM ITS JANUARY RECORD, AND THE DOLLAR IS UP SINCE THE WAR BEGAN.', '700 20px "Barlow Condensed", sans-serif', tw).forEach(l => { ctx.fillText(l, tx, y); y += 22; });
+        ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(108,140,213,.85)';
+        ctx.fillText('FEDS NOTES \u00b7 COLIN WEISS \u00b7 3 SEP 2026', tx, y + 6);
       }
     }
     const sg = ctx.createLinearGradient(0, H * 0.58, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.92)');
     ctx.fillStyle = sg; ctx.fillRect(0, H * 0.58, W, H * 0.42);
     const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
-    set(this.vaultNumRef, String(Math.round(B.gold.earmarked[0][2] - B.gold.earmarked[mIdx][2])));
-    const d = mIdx === 0 ? B.gold.earmarked[0][0] : this.vOut[mIdx - 1].date;
-    set(this.vaultDateRef, new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase() + (mIdx > 0 ? ' · −' + this.vOut[mIdx - 1].n + ' T THIS MONTH' : ''));
+    set(this.vaultNumRef, barsNow.toLocaleString());
+    const d = mIdx === 0 ? E[0][0] : this.vOut[mIdx - 1].date;
+    set(this.vaultDateRef, new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase() + (mIdx > 0 ? ' \u00b7 ' + Math.round(this.vOut[mIdx - 1].t / this.BAR_T).toLocaleString() + ' BARS OUT THIS MONTH' : ''));
   }
 
   /* ---------- block 4: prices ---------- */

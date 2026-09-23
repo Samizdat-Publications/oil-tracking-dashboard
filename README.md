@@ -35,7 +35,7 @@ series IDs, the dates and the method.
 | ![Nobody is hiring](docs/screens/jobs.gif) | ![What the war cost](docs/screens/war-cost.gif) |
 | **05 · Nobody is hiring.** One figure per 10,000 jobs: 320,938 a month in 2021-25 against 42,474 since. It also explains why jobless claims are low while hiring is frozen. | **06 · What the war cost.** US service members killed, 42 aircraft lost or damaged, $43.6 billion spent, and the interceptor count the Defense Secretary disputes, printed beside the dispute. |
 | ![What it buys](docs/screens/07-what-it-buys.jpg) | ![The gold leaves New York](docs/screens/gold.gif) |
-| **07 · What it buys.** The lost aircraft priced in PlayStations, gallons of diesel, years of tuition and hot dogs, then the whole war at the same scale. | **08 · The world backs away.** One ingot per tonne of foreign gold at the New York Fed, leaving month by month, with the Fed's own rebuttal at full size. |
+| **07 · What it buys.** The lost aircraft priced in PlayStations, gallons of diesel, years of tuition and hot dogs, then the whole war at the same scale. | **08 · The world backs away.** 13,142 gold bars (164 tonnes, about 39 a day) taken out of the New York Fed in eleven months, who moved theirs and why, and the Fed's own rebuttal at full size. |
 | ![Your bill](docs/screens/bill.gif) | ![Check our work](docs/screens/10-check-our-work.jpg) |
 | **09 · Your bill.** The share card, rendered from the real block, so the card and the page can never disagree. | **10 · Check our work.** What cuts against this page, how fresh each figure is, and what the numbers can and cannot say. |
 
@@ -89,7 +89,7 @@ rule exists because the page once said "not a record" for two refreshes after EI
 weekly diesel passed its 2022 peak.
 
 **What cuts against the page is shown at full size.** Stocks are up, mortgages are
-cheaper than at the handover, almost nobody is being laid off, core inflation is modest,
+cheaper than at the handover, almost nobody is being laid off, core CPI runs below the headline (printed beside the Fed raising rates because "inflation remains elevated"),
 customs receipts turned positive again in August. A row drops out only when it stops
 being true.
 
