@@ -519,7 +519,7 @@ class Component extends DCLogic {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
-      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), againstRows: this.againstRows(),
+      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -721,7 +721,7 @@ class Component extends DCLogic {
     // the gate
     const gx = X(CB.gate.x), gt = Y(CB.gate.top), gb = Y(CB.gate.bot);
     if (closed) {
-      const pulse = 0.5 + 0.5 * Math.sin(t / 420);
+      const pulse = this.reduced ? 1 : 0.5 + 0.5 * Math.sin(t / 420);
       ctx.strokeStyle = 'rgba(178,34,52,' + (0.3 + 0.3 * pulse).toFixed(2) + ')'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
       ctx.strokeStyle = '#B22234'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
       ctx.fillStyle = '#E04B5C'; ctx.font = '700 14px "IBM Plex Mono", monospace'; ctx.fillText('CLOSED', gx + 10, (gt + gb) / 2 + 4);
@@ -760,6 +760,22 @@ class Component extends DCLogic {
     if (sub) { const html = !after ? 'ships a day<br><span style="color:rgba(247,245,240,.6)">before his war</span>' : closed ? 'ships a day<br><span style="color:#E04B5C">the strait is shut · was 83</span>' : 'ships a day<br><span style="color:rgba(247,245,240,.6)">was 83</span>'; if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; } }
   }
 
+  // The canvases' accessible descriptions carry the same figures the canvas
+  // draws, so they are built from the data too (see CANVAS_LABELS in
+  // scripts/template-to-jsx.py, which reads these names).
+  labelVals() {
+    const D = this.data, B = this.bill, C = this.crude, keys = 'hormuzMean straitRange crudeLastText casN aircraftN suppText patriotPct vaultMonths'.split(' ');
+    if (!D || !B || !C) return Object.fromEntries(keys.map(k => [k, '']));
+    const others = Object.entries(D.items).filter(([k]) => k !== 'hormuz').map(([, v]) => v.recent.pct_of_baseline), W = B.war_cost, last = C.observations.at(-1);
+    return {
+      hormuzMean: String(Math.round(D.items.hormuz.recent.mean7_total)),
+      straitRange: Math.round(Math.min(...others)) + ' to ' + Math.round(Math.max(...others)) + ' percent',
+      crudeLastText: '$' + Math.round(last[1]) + ' on ' + this.dayLong(last[0]),
+      casN: String(W.casualties.us_killed), aircraftN: String(W.aircraft.total_lost_or_damaged),
+      suppText: '$' + W.supplemental_request.usd_bn + ' billion', patriotPct: String(Math.round(W.munitions.patriot_remaining_share * 100)),
+      vaultMonths: this.words(B.gold.earmarked.length - 1),
+    };
+  }
   /* ---------- computed copy ----------
    * Sentences that state a verdict about a moving number are built from the
    * data, never typed. "Not a record" stayed on the page for two refreshes after
@@ -1409,7 +1425,13 @@ class Component extends DCLogic {
     });
     this.setupSim();
     this.prices = prices; this.buildBoard(false); this.setupBuy();
-    this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Reduced motion: every block at its end state (P = 1), and once the first
+    // frames have placed the particles and ships, nothing drifts or pulses.
+    // Read live, so turning the setting on mid-visit takes effect.
+    this.motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+    this.reduced = this.motionQuery.matches;
+    this.motionQuery.addEventListener('change', e => { this.reduced = e.matches; this.settleAt = performance.now() + 1500; });
+    this.settleAt = performance.now() + 2500;
     this.loop = this.loop.bind(this);
     this.raf = requestAnimationFrame(this.loop);
   }
@@ -1530,7 +1552,8 @@ class Component extends DCLogic {
   loop(t) {
     this.raf = requestAnimationFrame(this.loop);
     const cv = this.canvasRef.current; if (!cv || !this.land) return;
-    const dt = Math.max(0, Math.min(0.05, (t - (this.lastT || t)) / 1000)); this.lastT = t;
+    const still = this.reduced && t > this.settleAt;
+    const dt = still ? 0 : Math.max(0, Math.min(0.05, (t - (this.lastT || t)) / 1000)); this.lastT = t;
     const vh = innerHeight;
     const run = (sec, key, dur, fn, loop) => {
       if (!sec) return; const r = sec.getBoundingClientRect(); if (r.bottom < -200 || r.top > vh + 200) return;
@@ -1694,7 +1717,7 @@ class Component extends DCLogic {
       if (visible(r.choke) && fade > 0.3) {
         const [x, y] = proj(r.choke);
         const closed = r.key === 'hormuz' && frac < 0.12 && day >= this.STRIKE;
-        const pulse = 0.5 + 0.5 * Math.sin(t / 420);
+        const pulse = this.reduced ? 1 : 0.5 + 0.5 * Math.sin(t / 420);
         if (closed) {
           // the gate: a red bar across the 33 km between Musandam and Larak
           const [gx1, gy1] = proj(this.gate.top), [gx2, gy2] = proj(this.gate.bot);

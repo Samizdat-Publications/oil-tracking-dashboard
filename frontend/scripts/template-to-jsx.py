@@ -28,45 +28,50 @@ HOLE = re.compile(r'^\s*\{\{(.+?)\}\}\s*$', re.S)
 # are canvas, so without these a screen reader gets the readouts (which are real
 # HTML) but nothing at all for the pictographs. Applied in document order, which
 # is block order. Kept here rather than in the generated file so re-running the
-# converter against a new prototype does not silently drop them.
+# converter against a new prototype does not silently drop them. A ${name} is a
+# render value: labels state the same figures the canvas draws, so they are not typed.
 CANVAS_LABELS = [
     "A globe showing shipping through six straits. Gold particles move along each "
     "route at a rate set by the ships counted per day. Traffic through the Strait "
-    "of Hormuz falls from 83 a day before the war to 4, while the other five "
-    "straits hold near their baselines.",
+    "of Hormuz falls from 83 a day before the war to ${hormuzMean}, while the other five "
+    "straits run at ${straitRange} of their pre-war counts.",
 
     "A seismograph-style chart of the daily closing price of WTI crude through "
     "2026. The trace runs from $57 a barrel in January to a peak of $115 five "
     "weeks after the 28 February strike, falls back under the ceasefires, and "
-    "climbs again when strikes resume. Red marks are his acts, blue are ceasefires.",
+    "climbs again when strikes resume, to its last close of ${crudeLastText}. Red marks "
+    "are his acts, blue are ceasefires.",
 
     "A map of the Strait of Hormuz with the real Traffic Separation Scheme lane "
     "and the 33 kilometre gate between Musandam and Larak. The lane is full of ships "
-    "at the pre-war 83 a day, then nearly empty at the latest seven-day count, with "
-    "one ship on screen for each ship a day. A side-by-side compares the "
-    "claim of 30 ships a night against the count.",
+    "at the pre-war 83 a day, then nearly empty at the latest seven-day count of "
+    "${strNowWord}, with one ship on screen for each ship a day. A side-by-side compares "
+    "the President's claim of 30 ships a night against the count.",
 
     "Two crowds of small human figures, one figure per 10,000 jobs. The left stand "
     "shows the 2021-25 average of 320,938 jobs a month; the right shows what has "
-    "actually been added each month since January 2025, a far smaller crowd. Below, "
-    "100 figures show the share of the unemployed out of work six months or more.",
+    "actually been added each month since January 2025, ${jobsCurr} a month on average. "
+    "Below, 100 figures show the share of the unemployed out of work six months or "
+    "more, ${ltu1} percent.",
 
-    "A four-row ledger of what the war has cost: 18 cream stars for US service "
-    "members killed, 42 aircraft silhouettes for those lost or damaged, a bar for "
-    "$37.5 billion spent against a dashed outline for the $67.1 billion more "
-    "requested, and 100 triangles showing roughly one in three Patriot interceptors "
-    "left.",
+    "A four-row ledger of what the war has cost: ${casN} cream stars for US service "
+    "members killed, ${aircraftN} aircraft silhouettes for those lost or damaged, a bar "
+    "for ${warSpent} spent against a dashed outline for the ${suppText} more "
+    "requested, and 100 triangles showing about ${patriotPct} percent of Patriot "
+    "interceptors left, an estimate the Secretary of Defense disputes.",
 
-    "The 42 lost aircraft beside a large equals sign, and a pile of gold squares "
-    "showing what the same money buys: PlayStation 5s, gallons of diesel, years of "
-    "in-state tuition, Costco hot dogs. The sequence ends with the whole war's "
-    "$37.5 billion as a pile roughly fourteen times larger, running off the top of "
-    "the frame.",
+    "The ${aircraftN} lost or damaged aircraft beside a large equals sign, and a pile of "
+    "gold squares showing what the same money buys: PlayStation 5s, gallons of diesel, "
+    "years of in-state tuition, Costco hot dogs. The sequence ends with the whole "
+    "war's ${warSpent} as a pile roughly ${buyRatio} times larger, running off the top "
+    "of the frame.",
 
     "A vault cage holding one gold ingot per tonne of foreign gold held at the New "
     "York Fed. Ingots leave the stack month by month as foreign governments "
-    "withdraw, 159 tonnes over ten months with none coming in. Alongside, a falling "
-    "blue bar shows Treasuries held for foreign officials.",
+    "withdraw, ${vaultOut} tonnes over ${vaultMonths} months with none coming in. "
+    "Alongside, a blue bar shows Treasuries held for foreign officials. The Fed's "
+    "own answer is printed beside it: gold is down a fifth from its January record, "
+    "and the dollar is up since the war began.",
 ]
 
 
@@ -130,6 +135,7 @@ class ToJSX(HTMLParser):
         self.out = []
         self.stack = []      # tracks sc-for / sc-if so end tags close correctly
         self.canvases = 0    # index into CANVAS_LABELS
+        self.root = True     # the first element is the page: it becomes the main landmark
 
     # ---- text -------------------------------------------------------------
     def handle_data(self, data):
@@ -177,11 +183,26 @@ class ToJSX(HTMLParser):
                 parts.append('%s="%s"' % (name, v.replace('"', '&quot;')))
         if tag == 'canvas' and not any(p.startswith('aria-label') for p in parts):
             if self.canvases < len(CANVAS_LABELS):
-                label = CANVAS_LABELS[self.canvases].replace('"', '&quot;')
-                parts += ['role="img"', 'aria-label="%s"' % label]
+                label = CANVAS_LABELS[self.canvases]
+                # ${name} reads a render value, so a label carries today's figures.
+                if '${' in label:
+                    parts += ['role="img"', 'aria-label={`%s`}' % label.replace('`', '\\`')]
+                else:
+                    parts += ['role="img"', 'aria-label="%s"' % label.replace('"', '&quot;')]
             self.canvases += 1
+        # The prototype has no headings: eleven blocks and nothing for a screen
+        # reader to jump between. The page root becomes the main landmark with
+        # an h1, and each block gets a visually hidden h2 from its screen label.
+        after = ''
+        if self.root and tag == 'div':
+            self.root = False
+            parts.insert(0, 'role="main"')
+            after = '\n  <h1 className="v5-sr">The Bill: what Trump’s war and tariffs cost you</h1>'
+        if tag == 'section' and a.get('data-screen-label'):
+            after = '\n    <h2 className="v5-sr">%s</h2>' % re.sub(r'^\d+\s+', '', a['data-screen-label'])
         s = ' '.join(parts)
         self.out.append('<%s%s%s>' % (tag, (' ' + s) if s else '', ' /' if tag in VOID else ''))
+        self.out.append(after)
         if tag not in VOID: self.stack.append(tag)
 
     def handle_startendtag(self, tag, attrs):

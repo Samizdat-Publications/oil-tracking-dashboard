@@ -147,3 +147,7 @@ body.v5-bill *::after { box-sizing: content-box; }
   }
   .v5-bill-root .p-total-label span:nth-last-child(-n + 2) { display: none !important; }
 }
+
+/* Headings for screen readers: the page has eleven blocks and no visible
+   headings, so without these there is nothing to jump between. */
+.v5-sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
