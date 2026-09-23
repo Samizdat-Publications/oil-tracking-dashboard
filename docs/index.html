@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Bill: what the war and the tariffs cost a household</title>
+<meta name="description" content="The Bill is a public data story: what the 2026 Iran war and the US tariffs cost an American household, measured only in the government's own numbers. Eleven animated blocks, every source shown.">
+<meta name="theme-color" content="#061530">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Bill">
+<meta property="og:description" content="What the Iran war and the tariffs cost an American household, measured only in the government's own numbers.">
+<meta property="og:url" content="https://samizdat-publications.github.io/oil-tracking-dashboard/">
+<meta property="og:image" content="https://samizdat-publications.github.io/oil-tracking-dashboard/screens/09-bill.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230B1E3F'/%3E%3Crect y='0' width='8' height='4' fill='%23D93B4A'/%3E%3Crect x='16' y='0' width='8' height='4' fill='%23D93B4A'/%3E%3Ctext x='16' y='26' font-family='Arial Narrow,Arial' font-weight='700' font-size='19' text-anchor='middle' fill='%23D4A017'%3E$%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --navy:#0B1E3F; --deep:#061530; --cream:#F7F5F0; --gold:#D4A017; --red:#D93B4A; --blue:#6C8CD5;
+  --ink:#F7F5F0; --ink-2:#C9CDD6; --ink-3:#9AA4B8;
+  --rule:rgba(247,245,240,.14); --rule-2:rgba(247,245,240,.26);
+  --display:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --serif:'Source Serif 4',Georgia,serif;
+  --gut:clamp(16px,4vw,48px); --max:1360px;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:72px}
+body{margin:0;background:var(--navy);color:var(--ink);font:400 18px/1.6 var(--serif);overflow-x:clip;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+h1,h2,h3,p,ol,ul,figure{margin:0}
+ol,ul{padding:0;list-style:none}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:2px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:12px;top:-60px;z-index:100;background:var(--gold);color:var(--deep);padding:10px 14px;font:500 14px var(--mono);text-decoration:none}
+.skip:focus{top:12px}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gut)}
+.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;line-height:1.5}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- header ---------- */
+.stripe{height:5px;background:repeating-linear-gradient(90deg,var(--red) 0 56px,var(--cream) 56px 112px)}
+.top{position:sticky;top:0;z-index:50;background:rgba(6,21,48,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px}
+.brand{font:700 26px/1 var(--display);letter-spacing:.02em;text-decoration:none;text-transform:uppercase}
+.nav{display:flex;align-items:center;gap:26px}
+.nav a{font:500 12.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--ink-2)}
+.nav a:hover{color:var(--ink)}
+.nav .nav-live{color:var(--deep);background:var(--gold);padding:9px 14px;border-radius:3px}
+.nav .nav-live:hover{color:var(--deep);background:#E3B228}
+@media (max-width:760px){.nav a:not(.nav-live){display:none}}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 24px;border-radius:3px;font:700 20px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:transform .18s var(--ease),background-color .18s,box-shadow .18s}
+.btn-primary{background:var(--gold);color:var(--deep);box-shadow:0 0 0 0 rgba(212,160,23,.5)}
+.btn-primary:hover{background:#E3B228;transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(212,160,23,.7)}
+.btn-ghost{color:var(--ink);border:1.5px solid var(--rule-2)}
+.btn-ghost:hover{border-color:var(--ink);transform:translateY(-2px)}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;background:
+  radial-gradient(1100px 620px at 78% 38%,rgba(108,140,213,.20),transparent 62%),
+  radial-gradient(700px 500px at 8% 90%,rgba(217,59,74,.10),transparent 60%),
+  linear-gradient(180deg,var(--deep),var(--navy) 70%)}
+.hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(247,245,240,.025) 0 1px,transparent 1px 4px);pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:center;gap:clamp(24px,3vw,48px);min-height:min(820px,calc(100svh - 61px - 58px));padding-block:clamp(40px,6vh,72px)}
+.hero-copy{position:relative;z-index:2}
+.wordmark{font:700 clamp(104px,15.2vw,236px)/.8 var(--display);text-transform:uppercase;letter-spacing:-.01em;margin-left:-.04em}
+.wordmark .line{display:block;overflow:hidden;padding-top:.06em}
+.wordmark .ch{display:inline-block}
+.stamp{position:absolute;right:max(-8px,2%);top:clamp(26px,5.5vw,84px);transform:rotate(-9deg);font:700 22px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--red);padding:10px 14px 9px;border:3px solid var(--red);border-radius:4px;box-shadow:inset 0 0 0 2px var(--navy),inset 0 0 0 4px var(--red);background:rgba(6,21,48,.35);mix-blend-mode:normal;white-space:nowrap}
+.stamp small{display:block;font:500 11px/1 var(--mono);letter-spacing:.2em;margin-bottom:6px}
+.lede{margin-top:clamp(20px,3vh,32px);max-width:30ch;font-size:clamp(20px,1.7vw,25px);line-height:1.45;color:var(--ink)}
+.ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:clamp(24px,4vh,40px)}
+.hero-note{margin-top:22px;color:var(--ink-3)}
+
+.hero-shot{position:relative;z-index:1;margin-right:calc(var(--gut) * -.5);perspective:1600px}
+.hero-shot .device{--t:1;transform:rotateY(calc(var(--t) * -14deg)) rotateX(calc(var(--t) * 5deg)) rotateZ(calc(var(--t) * 1deg));transform-origin:0% 50%;transition:transform .1s linear;will-change:transform}
+.hero-shot figcaption{margin-top:34px;color:var(--ink-3);max-width:46ch}
+
+/* the browser frame used by every screen */
+.device{position:relative;border-radius:8px;background:var(--deep);border:1px solid var(--rule-2);box-shadow:0 40px 90px -30px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.4);overflow:hidden}
+.chrome{display:flex;align-items:center;gap:12px;height:34px;padding:0 12px;background:#0A1834;border-bottom:1px solid var(--rule)}
+.chrome .dots{display:flex;gap:6px}
+.chrome .dots i{width:9px;height:9px;border-radius:50%;background:rgba(247,245,240,.18)}
+.chrome .url{flex:1;min-width:0;font:400 12px/1 var(--mono);color:var(--ink-3);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chrome .tag{font:500 11.5px/1 var(--mono);letter-spacing:.14em;color:var(--gold);white-space:nowrap}
+.screen{position:relative;aspect-ratio:16/9;background:var(--navy);overflow:hidden}
+.screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.screen img:not([src]){visibility:hidden}
+.screen .clip{opacity:0;transition:opacity .35s ease}
+.screen .clip.on{opacity:1}
+.device.playing .chrome .tag::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:1px;animation:blink 1.2s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+
+/* ticker */
+.ticker{position:relative;border-block:1px solid var(--rule);background:var(--deep);overflow:hidden;height:58px;display:flex;align-items:center}
+.ticker-track{display:flex;width:max-content;animation:tick 48s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker ul{display:flex;align-items:center;flex:none}
+.ticker li{display:flex;align-items:baseline;gap:10px;padding:0 26px;white-space:nowrap;font:500 12.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.ticker li b{font:700 24px/1 var(--display);letter-spacing:.02em;color:var(--gold)}
+.ticker li::after{content:"";width:8px;height:8px;background:var(--red);margin-left:26px;align-self:center}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* hero entrance: one orchestrated sequence */
+.js .wordmark .ch{transform:translateY(105%);animation:rise .7s var(--ease) forwards;animation-delay:calc(var(--i) * 55ms + 80ms)}
+.js .stamp{opacity:0;animation:stamp .42s cubic-bezier(.3,1.6,.5,1) .78s forwards}
+.js .hero-copy .lede,.js .hero-copy .ctas,.js .hero-copy .hero-note{opacity:0;animation:fade .6s ease forwards}
+.js .hero-copy .lede{animation-delay:.55s}.js .hero-copy .ctas{animation-delay:.7s}.js .hero-copy .hero-note{animation-delay:.85s}
+.js .hero-shot{opacity:0;animation:slidein 1s var(--ease) .25s forwards}
+@keyframes rise{to{transform:none}}
+@keyframes stamp{0%{opacity:0;transform:rotate(-2deg) scale(2.6)}60%{opacity:1}100%{opacity:1;transform:rotate(-9deg) scale(1)}}
+@keyframes fade{to{opacity:1}}
+@keyframes slidein{from{opacity:0;transform:translateX(80px)}to{opacity:1;transform:none}}
+
+/* ---------- section scaffolding ---------- */
+.sec{padding-block:clamp(72px,11vw,150px)}
+.sec-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 40px;margin-bottom:clamp(36px,5vw,64px)}
+.h2{font:700 clamp(46px,7.2vw,104px)/.86 var(--display);text-transform:uppercase;letter-spacing:-.005em}
+.intro{max-width:44ch;color:var(--ink-2);font-size:clamp(18px,1.4vw,21px)}
+.asof{display:inline-block;color:var(--ink);border:1.5px solid var(--rule-2);padding:8px 12px 7px;border-radius:2px}
+.js .wipe{clip-path:inset(0 100% 0 0);transition:clip-path .9s var(--ease)}
+.js .wipe.in{clip-path:inset(0 0 0 0)}
+
+/* ---------- ledger (counters) ---------- */
+.ledger{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));column-gap:clamp(20px,2.6vw,40px)}
+.item{border-top:1px solid var(--rule-2);padding:20px 0 36px;min-width:0}
+.item .mono{color:var(--ink-3)}
+.fig{display:block;margin-top:10px;font:700 clamp(58px,5.6vw,92px)/.9 var(--display);color:var(--gold);letter-spacing:-.005em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fig small{font-size:.42em;letter-spacing:.02em;margin-left:.12em;color:var(--ink)}
+.item p.say{margin-top:12px;font-size:17px;line-height:1.5;color:var(--ink);max-width:34ch}
+.item p.src{margin-top:10px;font:400 12px/1.5 var(--mono);letter-spacing:.06em;color:var(--ink-3)}
+.lead{grid-column:span 2;grid-row:span 2;padding-right:clamp(0px,2vw,24px)}
+.lead .say{font-size:clamp(20px,1.7vw,24px)!important;max-width:24ch!important}
+.wide2{grid-column:span 2}
+.flap{display:flex;gap:6px;margin-top:18px;font:700 clamp(84px,11vw,168px)/1 var(--display);color:var(--gold);font-variant-numeric:tabular-nums}
+.flap.sm{font-size:clamp(58px,5.6vw,92px);gap:4px;margin-top:10px}
+.tile{position:relative;display:inline-block;min-width:.56em;padding:.06em .05em .02em;text-align:center;background:linear-gradient(180deg,#0A1A3A 0 50%,#07142E 50% 100%);border:1px solid rgba(247,245,240,.1);border-radius:6px;box-shadow:0 10px 24px -12px rgba(0,0,0,.8);perspective:300px}
+.tile.punct{min-width:.3em;background:none;border-color:transparent;box-shadow:none}
+.tile::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;background:rgba(6,21,48,.95)}
+.tile.punct::after{display:none}
+.tile .c{display:inline-block;transform-origin:50% 55%}
+.tile .c.flip{animation:flip .09s linear}
+@keyframes flip{from{transform:rotateX(-80deg);filter:brightness(.6)}to{transform:none}}
+.lead .since{margin-top:18px;font:700 clamp(26px,2.4vw,36px)/1 var(--display);text-transform:uppercase;color:var(--ink)}
+.lead .since span{color:var(--gold)}
+.bars{margin-top:16px;display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 10px;font:400 12px/1.2 var(--mono);letter-spacing:.04em;color:var(--ink-2)}
+.bar .track{grid-column:1 / -1;height:8px;background:rgba(247,245,240,.07);border-radius:1px;overflow:hidden}
+.bar .track i{display:block;height:100%;width:var(--w);background:var(--ink-3);transform-origin:0 50%}
+.bar.now .track i{background:var(--gold)}
+.bar.bad .track i{background:var(--red)}
+.bar b{font-weight:500;color:var(--ink)}
+.js .reveal .bar .track i{transform:scaleX(0);transition:transform 1.3s var(--ease)}
+.js .reveal.in .bar .track i{transform:none}
+.js .reveal.in .bar:nth-child(2) .track i{transition-delay:.15s}
+.js .reveal.in .bar:nth-child(3) .track i{transition-delay:.3s}
+
+/* ---------- eleven blocks ---------- */
+#blocks{background:linear-gradient(180deg,var(--navy),var(--deep) 18%,var(--deep) 82%,var(--navy))}
+.steps{counter-reset:none}
+.block{padding-block:28px 56px;border-top:1px solid var(--rule)}
+.block .shot{margin-bottom:22px}
+.shot .device{border-radius:6px}
+.copy .num{font:700 clamp(40px,4vw,64px)/.9 var(--display);color:var(--gold);font-variant-numeric:tabular-nums}
+.copy h3{margin-top:6px;font:700 clamp(32px,3vw,46px)/.95 var(--display);text-transform:uppercase}
+.copy p.line{margin-top:14px;max-width:40ch;font-size:clamp(18px,1.35vw,21px);line-height:1.55;color:var(--ink-2)}
+.copy a.try{display:inline-flex;margin-top:16px;font:500 13px/1.4 var(--mono);letter-spacing:.08em;color:var(--blue);text-underline-offset:4px}
+.copy a.try:hover{color:var(--ink)}
+.stage{display:none}
+
+.wide .blocks-wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,8fr);gap:clamp(40px,5vw,80px)}
+.wide .stage{display:block;grid-column:2;grid-row:1}
+.wide .steps{grid-column:1;grid-row:1}
+.wide .stage-in{position:sticky;top:max(80px,calc(50vh + 28px - min(17.3vw + 11px,246px)))}
+.wide .stage-shots{position:relative;aspect-ratio:16/9}
+.wide .stage-shots .shot{position:absolute;inset:0;margin:0;opacity:0;clip-path:inset(0 0 100% 0);transition:clip-path .55s var(--ease),opacity .2s linear .35s;z-index:1}
+.wide .stage-shots .shot.is-active{opacity:1;clip-path:inset(0 0 0 0);transition:clip-path .55s var(--ease),opacity 0s;z-index:2}
+.wide .stage-shots .shot.was-active{opacity:1;clip-path:inset(0 0 0 0);z-index:1;transition:none}
+.wide .stage-shots .shot .screen img{transform:scale(1.06);transition:transform 1.2s var(--ease)}
+.wide .stage-shots .shot.is-active .screen img{transform:none}
+.wide .stage-shots .device{position:absolute;inset:0;display:flex;flex-direction:column}
+.wide .stage-shots .screen{flex:1;aspect-ratio:auto}
+.wide .block{min-height:74vh;display:flex;align-items:center;border-top:0;padding-block:0}
+.wide .block:first-child{min-height:60vh}
+.wide .block:last-child{min-height:84vh}
+.wide .block .copy{opacity:.55;transition:opacity .35s ease}
+.wide .block.is-active .copy{opacity:1}
+.wide .block:not(.is-active) .num{color:var(--ink-3)}
+.stage-frame{position:relative}
+.stage-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px}
+.ticks{display:flex;gap:4px;flex-wrap:wrap}
+.ticks button{appearance:none;border:0;border-radius:2px;background:rgba(247,245,240,.08);color:var(--ink-3);font:500 12px/1 var(--mono);letter-spacing:.06em;height:32px;min-width:36px;padding:0 6px;cursor:pointer;transition:background-color .2s,color .2s}
+.ticks button:hover{background:rgba(247,245,240,.16);color:var(--ink)}
+.ticks button[aria-current="true"]{background:var(--gold);color:var(--deep)}
+.stage-now{font:500 12.5px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);text-align:right}
+.progress{height:2px;background:rgba(247,245,240,.1);margin-top:14px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--gold);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:transform .4s var(--ease)}
+
+/* ---------- honest (cream) ---------- */
+.honest{background:var(--cream);color:var(--navy)}
+.honest .intro{color:#3A4760}
+.honest-grid{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:clamp(32px,6vw,96px)}
+.honest-side{position:relative}
+.honest-side .big{position:sticky;top:110px;font:700 clamp(64px,8.6vw,140px)/.84 var(--display);text-transform:uppercase;color:var(--navy)}
+.honest-side .big span{display:block;color:var(--red)}
+.rules > li{border-top:2px solid var(--navy);padding:22px 0 38px}
+.rules h3{font:700 clamp(28px,2.6vw,38px)/1 var(--display);text-transform:uppercase}
+.rules p{margin-top:10px;max-width:56ch;font-size:clamp(18px,1.3vw,20px);color:#24324D}
+.against{margin-top:18px;display:grid;gap:0}
+.against li{font:700 clamp(30px,3.6vw,54px)/1.02 var(--display);text-transform:uppercase;color:var(--navy);padding:10px 0;border-bottom:1px solid rgba(11,30,63,.16);display:flex;gap:16px;align-items:baseline}
+.against li::before{content:"";flex:none;width:.34em;height:.34em;background:var(--gold);transform:translateY(-.05em)}
+.claim{margin-top:20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.claim > div{padding:16px 16px 18px;background:var(--navy);color:var(--cream);border-radius:3px}
+.claim .k{font:500 12px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.claim .v{margin-top:8px;font:700 clamp(34px,3.4vw,52px)/1 var(--display);text-transform:uppercase}
+.claim .said .v{color:#F08A95}
+.claim .counted .v{color:var(--gold)}
+.ships{display:flex;flex-wrap:wrap;gap:5px;margin-top:14px}
+.ships i{width:14px;height:6px;border-radius:3px}
+.said .ships i{border:1px dashed #F08A95}
+.counted .ships i{background:var(--gold)}
+.months{margin-top:20px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.months div{height:64px;border-radius:2px;background:var(--navy);color:var(--cream);display:flex;flex-direction:column;justify-content:space-between;padding:8px;font:500 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.months div b{display:block;height:4px;background:var(--gold);border-radius:1px}
+.months .gap{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(11,30,63,.22) 6px 7px);border:1.5px dashed var(--navy);color:var(--navy)}
+.gapnote{margin-top:10px;font:500 12.5px/1.4 var(--mono);letter-spacing:.06em;color:#3A4760}
+
+/* ---------- pipeline ---------- */
+.how{background:var(--deep);position:relative;overflow:hidden}
+.how::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(247,245,240,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(247,245,240,.035) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at 50% 40%,#000 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 30%,transparent 75%);pointer-events:none}
+.pipe{position:relative;display:grid;grid-template-columns:1.25fr 1fr 1.1fr 1fr 1.1fr;gap:56px;align-items:stretch}
+.node{position:relative;padding:18px 18px 20px;border:1px solid var(--rule-2);border-radius:4px;background:rgba(11,30,63,.75);min-width:0}
+.node .step{font:500 12px/1 var(--mono);letter-spacing:.16em;color:var(--ink-3)}
+.node h3{margin-top:10px;font:700 clamp(24px,2vw,30px)/1 var(--display);text-transform:uppercase}
+.node p{margin-top:10px;font-size:16px;line-height:1.5;color:var(--ink-2)}
+.node code{font:400 13px/1.4 var(--mono);color:var(--gold);word-break:break-word}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chips li{font:500 12px/1 var(--mono);letter-spacing:.06em;padding:7px 8px;border:1px solid var(--rule-2);border-radius:2px;color:var(--ink)}
+.chips li.tier{border-style:dashed;color:var(--ink-2)}
+.gate{border-color:var(--gold);box-shadow:0 0 0 1px rgba(212,160,23,.25),0 0 40px -10px rgba(212,160,23,.4)}
+.gate .bar-arm{position:relative;height:8px;margin-top:14px;background:repeating-linear-gradient(90deg,var(--red) 0 14px,var(--cream) 14px 28px);border-radius:1px;transform-origin:0 50%}
+.gate .verdicts{display:flex;gap:8px;margin-top:12px;font:500 11.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.gate .verdicts span{padding:6px 7px;border-radius:2px}
+.gate .v-pass{background:rgba(212,160,23,.16);color:var(--gold)}
+.gate .v-stop{background:rgba(217,59,74,.2);color:#F08A95}
+.site{border-color:var(--blue)}
+.wire{position:absolute;top:50%;left:100%;width:56px;height:2px;margin-top:-1px;background:repeating-linear-gradient(90deg,rgba(247,245,240,.35) 0 6px,transparent 6px 12px);background-size:24px 2px}
+.wire::after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left:7px solid rgba(247,245,240,.5);border-right:0}
+.pkt{position:absolute;top:-4px;left:0;width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px var(--gold);opacity:0}
+.pkt.red{background:var(--red);box-shadow:0 0 12px var(--red)}
+.how.in .wire{animation:dash .6s linear infinite}
+.how.in .pkt{animation:run 2.4s linear infinite}
+.how.in .wire.w2 .pkt{animation-delay:.4s}
+.how.in .wire.w2 .pkt.red{animation:bounce 4.8s var(--ease) 1.6s infinite}
+.how.in .wire.w3 .pkt{animation-delay:.8s}
+.how.in .wire.w4 .pkt{animation-delay:1.2s}
+.how.in .gate .bar-arm{animation:arm 4.8s ease 1.6s infinite}
+@keyframes dash{to{background-position:24px 0}}
+@keyframes run{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 10px);opacity:0}}
+@keyframes bounce{0%{left:0;opacity:0}8%{opacity:1}28%{left:calc(100% - 12px);opacity:1}36%{left:40%;opacity:.8}46%{left:30%;opacity:0}100%{left:30%;opacity:0}}
+@keyframes arm{0%,22%{transform:none}27%{transform:scaleX(1.06)}32%,100%{transform:none}}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(20px,3vw,40px);margin-top:clamp(40px,5vw,64px)}
+.fact{border-top:1px solid var(--rule-2);padding-top:18px}
+.fact h3{font:700 clamp(28px,2.6vw,38px)/1 var(--display);text-transform:uppercase}
+.fact p{margin-top:10px;color:var(--ink-2);max-width:48ch}
+.fact .cmd{display:block;margin-top:14px;padding:14px 16px;background:#030C1E;border:1px solid var(--rule);border-radius:3px;font:400 14px/1.4 var(--mono);color:var(--ink);overflow-x:auto;white-space:nowrap}
+.fact .cmd::before{content:"PS> ";color:var(--ink-3)}
+.fact a{color:var(--blue);text-underline-offset:4px}
+.fact a:hover{color:var(--ink)}
+
+/* ---------- phones ---------- */
+.phones-sec{overflow:hidden}
+.phones{display:flex;justify-content:center;align-items:flex-end;gap:clamp(12px,3vw,48px);padding-top:12px}
+.phone{flex:0 1 300px;min-width:0;border-radius:34px;padding:10px;background:#030C1E;border:1px solid var(--rule-2);box-shadow:0 50px 90px -40px rgba(0,0,0,.9)}
+.phone .glass{border-radius:25px;overflow:hidden;aspect-ratio:780/1688;background:var(--navy)}
+.phone img{width:100%;height:100%;object-fit:cover}
+.phone figcaption{margin-top:14px;text-align:center;color:var(--ink-3)}
+.phone:nth-child(2){transform:translateY(-36px)}
+.js .phones .phone{transition:transform 1s var(--ease),opacity .6s ease}
+.js .phones:not(.in) .phone:nth-child(1){transform:translateX(70%) rotate(-4deg) scale(.92);opacity:0}
+.js .phones:not(.in) .phone:nth-child(3){transform:translateX(-70%) rotate(4deg) scale(.92);opacity:0}
+.js .phones.in .phone:nth-child(1){transform:rotate(-3deg)}
+.js .phones.in .phone:nth-child(3){transform:rotate(3deg)}
+
+/* ---------- footer ---------- */
+.end{background:var(--deep);border-top:1px solid var(--rule)}
+.end-cta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,5vw,72px);align-items:center;padding-block:clamp(72px,10vw,130px)}
+.end-cta .h2{font-size:clamp(46px,6.4vw,96px)}
+.end-cta .h2 span{color:var(--gold)}
+.end-cta p{margin-top:18px;color:var(--ink-2);max-width:40ch}
+.end-cta .ctas{margin-top:28px}
+.foot{border-top:1px solid var(--rule);padding-block:28px 40px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:18px 32px}
+.foot ul{display:flex;flex-wrap:wrap;gap:10px 26px}
+.foot a{font:500 12.5px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);text-underline-offset:4px}
+.foot a:hover{color:var(--ink)}
+.foot .data{color:var(--ink-3)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1180px){
+  .ledger{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pipe{grid-template-columns:minmax(0,1fr);gap:44px;max-width:620px}
+  .wire{top:100%;left:50%;width:2px;height:44px;margin:0 0 0 -1px;background:repeating-linear-gradient(180deg,rgba(247,245,240,.35) 0 6px,transparent 6px 12px);background-size:2px 24px}
+  .wire::after{right:auto;left:-4px;top:auto;bottom:-1px;border:5px solid transparent;border-top:7px solid rgba(247,245,240,.5);border-bottom:0}
+  .pkt{left:-4px;top:0}
+  @keyframes dash{to{background-position:0 24px}}
+  @keyframes run{0%{top:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{top:calc(100% - 10px);opacity:0}}
+  @keyframes bounce{0%{top:0;opacity:0}8%{opacity:1}28%{top:calc(100% - 12px);opacity:1}36%{top:40%;opacity:.8}46%{top:30%;opacity:0}100%{top:30%;opacity:0}}
+}
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:minmax(0,1fr);min-height:0;padding-bottom:40px}
+  .hero-shot{margin-right:0}
+  .hero-shot .device{--t:0!important;transform:none}
+  .stamp{top:clamp(10px,4vw,40px);right:0}
+  .honest-grid{grid-template-columns:minmax(0,1fr)}
+  .honest-side .big{position:static}
+  .end-cta{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  body{font-size:17px}
+  .wordmark{font-size:clamp(104px,35vw,150px)}
+  .ledger{grid-template-columns:minmax(0,1fr)}
+  .lead,.wide2{grid-column:auto;grid-row:auto}
+  .facts{grid-template-columns:minmax(0,1fr)}
+  .claim{grid-template-columns:minmax(0,1fr)}
+  .months{grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+  .months div{height:56px;padding:5px 4px;font-size:9.5px;letter-spacing:0}
+  .phones{gap:10px}
+  .phone{border-radius:22px;padding:5px}
+  .phone .glass{border-radius:17px}
+  .phone:nth-child(2){transform:translateY(-18px)}
+  .phone figcaption{font-size:10.5px;letter-spacing:.06em}
+  .stamp{font-size:17px;padding:8px 10px 7px}
+  .stamp small{font-size:9.5px}
+  .btn{font-size:18px;padding:0 18px}
+  .ticker li b{font-size:21px}
+}
+
+/* ---------- reduced motion: end states, nothing moves ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .js .wordmark .ch,.js .stamp,.js .hero-copy .lede,.js .hero-copy .ctas,.js .hero-copy .hero-note,.js .hero-shot{opacity:1;transform:none}
+  .js .stamp{transform:rotate(-9deg)}
+  .hero-shot .device{--t:0!important;transform:none}
+  .js .wipe{clip-path:none}
+  .js .reveal .bar .track i{transform:none}
+  .ticker{height:auto;padding-block:12px}
+  .ticker-track{width:auto}
+  .ticker ul{flex-wrap:wrap;row-gap:14px}
+  .ticker ul[aria-hidden]{display:none}
+  .js .phones .phone{opacity:1}
+  .js .phones:not(.in) .phone:nth-child(1),.js .phones.in .phone:nth-child(1){transform:rotate(-3deg)}
+  .js .phones:not(.in) .phone:nth-child(3),.js .phones.in .phone:nth-child(3){transform:rotate(3deg)}
+  .wide .stage-shots .shot .screen img{transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="stripe" aria-hidden="true"></div>
+  <div class="wrap">
+    <a class="brand" href="#main" aria-label="The Bill, back to top">The Bill</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#numbers">The numbers</a>
+      <a href="#blocks">The blocks</a>
+      <a href="#honest">Honesty</a>
+      <a href="#how">How it works</a>
+      <a class="nav-live" href="https://trumps-economy-the-bill.pages.dev">Live page</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" aria-labelledby="title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1 id="title" class="wordmark" aria-label="The Bill"><span class="line" aria-hidden="true"><span class="ch" style="--i:0">T</span><span class="ch" style="--i:1">H</span><span class="ch" style="--i:2">E</span></span><span class="line" aria-hidden="true"><span class="ch" style="--i:3">B</span><span class="ch" style="--i:4">I</span><span class="ch" style="--i:5">L</span><span class="ch" style="--i:6">L</span></span></h1>
+      <p class="stamp"><small>Figures as of</small>23 Sep 2026</p>
+      <p class="lede">What the Iran war and the tariffs cost an American household, measured only in the government's own numbers.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="https://trumps-economy-the-bill.pages.dev">Open the live page</a>
+        <a class="btn btn-ghost" href="https://github.com/Samizdat-Publications/oil-tracking-dashboard"><svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>Source on GitHub</a>
+      </div>
+      <p class="hero-note mono">Eleven animated blocks. Every source shown.</p>
+    </div>
+    <figure class="hero-shot">
+      <div class="device">
+        <div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">Block 00</span></div>
+        <div class="screen" id="hero-screen" data-clip="screens/globe.webp">
+          <img class="poster" src="screens/globe-poster.jpg" width="1280" height="720" fetchpriority="high" decoding="async" alt="The opening block of the live page: a map of the Strait of Hormuz with the shipping lane nearly empty, and a gold figure 3 reading ships a day through Hormuz, was 83. Counts for Bab el-Mandeb, Suez, the Cape of Good Hope, Malacca and Panama sit in the corner.">
+          
+        </div>
+      </div>
+      <figcaption class="mono">Block 00, the globe. Ships a day through six straits; Hormuz falls from 83 to 3.</figcaption>
+    </figure>
+  </div>
+  <div class="ticker" role="region" aria-label="Headline figures, as of 23 Sep 2026">
+    <div class="ticker-track">
+      <ul>
+        <li><b>+$89</b> a month, a household</li>
+        <li><b>$1,636</b> since 20 Jan 2025</li>
+        <li><b>$96.41</b> crude, 22 Sep</li>
+        <li><b>$114.58</b> crude peak, 7 Apr</li>
+        <li><b>3</b> ships a day through Hormuz, was 83</li>
+        <li><b>$6.53</b> diesel, a record</li>
+        <li><b>42,474</b> new jobs a month, was 320,938</li>
+        <li><b>$43.6bn</b> the war so far</li>
+        <li><b>164 t</b> gold out of the New York Fed</li>
+      </ul>
+      <ul aria-hidden="true">
+        <li><b>+$89</b> a month, a household</li>
+        <li><b>$1,636</b> since 20 Jan 2025</li>
+        <li><b>$96.41</b> crude, 22 Sep</li>
+        <li><b>$114.58</b> crude peak, 7 Apr</li>
+        <li><b>3</b> ships a day through Hormuz, was 83</li>
+        <li><b>$6.53</b> diesel, a record</li>
+        <li><b>42,474</b> new jobs a month, was 320,938</li>
+        <li><b>$43.6bn</b> the war so far</li>
+        <li><b>164 t</b> gold out of the New York Fed</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="numbers" aria-labelledby="numbers-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="h2 wipe" id="numbers-h">The bill so far</h2>
+      <p class="asof mono">As of 23 Sep 2026</p>
+    </div>
+    <div class="ledger">
+      <div class="item lead reveal">
+        <p class="mono">What it adds to a household's month</p>
+        <p class="flap" data-flap="+$89" aria-hidden="true">+$89</p>
+        <p class="sr-only">Plus 89 dollars a month for a household.</p>
+        <p class="say">a month for a household.</p>
+        <p class="since">Since 20 Jan 2025: <span class="count tnum" data-to="1636" data-pre="$" aria-hidden="true">$1,636</span><span class="sr-only">$1,636</span></p>
+        <p class="src">Pick your state on the live page and the total re-flips for it.</p>
+      </div>
+      <div class="item reveal">
+        <p class="mono">Crude oil, a barrel</p>
+        <span class="fig count" data-from="57" data-to="114.58" data-dec="2" data-pre="$" aria-hidden="true">$114.58</span>
+        <p class="say">at the peak on 7 Apr, from $57 in January. $96.41 on 22 Sep.</p>
+        <div class="bars" aria-hidden="true">
+          <div class="bar"><span>January</span><b>$57</b><span class="track"><i style="--w:49.7%"></i></span></div>
+          <div class="bar bad"><span>Peak, 7 Apr</span><b>$114.58</b><span class="track"><i style="--w:100%"></i></span></div>
+          <div class="bar now"><span>22 Sep</span><b>$96.41</b><span class="track"><i style="--w:84.1%"></i></span></div>
+        </div>
+      </div>
+      <div class="item reveal">
+        <p class="mono">Strait of Hormuz</p>
+        <span class="fig count" data-from="83" data-to="3" data-dur="1800" aria-hidden="true">3</span>
+        <p class="say">ships a day, down from 83 before the war.</p>
+        <div class="bars" aria-hidden="true">
+          <div class="bar"><span>Before the war</span><b>83</b><span class="track"><i style="--w:100%"></i></span></div>
+          <div class="bar bad"><span>Now</span><b>3</b><span class="track"><i style="--w:3.6%"></i></span></div>
+        </div>
+        <p class="src">7-day mean to 20 Sep, IMF PortWatch.</p>
+      </div>
+      <div class="item reveal">
+        <p class="mono">Diesel, a gallon</p>
+        <p class="flap sm" data-flap="$6.53" aria-hidden="true">$6.53</p>
+        <p class="say">on 21 Sep, a record for the EIA series.</p>
+        <div class="bars" aria-hidden="true">
+          <div class="bar"><span>Previous peak, June 2022</span><b>$5.81</b><span class="track"><i style="--w:89%"></i></span></div>
+          <div class="bar bad"><span>21 Sep 2026</span><b>$6.53</b><span class="track"><i style="--w:100%"></i></span></div>
+        </div>
+      </div>
+      <div class="item reveal">
+        <p class="mono">New jobs a month</p>
+        <span class="fig count" data-to="42474" aria-hidden="true">42,474</span>
+        <p class="say">since January 2025, against 320,938 a month in 2021-25.</p>
+        <div class="bars" aria-hidden="true">
+          <div class="bar"><span>2021-25</span><b>320,938</b><span class="track"><i style="--w:100%"></i></span></div>
+          <div class="bar bad"><span>Since Jan 2025</span><b>42,474</b><span class="track"><i style="--w:13.2%"></i></span></div>
+        </div>
+      </div>
+      <div class="item wide2 reveal">
+        <p class="mono">What the war has cost</p>
+        <span class="fig count" data-to="43.6" data-dec="1" data-pre="$" data-suf="bn" aria-hidden="true">$43.6bn</span>
+        <p class="say">so far, the Pentagon's own estimate as of 3 Sep.</p>
+        <p class="src">Reported by Roll Call.</p>
+      </div>
+      <div class="item wide2 reveal">
+        <p class="mono">Gold leaving New York</p>
+        <span class="fig"><span class="count" data-to="164" aria-hidden="true">164</span><small>tonnes</small></span>
+        <p class="say">of foreign gold taken out of the New York Fed over eleven months.</p>
+      </div>
+    </div>
+    <p class="sr-only">In text: plus $89 a month for a household, $1,636 since 20 January 2025. Crude oil went from $57 in January to $114.58 at the peak on 7 April, and was $96.41 on 22 September. The Strait of Hormuz carried 83 ships a day before the war and 3 now, the 7-day mean to 20 September from IMF PortWatch. Diesel was $6.53 a gallon on 21 September, a record for the EIA series; the previous peak was $5.81 in June 2022. 42,474 new jobs a month since January 2025, against 320,938 in 2021-25. The war has cost $43.6 billion, the Pentagon's estimate as of 3 September, reported by Roll Call. 164 tonnes of foreign gold left the New York Fed over eleven months.</p>
+  </div>
+</section>
+
+<section class="sec" id="blocks" aria-labelledby="blocks-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="h2 wipe" id="blocks-h">Eleven blocks, one scroll</h2>
+      <p class="intro">The live page is a single scroll. Each block plays once as it comes into view, then holds still, and each has a panel that shows the work: the series, the dates, the method.</p>
+    </div>
+    <div class="blocks-wrap">
+      <div class="stage" aria-hidden="true">
+        <div class="stage-in">
+          <div class="stage-shots"></div>
+          <div class="progress"><i></i></div>
+          <div class="stage-bar">
+            <div class="ticks"></div>
+            <p class="stage-now"></p>
+          </div>
+        </div>
+      </div>
+      <ol class="steps">
+        <li class="block" id="b-00">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">00</span></div><div class="screen" data-clip="screens/globe.webp"><img class="poster" data-src="screens/globe-poster.jpg" width="1280" height="720" decoding="async" alt="Block 00: the Strait of Hormuz on a map, the lane almost empty, with 3 ships a day against 83 before."><noscript><img src="screens/globe-poster.jpg" width="1280" height="720" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">00</p><h3><span class="sr-only">Block 00: </span>The globe</h3><p class="line">Ships a day through six straits, counted from satellite. Scroll, and Hormuz falls from 83 to 3 while the other five hold.</p></div>
+        </li>
+        <li class="block" id="b-01">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">01</span></div><div class="screen"><img class="poster" data-src="screens/01-two-dates.jpg" width="1440" height="900" decoding="async" alt="Block 01: two stamped dates on a dark red ground, 28 Feb 2026, he ordered the strike, and 24 Feb 2026, he re-imposed the tariffs a court had struck down."><noscript><img src="screens/01-two-dates.jpg" width="1440" height="900" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">01</p><h3><span class="sr-only">Block 01: </span>Two dates</h3><p class="line">24 Feb, the tariffs re-imposed. 28 Feb, the strike. Every red mark on the page traces back to one of them.</p></div>
+        </li>
+        <li class="block" id="b-02">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">02</span></div><div class="screen" data-clip="screens/oil.webp"><img class="poster" data-src="screens/oil-poster.jpg" width="1280" height="720" decoding="async" alt="Block 02: a gold seismograph line of daily crude closes marked with the ceasefire and the renewed strikes, over a large $96 a barrel."><noscript><img src="screens/oil-poster.jpg" width="1280" height="720" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">02</p><h3><span class="sr-only">Block 02: </span>Oil doubled</h3><p class="line">Every daily WTI close on a moving seismograph: $57 in January, $114.58 at the peak on 7 April.</p></div>
+        </li>
+        <li class="block" id="b-03">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">03</span></div><div class="screen" data-clip="screens/strait.webp"><img class="poster" data-src="screens/strait-poster.jpg" width="1280" height="720" decoding="async" alt="Block 03: the strait drawn on a coastline with a red closed marker, the claim of 30 a night in dashed outlines beside 3 counted ships a day in gold."><noscript><img src="screens/strait-poster.jpg" width="1280" height="720" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">03</p><h3><span class="sr-only">Block 03: </span>The strait</h3><p class="line">One ship on screen for each ship a day: 83 before, 3 now, drawn beside the claim of "30 a night".</p></div>
+        </li>
+        <li class="block" id="b-04">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev/?state=CA</span><span class="tag">04</span></div><div class="screen" data-clip="screens/prices.webp"><img class="poster" data-src="screens/prices-poster.jpg" width="1280" height="720" decoding="async" alt="Block 04: a split-flap board of fourteen prices, January 2025 against now, with diesel at $6.53 a gallon in large flap tiles and a state picker."><noscript><img src="screens/prices-poster.jpg" width="1280" height="720" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">04</p><h3><span class="sr-only">Block 04: </span>Your prices</h3><p class="line">A split-flap board of fourteen prices. Pick your state and the fuel and power rows flip to it; a link like ?state=CA opens straight on one.</p><a class="try" href="https://trumps-economy-the-bill.pages.dev/?state=CA">Try it with ?state=CA</a></div>
+        </li>
+        <li class="block" id="b-05">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">05</span></div><div class="screen" data-clip="screens/jobs.webp"><img class="poster" data-src="screens/jobs-poster.jpg" width="1280" height="720" decoding="async" alt="Block 05: two panels of small figures, one per 10,000 jobs, a full panel at the previous pace beside a thin row since January 2025."><noscript><img src="screens/jobs-poster.jpg" width="1280" height="720" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">05</p><h3><span class="sr-only">Block 05: </span>Nobody is hiring</h3><p class="line">One figure per 10,000 jobs, and why jobless claims are low while hiring is frozen.</p></div>
+        </li>
+        <li class="block" id="b-06">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">06</span></div><div class="screen" data-clip="screens/war-cost.webp"><img class="poster" data-src="screens/war-cost-poster.jpg" width="1280" height="720" decoding="async" alt="Block 06: on a dark red ground, rows of stars for the service members killed, aircraft outlines for the 42 lost or damaged, a bar for $43.6bn spent, and a row of interceptors with the dispute printed beneath."><noscript><img src="screens/war-cost-poster.jpg" width="1280" height="720" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">06</p><h3><span class="sr-only">Block 06: </span>What the war cost</h3><p class="line">18 US service members killed, per the official count. 42 aircraft lost or damaged. $43.6bn spent. The disputed interceptor estimate is printed beside the dispute.</p></div>
+        </li>
+        <li class="block" id="b-07">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">07</span></div><div class="screen"><img class="poster" data-src="screens/07-what-it-buys.jpg" width="1440" height="900" decoding="async" alt="Block 07: the lost aircraft drawn as icons, equal to a gold grid of everyday purchases, with the whole war at the same scale in red."><noscript><img src="screens/07-what-it-buys.jpg" width="1440" height="900" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">07</p><h3><span class="sr-only">Block 07: </span>What it buys</h3><p class="line">The lost aircraft priced in PlayStations, gallons of diesel, years of tuition and hot dogs.</p></div>
+        </li>
+        <li class="block" id="b-08">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">08</span></div><div class="screen" data-clip="screens/gold.webp"><img class="poster" data-src="screens/gold-poster.jpg" width="1280" height="720" decoding="async" alt="Block 08: a wall of gold ingots, one per tonne held at the New York Fed, thinning month by month, beside the Federal Reserve's rebuttal."><noscript><img src="screens/gold-poster.jpg" width="1280" height="720" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">08</p><h3><span class="sr-only">Block 08: </span>The world backs away</h3><p class="line">Gold leaving the New York Fed, month by month, with the Fed's own rebuttal at full size.</p></div>
+        </li>
+        <li class="block" id="b-09">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">09</span></div><div class="screen" data-clip="screens/bill.webp"><img class="poster" data-src="screens/bill-poster.jpg" width="1280" height="720" decoding="async" alt="Block 09: the share card, a navy card with a red and white striped top edge listing eight headline figures under the words The Bill."><noscript><img src="screens/bill-poster.jpg" width="1280" height="720" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">09</p><h3><span class="sr-only">Block 09: </span>Your bill</h3><p class="line">The share card, rendered from the real block, so the card and the page can never disagree.</p></div>
+        </li>
+        <li class="block" id="b-10">
+          <figure class="shot"><div class="device"><div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">10</span></div><div class="screen"><img class="poster" data-src="screens/10-check-our-work.jpg" width="1440" height="900" decoding="async" alt="Block 10: a cream page headed Check our work, listing what cuts against the page and how fresh each figure is."><noscript><img src="screens/10-check-our-work.jpg" width="1440" height="900" alt=""></noscript></div></div></figure>
+          <div class="copy"><p class="num" aria-hidden="true">10</p><h3><span class="sr-only">Block 10: </span>Check our work</h3><p class="line">What cuts against the page, and how fresh each figure is.</p></div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="sec honest" id="honest" aria-labelledby="honest-h">
+  <div class="wrap honest-grid">
+    <div class="honest-side">
+      <h2 class="big" id="honest-h">How it stays honest</h2>
+    </div>
+    <ol class="rules">
+      <li>
+        <h3>Zero fabrication</h3>
+        <p>Every figure comes from a government series or a cited, tiered source.</p>
+      </li>
+      <li>
+        <h3>No moving figure is typed</h3>
+        <p>A verdict like "a record" is computed from the full series on every refresh, so the words cannot outlive the numbers.</p>
+      </li>
+      <li>
+        <h3>What cuts against the page, at full size</h3>
+        <p>The page prints the numbers that argue the other way, as large as its own.</p>
+        <ul class="against">
+          <li>Stocks are up</li>
+          <li>Mortgages cost less than at the handover</li>
+          <li>Few people are being laid off</li>
+          <li>Core inflation is modest</li>
+          <li>Customs receipts were positive again in August</li>
+        </ul>
+      </li>
+      <li>
+        <h3>The claim beside the count</h3>
+        <p>Where an official says one thing and the measurement says another, both are drawn, side by side.</p>
+        <div class="claim" aria-label="The claim against the count at the Strait of Hormuz">
+          <div class="said"><p class="k">The claim</p><p class="v">"30 a night"</p><div class="ships" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          <div class="counted"><p class="k">The satellites, 7-day mean</p><p class="v">3 a day</p><div class="ships" aria-hidden="true"><i></i><i></i><i></i></div></div>
+        </div>
+      </li>
+      <li>
+        <h3>Gaps stay gaps</h3>
+        <p>The October 2025 Consumer Price Index was never collected. The page leaves the month empty and says so.</p>
+        <div class="months" role="img" aria-label="Monthly CPI releases from July 2025 to January 2026, with October 2025 shown as an empty, hatched month because it was never collected.">
+          <div>Jul<b></b></div><div>Aug<b></b></div><div>Sep<b></b></div><div class="gap">Oct<span>none</span></div><div>Nov<b></b></div><div>Dec<b></b></div><div>Jan<b></b></div>
+        </div>
+        <p class="gapnote">Consumer Price Index, Jul 2025 to Jan 2026. October was never collected.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec how" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="h2 wipe" id="how-h">How it works</h2>
+      <p class="intro">Public numbers in, one static page out, and a gate in the middle that refuses to ship anything stale or broken.</p>
+    </div>
+    <ol class="pipe">
+      <li class="node src">
+        <p class="step">1 &nbsp;Sources</p>
+        <h3>Public sources</h3>
+        <ul class="chips">
+          <li>FRED</li><li>EIA</li><li>Treasury</li><li>IMF PortWatch</li><li>BLS</li><li class="tier">Curated, tiered figures</li>
+        </ul>
+        <span class="wire w1" aria-hidden="true"><i class="pkt"></i></span>
+      </li>
+      <li class="node">
+        <p class="step">2 &nbsp;Snapshot</p>
+        <h3>One snapshot</h3>
+        <p>Every series pulled into a single file, <code>data-snapshot.json</code>.</p>
+        <span class="wire w2" aria-hidden="true"><i class="pkt"></i><i class="pkt red"></i></span>
+      </li>
+      <li class="node gate">
+        <p class="step">3 &nbsp;Gate</p>
+        <h3>Validation gate</h3>
+        <p>Stops a stale or broken deploy before it reaches anyone.</p>
+        <div class="bar-arm" aria-hidden="true"></div>
+        <p class="verdicts" aria-hidden="true"><span class="v-pass">Fresh</span><span class="v-stop">Stale</span></p>
+        <span class="wire w3" aria-hidden="true"><i class="pkt"></i></span>
+      </li>
+      <li class="node">
+        <p class="step">4 &nbsp;Cut</p>
+        <h3>The V5 data cut</h3>
+        <p>The snapshot cut into the few small files the page reads.</p>
+        <span class="wire w4" aria-hidden="true"><i class="pkt"></i></span>
+      </li>
+      <li class="node site">
+        <p class="step">5 &nbsp;Site</p>
+        <h3>A static site</h3>
+        <p>Served from Cloudflare Pages. Nothing is fetched from a CDN at read time.</p>
+      </li>
+    </ol>
+    <div class="facts">
+      <div class="fact">
+        <h3>Refresh is one command</h3>
+        <p>Rebuild, gate, test, build and deploy, run on demand after something moves the numbers.</p>
+        <code class="cmd">.\backend\scripts\refresh.ps1</code>
+      </div>
+      <div class="fact">
+        <h3>Every refresh is logged</h3>
+        <p>Each run appends the headline figures to a public file, so the history of every number is on the record: <a href="https://github.com/Samizdat-Publications/oil-tracking-dashboard/blob/main/docs/refresh-history.csv">docs/refresh-history.csv</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec phones-sec" aria-labelledby="phones-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="h2 wipe" id="phones-h">In one hand</h2>
+      <p class="intro">The same page on a phone: the globe, the price board and the bill, laid out for a narrow screen.</p>
+    </div>
+    <div class="phones">
+      <figure class="phone"><div class="glass"><img src="screens/phone-globe.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="The globe block on a phone: the strait on a map with the figure 3 ships a day."></div><figcaption class="mono">The globe</figcaption></figure>
+      <figure class="phone"><div class="glass"><img src="screens/phone-prices.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="The price board on a phone: diesel at $6.53 in flap tiles above fourteen prices, January 2025 against now."></div><figcaption class="mono">Your prices</figcaption></figure>
+      <figure class="phone"><div class="glass"><img src="screens/phone-bill.jpg" width="780" height="1688" loading="lazy" decoding="async" alt="The share card on a phone: eight headline figures on a navy card with a red and white striped edge."></div><figcaption class="mono">Your bill</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="end">
+  <div class="wrap end-cta">
+    <div>
+      <h2 class="h2">Read the whole bill</h2>
+      <p>Eleven blocks, every figure sourced, every source a click away.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="https://trumps-economy-the-bill.pages.dev">Open the live page</a>
+        <a class="btn btn-ghost" href="https://github.com/Samizdat-Publications/oil-tracking-dashboard/blob/main/docs/THESIS.md">Read the thesis</a>
+      </div>
+    </div>
+    <div class="device">
+      <div class="chrome" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="url">trumps-economy-the-bill.pages.dev</span><span class="tag">09</span></div>
+      <div class="screen"><img src="screens/09-bill.jpg" width="1440" height="900" loading="lazy" decoding="async" alt="The share card from the live page: The Bill, in the government's own numbers, 23 Sep 2026, with eight headline figures."></div>
+    </div>
+  </div>
+  <div class="wrap foot">
+    <ul>
+      <li><a href="https://trumps-economy-the-bill.pages.dev">The live page</a></li>
+      <li><a href="https://github.com/Samizdat-Publications/oil-tracking-dashboard">Source on GitHub</a></li>
+      <li><a href="https://github.com/Samizdat-Publications/oil-tracking-dashboard/blob/main/docs/THESIS.md">The thesis and every source</a></li>
+      <li><a href="https://trumps-economy-ledger-v4.pages.dev">The V4 ledger</a></li>
+    </ul>
+    <p class="data mono">Data: US and EU government statistics. Code MIT.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var doc = document.documentElement;
+  doc.classList.add('js');
+  var RM = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var reduced = RM.matches;
+  var conn = navigator.connection || {};
+  var lowData = !!conn.saveData || /(^|-)[23]g$/.test(conn.effectiveType || '');
+  var $ = function(s, r){ return (r || document).querySelector(s); };
+  var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+  /* ---------- clips: posters first, animated WebP only when on screen ---------- */
+  function ensurePoster(screen){
+    if (!screen) return;
+    var img = $('img.poster', screen);
+    if (img && img.dataset.src && !img.getAttribute('src')) img.src = img.dataset.src;
+  }
+  function playClip(screen){
+    if (!screen || reduced || lowData || !screen.dataset.clip || screen._clip) return;
+    ensurePoster(screen);
+    var c = new Image();
+    c.className = 'clip'; c.alt = ''; c.setAttribute('aria-hidden', 'true');
+    c.width = 1280; c.height = 720; c.decoding = 'async';
+    c.onload = function(){ if (screen._clip === c){ c.classList.add('on'); var d = screen.closest('.device'); if (d) d.classList.add('playing'); } };
+    c.src = screen.dataset.clip;
+    screen.appendChild(c);
+    screen._clip = c;
+  }
+  function stopClip(screen){
+    if (!screen || !screen._clip) return;
+    screen._clip.remove(); screen._clip = null; var d = screen.closest('.device'); if (d) d.classList.remove('playing');
+  }
+
+  /* hero clip: after load and idle, only while the hero is on screen */
+  var hero = $('#hero-screen'), heroOn = true, heroReady = false;
+  new IntersectionObserver(function(es){
+    heroOn = es[0].isIntersecting;
+    if (heroOn && heroReady) playClip(hero); else stopClip(hero);
+  }, {rootMargin: '100px 0px'}).observe(hero);
+  function heroGo(){ heroReady = true; if (heroOn) playClip(hero); }
+  window.addEventListener('load', function(){
+    if ('requestIdleCallback' in window) requestIdleCallback(heroGo, {timeout: 1500}); else setTimeout(heroGo, 400);
+  });
+
+  /* ---------- counters and split-flaps ---------- */
+  function fmt(el, v){
+    var dec = +(el.dataset.dec || 0);
+    return (el.dataset.pre || '') + v.toLocaleString('en-US', {minimumFractionDigits: dec, maximumFractionDigits: dec}) + (el.dataset.suf || '');
+  }
+  function runCount(el){
+    var to = +el.dataset.to, from = +(el.dataset.from || 0), dur = +(el.dataset.dur || 1500);
+    if (reduced){ el.textContent = fmt(el, to); return; }
+    var t0 = performance.now();
+    (function step(t){
+      var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 4);
+      el.textContent = fmt(el, from + (to - from) * e);
+      if (p < 1) requestAnimationFrame(step); else el.textContent = fmt(el, to);
+    })(t0);
+  }
+  function buildFlap(el){
+    var s = el.dataset.flap; el.textContent = '';
+    el._tiles = s.split('').map(function(ch){
+      var t = document.createElement('span');
+      t.className = 'tile' + (/[0-9]/.test(ch) ? '' : ' punct');
+      var c = document.createElement('span'); c.className = 'c';
+      c.textContent = reduced ? ch : (/[0-9]/.test(ch) ? '0' : ch);
+      t.appendChild(c); el.appendChild(t);
+      return {c: c, ch: ch};
+    });
+  }
+  function setFlip(c, v){ c.textContent = v; c.classList.remove('flip'); void c.offsetWidth; c.classList.add('flip'); }
+  function runFlap(el){
+    if (reduced) return;
+    var k = 0;
+    el._tiles.forEach(function(t){
+      if (!/[0-9]/.test(t.ch)) return;
+      var n = 7 + (k++) * 4, i = 0;
+      var id = setInterval(function(){
+        if (++i >= n){ clearInterval(id); setFlip(t.c, t.ch); }
+        else setFlip(t.c, String(Math.floor(Math.random() * 10)));
+      }, 62);
+    });
+  }
+  $$('.flap').forEach(buildFlap);
+  if (!reduced) $$('.count').forEach(function(el){ el.textContent = fmt(el, +(el.dataset.from || 0)); });
+
+  var once = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (!e.isIntersecting) return;
+      var el = e.target; el.classList.add('in'); once.unobserve(el);
+      $$('.count', el).forEach(runCount);
+      if (el.classList.contains('count')) runCount(el);
+      $$('.flap', el).forEach(runFlap);
+      $$('.wipe', el).forEach(function(w){ w.classList.add('in'); });
+    });
+  }, {rootMargin: '0px 0px -10% 0px', threshold: 0.2});
+  $$('.reveal, .sec-head, .phones').forEach(function(el){ once.observe(el); });
+
+  /* pipeline animates only while on screen */
+  var how = $('#how');
+  new IntersectionObserver(function(es){ how.classList.toggle('in', es[0].isIntersecting && !reduced); }, {threshold: 0.15}).observe(how);
+
+  /* ---------- the eleven blocks ---------- */
+  var WIDE = window.matchMedia('(min-width: 1024px)');
+  var blocks = $$('.block'), shots = blocks.map(function(b){ return $('.shot', b); });
+  var screens = shots.map(function(s){ return $('.screen', s); });
+  var stageShots = $('.stage-shots'), ticks = $('.ticks'), now = $('.stage-now'), prog = $('.progress i');
+  var active = 0, prev = -1, stageOn = false, wide = false, near = false;
+  var titles = blocks.map(function(b){ return $('h3', b).textContent.replace(/^Block \d+: /, ''); });
+
+  blocks.forEach(function(b, i){
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.textContent = String(i).padStart(2, '0');
+    btn.setAttribute('aria-label', 'Go to block ' + btn.textContent + ', ' + titles[i]);
+    btn.tabIndex = -1;
+    btn.addEventListener('click', function(){ b.scrollIntoView({block: 'center', behavior: reduced ? 'auto' : 'smooth'}); });
+    ticks.appendChild(btn);
+  });
+  var tickBtns = $$('button', ticks);
+
+  function paint(){
+    blocks.forEach(function(b, i){ b.classList.toggle('is-active', i === active); });
+    tickBtns.forEach(function(t, i){ t.setAttribute('aria-current', i === active ? 'true' : 'false'); });
+    now.textContent = 'Block ' + String(active).padStart(2, '0') + ' of 10, ' + titles[active];
+    prog.style.setProperty('--p', (active / (blocks.length - 1)).toFixed(3));
+    if (!wide) return;
+    shots.forEach(function(s, i){
+      s.classList.toggle('is-active', i === active);
+      s.classList.toggle('was-active', i === prev && i !== active);
+    });
+    if (near) for (var j = active - 1; j <= active + 2; j++) ensurePoster(screens[j]);
+    screens.forEach(function(sc, i){ if (i === active && stageOn) playClip(sc); else stopClip(sc); });
+  }
+  function setActive(i){ if (i === active) return; prev = active; active = i; paint(); }
+
+  var stepIO = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting) setActive(blocks.indexOf(e.target)); });
+  }, {rootMargin: '-50% 0px -50% 0px'});
+  blocks.forEach(function(b){ stepIO.observe(b); });
+
+  var stageIO = new IntersectionObserver(function(es){
+    stageOn = es[0].isIntersecting;
+    if (stageOn){ ensurePoster(screens[active]); ensurePoster(screens[active + 1]); }
+    if (wide) paint();
+  }, {rootMargin: '0px'});
+  var nearIO = new IntersectionObserver(function(es){
+    near = es[0].isIntersecting;
+    if (near && wide) paint();
+  }, {rootMargin: '900px 0px'});
+  nearIO.observe($('.blocks-wrap'));
+
+  /* narrow screens: each shot sits in its block; load near, play when mostly visible */
+  var shotNear = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting && !wide) ensurePoster($('.screen', e.target)); });
+  }, {rootMargin: '900px 0px'});
+  var shotPlay = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (wide) return;
+      var sc = $('.screen', e.target);
+      if (e.isIntersecting) playClip(sc); else stopClip(sc);
+    });
+  }, {threshold: 0.6});
+
+  function layout(){
+    wide = WIDE.matches;
+    doc.classList.toggle('wide', wide);
+    screens.forEach(stopClip);
+    shots.forEach(function(s, i){
+      shotNear.unobserve(s); shotPlay.unobserve(s);
+      if (wide){ stageShots.appendChild(s); }
+      else { blocks[i].insertBefore(s, blocks[i].firstChild); s.classList.remove('is-active', 'was-active'); shotNear.observe(s); shotPlay.observe(s); }
+    });
+    stageIO.disconnect();
+    if (wide) stageIO.observe($('.stage-in'));
+    nearIO.unobserve($('.blocks-wrap')); nearIO.observe($('.blocks-wrap'));
+    paint();
+  }
+  layout();
+  if (WIDE.addEventListener) WIDE.addEventListener('change', layout); else WIDE.addListener(layout);
+
+  /* ---------- hero device straightens as you scroll ---------- */
+  var device = $('.hero-shot .device'), ticking = false;
+  function tilt(){
+    ticking = false;
+    if (reduced || window.innerWidth <= 980) return;
+    var t = Math.max(0, 1 - window.scrollY / 520);
+    device.style.setProperty('--t', t.toFixed(3));
+  }
+  window.addEventListener('scroll', function(){ if (!ticking){ ticking = true; requestAnimationFrame(tilt); } }, {passive: true});
+
+  RM.addEventListener && RM.addEventListener('change', function(){ location.reload(); });
+})();
+</script>
+</body>
+</html>
