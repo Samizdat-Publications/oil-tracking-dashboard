@@ -1283,7 +1283,6 @@ export default class TheBill extends React.Component {
     const R = baseR + (endR - baseR) * ez;
     const cx = mobile ? W * 0.5 : W * 0.6, cy = mobile ? H * 0.38 : H * 0.42;
     const proj = d3.geoOrthographic().translate([cx, cy]).scale(R).rotate([-lon, -lat]).clipAngle(90).clipExtent([[-40, -40], [W + 40, H + 40]]);
-    const path = d3.geoPath(proj, ctx);
     const center = [lon, lat];
     const visible = pt => d3.geoDistance(pt, center) < 1.52;
 
