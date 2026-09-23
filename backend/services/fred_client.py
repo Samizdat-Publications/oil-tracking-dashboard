@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 from datetime import date
 
@@ -74,6 +75,30 @@ DOWNSTREAM_SERIES = [
 
 BASE_URL = "https://api.stlouisfed.org/fred/series/observations"
 
+# A snapshot build asks for about a hundred series, most of them at once, and
+# since each build uses a fresh cache none of them is served locally. Unbounded,
+# that burst drew timeouts and throttling from FRED on 23 Sep 2026 and the gate
+# rejected a snapshot missing weekly gasoline. So: a few requests at a time, and
+# a retry with backoff for a timeout, a dropped connection, a 429 or a 5xx.
+_FRED_SLOTS = asyncio.Semaphore(6)
+_RETRIES = (2.0, 5.0, 12.0)
+
+
+async def _fetch(params: dict) -> dict:
+    async with _FRED_SLOTS:
+        for attempt, wait in enumerate((*_RETRIES, None)):
+            try:
+                async with httpx.AsyncClient(timeout=30) as client:
+                    resp = await client.get(BASE_URL, params=params)
+                resp.raise_for_status()
+                return resp.json()
+            except (httpx.TransportError, httpx.HTTPStatusError) as exc:
+                transient = not isinstance(exc, httpx.HTTPStatusError) or exc.response.status_code == 429                     or exc.response.status_code >= 500
+                if wait is None or not transient:
+                    raise RuntimeError(f"FRED {params.get('series_id')}: {type(exc).__name__} {exc}") from exc
+                await asyncio.sleep(wait)
+    raise AssertionError("unreachable")
+
 # Load .env once at module level
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
 _cached_api_key: str | None = os.getenv("FRED_API_KEY", "").strip() or None
@@ -119,10 +144,7 @@ async def get_series(
         "observation_end": end_date,
     }
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.get(BASE_URL, params=params)
-        resp.raise_for_status()
-        data = resp.json()
+    data = await _fetch(params)
 
     observations = []
     for obs in data.get("observations", []):
