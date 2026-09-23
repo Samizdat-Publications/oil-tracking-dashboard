@@ -12,7 +12,8 @@ GitHub Pages from `/docs`).
 
 **Repo:** github.com/Samizdat-Publications/oil-tracking-dashboard
 **Two dates:** tariffs re-imposed 2026-02-24, the strike 2026-02-28.
-**Working copy:** `C:\Users\stewa\dev\oil-tracking-dashboard`, never the OneDrive copy
+**Working copy:** `C:\Users\stewa\Documents\Claude\Oil Traacking Dashboard\oil-dashboard`,
+never the OneDrive copy
 (see Conventions).
 
 ## V5 "The Bill" (the page at `/`) -- read this first
@@ -279,11 +280,13 @@ them; `build_snapshot.py` calls the `services/` modules directly.
 - All emoji in Python: `\U000XXXXX` format (e.g., `\U0001F4C9`).
 - **Update memory files at every git commit**: the user frequently starts new sessions.
 - **Never use an em dash** in anything written here (code, comments, copy, commits).
-- **Work from `C:\Users\stewa\dev\oil-tracking-dashboard`, not the OneDrive copy.**
-  On 2026-09-23 the OneDrive checkout's `.git` had hundreds of unreadable loose objects
-  (`fatal: mmap failed`) and OneDrive refused reads on dozens of working files. GitHub
-  was complete, so a fresh clone outside OneDrive replaced it. `backend/.env` and
-  `backend/data/cache.db` are untracked: copy them across by hand.
+- **Work from `C:\Users\stewa\Documents\Claude\Oil Traacking Dashboard\oil-dashboard`,
+  not `OneDrive\Documents\Claude\...`.** The Claude folders stopped syncing through
+  OneDrive in September 2026 and were split to `Documents\Claude`. With the OneDrive
+  client stopped, files in the old copy are cloud-only placeholders (`attrib` shows `O`):
+  git fails with `fatal: mmap failed` and other tools with "Permission denied". The old
+  copy is not corrupt, just unreadable until OneDrive downloads it. `backend/.env` and
+  `backend/data/cache.db` are untracked and live only in the working copy.
 - **Do NOT use git worktrees.** Work directly on main.
 - **Always run dev servers from main repo**, not worktrees. Vite HMR only picks up changes in the directory it was started from.
 
