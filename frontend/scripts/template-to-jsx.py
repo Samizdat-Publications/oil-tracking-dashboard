@@ -41,9 +41,10 @@ CANVAS_LABELS = [
     "climbs again when strikes resume. Red marks are his acts, blue are ceasefires.",
 
     "A map of the Strait of Hormuz with the real Traffic Separation Scheme lane "
-    "and the 33 kilometre gate between Musandam and Larak. Ship icons in the lane "
-    "thin out as the counted traffic falls. From 18 August a side-by-side compares "
-    "the claim of 30 ships a night against the counted 7-day mean.",
+    "and the 33 kilometre gate between Musandam and Larak. The lane is full of ships "
+    "at the pre-war 83 a day, then nearly empty at the latest seven-day count, with "
+    "one ship on screen for each ship a day. A side-by-side compares the "
+    "claim of 30 ships a night against the count.",
 
     "Two crowds of small human figures, one figure per 10,000 jobs. The left stand "
     "shows the 2021-25 average of 320,938 jobs a month; the right shows what has "

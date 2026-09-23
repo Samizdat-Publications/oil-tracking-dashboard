@@ -109,6 +109,7 @@ export default class TheBill extends React.Component {
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
+      strNowWord: this.data ? this.numWord(Math.round(this.data.items.hormuz.recent.mean7_total)) : '',
       ...this.dieselVals(),
       crudeCount: this.crude ? this.crude.observations.length : '', crudeLast: this.crude ? this.fmtISO(this.crude.observations.at(-1)[0]).replace(' 2026', '') : '',
       rows, totalCells, digits: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
@@ -251,16 +252,30 @@ export default class TheBill extends React.Component {
   stepStrait(dt, P, t) {
     const cv = this.straitRef.current, CB = this.coastBox; if (!cv || !CB || !this.routes) return;
     const h = this.routes.hormuz;
-    const tl = Math.max(0, Math.min(1, (P - 0.02) / 0.6));
-    const day = tl * this.LAST;                          // 1 Jan → last counted day (same day0 as the globe)
-    const flow = this.flowAt(h, day), frac = Math.min(1, flow / h.base), closed = day >= this.STRIKE && frac < 0.12;
-    // ships: spawn ∝ the day's count, crawl when the count is low
-    const rate = Math.max(0.2, flow) * 0.12;
-    this.strAcc = Math.min(3, this.strAcc + rate * dt);
-    while (this.strAcc >= 1 && this.strShips.length < 90) { this.strAcc -= 1; const dir = Math.random() < 0.5 ? 1 : -1; this.strShips.push({ s: dir > 0 ? -0.6 : 1.6, dir, v: 0.05 + Math.random() * 0.02, w: [0.8, 1, 1.3][Math.floor(Math.random() * 3)] }); }
-    const slow = 0.3 + 0.7 * Math.pow(frac, 0.6);
-    for (const sh of this.strShips) sh.s += sh.v * dt * slow * sh.dir;
-    this.strShips = this.strShips.filter(sh => sh.s > -0.65 && sh.s < 1.65);
+    // Two states, not a day-by-day replay. Scrubbing every daily count made the
+    // number bounce on its way down, and ships spawned at 83 a day kept crawling
+    // through a gate marked CLOSED, so the closure read as no impact at all.
+    // Before is the pre-war mean, now is the latest 7-day mean, and the ships on
+    // screen are held in proportion to whichever is showing.
+    const nowFlow = this.mean7(h, this.LAST) ?? h.base;
+    const CUT = 0.33, SETTLE = 0.43, CLAIM = 0.58;
+    const fall = P < CUT ? 0 : P >= SETTLE ? 1 : (P - CUT) / (SETTLE - CUT), ease = 1 - Math.pow(1 - fall, 3);
+    const flow = h.base + (nowFlow - h.base) * ease, frac = Math.min(1, flow / h.base);
+    const after = P >= CUT, closed = fall >= 1 && nowFlow / h.base < 0.12;
+    // one ship on screen for each ship a day: 83 before, the count now
+    const target = Math.max(flow >= 0.5 ? 1 : 0, Math.round(flow));
+    const newShip = s => ({ s, dir: Math.random() < 0.5 ? 1 : -1, v: 0.05 + Math.random() * 0.02, w: [0.8, 1, 1.3][Math.floor(Math.random() * 3)], a: 1 });
+    if (!this.strFilled) { this.strFilled = true; for (let i = 0; i < target; i++) this.strShips.push(newShip(-0.6 + 2.2 * (i + Math.random()) / target)); }
+    // surplus ships fade out; the ones nearest the gate stay, so the few left are in view
+    const active = this.strShips.filter(sh => !sh.leaving).sort((a, b) => Math.abs(a.s - 0.5) - Math.abs(b.s - 0.5));
+    for (let i = target; i < active.length; i++) active[i].leaving = true;
+    this.strAcc = Math.min(2, this.strAcc + dt * target / 37);                   // ~37 s to cross the frame
+    if (active.length >= target) this.strAcc = Math.min(this.strAcc, 1);
+    while (this.strAcc >= 1 && this.strShips.filter(sh => !sh.leaving).length < target) {
+      this.strAcc -= 1; const sh = newShip(0); sh.s = sh.dir > 0 ? -0.6 : 1.6; this.strShips.push(sh);
+    }
+    for (const sh of this.strShips) { sh.s += sh.v * dt * sh.dir; if (sh.leaving) sh.a -= dt * 1.4; }
+    this.strShips = this.strShips.filter(sh => sh.a > 0 && sh.s > -0.65 && sh.s < 1.65);
     // paint
     const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
@@ -303,31 +318,32 @@ export default class TheBill extends React.Component {
     for (const sh of this.strShips) {
       const p = this.strLane(sh.s, sh.dir > 0 ? -0.026 : 0.026);
       const ang = Math.atan2(p.dy * mh, p.dx * mw) + (sh.dir > 0 ? 0 : Math.PI);
+      ctx.globalAlpha = Math.max(0, Math.min(1, sh.a));
       this.drawShip(ctx, X(p.x), Y(p.y), ang, L * sh.w, '#F2C94C', false);
     }
+    ctx.globalAlpha = 1;
     // his claim against the count: from 18 August, drawn to the same scale
-    const claimDay = this.dayOf('2026-08-18');
-    if (day >= claimDay - 0.5 && !mobile) {
-      const a = Math.min(1, (day - claimDay + 0.5) / 4);
+    if (P >= CLAIM && !mobile) {
+      const a = Math.min(1, (P - CLAIM) / 0.08);
       ctx.globalAlpha = a;
       const bx = W - 36 - 10 * (L * 1.15), by = H * 0.12;
       ctx.font = '700 14px "IBM Plex Mono", monospace'; ctx.fillStyle = '#E04B5C'; ctx.textAlign = 'right'; ctx.fillText('HE SAYS · 30 A NIGHT · 18 AUG', W - 36, by - 10); ctx.textAlign = 'left';
       for (let i = 0; i < 30; i++) this.drawShip(ctx, bx + (i % 10) * L * 1.15 + L / 2, by + Math.floor(i / 10) * L * 0.5 + L * 0.2, 0, L, null, true);
       const cy2 = by + 3 * L * 0.5 + 26;
-      ctx.fillStyle = '#D4A017'; ctx.textAlign = 'right'; ctx.fillText('COUNTED · ' + Math.round(flow) + ' A DAY · 7-DAY MEAN', W - 36, cy2 - 10); ctx.textAlign = 'left';
-      for (let i = 0; i < Math.max(1, Math.round(flow)); i++) this.drawShip(ctx, bx + (i % 10) * L * 1.15 + L / 2, cy2 + Math.floor(i / 10) * L * 0.5 + L * 0.2, 0, L, '#F2C94C', false);
+      ctx.fillStyle = '#D4A017'; ctx.textAlign = 'right'; ctx.fillText('COUNTED · ' + Math.round(nowFlow) + ' A DAY · 7-DAY MEAN', W - 36, cy2 - 10); ctx.textAlign = 'left';
+      for (let i = 0; i < Math.max(1, Math.round(nowFlow)); i++) this.drawShip(ctx, bx + (i % 10) * L * 1.15 + L / 2, cy2 + Math.floor(i / 10) * L * 0.5 + L * 0.2, 0, L, '#F2C94C', false);
       ctx.globalAlpha = 1;
     }
     const sg = ctx.createLinearGradient(0, H * 0.5, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.9)');
     ctx.fillStyle = sg; ctx.fillRect(0, H * 0.5, W, H * 0.5);
     // readouts
     const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
-    set(this.strNumRef, day < this.STRIKE ? String(Math.round(h.base)) : String(Math.round(flow)));
-    set(this.strDateRef, day < this.STRIKE ? 'BEFORE THE WAR · 1 JAN 2025 – 27 FEB 2026' : this.fmtDay(Math.round(day)));
-    let ev = null; for (const e of this.events) if (day >= e.d && day < e.d + 22) ev = e;
+    set(this.strNumRef, String(Math.round(after ? flow : h.base)));
+    set(this.strDateRef, after ? 'NOW · 7 DAYS TO ' + this.fmtDay(this.LAST) : 'BEFORE THE WAR · 1 JAN 2025 – 27 FEB 2026');
+    const ev = !after ? null : P < CLAIM + 0.07 ? this.events[0] : this.events.find(e => /OPEN AND OPERATING/.test(e.t));
     const er = this.strEventRef.current; if (er) { const txt = ev ? ev.t : ''; if (er.textContent !== txt) { er.textContent = txt; er.style.color = ev && ev.red ? '#E04B5C' : '#6C8CD5'; } }
     const sub = this.strSubRef.current;
-    if (sub) { const html = day < this.STRIKE ? 'ships a day<br><span style="color:rgba(247,245,240,.6)">before his war</span>' : closed ? 'ships a day<br><span style="color:#E04B5C">the strait is shut · was 83</span>' : 'ships a day<br><span style="color:rgba(247,245,240,.6)">was 83</span>'; if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; } }
+    if (sub) { const html = !after ? 'ships a day<br><span style="color:rgba(247,245,240,.6)">before his war</span>' : closed ? 'ships a day<br><span style="color:#E04B5C">the strait is shut · was 83</span>' : 'ships a day<br><span style="color:rgba(247,245,240,.6)">was 83</span>'; if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; } }
   }
 
   /* ---------- computed copy ----------
@@ -336,9 +352,10 @@ export default class TheBill extends React.Component {
    * EIA's weekly diesel passed its 2022 peak on 7 Sep 2026. The record test runs
    * on the whole series (from 1994) in build_snapshot.py; with no history the
    * copy states the price and claims nothing either way. */
+  numWord(n) { return ['none', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'][n] || String(n); }
   hormuzNow(mean7) {
-    const n = Math.round(mean7), W = ['none', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
-    return 'Now ' + (W[n] || String(n)) + (n === 1 ? ' does.' : ' do.');
+    const n = Math.round(mean7);
+    return 'Now ' + this.numWord(n) + (n === 1 ? ' does.' : ' do.');
   }
   dieselVals() {
     const D = this.prices && this.prices.diesel, R = D && D.record;
@@ -1261,7 +1278,7 @@ export default class TheBill extends React.Component {
 
   render() {
     const V = this.renderVals();
-    const { aheYoy, aircraftList, dieselHead, dieselHeadPolicy, dieselNote, hormuzNow, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
+    const { aheYoy, aircraftList, strNowWord, dieselHead, dieselHeadPolicy, dieselNote, hormuzNow, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
     return (
 <div className="v5-bill-root" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
 
@@ -1374,7 +1391,7 @@ export default class TheBill extends React.Component {
   <section data-screen-label="03 The strait" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={straitRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="A map of the Strait of Hormuz with the real Traffic Separation Scheme lane and the 33 kilometre gate between Musandam and Larak. Ship icons in the lane thin out as the counted traffic falls. From 18 August a side-by-side compares the claim of 30 ships a night against the counted 7-day mean."></canvas>
+      <canvas ref={straitRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label="A map of the Strait of Hormuz with the real Traffic Separation Scheme lane and the 33 kilometre gate between Musandam and Larak. The lane is full of ships at the pre-war 83 a day, then nearly empty at the latest seven-day count, with one ship on screen for each ship a day. A side-by-side compares the claim of 30 ships a night against the count."></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", bottom: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div style={{display: "flex", flexDirection: "column", gap: "6px"}}>
           <div ref={strDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>1 JAN 2026</div>
@@ -1388,7 +1405,7 @@ export default class TheBill extends React.Component {
           <div className="g-num" ref={strNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,240px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>83</div>
           <div ref={strSubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>ships a day<br /><span style={{color: "rgba(247,245,240,.6)"}}>before his war</span></div>
         </div>
-        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>He says thirty ships a night. The satellites count four. Before his war it was eighty-three a day.</p>
+        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>He says thirty ships a night. The satellites count {strNowWord}. Before his war it was eighty-three a day.</p>
       </div>
     </div>
   </section>
@@ -1399,7 +1416,7 @@ export default class TheBill extends React.Component {
         <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · THE STRAIT
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
-        <p style={{margin: "0", textWrap: "pretty"}}>The coastline is Natural Earth at 1:10m, clipped to a box around the strait; the box is stretched to the screen, so shapes are real and the aspect is not. The lane is the real Traffic Separation Scheme, outbound one side and inbound the other; the gate is the 33 km between Musandam and Larak. Every ship on the screen is a share of the day's count: the IMF PortWatch estimate of transit calls, from satellite AIS positions, averaged over the trailing seven days. Ships transmitting no position are not counted, so the figure is a floor, not a census, and it is not a queue count. Ship positions are a model; the counts are not.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}>The coastline is Natural Earth at 1:10m, clipped to a box around the strait; the box is stretched to the screen, so shapes are real and the aspect is not. The lane is the real Traffic Separation Scheme, outbound one side and inbound the other; the gate is the 33 km between Musandam and Larak. The picture shows two states rather than a day-by-day replay: the pre-war mean (1 January 2025 to 27 February 2026) and the latest trailing seven-day mean, with one ship on the screen for each ship a day. The counts are the IMF PortWatch estimate of transit calls from satellite AIS positions. Ships transmitting no position are not counted, so the figure is a floor, not a census, and it is not a queue count. Ship positions are a model; the counts are not.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>"Thirty a night."</strong> On 18 August 2026 the President said the strait was "open and operating." That day the MV Minoan Dignity was struck and one crew member was killed; Lloyd's List counted about 14 transits, PortWatch {strAug18}. The hatched fleet on the screen is his figure drawn to the same scale as the counted one. The pre-war figure is the mean of 423 days, 1 January 2025 to 27 February 2026: {strBase} a day, of which {strTanker} were tankers. Thirteen merchant ships were struck in August; on 25 August the US Navy said it had cleared the mines and PortWatch counted four vessels that day.</p>
         <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: IMF PortWatch (IMF / University of Oxford) chokepoint6, as of {asOf} · Natural Earth 1:10m coastlines · Lloyd's List for the 18 August transit count.</p>
       </div>
