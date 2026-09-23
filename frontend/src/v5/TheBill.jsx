@@ -268,15 +268,26 @@ export default class TheBill extends React.Component {
     const target = Math.max(flow >= 0.5 ? 1 : 0, Math.round(flow));
     const newShip = s => ({ s, dir: Math.random() < 0.5 ? 1 : -1, v: 0.05 + Math.random() * 0.02, w: [0.8, 1, 1.3][Math.floor(Math.random() * 3)], a: 1 });
     if (!this.strFilled) { this.strFilled = true; for (let i = 0; i < target; i++) this.strShips.push(newShip(-0.6 + 2.2 * (i + Math.random()) / target)); }
-    // surplus ships fade out; the ones nearest the gate stay, so the few left are in view
-    const active = this.strShips.filter(sh => !sh.leaving).sort((a, b) => Math.abs(a.s - 0.5) - Math.abs(b.s - 0.5));
-    for (let i = target; i < active.length; i++) active[i].leaving = true;
-    this.strAcc = Math.min(2, this.strAcc + dt * target / 37);                   // ~37 s to cross the frame
+    // surplus ships fade out; the ones kept are spread along the visible lane, so
+    // the few left are in view and do not stack on the gate
+    const active = this.strShips.filter(sh => !sh.leaving);
+    if (active.length > target) {
+      const keep = new Set();
+      for (let i = 0; i < target; i++) {
+        const want = 0.1 + 0.8 * (i + 0.5) / target; let best = null;
+        for (const sh of active) if (!keep.has(sh) && (!best || Math.abs(sh.s - want) < Math.abs(best.s - want))) best = sh;
+        if (best) keep.add(best);
+      }
+      for (const sh of active) if (!keep.has(sh)) sh.leaving = true;
+    }
+    this.strAcc = Math.min(2, this.strAcc + dt * target * frac / 37);            // ~37 s to cross the frame at full speed
     if (active.length >= target) this.strAcc = Math.min(this.strAcc, 1);
     while (this.strAcc >= 1 && this.strShips.filter(sh => !sh.leaving).length < target) {
       this.strAcc -= 1; const sh = newShip(0); sh.s = sh.dir > 0 ? -0.6 : 1.6; this.strShips.push(sh);
     }
-    for (const sh of this.strShips) { sh.s += sh.v * dt * sh.dir; if (sh.leaving) sh.a -= dt * 1.4; }
+    // the few ships left crawl, so they stay in view long enough to count
+    const slow = 0.25 + 0.75 * frac;
+    for (const sh of this.strShips) { sh.s += sh.v * dt * sh.dir * slow; if (sh.leaving) sh.a -= dt * 1.4; }
     this.strShips = this.strShips.filter(sh => sh.a > 0 && sh.s > -0.65 && sh.s < 1.65);
     // paint
     const dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
