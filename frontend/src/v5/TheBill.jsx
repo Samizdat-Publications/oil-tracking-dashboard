@@ -1220,8 +1220,11 @@ export default class TheBill extends React.Component {
   loop(t) {
     this.raf = requestAnimationFrame(this.loop);
     const cv = this.canvasRef.current;
-    const still = this.reduced && t > this.settleAt;
-    const dt = still ? 0 : Math.max(0, Math.min(0.05, (t - (this.lastT || t)) / 1000)); this.lastT = t;
+    const dt = Math.max(0, Math.min(0.05, (t - (this.lastT || t)) / 1000)); this.lastT = t;
+    // Under reduced motion only what drifts is frozen (globe particles, strait ships),
+    // once the first frames have placed them. Everything else keeps the real clock:
+    // the split-flap board settles on elapsed time and froze on January's prices.
+    const drift = this.reduced && t > this.settleAt ? 0 : dt;
     const vh = innerHeight;
     // cueAt: the progress at which the SCROLL affordance appears. It is 1 for
     // every block that plays once. Block 07 loops, so its P never settles at 1
@@ -1237,7 +1240,7 @@ export default class TheBill extends React.Component {
     const secOf = ref => ref.current && ref.current.closest('section');
     run(this.stampStageRef.current && this.stampStageRef.current.parentElement, 'stamps', 3.5, P => this.stepStamps(P));
     run(secOf(this.seisRef), 'seis', 8, P => this.stepSeis(dt, P, t));
-    run(secOf(this.straitRef), 'strait', 9, P => this.stepStrait(dt, P, t));
+    run(secOf(this.straitRef), 'strait', 9, P => this.stepStrait(drift, P, t));
     run(secOf(this.boardRef), 'prices', 6, P => this.stepPrices(dt, P));
     run(secOf(this.crowdRef), 'crowd', 9, P => this.stepCrowd(dt, P, t));
     run(secOf(this.warRef), 'war', 9, P => this.stepWar(dt, P, t));
@@ -1260,7 +1263,7 @@ export default class TheBill extends React.Component {
     const tl = Math.max(0, Math.min(1, (P - 0.04) / 0.26));
     const day = this.STRIKE - 1 + tl * (this.LAST - this.STRIKE + 1);
     this.day = day;
-    this.stepParts(dt, day);
+    this.stepParts(drift, day);
     this.paint(cv, P, day, t);
     this.readout(P, day);
   }
