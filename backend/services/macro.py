@@ -58,6 +58,10 @@ MACRO_SERIES: list[tuple[str, str, str, str, str]] = [
     ("pce_headline", "PCEPI", "PCE price index", "index", "2024-01-01"),
     # September 2026 additions -- the metrics the page should have led with.
     ("continued_claims", "CCSA", "Continued unemployment claims (insured)", "persons", "2025-01-01"),
+    # Why claims are low while hiring is frozen: few layoffs, long spells out of work.
+    ("initial_claims", "ICSA", "Initial unemployment claims (weekly)", "persons", "2025-01-01"),
+    ("layoffs_rate", "JTSLDR", "Layoffs and discharges rate (JOLTS)", "pct", "2025-01-01"),
+    ("ltu_count", "UEMP27OV", "Unemployed 27 weeks or more", "thousands", "2025-01-01"),
     ("real_ahe", "CES0500000013", "Real average hourly earnings, all private (1982-84 $)", "usd", "2024-01-01"),
     ("prime_epop", "LNS12300060", "Prime-age (25-54) employment-population ratio", "pct", "2025-01-01"),
     ("participation", "CIVPART", "Labor force participation rate", "pct", "2025-01-01"),

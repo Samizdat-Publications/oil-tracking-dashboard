@@ -106,6 +106,7 @@ export default class TheBill extends React.Component {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
+      ...this.jobsVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -382,6 +383,63 @@ export default class TheBill extends React.Component {
     };
   }
 
+  /* ---------- blocks 5 and 10: computed copy ----------
+   * Month names, counts and "best month" verdicts were typed into the jobs note
+   * and went stale on the next jobs report. They are derived here, and a verdict
+   * that stops being true drops out rather than staying on the page. */
+  monthLong(iso) { return new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }); }
+  dayLong(iso) { const [d, m, y] = this.fmtISO(iso).split(' '); return d + ' ' + m[0] + m.slice(1).toLowerCase() + ' ' + y; }
+  // how many months the latest print has been the best of, counting itself; 1 if it is not
+  bestRun(months) {
+    const last = months.at(-1); let k = 1;
+    for (let i = months.length - 2; i >= 0 && months[i][1] < last[1]; i--) k++;
+    return k;
+  }
+  jobsVals() {
+    const B = this.bill, keys = 'jobsNeg jobsLatest ltuWhen unempDir layoffs payMonth claimsNote'.split(' ');
+    if (!B || !this.cMonths) return Object.fromEntries(keys.map(k => [k, '']));
+    const M = this.cMonths, last = M.at(-1), run = this.bestRun(M), n = v => Math.round(v).toLocaleString();
+    const ltuTerm = B.ltu.points.filter(p => p[0] >= '2025-01-01').map(p => p[1]);
+    const u0 = (B.unemployment.points.find(p => p[0] === '2025-01-01') || [0, B.unemployment.handover.value])[1], u1 = B.unemployment.latest.value;
+    let claimsNote = '';
+    if (B.claims && B.layoffs && B.ltu_count) {
+      const lc = B.ltu_count, pa = B.participation;
+      claimsNote = 'New claims for unemployment benefit were ' + n(B.claims.latest.value) + ' in the week to ' + this.dayLong(B.claims.latest.date) + '. Claims count people who are let go, and few are: ' + B.layoffs.latest.value.toFixed(1) + '% of workers were laid off in ' + this.monthLong(B.layoffs.latest.date) + '. They do not count people who cannot get hired, which is where the market froze, so the damage shows up as time out of work: ' + n(lc.latest.value * 1000) + ' people have been looking for 27 weeks or more, against ' + n(lc.handover.value * 1000) + ' in January 2025. Claims also miss people whose benefits have run out, who never qualified, or who took a worse job to get by; U-6, which adds part-timers who want full-time work and people who have stopped looking, is ' + B.u6.latest.value.toFixed(1) + '%.'
+        + (pa ? ' Labour-force participation is ' + pa.latest.value.toFixed(1) + '%, against ' + pa.handover.value.toFixed(1) + '% in January 2025; an ageing population and lower immigration account for part of that, so not all of it is people giving up.' : '');
+    }
+    return {
+      jobsNeg: this.numWord(M.filter(m => m[1] < 0).length),
+      jobsLatest: this.monthLong(last[0]) + ' at ' + (last[1] < 0 ? '\u2212' : '+') + n(Math.abs(last[1])) + (run >= 3 ? ', the best month in ' + this.numWord(run) + ', drawn brighter because it deserves to be' : ''),
+      ltuWhen: this.monthLong(B.ltu.latest.date) + (B.ltu.latest.value >= Math.max(...ltuTerm) ? ', the highest of his term' : ''),
+      unempDir: u1 > u0 ? 'up from' : u1 < u0 ? 'down from' : 'unchanged from',
+      layoffs: B.layoffs ? B.layoffs.latest.value.toFixed(1) : '',
+      payMonth: B.pay.ahe_date ? this.monthLong(B.pay.ahe_date) : 'the latest month',
+      claimsNote,
+    };
+  }
+  againstRows() {
+    const A = this.bill && this.bill.against, B = this.bill; if (!A) return [];
+    const rows = [], pct = (a, b) => (a / b - 1) * 100, sgn = v => (v >= 0 ? '+' : '\u2212') + Math.abs(v).toFixed(1) + '%';
+    const day = iso => this.dayLong(iso), month = iso => this.monthLong(iso), n = v => Math.round(v).toLocaleString();
+    const s = A.sp500;
+    if (s && s.latest && s.handover && s.latest.value > s.handover.value) rows.push({ head: 'Stocks are up.', text: 'The S&P 500 closed at ' + n(s.latest.value) + ' on ' + day(s.latest.date) + ', ' + sgn(pct(s.latest.value, s.handover.value)) + ' since the handover' + (s.prewar ? ' and ' + sgn(pct(s.latest.value, s.prewar.value)) + ' since the war began' : '') + '.' });
+    const m = A.mortgage;
+    if (m && m.latest && m.handover && m.latest.value < m.handover.value) rows.push({ head: 'Mortgages cost less than at the handover.', text: 'The 30-year fixed rate is ' + m.latest.value.toFixed(2) + '% (' + day(m.latest.date) + '), against ' + m.handover.value.toFixed(2) + '% in January 2025' + (m.prewar && m.latest.value > m.prewar.value ? ', though it is above the ' + m.prewar.value.toFixed(2) + '% of the week before the war' : '') + '.' });
+    if (B.claims && B.layoffs) rows.push({ head: 'Almost nobody is being laid off.', text: 'New jobless claims were ' + n(B.claims.latest.value) + ' in the week to ' + day(B.claims.latest.date) + ', and ' + B.layoffs.latest.value.toFixed(1) + '% of workers were laid off in ' + month(B.layoffs.latest.date) + '. What this page says about jobs is about hiring, not firing.' });
+    const j = A.latest_jobs;
+    if (j && j.value > A.jobs_mean) rows.push({ head: 'The latest month was better.', text: 'Payrolls rose ' + n(j.value) + ' in ' + month(j.date) + ', above the ' + n(A.jobs_mean) + ' a month since January 2025. One month moves that average little, and it does not move the hires rate.' });
+    const c = A.core_cpi_yoy, h = A.headline_yoy;
+    if (c && h && c.value < h.value) rows.push({ head: 'Inflation outside energy is modest.', text: 'Core CPI, which leaves out food and energy, rose ' + c.value.toFixed(1) + '% in the year to ' + month(c.date) + ', against ' + h.value.toFixed(1) + '% for everything.' });
+    const cu = A.customs;
+    if (cu && cu.latest.value > 0 && cu.months_negative.length && cu.months_negative.at(-1) < cu.latest.date) {
+      const names = cu.months_negative.map(d => month(d).split(' ')[0]);
+      rows.push({ head: 'Tariff receipts are positive again.', text: 'Customs duties net of refunds were $' + (cu.latest.value / 1e9).toFixed(1) + 'bn in ' + month(cu.latest.date) + ', after refunds of struck-down tariffs exceeded collections in ' + (names.length > 1 ? names.slice(0, -1).join(', ') + ' and ' + names.at(-1) : names[0]) + '.' });
+    }
+    const cr = A.crude;
+    if (cr && cr.month_ago && cr.latest.value < cr.month_ago.value * 0.95) rows.push({ head: 'Oil is falling.', text: 'WTI closed at $' + cr.latest.value.toFixed(2) + ' on ' + day(cr.latest.date) + ', down ' + Math.abs(pct(cr.latest.value, cr.month_ago.value)).toFixed(0) + '% from $' + cr.month_ago.value.toFixed(2) + ' a month earlier.' });
+    return rows;
+  }
+
   /* ---------- block 9: the bill ---------- */
   cardItems() {
     const B = this.bill, P = this.prices, D = this.data, C = this.crude, R = this.cardItemRefs;
@@ -413,10 +471,11 @@ export default class TheBill extends React.Component {
     const fmt = n => Math.round(n).toLocaleString();
     const ltu = B.ltu.points, un = B.unemployment.points;
     const at = (pts, d) => (pts.find(p => p[0] === d) || [0, null])[1];
+    const f1 = v => (v == null ? '' : v.toFixed(1));
     const mon = iso => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' }).toUpperCase();
     return {
       jobsPrev: fmt(B.jobs.prev.mean_monthly), jobsCurr: fmt(B.jobs.curr.mean_monthly), jobsN: B.jobs.curr.n_months, jobsMed: fmt(B.jobs.curr.median_monthly), jobsPrevMed: fmt(B.jobs.prev.median_monthly),
-      ltu0: at(ltu, '2025-01-01'), ltu1: B.ltu.latest.value, unemp0: at(un, '2025-01-01'), unemp1: B.unemployment.latest.value, hires: B.hires.latest.value, quits: B.quits.latest.value,
+      ltu0: f1(at(ltu, '2025-01-01')), ltu1: f1(B.ltu.latest.value), unemp0: f1(at(un, '2025-01-01')), unemp1: f1(B.unemployment.latest.value), hires: B.hires.latest.value, quits: B.quits.latest.value,
       aheYoy: B.pay.ahe_yoy_pct.toFixed(1), cpiYoy: B.pay.cpi_yoy_pct.toFixed(1), realYoy: B.pay.real_yoy_pct.toFixed(1),
       aircraftList: Object.entries(B.war_cost.aircraft.by_type).map(([k, v]) => v + ' ' + k).join(', '),
       vaultStart: fmt(B.gold.earmarked[0][2]), vaultEnd: fmt(B.gold.earmarked.at(-1)[2]), vaultOut: B.gold.tonnes_out,
@@ -429,6 +488,8 @@ export default class TheBill extends React.Component {
     this.cMonths = B.jobs.monthly.filter(m => m[0] >= '2025-02-01');   // the 19 months of his term; January 2025 belongs to the previous one
     this.cPrevPace = B.jobs.prev.mean_monthly;
     this.cLeft = []; this.cRight = []; this.cMonthDone = -1;
+    // the latest month is drawn brighter only while it is the best of at least three
+    this.cBright = this.bestRun(this.cMonths) >= 3 ? this.cMonths.at(-1)[0] : null;
     // block 7: the vault — one bar per tonne, removed month by month
     const E = B.gold.earmarked;
     this.vTotal = Math.round(E[0][2]);
@@ -454,7 +515,7 @@ export default class TheBill extends React.Component {
       const m = this.cMonths[this.cMonthDone], k = this.cMonthDone;
       const nL = Math.round(this.cPrevPace / 10000), nR = Math.round(m[1] / 10000);
       for (let i = 0; i < nL; i++) this.cLeft.push({ born: t + i * 12, m: k });
-      if (nR >= 0) for (let i = 0; i < nR; i++) this.cRight.push({ born: t + i * 40, m: k, bright: m[0] === '2026-08-01' });
+      if (nR >= 0) for (let i = 0; i < nR; i++) this.cRight.push({ born: t + i * 40, m: k, bright: this.cBright === m[0] });
       else for (let i = 0; i < -nR; i++) { const idx = this.cRight.length - 1 - i; if (idx >= 0 && !this.cRight[idx].leaving) this.cRight[idx].leaving = t + i * 30; }
     }
     // two stadiums: dots stack in rows of `cols`
@@ -1278,7 +1339,7 @@ export default class TheBill extends React.Component {
 
   render() {
     const V = this.renderVals();
-    const { aheYoy, aircraftList, strNowWord, dieselHead, dieselHeadPolicy, dieselNote, hormuzNow, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
+    const { aheYoy, aircraftList, againstRows, claimsNote, jobsLatest, jobsNeg, layoffs, ltuWhen, payMonth, unempDir, strNowWord, dieselHead, dieselHeadPolicy, dieselNote, hormuzNow, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
     return (
 <div className="v5-bill-root" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
 
@@ -1569,9 +1630,10 @@ export default class TheBill extends React.Component {
         <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · HIRING
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
-        <p style={{margin: "0", textWrap: "pretty"}}>Each figure is 10,000 jobs from the BLS monthly change in nonfarm payrolls. The left crowd adds the previous term's average, {jobsPrev} a month over 48 months, for each of the {jobsN} months since 20 January 2025. The right crowd adds what actually happened each month: {jobsCurr} a month on average, five negative months (figures leave in red), and August 2026 at +162,000, the best month in five, drawn brighter because it deserves to be. Median rather than mean would read {jobsMed} against {jobsPrevMed}.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The frozen row.</strong> One hundred figures stand for the unemployed; the lit ones are the share out of work 27 weeks or more: {ltu0}% in January 2025, {ltu1}% in August 2026, the highest of his term. Unemployment itself is {unemp1}%, up from {unemp0}%: few are being fired (hires rate {hires}%, quits {quits}%), but those who are stay out longer.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The paycheck.</strong> Average hourly earnings rose {aheYoy}% in the year to July 2026; consumer prices rose {cpiYoy}%. The difference, {realYoy}%, is derived from average hourly earnings for all private employees (CES0500000003) and CPI-U, not seasonally adjusted.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}>Each figure is 10,000 jobs from the BLS monthly change in nonfarm payrolls. The left crowd adds the previous term's average, {jobsPrev} a month over 48 months, for each of the {jobsN} months since 20 January 2025. The right crowd adds what actually happened each month: {jobsCurr} a month on average, {jobsNeg} negative months (figures leave in red), and {jobsLatest}. Median rather than mean would read {jobsMed} against {jobsPrevMed}.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The frozen row.</strong> One hundred figures stand for the unemployed; the lit ones are the share out of work 27 weeks or more: {ltu0}% in January 2025, {ltu1}% in {ltuWhen}. Unemployment itself is {unemp1}%, {unempDir} {unemp0}%: few are being laid off (layoffs rate {layoffs}%), but hiring has all but stopped (hires rate {hires}%, quits {quits}%), so those who lose a job stay out longer.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Why jobless claims are low.</strong> {claimsNote}</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The paycheck.</strong> Average hourly earnings rose {aheYoy}% in the year to {payMonth}; consumer prices rose {cpiYoy}%. The difference, {realYoy}%, is derived from average hourly earnings for all private employees (CES0500000003) and CPI-U, not seasonally adjusted.</p>
         <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: BLS Current Employment Statistics (PAYEMS monthly change) · BLS long-term unemployed share, U-6, JOLTS hires and quits · BLS CPI-U NSA · all via FRED.</p>
       </div>
     </details>
@@ -1717,6 +1779,12 @@ export default class TheBill extends React.Component {
     <div style={{maxWidth: "820px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "28px", fontSize: "17px", lineHeight: "1.5"}}>
       <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F", display: "flex", alignItems: "center", gap: "14px"}}><span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>CHECK OUR WORK</div>
       <p style={{margin: "0", textWrap: "pretty", fontSize: "20px"}}>Every number on this page comes from the government's own tables or a named source, and every block has a "Show the work" panel above with the series, the dates and the method. What follows is what the numbers can and cannot say.</p>
+      <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", color: "rgba(11,30,63,.7)"}}>WHAT CUTS AGAINST THIS PAGE</div>
+      <div style={{display: "flex", flexDirection: "column", gap: "18px"}}>
+        {(againstRows || []).map((r, _i9) => (<React.Fragment key={_i9}>
+          <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{r.head}</strong> {r.text}</p>
+        </React.Fragment>))}
+      </div>
       <div style={{display: "flex", flexDirection: "column", gap: "18px"}}>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The missing month.</strong> The October 2025 Consumer Price Index was never collected. Every twelve-month comparison on this page runs month to month across that gap rather than by counting observations.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{dieselHeadPolicy}</strong> {dieselNote} Eggs cost half what they did in January 2025 because the 2022–25 avian influenza outbreak ended; that fall is real and it is not policy. The oil peak is the daily spot close, $114.58 on 7 April, the day the first ceasefire was announced.</p>

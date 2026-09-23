@@ -52,6 +52,11 @@ BILL_SERIES = {
     "unemployment": "unemployment",
     "hires": "hires_rate",
     "quits": "quits_rate",
+    # Block 05's note on why claims are low while hiring is frozen.
+    "claims": "initial_claims",
+    "layoffs": "layoffs_rate",
+    "ltu_count": "ltu_count",
+    "participation": "participation",
 }
 
 
@@ -187,7 +192,7 @@ def bill_data(sn, old):
     out["pay"] = pay_block(ms, old.get("pay"))
     out["war_cost"] = ctx["war_cost"]
     out["gold"] = gold(ctx["gold"])
-    out["against"] = old.get("against")
+    out["against"] = against(sn)
     rc = sn["receipt"]
     out["receipt"] = {"monthly_usd": rc["monthly_usd"],
                       "cumulative_usd": rc["cumulative_usd"],
@@ -197,6 +202,44 @@ def bill_data(sn, old):
     out["international"] = {"peers": intl.get("peers"),
                             "latest": (intl.get("series") or [])[-3:]}
     return out
+
+
+def against(sn):
+    """Block 10's "what cuts against this page", from the snapshot.
+
+    This used to be carried over from the previous file and never refreshed, so
+    the S&P, the mortgage rate and core inflation it held stayed at Design's
+    early-September values. The page decides which rows to print from these
+    figures; nothing here is phrased.
+    """
+    ms, yoy = sn["macro"]["series"], sn["macro"].get("yoy") or {}
+    pick = lambda s: s and {k: s.get(k) for k in ("name", "fred_id", "latest", "handover", "prewar")}  # noqa: E731
+    eggs = next((i for i in sn["staples"]["items"] if i["key"] == "eggs"), None)
+    months = sn["jobs"].get("monthly_changes") or []
+    customs = (sn.get("fiscal") or {}).get("customs") or {}
+    crude = [o for o in sn["crude_daily"]["observations"] if o.get("value") is not None]
+    last = crude[-1] if crude else None
+    month_ago = None
+    if last:
+        y, m, d = (int(x) for x in last["date"].split("-"))
+        target = "%04d-%02d-%02d" % ((y, m - 1, d) if m > 1 else (y - 1, 12, d))
+        month_ago = next((o for o in reversed(crude) if o["date"] <= target), None)
+    return {
+        "sp500": pick(ms.get("sp500")),
+        "mortgage": pick(ms.get("mortgage_30y")),
+        "dollar": pick(ms.get("dollar_index")),
+        "core_cpi_yoy": (yoy.get("cpi_core") or {}).get("latest"),
+        "headline_yoy": (yoy.get("cpi_headline_nsa") or {}).get("latest"),
+        "core_pce_yoy": (yoy.get("pce_core") or {}).get("latest"),
+        "eggs": eggs and {"name": eggs["name"], "fred_id": eggs["fred_id"],
+                          "current_term": eggs["current_term"]},
+        "latest_jobs": months[-1] if months else None,
+        "jobs_mean": sn["jobs"]["current_term"]["mean_monthly"],
+        "customs": customs.get("latest") and {
+            "latest": {k: customs["latest"][k] for k in ("date", "value")},
+            "months_negative": customs.get("months_negative") or []},
+        "crude": last and {"latest": last, "month_ago": month_ago},
+    }
 
 
 def yoy_pct(points, latest_date):
@@ -258,6 +301,7 @@ def pay_block(ms, previous):
         "cpi_yoy_pct": cpi_yoy,
         "real_yoy_pct": ((1 + ahe_yoy / 100.0) / (1 + cpi_yoy / 100.0) - 1.0) * 100.0,
         "ahe_id": ahe.get("fred_id"), "cpi_id": cpi.get("fred_id"),
+        "ahe_date": ahe["latest"]["date"],
     }
 
 
