@@ -994,7 +994,10 @@ class Component extends DCLogic {
     const s = A.sp500;
     if (s && s.latest && s.handover && s.latest.value > s.handover.value) rows.push({ head: 'Stocks are up.', text: 'The S&P 500 closed at ' + n(s.latest.value) + ' on ' + day(s.latest.date) + ', ' + sgn(pct(s.latest.value, s.handover.value)) + ' since the handover' + (s.prewar ? ' and ' + sgn(pct(s.latest.value, s.prewar.value)) + ' since the war began' : '') + '.' });
     const m = A.mortgage;
-    if (m && m.latest && m.handover && m.latest.value < m.handover.value) rows.push({ head: 'Mortgages cost less than at the handover.', text: 'The 30-year fixed rate is ' + m.latest.value.toFixed(2) + '% (' + day(m.latest.date) + '), against ' + m.handover.value.toFixed(2) + '% in January 2025' + (m.prewar && m.latest.value > m.prewar.value ? ', though it is above the ' + m.prewar.value.toFixed(2) + '% of the week before the war' : '') + '.' });
+    // A tenth of a point either way is "about the same": at 7.03% against 7.04% the
+    // old "cost less" was true to the hundredth and misleading to a reader.
+    const mGap = m && m.latest && m.handover ? m.handover.value - m.latest.value : null;
+    if (mGap != null && mGap > -0.1) rows.push({ head: mGap >= 0.1 ? 'Mortgages cost less than at the handover.' : 'Mortgages cost about what they did at the handover.', text: 'The 30-year fixed rate is ' + m.latest.value.toFixed(2) + '% (' + day(m.latest.date) + '), against ' + m.handover.value.toFixed(2) + '% in January 2025' + (m.prewar && m.latest.value > m.prewar.value ? ', though it is above the ' + m.prewar.value.toFixed(2) + '% of the week before the war' : '') + '.' });
     if (B.claims && B.layoffs) rows.push({ head: 'Almost nobody is being laid off.', text: 'New jobless claims were ' + n(B.claims.latest.value) + ' in the week to ' + day(B.claims.latest.date) + ', and ' + B.layoffs.latest.value.toFixed(1) + '% of workers were laid off in ' + month(B.layoffs.latest.date) + '. What this page says about jobs is about hiring, not firing.' });
     const j = A.latest_jobs;
     if (j && j.value > A.jobs_mean) rows.push({ head: 'The latest month was better.', text: 'Payrolls rose ' + n(j.value) + ' in ' + month(j.date) + ', above the ' + n(A.jobs_mean) + ' a month since January 2025. One month moves that average little, and it does not move the hires rate.' });
