@@ -40,17 +40,19 @@ CANVAS_LABELS = [
     "2026. The trace runs from $57 a barrel in January to a peak of $115 five "
     "weeks after the 28 February strike, falls back under the ceasefires, and "
     "climbs again when strikes resume, to its last close of ${crudeLastText}. Red marks "
-    "are his acts, blue are ceasefires.",
+    "are the tariffs and the strikes, blue are ceasefires. It ends on the whole year "
+    "with a price scale.",
 
     "A map of the Strait of Hormuz with the real Traffic Separation Scheme lane "
     "and the 33 kilometre gate between Musandam and Larak. The lane is full of ships "
     "at the pre-war 83 a day, then nearly empty at the latest seven-day count of "
     "${strNowWord}, with one ship on screen for each ship a day. A side-by-side compares "
-    "the President's claim of 30 ships a night against the count.",
+    "the President's claim of 30 ships a night against the count, drawn to the same scale.",
 
     "Two crowds of small human figures, one figure per 10,000 jobs. The left stand "
-    "shows the 2021-25 average of 320,938 jobs a month; the right shows what has "
-    "actually been added each month since January 2025, ${jobsCurr} a month on average. "
+    "shows the ${jobsBaseLabel} average of ${jobsPrev} jobs a month; the right shows what has "
+    "actually been added each month since January 2025, ${jobsCurr} a month on average, "
+    "with a dashed line where it would stand at the earlier pace. "
     "Below, 100 figures show the share of the unemployed out of work six months or "
     "more, ${ltu1} percent.",
 

@@ -16,7 +16,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The Bill" />
     <meta property="og:title" content="The Bill: what Trump's war and tariffs cost you" />
-    <meta property="og:description" content="Ordered by Trump. Paid by you. Crude {{og.crude_start}} to {{og.crude_peak}}. Diesel {{og.diesel}} a gallon{{og.diesel_record}}. Hormuz down from {{og.hormuz_base}} ships a day to {{og.hormuz_now}}. Job creation {{og.jobs_prev}} a month to {{og.jobs_now}}. {{og.us_killed}} dead, {{og.aircraft}} aircraft, {{og.dod_bn}} spent, and {{og.gold_out}} tonnes of foreign gold out of the New York Fed." />
+    <meta property="og:description" content="Ordered by Trump. Paid by you. Crude {{og.crude_start}} in January, {{og.crude_peak}} at the peak, {{og.crude_now}} now. Diesel {{og.diesel}} a gallon{{og.diesel_record}}. Hormuz down from {{og.hormuz_base}} ships a day to {{og.hormuz_now}}. Job creation {{og.jobs_prev}} a month in 2023-24, {{og.jobs_now}} since. {{og.us_killed}} dead, {{og.aircraft}} aircraft, {{og.dod_bn}} spent, and {{og.gold_out}} tonnes of foreign gold out of the New York Fed." />
     <meta property="og:url" content="https://trumps-economy-the-bill.pages.dev/" />
     <meta property="og:image" content="https://trumps-economy-the-bill.pages.dev/og.png" />
     <meta property="og:image:type" content="image/png" />
@@ -44,10 +44,17 @@
     <!-- The summary in #root is for crawlers and screen readers until React
          replaces it on mount; without JS it is the page, so it is shown. -->
     <style>
+      html, body { margin: 0; background: #0B1E3F; }
+      .boot { min-height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-start; gap: 8px; padding: 28px 36px; color: #F7F5F0; }
+      .boot-name { font: 700 clamp(30px, 5vh, 48px)/.95 'Barlow Condensed', 'Arial Narrow', sans-serif; letter-spacing: .02em; text-transform: uppercase; }
+      .boot-dek { font: clamp(16px, 2.3vh, 20px)/1.35 'Source Serif 4', Georgia, serif; max-width: 500px; }
+      .boot-note { font: 11px/1.6 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: .14em; color: rgba(247,245,240,.55); margin-top: 6px; }
+      @media (max-width: 640px) { .boot { padding: 20px; } .boot-dek { font-size: 15px; } }
       .seo-summary { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     </style>
     <noscript>
       <style>
+        .boot { display: none; }
         .seo-summary { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal;
           max-width: 40rem; margin: 0 auto; padding: 48px 20px; font: 18px/1.5 Georgia, serif; color: #F7F5F0; }
         html, body { margin: 0; background: #0B1E3F; }
@@ -57,17 +64,25 @@
   </head>
   <body>
     <div id="root">
+      <!-- What a reader on a slow phone sees before the page's script arrives: the
+           name, what it is and who "he" is, instead of a blank navy screen. React
+           replaces everything in #root when it mounts. -->
+      <div class="boot" aria-hidden="true">
+        <div class="boot-name">The Bill</div>
+        <div class="boot-dek">What Trump&rsquo;s war with Iran and his tariffs have cost Americans, in the government&rsquo;s own numbers.</div>
+        <div class="boot-note">LOADING THE DATA</div>
+      </div>
       <div class="seo-summary">
         <h1>The Bill</h1>
         <p>The Iran war and the re-imposed tariffs, priced in government data: ships through Hormuz, crude oil, fourteen household prices, hiring, and what the Pentagon spent. Every figure is sourced, and every block of the page shows its work.</p>
         <ul>
           <li>Household cost: {{og.receipt_month}} a month, {{og.receipt_total}} since 20 January 2025.</li>
-          <li>Crude oil: {{og.crude_start}} a barrel in January 2026, {{og.crude_peak}} at the peak.</li>
+          <li>Crude oil: {{og.crude_start}} a barrel in January 2026, {{og.crude_peak}} at the peak, {{og.crude_now}} at the latest close.</li>
           <li>Strait of Hormuz: {{og.hormuz_base}} ships a day before the war, {{og.hormuz_now}} now (IMF PortWatch, seven-day mean).</li>
           <li>Diesel: {{og.diesel}} a gallon{{og.diesel_record}} (EIA weekly national average).</li>
-          <li>Jobs: {{og.jobs_prev}} a month in the previous term, {{og.jobs_now}} a month since.</li>
+          <li>Jobs: {{og.jobs_prev}} a month in 2023 and 2024, {{og.jobs_now}} a month since 20 January 2025.</li>
           <li>The war: {{og.us_killed}} Americans dead, {{og.aircraft}} aircraft lost or damaged, {{og.dod_bn}} spent.</li>
-          <li>Gold: {{og.gold_out}} tonnes of foreign gold taken out of the New York Fed in ten months.</li>
+          <li>Gold: {{og.gold_out}} tonnes of foreign gold taken out of the New York Fed in {{og.gold_months}} months.</li>
         </ul>
         <p>Updated {{og.date_modified}}. Published by Samizdat Publications.</p>
         <noscript><p>The charts, the globe and the strait simulation need JavaScript. The figures above are current as of the last refresh.</p></noscript>

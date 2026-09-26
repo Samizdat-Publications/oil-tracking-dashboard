@@ -95,6 +95,19 @@ globe header and "How fresh this is" in block 10). `bill-data.against` is now bu
 from the snapshot by `against()` in `build_v5_data.py`; it used to be copied forward
 from Design's file and never refreshed.
 
+**The first-visitor review pass (2026-09-25)** added more computed copy, all mirrored in
+the handoff: `storyVals()` builds block 01's tariff sentence and note (customs duties by
+closed fiscal year, `bill-data.tariffs`, cut by `tariffs()` in `build_v5_data.py`), block
+02's kicker and sentence, block 03's claim sentence, block 06's CBO note and block 08's
+sentence. `jobsBase()` is the jobs comparison: the 2023-24 calendar average from
+`jobs.monthly`, not the whole previous term (which opens on the 2020 rebound); the card,
+the crowd, the share text (`base23` in `vite.config.ts`) and Show the work all read it.
+The oil chart pulls back to the whole year with a price scale at the end; block 07 plays
+once and ends on the finale; its figure is the beat total, never a count in progress.
+Diesel stays the headline price by the owner's choice (it moves the cost of everything
+else); the page says so in block 04. The render destructure in `TheBill.jsx` is rebuilt
+from the template's holes whenever `render()` is regenerated.
+
 **The strait (block 03) is two states, not a replay.** Before (pre-war mean) and now
 (latest 7-day mean), with one ship on screen per ship a day and a short fall between.
 Replaying the daily counts made the number bounce and left pre-war ships crawling

@@ -193,6 +193,7 @@ def bill_data(sn, old):
     out["war_cost"] = ctx["war_cost"]
     out["gold"] = gold(ctx["gold"])
     out["against"] = against(sn)
+    out["tariffs"] = tariffs(sn)
     rc = sn["receipt"]
     out["receipt"] = {"monthly_usd": rc["monthly_usd"],
                       "cumulative_usd": rc["cumulative_usd"],
@@ -213,6 +214,30 @@ STALE: list[str] = []
 def stale(msg):
     print("  WARNING: " + msg, file=sys.stderr)
     STALE.append(msg)
+
+
+def tariffs(sn):
+    """Customs duties by federal fiscal year (October to September), for block 01.
+
+    The Monthly Treasury Statement carries a fiscal-year-to-date total on every
+    month, so a September row closes a year, and its prior_fytd is the year
+    before. Only closed years are returned: the running year is net of the
+    refunds of the struck-down tariffs, and is not comparable until it closes.
+    """
+    cu = (sn.get("fiscal") or {}).get("customs") or {}
+    pts = [p for p in cu.get("points") or [] if p.get("fytd") is not None]
+    years = {}
+    for p in pts:
+        if p["date"][5:7] == "09":
+            fy = int(p["date"][:4])
+            years[fy] = p["fytd"]
+            if p.get("prior_fytd") is not None:
+                years.setdefault(fy - 1, p["prior_fytd"])
+    if not years:
+        return None
+    return {"fy": [[fy, round(v)] for fy, v in sorted(years.items())],
+            "source": "Monthly Treasury Statement, table 9, customs duties",
+            "url": cu.get("url")}
 
 
 def against(sn):

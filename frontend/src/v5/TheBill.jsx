@@ -75,7 +75,7 @@ export default class TheBill extends React.Component {
   // an unknown code falls back to the US once the state list is known (setupStateParam)
   state = { rows: [], asOf: '', prows: [], totalCells: [], state: (() => { try { const q = (new URLSearchParams(location.search).get('state') || '').toUpperCase(); return /^[A-Z]{2}$/.test(q) ? q : 'US'; } catch (e) { return 'US'; } })(), tick: 0 };
   canvasRef = React.createRef(); dateRef = React.createRef(); eventRef = React.createRef();
-  numRef = React.createRef(); wasRef = React.createRef(); legendRef = React.createRef(); cueRef = React.createRef();
+  numRef = React.createRef(); wasRef = React.createRef(); legendRef = React.createRef(); cueRef = React.createRef(); kickRef = React.createRef();
   boardRef = React.createRef(); pDateRef = React.createRef(); pWeekRef = React.createRef();
   stampStageRef = React.createRef(); stamp1Ref = React.createRef(); stamp2Ref = React.createRef(); stampNoteRef = React.createRef(); stampSentenceRef = React.createRef();
   seisRef = React.createRef(); seisDateRef = React.createRef(); seisNumRef = React.createRef(); seisSubRef = React.createRef();
@@ -83,7 +83,7 @@ export default class TheBill extends React.Component {
   crowdRef = React.createRef(); crowdDateRef = React.createRef(); crowdNumRef = React.createRef();
   warRef = React.createRef();
   vaultRef = React.createRef(); vaultDateRef = React.createRef(); vaultNumRef = React.createRef();
-  buyRef = React.createRef(); buyDateRef = React.createRef(); buyNumRef = React.createRef(); buySubRef = React.createRef();
+  buyRef = React.createRef(); buyDateRef = React.createRef(); buyNumRef = React.createRef(); buySubRef = React.createRef(); buyKickRef = React.createRef();
   cardRef = React.createRef(); cardItemRefs = [0, 1, 2, 3, 4, 5, 6, 7].map(() => React.createRef());
   odoRefs = [React.createRef(), React.createRef(), React.createRef()];
   STATES = 'AL Alabama,AK Alaska,AZ Arizona,AR Arkansas,CA California,CO Colorado,CT Connecticut,DE Delaware,DC District of Columbia,FL Florida,GA Georgia,HI Hawaii,ID Idaho,IL Illinois,IN Indiana,IA Iowa,KS Kansas,KY Kentucky,LA Louisiana,ME Maine,MD Maryland,MA Massachusetts,MI Michigan,MN Minnesota,MS Mississippi,MO Missouri,MT Montana,NE Nebraska,NV Nevada,NH New Hampshire,NJ New Jersey,NM New Mexico,NY New York,NC North Carolina,ND North Dakota,OH Ohio,OK Oklahoma,OR Oregon,PA Pennsylvania,RI Rhode Island,SC South Carolina,SD South Dakota,TN Tennessee,TX Texas,UT Utah,VT Vermont,VA Virginia,WA Washington,WV West Virginia,WI Wisconsin,WY Wyoming'.split(',').map(s => ({ code: s.slice(0, 2), name: s.slice(3) }));
@@ -100,7 +100,7 @@ export default class TheBill extends React.Component {
     const totalCells = cellsOf(tot.shown, '#D4A017', tot.phase === 'flipping' && tot.flapOn).map(c => ({ ...c, w: c.w === '0.72em' ? '0.64em' : c.w }));
     const rc = P && P.receipt, sel = this.receiptFor(this.state.state);
     return {
-      canvasRef: this.canvasRef, dateRef: this.dateRef, eventRef: this.eventRef, numRef: this.numRef,
+      canvasRef: this.canvasRef, dateRef: this.dateRef, eventRef: this.eventRef, numRef: this.numRef, kickRef: this.kickRef, buyKickRef: this.buyKickRef,
       wasRef: this.wasRef, legendRef: this.legendRef, cueRef: this.cueRef,
       workRows: this.state.rows, asOf: this.state.asOf,
       boardRef: this.boardRef, pDateRef: this.pDateRef, pWeekRef: this.pWeekRef,
@@ -113,7 +113,7 @@ export default class TheBill extends React.Component {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
-      ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.headVals(), ...this.goldVals(), ...this.freshVals(), againstRows: this.againstRows(),
+      ...this.storyVals(), ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.headVals(), ...this.goldVals(), ...this.freshVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -126,7 +126,10 @@ export default class TheBill extends React.Component {
       state: this.state.state, onState: e => this.setState({ state: e.target.value }, () => { this.buildBoard(true); this.stateToUrl(); }),
       stateOptions: [{ code: 'US', name: 'United States' }].concat(this.STATES),
       placeName: sel ? sel.name : 'the United States',
-      cumulativeText: rc && sel ? '$' + Math.round(sel.total * rc.months_elapsed).toLocaleString() + ' over ' + rc.months_elapsed.toFixed(1) + ' months' : '',
+      // The effective months are the published total over the published month, so the
+      // US figure is the receipt's own $ total to the dollar, as on the card; a state's
+      // is its month times the same span. 18.3 x $89.23 printed $1,633 beside $1,636.
+      cumulativeText: rc && sel ? '$' + Math.round(sel.total * rc.cumulative_usd / rc.monthly_usd).toLocaleString() : '',
       workPrices: (this.board || []).map(r => ({ name: r.name, unit: r.unit, start: r.startText, end: r.endText, change: r.changeText, series: r.series })),
       receiptMonths: rc ? rc.months_elapsed.toFixed(1) : '',
       receiptMethod: rc ? `Published receipt: $${rc.monthly_usd.toFixed(2)} a month, $${Math.round(rc.cumulative_usd).toLocaleString()} over the ${rc.months_elapsed.toFixed(1)} months since 20 January 2025.` : '',
@@ -161,7 +164,7 @@ export default class TheBill extends React.Component {
     this.sMarks = [
       { d: dayOf('2026-02-24'), red: true, t: '24 FEB · TARIFFS' }, { d: dayOf('2026-02-28'), red: true, t: '28 FEB · THE STRIKE' },
       { d: dayOf('2026-04-07'), red: false, t: '7 APR · CEASEFIRE' }, { d: dayOf('2026-06-18'), red: false, t: '18 JUN · CEASEFIRE' },
-      { d: dayOf('2026-07-08'), red: true, t: '8 JUL · STRIKES AGAIN' }, { d: dayOf('2026-09-01'), red: true, t: '1 SEP · STRIKES' },
+      { d: dayOf('2026-07-08'), red: true, t: '8 JUL · STRIKES RESUME' }, { d: dayOf('2026-09-01'), red: true, t: '1 SEP · STRIKES' },
     ];
     this.sStrike = dayOf('2026-02-28');
     this.sShake = 0; this.sPrevDay = 0;
@@ -186,14 +189,22 @@ export default class TheBill extends React.Component {
     const mobile = W < 640;
     const sh = this.sShake, jx = sh ? (Math.random() - 0.5) * 18 * sh : 0, jy = sh ? (Math.random() - 0.5) * 18 * sh : 0;
     ctx.save(); ctx.translate(jx, jy);
-    // paper: the needle sits at 68% of the width; the paper slides left under it as the days pass
-    const needleX = W * (mobile ? 0.8 : 0.7), pxPerDay = Math.max(4.5, W * 0.0055);
-    const top = H * (mobile ? 0.2 : 0.2), bot = H * (mobile ? 0.5 : 0.54);
+    // paper: the needle sits at 70% of the width; the paper slides left under it as the days pass.
+    // Once the trace reaches the latest close the paper pulls back to the whole year, so the
+    // finished chart shows January, the peak and now on one scale: ending zoomed on the
+    // last few months left "doubled" sitting over a chart that no longer showed it.
+    const zo = Math.max(0, Math.min(1, (P - 0.84) / 0.12)), ze = zo * zo * (3 - 2 * zo);
+    const left = mobile ? 42 : 76, right = W - (mobile ? 18 : 48);
+    const needleX = W * (mobile ? 0.8 : 0.7) + (right - W * (mobile ? 0.8 : 0.7)) * ze, pxPerDay = Math.max(4.5, W * 0.0055) + ((right - left) / this.sLast - Math.max(4.5, W * 0.0055)) * ze;
+    const top = H * (mobile ? 0.17 : 0.2), bot = H * (mobile ? 0.44 : 0.5);
     const Y = v => bot - (v - 50) / 70 * (bot - top);
     const X = d => needleX - (day - d) * pxPerDay;
     ctx.fillStyle = '#10264D'; ctx.fillRect(0, top - 34, W, bot - top + 64);
     ctx.strokeStyle = 'rgba(247,245,240,.07)'; ctx.lineWidth = 1;
     for (let v = 50; v <= 120; v += 10) { ctx.beginPath(); ctx.moveTo(0, Y(v)); ctx.lineTo(W, Y(v)); ctx.stroke(); }
+    // the price scale, so every figure in the sentence can be read off the line
+    ctx.font = '500 ' + (mobile ? 11 : 12) + 'px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.textAlign = 'left';
+    for (let v = 60; v <= 120; v += 20) ctx.fillText('$' + v, mobile ? 6 : 14, Y(v) - 4);
     for (let d = Math.floor((day - needleX / pxPerDay) / 7) * 7; d <= day + (W - needleX) / pxPerDay; d += 7) { const x = X(d); ctx.beginPath(); ctx.moveTo(x, top - 30); ctx.lineTo(x, bot + 30); ctx.stroke(); }
     // his acts and the ceasefires
     ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.textAlign = 'left';
@@ -202,11 +213,17 @@ export default class TheBill extends React.Component {
       const x = X(m.d); if (x < -120) return;
       ctx.strokeStyle = m.red ? 'rgba(178,34,52,.8)' : 'rgba(108,140,213,.8)'; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(x, top - 30); ctx.lineTo(x, bot + 30); ctx.stroke();
-      if (!mobile || m.red) {
-        ctx.fillStyle = m.red ? '#E04B5C' : '#6C8CD5';
-        const ly = top - 18 + (i % 2) * 17;          // alternate rows so 24 Feb and 28 Feb both read
-        ctx.fillText(m.t, x + 5, ly);
-      }
+    });
+    // a label whose tick has slid off the left edge is dropped, not cut; one that
+    // would run off the right edge is set on the other side of its tick
+    this.sMarks.forEach((m, i) => {
+      const x = X(m.d);
+      if (m.d > day || x < 4 || (mobile && !m.red) || (mobile && ze > 0.5)) return;
+      ctx.font = '500 ' + (mobile ? 11 : 13) + 'px "IBM Plex Mono", monospace';
+      const ly = top - 18 + (i % 2) * 17;          // alternate rows so 24 Feb and 28 Feb both read
+      const tw = ctx.measureText(m.t).width, lx = x + 5 + tw > W - 6 ? x - 5 - tw : x + 5;
+      ctx.fillStyle = '#10264D'; ctx.fillRect(lx - 3, ly - 12, tw + 6, 16);
+      ctx.fillStyle = m.red ? '#E04B5C' : '#6C8CD5'; ctx.fillText(m.t, lx, ly);
     });
     // the trace
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
@@ -216,11 +233,34 @@ export default class TheBill extends React.Component {
     if (started) ctx.lineTo(needleX, Y(cur.v));
     ctx.strokeStyle = 'rgba(212,160,23,.35)'; ctx.lineWidth = 7; ctx.stroke();
     ctx.strokeStyle = '#F2C94C'; ctx.lineWidth = 2.2; ctx.stroke();
-    // the needle arm, pivoting from the right edge
+    // the needle arm, pivoting from the right edge; it lifts away as the chart pulls back
     const px = W - (mobile ? 8 : 40), py = (top + bot) / 2, ny = Y(cur.v);
+    ctx.globalAlpha = 1 - ze;
     ctx.strokeStyle = 'rgba(247,245,240,.85)'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(needleX, ny); ctx.stroke();
     ctx.fillStyle = '#F7F5F0'; ctx.beginPath(); ctx.arc(px, py, 5, 0, 6.2832); ctx.fill();
+    ctx.globalAlpha = 1;
+    // the finished chart marks the three prices the sentence gives: January, the peak, now
+    if (ze > 0) {
+      ctx.globalAlpha = ze; ctx.font = '500 11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.textAlign = 'center';
+      const M = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      for (let m = 0; m < 12; m++) { const d = Math.round((Date.UTC(2026, m, 15) - this.sD0) / 86400000); if (d > this.sLast) break; if (!mobile || m % 2 === 0) ctx.fillText(M[m], X(d), bot + 18); }
+      if (mobile) { ctx.textAlign = 'left'; ctx.fillStyle = '#E04B5C'; ctx.fillText('RED: TARIFFS, STRIKES', 6, top - 20); ctx.fillStyle = '#6C8CD5'; ctx.textAlign = 'right'; ctx.fillText('BLUE: CEASEFIRES', W - 6, top - 20); }
+      ctx.textAlign = 'left';
+      const pk = this.crude.peak, P0 = this.sPts[0], pkPt = this.sPts.find(p => p.iso === pk.date) || this.sPts.reduce((a, p) => (p.v > a.v ? p : a));
+      ctx.globalAlpha = ze; ctx.font = '700 ' + (mobile ? 13 : 15) + 'px "IBM Plex Mono", monospace';
+      [[P0, '$' + Math.round(P0.v) + ' · ' + this.fmtISO(P0.iso).replace(/ \d{4}$/, ''), 'left', 16],
+       [pkPt, '$' + Math.round(pkPt.v) + ' · PEAK · ' + this.fmtISO(pkPt.iso).replace(/ \d{4}$/, ''), 'left', -10],
+       [cur, '$' + Math.round(cur.v) + ' · NOW', 'right', 24]].forEach(([p, txt, al, dy]) => {
+        const x = X(p.d), y = Y(p.v);
+        ctx.fillStyle = '#F7F5F0'; ctx.beginPath(); ctx.arc(x, y, 4, 0, 6.2832); ctx.fill();
+        // a plate of the paper colour, so a label never reads through the trace
+        const tx = al === 'right' ? x + 4 : x + 8, tw = ctx.measureText(txt).width, fs = mobile ? 13 : 15;
+        ctx.fillStyle = 'rgba(16,38,77,.88)'; ctx.fillRect((al === 'right' ? tx - tw : tx) - 4, y + dy - fs, tw + 8, fs + 6);
+        ctx.textAlign = al; ctx.fillStyle = '#F2C94C'; ctx.fillText(txt, tx, y + dy);
+      });
+      ctx.textAlign = 'left'; ctx.globalAlpha = 1;
+    }
     ctx.fillStyle = MARK_RED; ctx.beginPath(); ctx.arc(needleX, ny, 3.5, 0, 6.2832); ctx.fill();
     // the strike: a red flash across the paper for the first days
     const since = day - this.sStrike;
@@ -237,9 +277,9 @@ export default class TheBill extends React.Component {
     const sub = this.seisSubRef.current;
     if (sub) {
       const html = done ? 'a barrel<br><span style="color:rgba(247,245,240,.6)">now · $57 in January · $115 at the peak</span>'
-        : cur.d < this.sStrike ? 'a barrel<br><span style="color:rgba(247,245,240,.6)">before his war</span>'
+        : cur.d < this.sStrike ? 'a barrel<br><span style="color:rgba(247,245,240,.6)">before the war</span>'
         : cur.v >= 114 ? 'a barrel<br><span style="color:#E04B5C">the peak · five weeks after the strike</span>'
-        : 'a barrel<br><span style="color:rgba(247,245,240,.6)">' + (cur.d < this.sMarks[2].d ? 'after his strike' : cur.d < this.sMarks[4].d ? 'under the ceasefires' : 'the ceasefire broken') + '</span>';
+        : 'a barrel<br><span style="color:rgba(247,245,240,.6)">' + (cur.d < this.sMarks[2].d ? 'after the strike' : cur.d < this.sMarks[4].d ? 'under the ceasefires' : 'since strikes resumed') + '</span>';
       if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; }
     }
   }
@@ -319,7 +359,15 @@ export default class TheBill extends React.Component {
       ctx.fillStyle = '#2F4573'; ctx.fill(); ctx.strokeStyle = 'rgba(247,245,240,.5)'; ctx.lineWidth = 1.2; ctx.stroke();
     }
     ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.6)'; ctx.textAlign = 'center';
-    for (const l of CB.labels) { if (mobile && (l.text === 'QESHM' || l.text.indexOf('G U L F') >= 0)) continue; ctx.fillText(l.text, X(l.x), Y(l.y)); }
+    // Place names stay out of the bands the readouts use (the date and event lines at the
+    // top, the headline and source at the bottom) and are pulled in from the edges, so
+    // none is printed over copy or cut off ("IAN GULF").
+    for (const l of CB.labels) {
+      if (mobile && (l.text === 'QESHM' || l.text.indexOf('G U L F') >= 0)) continue;
+      const y = Y(l.y), hw = ctx.measureText(l.text).width / 2;
+      if (y < (mobile ? 120 : 96) || y > H * (mobile ? 0.52 : 0.78)) continue;
+      ctx.fillText(l.text, Math.max(10 + hw, Math.min(W - 10 - hw, X(l.x))), y);
+    }
     ctx.textAlign = 'left';
     // the lane
     const laneStroke = (off, style, dash, lw) => { ctx.beginPath(); for (let s = -0.6; s <= 1.6001; s += 0.02) { const p = this.strLane(s, off); s > -0.6 ? ctx.lineTo(X(p.x), Y(p.y)) : ctx.moveTo(X(p.x), Y(p.y)); } ctx.strokeStyle = style; ctx.lineWidth = lw; ctx.setLineDash(dash || []); ctx.stroke(); ctx.setLineDash([]); };
@@ -331,7 +379,7 @@ export default class TheBill extends React.Component {
       const pulse = this.reduced ? 1 : 0.5 + 0.5 * Math.sin(t / 420);
       ctx.strokeStyle = 'rgba(178,34,52,' + (0.3 + 0.3 * pulse).toFixed(2) + ')'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
       ctx.strokeStyle = MARK_RED; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke();
-      ctx.fillStyle = '#E04B5C'; ctx.font = '700 14px "IBM Plex Mono", monospace'; ctx.fillText('CLOSED', gx + 10, (gt + gb) / 2 + 4);
+      ctx.fillStyle = '#E04B5C'; ctx.font = '700 14px "IBM Plex Mono", monospace'; const gT = Math.round(100 * nowFlow / h.base) + '% OF PRE-WAR', gw2 = ctx.measureText(gT).width; ctx.fillStyle = 'rgba(11,30,63,.85)'; ctx.fillRect(gx + 8, (gt + gb) / 2 - 11, gw2 + 8, 20); ctx.fillStyle = '#E04B5C'; ctx.fillText(gT, gx + 12, (gt + gb) / 2 + 4);
     } else { ctx.strokeStyle = 'rgba(247,245,240,.4)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(gx, gt); ctx.lineTo(gx, gb); ctx.stroke(); }
     ctx.fillStyle = 'rgba(247,245,240,.6)'; ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; ctx.fillText('33 KM', gx, gt - 8); ctx.textAlign = 'left';
     // ships
@@ -344,15 +392,20 @@ export default class TheBill extends React.Component {
     }
     ctx.globalAlpha = 1;
     // his claim against the count: from 18 August, drawn to the same scale
-    if (P >= CLAIM && !mobile) {
-      const a = Math.min(1, (P - CLAIM) / 0.08);
-      ctx.globalAlpha = a;
-      const bx = W - 36 - 10 * (L * 1.15), by = H * 0.12;
-      ctx.font = '700 14px "IBM Plex Mono", monospace'; ctx.fillStyle = '#E04B5C'; ctx.textAlign = 'right'; ctx.fillText('HE SAYS · 30 A NIGHT · 18 AUG', W - 36, by - 10); ctx.textAlign = 'left';
-      for (let i = 0; i < 30; i++) this.drawShip(ctx, bx + (i % 10) * L * 1.15 + L / 2, by + Math.floor(i / 10) * L * 0.5 + L * 0.2, 0, L, null, true);
-      const cy2 = by + 3 * L * 0.5 + 26;
-      ctx.fillStyle = '#D4A017'; ctx.textAlign = 'right'; ctx.fillText('COUNTED · ' + Math.round(nowFlow) + ' A DAY · 7-DAY MEAN', W - 36, cy2 - 10); ctx.textAlign = 'left';
-      for (let i = 0; i < Math.max(1, Math.round(nowFlow)); i++) this.drawShip(ctx, bx + (i % 10) * L * 1.15 + L / 2, cy2 + Math.floor(i / 10) * L * 0.5 + L * 0.2, 0, L, '#F2C94C', false);
+    const tgs = ctx.createLinearGradient(0, 0, 0, H * 0.22); tgs.addColorStop(0, 'rgba(11,30,63,.92)'); tgs.addColorStop(0.6, 'rgba(11,30,63,.6)'); tgs.addColorStop(1, 'rgba(11,30,63,0)');
+    ctx.fillStyle = tgs; ctx.fillRect(0, 0, W, H * 0.22);
+    // The claim is the point of this block, so it is drawn large, on a plate, and on
+    // phones too: without it the headline's "he says" had nothing to point at.
+    if (P >= CLAIM) {
+      const a = Math.min(1, (P - CLAIM) / 0.08), Lc = mobile ? Math.min(17, (W - 56) / 11.5) : L * 1.5, fs = mobile ? 12 : 16;
+      const pw = 10 * Lc * 1.15, bx = mobile ? 16 + 12 : W - 36 - pw - 12, by = mobile ? H * 0.43 : H * 0.13, cy2 = by + 3 * Lc * 0.55 + fs + 20;
+      ctx.globalAlpha = a * 0.82; ctx.fillStyle = '#0B1E3F'; ctx.fillRect(bx - 12, by - fs - 18, pw + 24, cy2 - by + fs + 18 + Lc * 0.6 + 16); ctx.globalAlpha = a;
+      ctx.font = '700 ' + fs + 'px "IBM Plex Mono", monospace'; ctx.fillStyle = '#E04B5C'; ctx.textAlign = 'left'; ctx.fillText('HE SAID · 30 A NIGHT · 18 AUG', bx, by - 10);
+      for (let i = 0; i < 30; i++) this.drawShip(ctx, bx + (i % 10) * Lc * 1.15 + Lc / 2, by + Math.floor(i / 10) * Lc * 0.55 + Lc * 0.2, 0, Lc, null, true);
+      // like for like: what satellites counted on the day he spoke, then the latest week
+      const a18 = this.data && this.data.hormuz_daily.find(o => o[0] === '2026-08-18'), nC = a18 ? a18[1] : Math.round(nowFlow);
+      ctx.fillStyle = '#F2C94C'; ctx.fillText(a18 ? 'COUNTED THAT DAY · ' + nC + ' · NOW ' + Math.round(nowFlow) + ' A DAY' : 'COUNTED · ' + nC + ' A DAY · LAST 7 DAYS', bx, cy2 - 10);
+      for (let i = 0; i < Math.max(1, nC); i++) this.drawShip(ctx, bx + (i % 10) * Lc * 1.15 + Lc / 2, cy2 + Math.floor(i / 10) * Lc * 0.55 + Lc * 0.2, 0, Lc, '#F2C94C', false);
       ctx.globalAlpha = 1;
     }
     const sg = ctx.createLinearGradient(0, H * 0.5, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.9)');
@@ -364,7 +417,7 @@ export default class TheBill extends React.Component {
     const ev = !after ? null : P < CLAIM + 0.07 ? this.events[0] : this.events.find(e => /OPEN AND OPERATING/.test(e.t));
     const er = this.strEventRef.current; if (er) { const txt = ev ? ev.t : ''; if (er.textContent !== txt) { er.textContent = txt; er.style.color = ev && ev.red ? '#E04B5C' : '#6C8CD5'; } }
     const sub = this.strSubRef.current;
-    if (sub) { const html = !after ? 'ships a day<br><span style="color:rgba(247,245,240,.6)">before his war</span>' : closed ? 'ships a day<br><span style="color:#E04B5C">the strait is shut · was 83</span>' : 'ships a day<br><span style="color:rgba(247,245,240,.6)">was 83</span>'; if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; } }
+    if (sub) { const html = !after ? 'ships a day<br><span style="color:rgba(247,245,240,.6)">before the war</span>' : P >= CLAIM ? 'ships a day, counted<br><span style="color:#E04B5C">he said thirty a night</span>' : 'ships a day<br><span style="color:rgba(247,245,240,.6)">was ' + Math.round(h.base) + ' before the war</span>'; if (sub.__html !== html) { sub.__html = html; sub.innerHTML = html; } }
   }
 
   // The canvases' accessible descriptions carry the same figures the canvas
@@ -381,6 +434,67 @@ export default class TheBill extends React.Component {
       freshNote: 'Rebuilt from the sources on ' + day(D.as_of) + '. The latest figures run to: crude oil ' + day(C.observations.at(-1)[0]) + ', ship counts ' + day(D.hormuz_daily.at(-1)[0]) + ', pump prices ' + day(P.diesel.latest.date) + ', shop prices ' + this.monthLong(P.items.map(i => i.end_date).sort().at(-1)) + ', jobs ' + this.monthLong(M.at(-1)[0]) + ', the Pentagon’s cost ' + day(W.dod_cost.as_of) + '. Each series is published on its own schedule, so they do not all end on the same day.',
     };
   }
+  // The jobs comparison. The whole previous term (Feb 2021 to Jan 2025) averaged
+  // 321,000 a month, but it opens on the rebound from the 2020 lockdowns, which a
+  // critic would rightly call a rigged baseline. The last two full calendar years
+  // before he took office are the comparison instead; the term figure is printed
+  // in Show the work beside it.
+  jobsBase() {
+    const B = this.bill; if (!B) return null;
+    const v = B.jobs.monthly.filter(m => m[0] >= '2023-01-01' && m[0] <= '2024-12-01').map(m => m[1]);
+    if (!v.length) return null;
+    const s = v.slice().sort((a, b) => a - b), mid = s.length >> 1;
+    return { label: '2023\u2013\u206024', n: v.length, mean: v.reduce((a, b) => a + b, 0) / v.length, median: s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2 };
+  }
+  // Sentences whose every figure moves with the data (block 01's tariff line, block
+  // 02's oil, block 03's claim, block 05's baseline, block 06's CBO note, block 08).
+  storyVals() {
+    const C = this.crude, B = this.bill, D = this.data, keys = 'africaSentence africaNote tariffSentence tariffNote oilKicker oilSentence oilWeeks strSentence jobsWas jobsBaseLabel jobsTermMean jobsKicker cboNote vaultSentence'.split(' ');
+    const out = Object.fromEntries(keys.map(k => [k, '']));
+    const cap = s => s[0].toUpperCase() + s.slice(1);
+    const T = B && B.tariffs && B.tariffs.fy;
+    if (T && T.length >= 2) {
+      const [fa, a] = T.at(-2), [fb, b] = T.at(-1);
+      const neg = (B.against && B.against.customs && B.against.customs.months_negative) || [], mon = d => this.monthLong(d).split(' ')[0];
+      out.tariffSentence = 'Tariffs are a tax paid at the border. Under the tariffs the court later struck down, customs duties came to $' + Math.round(b / 1e9) + ' billion in the year to September ' + fb + ', against $' + Math.round(a / 1e9) + ' billion the year before.'
+        + (neg.length ? ' Refunds of those duties outran new collections in ' + (neg.length > 1 ? neg.slice(0, -1).map(mon).join(', ') + ' and ' + mon(neg.at(-1)) : mon(neg[0])) + ' ' + neg.at(-1).slice(0, 4) + '.' : '');
+      out.tariffNote = 'Customs duties are the Monthly Treasury Statement\u2019s receipts (table 9) for federal fiscal years, which run October to September: $' + (a / 1e9).toFixed(1) + ' billion in fiscal ' + fa + ', $' + (b / 1e9).toFixed(1) + ' billion in fiscal ' + fb + '. Fiscal ' + fb + ' includes four months before he took office, so the rise understates the tariffs. Importers pay the duty; how much of it reaches their customers\u2019 prices is argued over, so this is what was collected, not a measure of who bore it. The year running now is net of the refunds of the struck-down tariffs and is not compared until it closes.';
+    }
+    if (C && C.observations.length) {
+      const O = C.observations, jan = O[0][1], pre = (O.filter(o => o[0] < '2026-02-28').at(-1) || O[0])[1], pk = C.peak, now = O.at(-1)[1];
+      const weeks = Math.round((Date.parse(pk.date) - Date.parse('2026-02-28')) / (7 * 86400000));
+      const low = O.filter(o => o[0] >= '2026-06-18' && o[0] < '2026-07-08').reduce((m, o) => Math.min(m, o[1]), Infinity);
+      out.oilWeeks = this.words(weeks);
+      const cape = D && D.items.good_hope && D.items.good_hope.recent.pct_of_baseline;
+      out.africaSentence = cape >= 110 ? 'The oil goes the long way round Africa.' : '';
+      out.africaNote = cape >= 110 ? '"The long way round Africa" rests on Cape of Good Hope traffic at ' + Math.round(cape) + '% of its pre-war mean.' : 'Cape of Good Hope traffic is at ' + Math.round(cape) + '% of its pre-war mean, so the page does not claim the oil is going round Africa.';
+      out.oilKicker = 'OIL UP ' + Math.round((pk.value / pre - 1) * 100) + '% ' + this.words(weeks).toUpperCase() + ' WEEKS INTO THE WAR';
+      out.oilSentence = 'Crude was $' + Math.round(jan) + ' a barrel in January and $' + Math.round(pre) + ' at the last close before the strike. ' + cap(this.words(weeks)) + ' weeks in it was $' + Math.round(pk.value) + '.'
+        + (isFinite(low) ? ' It fell to $' + Math.round(low) + ' under the June ceasefire, and is $' + Math.round(now) + ' now, after strikes resumed in July.' : ' It is $' + Math.round(now) + ' now.');
+    }
+    if (D) {
+      const a18 = D.hormuz_daily.find(o => o[0] === '2026-08-18'), now = Math.round(D.items.hormuz.recent.mean7_total);
+      out.strSentence = 'On 18 August he said the strait was \u201Copen and operating,\u201D thirty ships a night. The satellites counted ' + (a18 ? this.numWord(a18[1]) + ' that day, and ' : '') + this.numWord(now) + ' a day over the last week.';
+    }
+    const base = this.jobsBase();
+    if (base && B) {
+      out.jobsBaseLabel = base.label; out.jobsTermMean = Math.round(B.jobs.prev.mean_monthly).toLocaleString();
+      out.jobsWas = 'was ' + Math.round(base.mean / 1000) + ',000 in ' + base.label;
+      // the share of the earlier pace in words, nearest of the plain fractions
+      const r = B.jobs.curr.mean_monthly / base.mean, F = [[0.1, 'A TENTH'], [0.125, 'AN EIGHTH'], [0.2, 'A FIFTH'], [0.25, 'A QUARTER'], [1 / 3, 'A THIRD'], [0.5, 'HALF'], [2 / 3, 'TWO THIRDS'], [0.75, 'THREE QUARTERS']];
+      const f = F.reduce((a, x) => (Math.abs(x[0] - r) < Math.abs(a[0] - r) ? x : a));
+      out.jobsKicker = r >= 1 ? 'HIRING IS AT OR ABOVE ITS ' + base.label + ' PACE' : 'HIRING IS DOWN TO ' + (Math.abs(f[0] - r) < 0.03 ? '' : 'ABOUT ') + f[1] + ' OF ITS ' + base.label + ' PACE';
+    }
+    const cb = B && B.war_cost.cbo_estimate;
+    if (cb) out.cboNote = 'The Congressional Budget Office, which is independent of the Pentagon, put the cost at $' + cb.usd_bn + ' billion through ' + this.dayLong(cb.through) + ' (published ' + this.dayLong(cb.release) + ')' + (cb.monthly_going_forward_usd_bn ? ', and $' + cb.monthly_going_forward_usd_bn + ' billion a month going forward' : '') + '. It is lower than the Pentagon\u2019s figure and covers a shorter period; the Pentagon\u2019s is drawn, and the CBO\u2019s is printed beside it on the screen.';
+    if (B && this.vOut) {
+      const E = B.gold.earmarked, out_t = Math.round(E[0][2] - E.at(-1)[2]), noneIn = this.vOut.every(o => o.t >= 0), q = (B.gold.moves || []).find(m => m.quote && m.tonnes);
+      out.vaultSentence = 'Foreign central banks have taken ' + out_t + ' tonnes of gold out of the New York Fed since ' + this.monthLong(E[0][0]) + (noneIn ? ', and none has come back' : '') + '. '
+        + (q ? q.bank + ' cited \u201C' + q.quote + '.\u201D ' : '')
+        + 'The Fed\u2019s economists say it is not a flight from the dollar.';
+    }
+    return out;
+  }
   // The headline sentences under each block's big number. Design typed their
   // figures; "Diesel has not cost this much since 2022" outlived diesel's record
   // and "it is $91 now" outlived the price.
@@ -389,7 +503,7 @@ export default class TheBill extends React.Component {
     if (!C || !P || !B || !D) return Object.fromEntries(keys.map(k => [k, '']));
     const cap = s => s[0].toUpperCase() + s.slice(1), R = P.diesel.record, W = B.war_cost;
     let dieselVerdict = '';
-    if (R && R.is_record) dieselVerdict = 'Diesel has never cost this much.';
+    if (R && R.is_record) dieselVerdict = 'Diesel has never cost this much, before adjusting for inflation.';
     else if (R && R.last_higher && R.last_higher.date < P.diesel.points[0][0]) dieselVerdict = 'Diesel has not cost this much since ' + R.last_higher.date.slice(0, 4) + '.';
     else if (R) dieselVerdict = 'Diesel is below its ' + this.monthLong(P.diesel.points.reduce((a, p) => (p[1] > a[1] ? p : a))[0]).split(' ')[0] + ' high.';
     const down = (this.board || []).filter(r => !r.up).length;
@@ -482,8 +596,8 @@ export default class TheBill extends React.Component {
     if (!R) return { ...none, dieselNote: 'Diesel is ' + now + '.' };
     const prior = usd(R.prior_peak.value) + ' on ' + day(R.prior_peak.date);
     if (R.is_record) return {
-      dieselLabel: 'diesel a gallon · a record', dieselHead: 'A record.', dieselHeadPolicy: 'A record, and a fall that is not policy.',
-      dieselNote: 'Diesel at ' + now + ' is the highest in a series that begins in ' + R.series_start.slice(0, 4) + '. It first passed the previous peak, ' + prior + ', in the week of ' + day(R.first_record.date) + '.',
+      dieselLabel: 'diesel a gallon · a record before inflation', dieselHead: 'A record.', dieselHeadPolicy: 'A record, and a fall that is not policy.',
+      dieselNote: 'Diesel at ' + now + ' is the highest in a series that begins in ' + R.series_start.slice(0, 4) + '. It first passed the previous peak, ' + prior + ', in the week of ' + day(R.first_record.date) + '. These are dollars of the day, not adjusted for inflation.',
     };
     const high = D.points.reduce((a, p) => (p[1] > a[1] ? p : a));
     if (R.last_higher.date >= D.points[0][0]) return {
@@ -509,8 +623,9 @@ export default class TheBill extends React.Component {
     for (let i = months.length - 2; i >= 0 && months[i][1] < last[1]; i--) k++;
     return k;
   }
-  // "Jan 2025": the board's series labels
-  monShort(iso) { return new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+  // "Jan 2025": the board's series labels. Built from fmtISO rather than the
+  // locale, which writes "Sept" where the rest of the page writes "SEP".
+  monShort(iso) { const [, m, y] = this.fmtISO(iso).split(' '); return m[0] + m.slice(1).toLowerCase() + ' ' + y; }
   // Dates in the method notes that move with the data. Typed, they said "30 August"
   // and "July 2026" after the series had moved on, and the strait percentages
   // were a week-one reading (Cape 103%, Bab el-Mandeb 78%).
@@ -538,7 +653,7 @@ export default class TheBill extends React.Component {
   // billion ... 21 July 2026" in five places; the Pentagon's own estimate moved
   // to $43.6bn and the copy would have disagreed with the bar beside it.
   warVals() {
-    const W = this.bill && this.bill.war_cost, keys = 'warHead warNote warCite warSpent warAsOf warWho casHead casDate casAlt'.split(' ');
+    const W = this.bill && this.bill.war_cost, keys = 'warHead warNote warCite warSpent warAsOf warWho casHead casDate casAlt quoteNote'.split(' ');
     if (!W) return Object.fromEntries(keys.map(k => [k, '']));
     const d = W.dod_cost, p = d.prior, p2 = d.prior_2, c = W.casualties, wp = c.wapo_count, day = iso => this.dayLong(iso);
     const cap = s => s[0].toUpperCase() + s.slice(1);
@@ -548,6 +663,8 @@ export default class TheBill extends React.Component {
       warCite: (d.cite || d.source) + (p && p.cite ? ' · earlier: ' + p.cite : ''),
       warSpent: '$' + d.usd_bn + ' billion', warAsOf: day(d.as_of), warWho: d.who || 'the latest official estimate',
       casHead: cap(this.words(c.us_killed)) + ' stars.', casDate: day(c.as_of),
+      // the one time the page quotes his forecast, with its date and source
+      quoteNote: W.trump_quote ? 'The President said "' + W.trump_quote.text + '" on ' + day(W.trump_quote.date) + ' (' + W.trump_quote.source + ').' : '',
       casAlt: wp ? ' The Washington Post reported on ' + day(wp.reported) + ', citing ' + this.words(wp.officials_cited) + ' US officials, at least ' + wp.killed_at_least + ' deaths; the Defense Secretary called the report false. The official count is drawn, and both are printed here.' : '',
     };
   }
@@ -626,13 +743,13 @@ export default class TheBill extends React.Component {
     const h = D.items.hormuz;
     return [
       { num: '+$' + Math.round(P.receipt.monthly_usd), label: 'a month for a household · $' + Math.round(P.receipt.cumulative_usd).toLocaleString() + ' since 20 Jan 2025', color: '#D4A017' },
-      { num: '$' + Math.round(C.observations[0][1]) + ' → $' + Math.round(C.peak.value), label: 'crude oil · January to the peak, five weeks after his strike', color: '#D4A017' },
+      { num: '$' + Math.round(C.observations[0][1]) + ' → $' + Math.round(C.observations.at(-1)[1]), label: 'crude oil · January to now · $' + Math.round(C.peak.value) + ' at the peak, ' + this.storyVals().oilWeeks + ' weeks into the war', color: '#D4A017' },
       { num: Math.round(h.recent.mean7_total) + ' / day', label: 'ships through Hormuz · was ' + Math.round(h.baseline.total_per_day), color: '#D4A017' },
       { num: '$' + P.diesel.latest.value.toFixed(2), label: this.dieselVals().dieselLabel, color: '#D4A017' },
-      { num: Math.round(B.jobs.curr.mean_monthly / 1000) + ',000', label: 'new jobs a month · was ' + Math.round(B.jobs.prev.mean_monthly / 1000) + ',000', color: '#D4A017' },
+      { num: Math.round(B.jobs.curr.mean_monthly / 1000) + ',000', label: 'new jobs a month · was ' + Math.round(this.jobsBase().mean / 1000) + ',000 in ' + this.jobsBase().label, color: '#D4A017' },
       { num: B.war_cost.casualties.us_killed + ' dead', label: B.war_cost.aircraft.total_lost_or_damaged + ' aircraft · $' + B.war_cost.dod_cost.usd_bn + 'bn spent', color: '#F7F5F0' },
       { num: B.gold.tonnes_out.toFixed(0) + ' t', label: 'gold out of the New York Fed · ' + this.words(B.gold.earmarked.length - 1) + ' months', color: '#D4A017' },
-      { num: '28 Feb · 24 Feb', label: 'he ordered the strike · he re-imposed the tariffs', color: MARK_RED },
+      { num: '24 & 28\u00a0Feb', label: 'he re-imposed the tariffs · he ordered the strike', color: MARK_RED },
     ].map((c, i) => ({ ...c, ref: R[i] }));
   }
   stepCard(P) {
@@ -651,9 +768,9 @@ export default class TheBill extends React.Component {
     const ltu = B.ltu.points, un = B.unemployment.points;
     const at = (pts, d) => (pts.find(p => p[0] === d) || [0, null])[1];
     const f1 = v => (v == null ? '' : v.toFixed(1));
-    const mon = iso => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' }).toUpperCase();
+    const mon = iso => { const [, m, y] = this.fmtISO(iso).split(' '); return m + ' ' + y.slice(2); };
     return {
-      jobsPrev: fmt(B.jobs.prev.mean_monthly), jobsCurr: fmt(B.jobs.curr.mean_monthly), jobsN: B.jobs.curr.n_months, jobsMed: fmt(B.jobs.curr.median_monthly), jobsPrevMed: fmt(B.jobs.prev.median_monthly),
+      jobsPrev: fmt(this.jobsBase().mean), jobsCurr: fmt(B.jobs.curr.mean_monthly), jobsN: B.jobs.curr.n_months, jobsMed: fmt(B.jobs.curr.median_monthly), jobsPrevMed: fmt(this.jobsBase().median),
       ltu0: f1(at(ltu, '2025-01-01')), ltu1: f1(B.ltu.latest.value), unemp0: f1(at(un, '2025-01-01')), unemp1: f1(B.unemployment.latest.value), hires: B.hires.latest.value, quits: B.quits.latest.value,
       aheYoy: B.pay.ahe_yoy_pct.toFixed(1), cpiYoy: B.pay.cpi_yoy_pct.toFixed(1), realYoy: B.pay.real_yoy_pct.toFixed(1),
       aircraftList: Object.entries(B.war_cost.aircraft.by_type).map(([k, v]) => v + ' ' + k).join(', '),
@@ -665,7 +782,7 @@ export default class TheBill extends React.Component {
     const B = this.bill;
     // block 5: the months of his term, and the previous-term pace for the same months
     this.cMonths = B.jobs.monthly.filter(m => m[0] >= '2025-02-01');   // the 19 months of his term; January 2025 belongs to the previous one
-    this.cPrevPace = B.jobs.prev.mean_monthly;
+    this.cPrevPace = this.jobsBase().mean;
     this.cLeft = []; this.cRight = []; this.cMonthDone = -1;
     // the latest month is drawn brighter only while it is the best of at least three
     this.cBright = this.bestRun(this.cMonths) >= 3 ? this.cMonths.at(-1)[0] : null;
@@ -675,7 +792,7 @@ export default class TheBill extends React.Component {
     this.vOut = E.slice(1).map((p, i) => ({ date: p[0], n: Math.round(E[i][2] - p[2]), t: E[i][2] - p[2] }));
     this.vIcons = this.vOut.map(o => Math.max(0, Math.round(o.t / this.BAR_T / 10)));
     this.vIconTotal = this.vIcons.reduce((a, b) => a + b, 0);
-    this.vMoves = this.goldMoves(B.gold.moves || []);
+    this.vMoves = this.goldMoves((B.gold.moves || []).filter(m => !/No bar was physically shipped/i.test(m.note || '')));
     this.vBars = []; this.vGone = []; this.vMonthDone = -1;
   }
   seeded(i) { const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }
@@ -701,7 +818,7 @@ export default class TheBill extends React.Component {
       else for (let i = 0; i < -nR; i++) { const idx = this.cRight.length - 1 - i; if (idx >= 0 && !this.cRight[idx].leaving) this.cRight[idx].leaving = t + i * 30; }
     }
     // two stadiums: dots stack in rows of `cols`
-    const pad = mobile ? 16 : 36, gap = mobile ? 12 : 48, top = Math.max(H * (mobile ? 0.16 : 0.15), 128), bot = H * (mobile ? 0.5 : 0.47);
+    const pad = mobile ? 16 : 36, gap = mobile ? 12 : 48, top = Math.max(H * (mobile ? 0.16 : 0.15), 128), bot = H * (mobile ? 0.42 : 0.44);
     const stadW = (W - pad * 2 - gap) / 2, stadH = bot - top, NL = N * Math.round(this.cPrevPace / 10000);
     const fw = Math.max(5, Math.sqrt(stadW * stadH * 0.88 / (1.9 * NL))), fh = fw * 1.9, cols = Math.floor(stadW / fw), step = stadW / cols;
     const person = (x, y, w, fill, a) => {
@@ -713,8 +830,8 @@ export default class TheBill extends React.Component {
     };
     const drawStadium = (x0, dots, title, sub, color) => {
       ctx.strokeStyle = 'rgba(247,245,240,.18)'; ctx.lineWidth = 1; ctx.strokeRect(x0, top, stadW, bot - top);
-      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.textAlign = 'left'; ctx.fillText(title, x0, top - 36);
-      ctx.fillStyle = color; ctx.font = '700 24px "Barlow Condensed", sans-serif'; ctx.fillText(sub, x0, top - 9);
+      ctx.font = '500 ' + (mobile ? 11 : 13) + 'px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.75)'; ctx.textAlign = 'left'; ctx.fillText(title, x0, top - 36);
+      ctx.fillStyle = color; ctx.font = '700 ' + (mobile ? 21 : 26) + 'px "Barlow Condensed", sans-serif'; ctx.fillText(sub, x0, top - 9);
       let n = 0;
       for (let i = 0; i < dots.length; i++) {
         const d = dots[i], age = (t - d.born) / 400; if (age < 0) continue;
@@ -728,21 +845,41 @@ export default class TheBill extends React.Component {
       }
       ctx.globalAlpha = 1;
     };
-    const cur = this.cMonths[mIdx];
-    drawStadium(pad, this.cLeft, 'AT THE PREVIOUS PACE · 2021–25 AVERAGE', '+' + Math.round(this.cPrevPace).toLocaleString() + ' A MONTH', 'rgba(247,245,240,.75)');
-    drawStadium(pad + stadW + gap, this.cRight, 'WHAT HAPPENED · SINCE 20 JAN 2025', (cur[1] >= 0 ? '+' : '−') + Math.abs(cur[1]).toLocaleString() + ' IN ' + new Date(cur[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase(), '#F2C94C');
+    const cur = this.cMonths[mIdx], base = this.jobsBase(), K = v => (v >= 0 ? '+' : '\u2212') + Math.abs(Math.round(v / 1000)) + ',000';
+    // Both headers state an average a month, the same measure as the headline under them.
+    // The right one used to print the month being poured, so it ended on "+162,000 IN
+    // AUGUST" in gold beside "hiring has slowed": the latest month is now a small note.
+    const soFar = this.cMonths.slice(0, mIdx + 1), meanR = soFar.reduce((s, m) => s + m[1], 0) / soFar.length;
+    drawStadium(pad, this.cLeft, mobile ? 'AT THE ' + base.label + ' PACE' : 'AT THE ' + base.label + ' PACE · THE TWO YEARS BEFORE HE TOOK OFFICE', K(this.cPrevPace) + ' A MONTH', 'rgba(247,245,240,.75)');
+    drawStadium(pad + stadW + gap, this.cRight, mobile ? 'SINCE 20 JAN 2025' : 'WHAT HAPPENED · SINCE 20 JAN 2025', K(meanR) + ' A MONTH', '#F2C94C');
+    if (!mobile) {
+      ctx.font = '500 14px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.78)'; ctx.textAlign = 'right';
+      ctx.fillText('LATEST MONTH · ' + (cur[1] >= 0 ? '+' : '\u2212') + Math.abs(cur[1]).toLocaleString(), pad + stadW * 2 + gap, top - 9); ctx.textAlign = 'left';
+    }
+    // where the right-hand crowd would stand at the earlier pace
+    const rowsL = Math.ceil(this.cLeft.length / cols);
+    if (rowsL > 0) {
+      const gy = Math.max(top + 1, bot - fh * 0.08 - rowsL * fh + fh * 0.15), gx0 = pad + stadW + gap;
+      ctx.strokeStyle = 'rgba(247,245,240,.55)'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.moveTo(gx0, gy); ctx.lineTo(gx0 + stadW, gy); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font = '500 ' + (mobile ? 11 : 12) + 'px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.textAlign = 'right';
+      ctx.fillText(mobile ? base.label + ' PACE' : 'AT THE ' + base.label + ' PACE THIS CROWD WOULD REACH HERE', gx0 + stadW - 6, gy - 7 < top + 14 ? gy + 16 : gy - 7); ctx.textAlign = 'left';
+    }
+    if (mobile) { ctx.font = '500 11px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.6)'; ctx.fillText('TOTALS SINCE JAN 2025 · 1 FIGURE = 10,000 JOBS', pad, bot + 18);
+      const ltuL = B.ltu.latest.value, ltu0 = (B.ltu.points.find(p => p[0] === '2025-01-01') || [0, B.ltu.handover.value])[1];
+      ctx.fillStyle = 'rgba(247,245,240,.85)'; ctx.fillText('OUT 6+ MONTHS: ' + Math.round(ltuL) + ' IN 100, WAS ' + Math.round(ltu0) + ' · REAL PAY ' + (B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%', pad, bot + 36);
+    }
     // the frozen row: 100 figures for the unemployed; lit = out of work 27 weeks or more
     if (!mobile) {
       const ltuNow = (B.ltu.points.find(p => p[0] === cur[0]) || [0, B.ltu.latest.value])[1];
       const ry = bot + 34, fw = stadW / 100;
-      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('OF EVERY 100 OUT OF WORK, OUT SIX MONTHS OR MORE', pad, ry - 10);
-      ctx.fillStyle = '#F7F5F0'; ctx.font = '700 24px "Barlow Condensed", sans-serif'; ctx.textAlign = 'right'; ctx.fillText(Math.round(ltuNow) + ' · WAS ' + Math.round(B.ltu.points.find(p => p[0] === '2025-01-01')[1]), pad + stadW, ry - 8); ctx.textAlign = 'left';
-      for (let i = 0; i < 100; i++) { const lit = i < Math.round(ltuNow); ctx.fillStyle = lit ? '#F7F5F0' : 'rgba(247,245,240,.18)'; const x = pad + i * fw + fw / 2; ctx.beginPath(); ctx.arc(x, ry + 4, 2, 0, 6.2832); ctx.fill(); ctx.fillRect(x - 1.4, ry + 7, 2.8, 7); }
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.8)'; ctx.fillText('OUT OF WORK SIX MONTHS OR MORE · PER 100 UNEMPLOYED', pad, ry - 10);
+      ctx.fillStyle = '#F7F5F0'; ctx.font = '700 26px "Barlow Condensed", sans-serif'; ctx.textAlign = 'right'; ctx.fillText(Math.round(ltuNow) + ' IN 100 · WAS ' + Math.round(B.ltu.points.find(p => p[0] === '2025-01-01')[1]), pad + stadW, ry - 8); ctx.textAlign = 'left';
+      for (let i = 0; i < 100; i++) { const lit = i < Math.round(ltuNow); ctx.fillStyle = lit ? '#F7F5F0' : 'rgba(247,245,240,.2)'; const x = pad + i * fw + fw / 2; ctx.beginPath(); ctx.arc(x, ry + 4, 2.6, 0, 6.2832); ctx.fill(); ctx.fillRect(x - 1.8, ry + 8, 3.6, 10); }
       // the paycheck, under the right-hand crowd
       const px = pad + stadW + gap, py = ry;
       ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('YOUR RAISE, AFTER PRICES · YEAR TO ' + (B.pay.ahe_date ? this.monthLong(B.pay.ahe_date).toUpperCase() : 'THE LATEST MONTH'), px, py - 10);
-      ctx.font = '700 30px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#F7F5F0'; ctx.fillText((B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%', px, py + 22); const pw = ctx.measureText((B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%').width;
-      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.55)'; ctx.fillText('PAY +' + B.pay.ahe_yoy_pct.toFixed(1) + '% · PRICES +' + B.pay.cpi_yoy_pct.toFixed(1) + '%', px + pw + 14, py + 22);
+      ctx.font = '700 44px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#F7F5F0'; ctx.fillText((B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%', px, py + 32); const pw = ctx.measureText((B.pay.real_yoy_pct > 0 ? '+' : '−') + Math.abs(B.pay.real_yoy_pct).toFixed(1) + '%').width;
+      ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('PAY +' + B.pay.ahe_yoy_pct.toFixed(1) + '% · PRICES +' + B.pay.cpi_yoy_pct.toFixed(1) + '%', px + pw + 14, py + 30);
     }
     const sg = ctx.createLinearGradient(0, H * 0.55, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.9)');
     ctx.fillStyle = sg; ctx.fillRect(0, H * 0.55, W, H * 0.45);
@@ -776,7 +913,7 @@ export default class TheBill extends React.Component {
     const mobile = W < 640, pad = mobile ? 16 : 36;
     const ph = (a, b) => Math.max(0, Math.min(1, (P - a) / (b - a)));
     const pStars = ph(0.02, 0.2), pPlanes = ph(0.2, 0.42), pMoney = ph(0.42, 0.66), pInt = ph(0.66, 0.86);
-    const nRows = mobile ? 3 : 4, top = H * 0.11, bot = H * (mobile ? 0.62 : 0.68), rowH = (bot - top) / nRows;
+    const nRows = 4, top = H * (mobile ? 0.1 : 0.11), bot = H * (mobile ? 0.64 : 0.68), rowH = (bot - top) / nRows;
     const numW = mobile ? W - pad * 2 : Math.min(W * 0.28, 360);
     const gx = mobile ? pad : pad + numW + 32, gw = W - pad - gx;
     const nf = mobile ? Math.round(Math.min(rowH * 0.34, 48)) : Math.round(Math.min(rowH * 0.55, 96));
@@ -791,8 +928,8 @@ export default class TheBill extends React.Component {
       const nw = ctx.measureText(num).width;
       ctx.font = '600 ' + Math.round(nf * 0.3) + 'px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#F7F5F0'; ctx.fillText(unit, pad + nw + nf * 0.12, by);
       const maxW = mobile ? W - pad * 2 : numW;
-      [lab1, lab2].forEach((s, k) => { if (!s) return; let fs = 14; ctx.font = '500 14px "IBM Plex Mono", monospace'; while (fs > 10 && ctx.measureText(s).width > maxW) { fs--; ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace'; } ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText(s, pad, by + 24 + k * 17); });
-      return mobile ? { x: gx, y: y + rowH * 0.52, w: gw, h: rowH * 0.46 } : { x: gx, y, w: gw, h: rowH };
+      [lab1, lab2].forEach((s, k) => { if (!s) return; let fs = mobile ? 13 : 15; ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace'; while (fs > 11 && ctx.measureText(s).width > maxW) { fs--; ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace'; } ctx.fillStyle = 'rgba(247,245,240,.88)'; ctx.fillText(s, pad, by + 24 + k * 18); });
+      return mobile ? { x: gx, y: y + rowH * 0.56, w: gw, h: rowH * 0.42 } : { x: gx, y, w: gw, h: rowH };
     };
     // 1 · the dead: eighteen stars
     const killed = WC.casualties.us_killed, lit = pStars * killed;
@@ -810,27 +947,31 @@ export default class TheBill extends React.Component {
     // 3 · the money: spent in gold; what he has asked for on top, dashed; the munitions slice in red
     const spent = WC.dod_cost.usd_bn, ask = WC.supplemental_request.usd_bn, mun = WC.supplemental_request.munitions_usd_bn;
     const money = spent * Math.min(1, pMoney / 0.7), askA = Math.max(0, Math.min(1, (pMoney - 0.7) / 0.3));
-    bx = row(2, '$' + money.toFixed(1) + 'bn', 'SPENT', 'PENTAGON COST · TO ' + this.fmtISO(B.war_cost.dod_cost.as_of), 'HE SAID FOUR TO FIVE WEEKS', pMoney);
+    const cbo = WC.cbo_estimate;
+    bx = row(2, '$' + money.toFixed(1) + 'bn', 'SPENT', mobile && cbo ? 'PENTAGON, TO ' + this.fmtISO(B.war_cost.dod_cost.as_of).replace(/ \d{4}$/, '') + ' · CBO: $' + cbo.usd_bn + 'BN TO ' + this.fmtISO(cbo.through).replace(/ \d{4}$/, '') : 'PENTAGON COST · TO ' + this.fmtISO(B.war_cost.dod_cost.as_of), cbo ? 'CBO\u2019S LOWER ESTIMATE · $' + cbo.usd_bn + 'BN TO ' + this.fmtISO(cbo.through) : '', pMoney);
     const bh = Math.min(bx.h * 0.34, 56), byy = bx.y + bx.h / 2 - bh / 2 - (mobile ? 4 : 6), ux = bx.w / (spent + ask);
     ctx.globalAlpha = Math.min(1, pMoney * 3);
     ctx.fillStyle = '#D4A017'; ctx.fillRect(bx.x, byy, ux * money, bh);
-    ctx.font = '500 14px "IBM Plex Mono", monospace'; ctx.fillStyle = '#F7F5F0'; ctx.textAlign = 'left'; ctx.fillText('SPENT · $' + money.toFixed(1) + 'BN', bx.x, byy - 8);
+    ctx.font = '500 ' + (mobile ? 11 : 14) + 'px "IBM Plex Mono", monospace'; ctx.fillStyle = '#F7F5F0'; ctx.textAlign = 'left'; if (!mobile) ctx.fillText('SPENT · $' + money.toFixed(1) + 'BN', bx.x, byy - 8);
     if (askA > 0) {
       ctx.globalAlpha = askA;
       ctx.strokeStyle = 'rgba(247,245,240,.6)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.strokeRect(bx.x + ux * spent + 0.5, byy + 0.5, ux * ask * askA - 1, bh - 1); ctx.setLineDash([]);
       if (askA >= 1) { ctx.fillStyle = '#0B1E3F'; ctx.fillRect(bx.x + ux * (spent + ask - mun), byy + 1, ux * mun - 1, bh - 2); }
-      ctx.fillStyle = '#F7F5F0'; ctx.textAlign = 'right'; ctx.fillText('ASKED FOR · $' + ask.toFixed(1) + 'BN MORE', bx.x + bx.w, byy - 8);
-      ctx.fillStyle = '#F7F5F0'; ctx.fillText('$' + mun + 'BN OF IT TO REPLACE MUNITIONS', bx.x + bx.w, byy + bh + 16); ctx.textAlign = 'left';
+      ctx.fillStyle = '#F7F5F0'; ctx.textAlign = 'right';
+      if (mobile) ctx.fillText('DASHED: $' + ask.toFixed(1) + 'BN MORE ASKED FOR · $' + mun + 'BN MUNITIONS', bx.x + bx.w, byy + bh + 14);
+      else { ctx.fillText('ASKED FOR · $' + ask.toFixed(1) + 'BN MORE', bx.x + bx.w, byy - 8); ctx.fillText('$' + mun + 'BN OF IT TO REPLACE MUNITIONS', bx.x + bx.w, byy + bh + 16); }
+      ctx.textAlign = 'left';
     }
-    // 4 · the interceptors: one hundred, two thirds fade, the denial printed beside them
-    if (!mobile) {
-      const remain = WC.munitions.patriot_remaining_share, keep = Math.round(remain * 100);
-      bx = row(3, '1 in 3', 'LEFT', 'PATRIOT INTERCEPTORS LEFT · CSIS, 27 JUL', 'REBUILDING TAKES THREE YEARS OR MORE', pInt);
-      const iw = bx.w / 100, ih = Math.min(bx.h * 0.4, 64), iy = bx.y + bx.h / 2 - ih / 2 - 14, base = Math.min(1, pInt * 3);
+    // 4 · the interceptors: one hundred, two thirds fade, the denial printed beside them.
+    // On phones too: the sentence under the ledger talks about them.
+    {
+      const M = WC.munitions, remain = M.patriot_remaining_share, keep = Math.round(remain * 100);
+      bx = row(3, '1 in ' + Math.round(1 / remain), 'LEFT', 'PATRIOT INTERCEPTORS LEFT · CSIS, ' + this.fmtISO(M.as_of).replace(/ \d{4}$/, ''), 'REBUILDING TAKES ' + this.words(M.rebuild_years).toUpperCase() + ' YEARS OR MORE', pInt);
+      const iw = bx.w / 100, ih = Math.min(bx.h * 0.4, 64), iy = bx.y + bx.h / 2 - ih / 2 - (mobile ? 8 : 14), base = Math.min(1, pInt * 3);
       for (let i = 0; i < 100; i++) { const gone = i >= keep; ctx.globalAlpha = base * (gone ? 1 - pInt * 0.85 : 1); ctx.fillStyle = gone ? 'rgba(247,245,240,.55)' : '#F7F5F0'; const x = bx.x + i * iw + iw / 2; ctx.beginPath(); ctx.moveTo(x, iy); ctx.lineTo(x + iw * 0.32, iy + ih); ctx.lineTo(x - iw * 0.32, iy + ih); ctx.closePath(); ctx.fill(); }
       ctx.globalAlpha = Math.max(0, Math.min(1, (pInt - 0.5) * 2));
-      ctx.font = '500 15px "IBM Plex Mono", monospace'; ctx.fillStyle = '#F7F5F0'; ctx.fillText('THE SECRETARY OF DEFENSE DISPUTES THIS ESTIMATE · 5 AUG', bx.x, iy + ih + 24);
-      ctx.fillStyle = 'rgba(247,245,240,.6)'; ctx.fillText('HIS OWN BUDGET REQUEST ASKS $21BN FOR MUNITIONS TO REPLACE THEM', bx.x, iy + ih + 44);
+      ctx.font = '500 ' + (mobile ? 11 : 15) + 'px "IBM Plex Mono", monospace'; ctx.fillStyle = '#F7F5F0'; ctx.fillText(mobile ? 'THE DEFENSE SECRETARY DISPUTES THIS' : 'THE SECRETARY OF DEFENSE DISPUTES THIS ESTIMATE · 5 AUG', bx.x, iy + ih + (mobile ? 15 : 24));
+      if (!mobile) { ctx.fillStyle = 'rgba(247,245,240,.75)'; ctx.fillText('THE BUDGET REQUEST ASKS $' + mun + 'BN FOR MUNITIONS TO REPLACE THEM', bx.x, iy + ih + 44); }
     }
     ctx.globalAlpha = 1;
     const sg = ctx.createLinearGradient(0, H * 0.62, 0, H); sg.addColorStop(0, 'rgba(110,27,39,0)'); sg.addColorStop(1, 'rgba(110,27,39,.92)');
@@ -845,13 +986,13 @@ export default class TheBill extends React.Component {
     this.buyR = { PS5, TUITION, HOTDOG, JET, HH, DAY, USPOP, days, dogs, hh, spent, loss, diesel, AC, lossBn: WC.aircraft.dod_loss_estimate_usd_bn, ratio: Math.round(spent / loss) };
     const date = AC + ' AIRCRAFT LOST OR DAMAGED · PENTAGON ESTIMATE $' + WC.aircraft.dod_loss_estimate_usd_bn + ' BILLION';
     this.buyBeats = [
-      { total: JET / PS5, per: 1000, label: 'PlayStation 5s', sub: 'for one F-35A · $82.5 million', each: 'EACH SQUARE IS 1,000 PLAYSTATION 5s AT $549.99', math: '$82.5M ÷ $549.99', jet: true, date: 'ONE F-35A · $82.5 MILLION · ONE WAS LOST' },
-      { total: loss / PS5, per: 1e4, label: 'PlayStation 5s', sub: 'one for every ' + hh + ' households in America', each: 'EACH SQUARE IS 10,000 PLAYSTATION 5s AT $549.99', math: S + ' ÷ $549.99', date },
-      { total: loss / diesel, per: 1e6, label: 'gallons of diesel', sub: days + ' days of every gallon America burns', each: 'EACH SQUARE IS 1 MILLION GALLONS AT $' + diesel.toFixed(2), math: S + ' ÷ $' + diesel.toFixed(2), date },
-      { total: loss / TUITION, per: 500, label: 'years of college tuition', sub: 'in-state, public four-year, at $11,610', each: 'EACH SQUARE IS 500 STUDENT-YEARS AT $11,610', math: S + ' ÷ $11,610', date },
-      { total: loss / HOTDOG, per: 5e6, label: 'Costco hot dogs', sub: dogs + ' for every American', each: 'EACH SQUARE IS 5 MILLION HOT DOGS AT $1.50', math: S + ' ÷ $1.50', date },
+      { total: JET / PS5, per: 1000, label: 'PlayStation 5s', sub: 'for one F-35A · $82.5 million', each: 'EACH SQUARE IS 1,000 PLAYSTATION 5s AT $549.99', math: '$82.5M ÷ $549.99 A CONSOLE', jet: true, kick: 'WHAT ONE F-35A COSTS', date: 'ONE F-35A · $82.5 MILLION · ONE WAS LOST' },
+      { total: loss / PS5, per: 1e4, label: 'PlayStation 5s', sub: 'one for every ' + hh + ' households in America', each: 'EACH SQUARE IS 10,000 PLAYSTATION 5s AT $549.99', math: S + ' ÷ $549.99 A CONSOLE', date },
+      { total: loss / diesel, per: 1e6, label: 'gallons of diesel', sub: days + ' days of every gallon America burns', each: 'EACH SQUARE IS 1 MILLION GALLONS AT $' + diesel.toFixed(2), math: S + ' ÷ $' + diesel.toFixed(2) + ' A GALLON', date },
+      { total: loss / TUITION, per: 500, label: 'years of college tuition', sub: 'in-state, public four-year, at $11,610', each: 'EACH SQUARE IS 500 STUDENT-YEARS AT $11,610', math: S + ' ÷ $11,610 A YEAR', date },
+      { total: loss / HOTDOG, per: 5e6, label: 'Costco hot dogs', sub: dogs + ' for every American', each: 'EACH SQUARE IS 5 MILLION HOT DOGS AT $1.50', math: S + ' ÷ $1.50 A HOT DOG AND SODA', date },
     ];
-    this.buyBeats.forEach(b => { b.N = Math.round(b.total / b.per); });
+    this.buyBeats.forEach(b => { b.N = Math.round(b.total / b.per); b.kick = b.kick || 'WHAT THE LOST AIRCRAFT COST'; });
     this.BEAT = 4.7; this.SPAWN = 2.2; this.FALL = 0.5; this.FINALE = 6.8; this.buyDur = this.buyBeats.length * this.BEAT + this.FINALE;
   }
   buyVals() {
@@ -864,16 +1005,20 @@ export default class TheBill extends React.Component {
     const key = bi + '|' + W + '|' + H + '|' + extra;
     if (this.buyL && this.buyL.key === key) return this.buyL;
     const b = this.buyBeats[bi], pad = mobile ? 16 : 36;
-    const x = mobile ? pad : W * 0.46, w = W - pad - x, y = Math.max(H * 0.13, 112), hgt = Math.max(60, H * (mobile ? 0.48 : 0.55) - y);
-    const cell = Math.max(4, Math.floor(Math.sqrt(w * hgt * 0.8 / b.N))), cols = Math.max(1, Math.floor(w / cell)), N = b.N + extra;
+    const x = mobile ? pad : W * 0.46, w = W - pad - x, y0 = Math.max(H * 0.13, 112), bot = H * (mobile ? 0.4 : 0.55);
+    // the finale uses the frame from just under the header to the pile's floor
+    const y = extra ? (mobile ? 118 : 96) : y0, hgt = Math.max(60, bot - y), N = b.N + extra;
+    let cell = Math.max(2, Math.floor(Math.sqrt(w * hgt * (extra ? 1 : 0.8) / N))), cols = Math.max(1, Math.floor(w / cell));
+    if (extra) while (cell > 2 && Math.ceil(N / cols) * cell > hgt) { cell--; cols = Math.max(1, Math.floor(w / cell)); }
     const col = new Int16Array(N), row = new Int16Array(N);
     let s = bi * 991 + 17;
     for (let r0 = 0; r0 * cols < N; r0++) {
       const perm = Array.from({ length: cols }, (_, i) => i);
-      for (let i = cols - 1; i > 0; i--) { const j = Math.floor(this.seeded(s++) * (i + 1)); const tmp = perm[i]; perm[i] = perm[j]; perm[j] = tmp; }
+      if (!extra) for (let i = cols - 1; i > 0; i--) { const j = Math.floor(this.seeded(s++) * (i + 1)); const tmp = perm[i]; perm[i] = perm[j]; perm[j] = tmp; }
       for (let j = 0; j < cols && r0 * cols + j < N; j++) { col[r0 * cols + j] = perm[j]; row[r0 * cols + j] = r0; }
     }
-    return (this.buyL = { key, x, y, w, h: hgt, cell, cols, col, row, N, xoff: (w - cols * cell) / 2 });
+    const fillH = extra ? Math.ceil(N / cols) * cell : hgt;
+    return (this.buyL = { key, x, y: y + hgt - fillH, w, h: fillH, cell, cols, col, row, N, xoff: (w - cols * cell) / 2 });
   }
   stepBuy(dt, P, t) {
     const cv = this.buyRef.current, B = this.bill; if (!cv || !B || !this.buyBeats) return;
@@ -882,20 +1027,21 @@ export default class TheBill extends React.Component {
     const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#0B1E3F'; ctx.fillRect(0, 0, W, H);
     const mobile = W < 640, pad = mobile ? 16 : 36, R = this.buyR, nB = this.buyBeats.length;
-    const DUR = this.buyDur, time = this.reduced ? DUR - 0.01 : (P * DUR) % DUR, bi = Math.min(nB - 1, Math.floor(time / this.BEAT)), bt = time - bi * this.BEAT, finale = time >= nB * this.BEAT;
+    const DUR = this.buyDur, time = this.reduced ? DUR - 0.01 : Math.min(P * DUR, DUR - 0.01), bi = Math.min(nB - 1, Math.floor(time / this.BEAT)), bt = time - bi * this.BEAT, finale = time >= nB * this.BEAT;
     const b = this.buyBeats[bi], extra = finale ? Math.round(b.N * R.spent / R.loss) : 0;
     const L = this.buyLayout(bi, W, H, mobile, extra);
     // the pile
     ctx.strokeStyle = 'rgba(247,245,240,.14)'; ctx.lineWidth = 1; ctx.strokeRect(L.x + 0.5, L.y + 0.5, L.w - 1, L.h - 1);
-    let landed = 0, landedX = 0;
+    let landedX = 0;
     for (let i = 0; i < L.N; i++) {
       const at = i < b.N ? (i / b.N) * this.SPAWN : this.BEAT + ((i - b.N) / extra) * 1.8;
       const age = (bt - at) / this.FALL; if (age <= 0) break;
       const ty = L.y + L.h - (L.row[i] + 1) * L.cell; if (ty < -L.cell) continue;
       const e = Math.min(1, age), yy = -L.cell + (ty + L.cell) * e * e, xx = L.x + L.xoff + L.col[i] * L.cell;
-      if (e >= 1) { if (i < b.N) landed++; else landedX++; }
+      if (e >= 1 && i >= b.N) landedX++;
       if (i < b.N) { ctx.fillStyle = (L.row[i] + L.col[i]) % 2 ? '#D4A017' : '#C2921A'; ctx.fillRect(xx + 0.5, yy + 0.5, L.cell - 1, L.cell - 1); }
-      else { ctx.strokeStyle = 'rgba(224,75,92,.9)'; ctx.strokeRect(xx + 1, yy + 1, L.cell - 2, L.cell - 2); }
+      // the red squares run off the top, but not over the header lines
+      else { ctx.fillStyle = 'rgba(224,75,92,.45)'; ctx.fillRect(xx + 0.5, yy + 0.5, L.cell - 1, L.cell - 1); if (L.cell >= 6) { ctx.strokeStyle = 'rgba(224,75,92,.95)'; ctx.strokeRect(xx + 1, yy + 1, L.cell - 2, L.cell - 2); } }
     }
     // left of the equals sign, the same money in jets: one F-35A for the first beat, the whole war's worth after that
     if (!mobile) {
@@ -911,25 +1057,31 @@ export default class TheBill extends React.Component {
         const x0 = pad + (jw - cols * cell) / 2 + cell / 2, y0 = L.y + L.h / 2 - rows * cell / 2 + cell / 2;
         for (let i = 0; i < n; i++) this.drawPlane(ctx, x0 + (i % cols) * cell, y0 + Math.floor(i / cols) * cell, s, a, i >= manned);
         ctx.globalAlpha = a; ctx.fillStyle = 'rgba(247,245,240,.7)';
-        [[n + ' AIRCRAFT LOST OR DAMAGED · $' + R.lossBn + ' BILLION', L.y - 28], [manned + ' MANNED · ' + (n - manned) + ' DRONES', L.y - 10]].forEach(([s, yy]) => { let fs = 14; ctx.font = '500 14px "IBM Plex Mono", monospace'; while (fs > 10 && ctx.measureText(s).width > jw) { fs--; ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace'; } ctx.fillText(s, pad + jw / 2, yy); });
+        [[manned + ' MANNED · ' + (n - manned) + ' DRONES', L.y - 10]].forEach(([s, yy]) => { let fs = 14; ctx.font = '500 14px "IBM Plex Mono", monospace'; while (fs > 10 && ctx.measureText(s).width > jw) { fs--; ctx.font = '500 ' + fs + 'px "IBM Plex Mono", monospace'; } ctx.fillText(s, pad + jw / 2, yy); });
       }
       ctx.font = '700 ' + Math.round(L.h * 0.28) + 'px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#D4A017'; ctx.fillText('=', L.x - 22, L.y + L.h / 2 + L.h * 0.1);
       ctx.textAlign = 'left'; ctx.globalAlpha = 1;
     }
     // captions on the pile
     ctx.font = '500 14px "IBM Plex Mono", monospace'; ctx.textAlign = 'left';
-    ctx.fillStyle = finale ? '#E04B5C' : 'rgba(247,245,240,.7)'; ctx.fillText(finale ? 'IN RED, SAME SCALE: THE WHOLE WAR SO FAR · $' + (R.spent / 1e9).toFixed(1) + 'BN' : b.each, L.x, L.y - 10);
-    ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(247,245,240,.45)'; ctx.fillText(b.math, L.x + L.w, L.y + L.h + 20); ctx.textAlign = 'left';
+    const perSq = R.loss / b.N / 1e6, sq = perSq >= 1 ? '$' + perSq.toFixed(perSq < 10 ? 1 : 0) + 'M' : '$' + Math.round(perSq * 1000) + 'K';
+    const capT = finale ? (mobile ? 'GOLD: AIRCRAFT · RED: THE WAR · 1 SQUARE ' + sq : 'GOLD: THE AIRCRAFT, $' + R.lossBn + 'BN · RED: THE WHOLE WAR, $' + (R.spent / 1e9).toFixed(1) + 'BN · EACH SQUARE ' + sq) : b.each;
+    if (mobile) ctx.font = '500 12px "IBM Plex Mono", monospace';
+    if (finale) { ctx.fillStyle = '#0B1E3F'; ctx.fillRect(L.x - 4, L.y - 28, ctx.measureText(capT).width + 12, 24); }
+    ctx.fillStyle = finale ? '#E04B5C' : 'rgba(247,245,240,.7)'; ctx.fillText(capT, L.x, L.y - 10);
+    ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(247,245,240,.45)'; if (!finale) ctx.fillText(b.math, L.x + L.w, L.y + L.h + 20); ctx.textAlign = 'left';
     const sg = ctx.createLinearGradient(0, H * 0.55, 0, H); sg.addColorStop(0, 'rgba(11,30,63,0)'); sg.addColorStop(1, 'rgba(11,30,63,.92)');
     ctx.fillStyle = sg; ctx.fillRect(0, H * 0.55, W, H * 0.45);
     // readout
     const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
-    const v = (landed / b.N) * b.total;
+    // the figure is the beat's total from the start, never a count in progress: a
+    // screenshot mid-count read "3.8 million PlayStations" beside a sentence saying 4.7
+    const v = b.total;
     const f = v >= 1e9 ? [(v / 1e9).toFixed(1), 'billion '] : v >= 1e6 ? [(v / 1e6).toFixed(1), 'million '] : [Math.round(v).toLocaleString(), ''];
     const num = this.buyNumRef.current, sub = this.buySubRef.current;
     if (finale && landedX > 0) {
       set(this.buyNumRef, '$' + (R.spent / 1e9).toFixed(1) + 'bn'); if (num) num.style.color = '#E04B5C';
-      const html = 'the war so far<br><span style="color:rgba(247,245,240,.6)">' + R.ratio + ' times the aircraft · and he has asked for $67.1bn more</span>';
+      const html = 'the war so far<br><span style="color:rgba(247,245,240,.6)">' + this.words(R.ratio) + ' times the aircraft</span>';
       if (sub && sub.__html !== html) { sub.__html = html; sub.innerHTML = html; }
     } else {
       set(this.buyNumRef, f[0]); if (num) num.style.color = '#D4A017';
@@ -937,6 +1089,7 @@ export default class TheBill extends React.Component {
       if (sub && sub.__html !== html) { sub.__html = html; sub.innerHTML = html; }
     }
     set(this.buyDateRef, b.date);
+    set(this.buyKickRef, finale && landedX > 0 ? 'THE WHOLE WAR, SAME SCALE' : b.kick);
   }
 
   /* ---------- block 7: the vault ---------- */
@@ -953,7 +1106,7 @@ export default class TheBill extends React.Component {
     while (this.vMonthDone < mIdx - 1) { this.vMonthDone++; const k = this.vMonthDone; for (let i = 0; i < this.vIcons[k]; i++) this.vGone.push({ born: t + i * 4, m: k }); }
     // The pile: only what left New York, one icon for ten real 400-ounce bars, a month
     // at a time in alternating shades so the steady pace shows. Sized to fill the frame.
-    const top = Math.max(H * (mobile ? 0.14 : 0.17), mobile ? 112 : 136), bot = H * (mobile ? 0.4 : 0.5), pileW = mobile ? W - pad * 2 : (W - pad * 2) * 0.54;
+    const top = Math.max(H * (mobile ? 0.14 : 0.17), mobile ? 112 : 136), bot = H * (mobile ? 0.3 : 0.46), pileW = mobile ? W - pad * 2 : (W - pad * 2) * 0.54;
     const cols = Math.max(12, Math.ceil(Math.sqrt(this.vIconTotal * pileW / (1.8 * (bot - top))))), bw = pileW / cols;
     const bh = Math.min(bw / 1.8, (bot - top) / Math.ceil(this.vIconTotal / cols));
     const ingot = (x, y, w, hh, a, alt) => { ctx.globalAlpha = a; const i = Math.min(2, w * 0.14); ctx.fillStyle = alt ? '#9C7014' : '#B8871A'; ctx.beginPath(); ctx.moveTo(x, y + hh); ctx.lineTo(x + i, y); ctx.lineTo(x + w - i, y); ctx.lineTo(x + w, y + hh); ctx.closePath(); ctx.fill(); ctx.fillStyle = alt ? '#DDB13E' : '#F2C94C'; ctx.fillRect(x + i, y, Math.max(1, w - 2 * i), Math.max(1, hh * 0.32)); ctx.globalAlpha = 1; };
@@ -965,9 +1118,17 @@ export default class TheBill extends React.Component {
     const outNow = E[0][2] - E[mIdx][2], barsNow = Math.round(outNow / this.BAR_T), gp = B.gold.gold_price && B.gold.gold_price.latest;
     const lf = mobile ? '500 11px "IBM Plex Mono", monospace' : '500 13px "IBM Plex Mono", monospace';
     ctx.textAlign = 'left'; ctx.font = lf; ctx.fillStyle = 'rgba(247,245,240,.75)';
-    ctx.fillText(mobile ? barsNow.toLocaleString() + ' BARS OUT OF THE NEW YORK FED' : 'GOLD TAKEN OUT OF THE NEW YORK FED \u00b7 ' + barsNow.toLocaleString() + ' BARS OF 400 OUNCES', pad, top - 30);
-    ctx.fillStyle = 'rgba(247,245,240,.5)';
+    ctx.fillText(mobile ? barsNow.toLocaleString() + ' BARS OUT · ONE ICON IS TEN BARS' : 'GOLD TAKEN OUT OF THE NEW YORK FED \u00b7 ' + barsNow.toLocaleString() + ' BARS OF 400 OUNCES \u00b7 ONE ICON IS TEN BARS', pad, top - 30);
+    ctx.fillStyle = 'rgba(247,245,240,.6)';
     ctx.fillText(mobile ? Math.round(outNow) + ' T · ' + (100 * outNow / E[0][2]).toFixed(1) + '% OF THE FOREIGN GOLD THERE' : Math.round(outNow) + ' T' + (gp ? ' \u00b7 ABOUT $' + (outNow * 1e6 / 31.1034768 * gp.usd_oz / 1e9).toFixed(1) + 'BN AT $' + Math.round(gp.usd_oz).toLocaleString() + ' AN OUNCE' : '') + ' \u00b7 ' + (100 * outNow / E[0][2]).toFixed(1) + '% OF THE FOREIGN GOLD HELD THERE', pad, top - 12);
+    // on a phone there is no room beside the pile, so the same two points go under it
+    if (mobile) {
+      ctx.font = '500 11px "IBM Plex Mono", monospace';
+      const who = this.vMoves.filter(m => !m.still).map(m => m.name + ' ' + m.t.split(' ')[0] + ' T').join(' \u00b7 ');
+      if (tl > 0.3 && who) { ctx.globalAlpha = Math.min(1, (tl - 0.3) / 0.2); ctx.fillStyle = 'rgba(247,245,240,.8)'; ctx.fillText('WHO MOVED IT \u00b7 ' + who, pad, bot + 22); }
+      if (tl >= 1) { ctx.globalAlpha = 1; ctx.fillStyle = '#8FA8E0'; ctx.fillText('FED ECONOMISTS: NOT A FLIGHT FROM THE DOLLAR', pad, bot + 40); }
+      ctx.globalAlpha = 1;
+    }
     // beside it: who moved theirs, and why, then the pace, then the Fed's answer at full size
     if (!mobile) {
       const tx = pad + pileW + 56, tw = W - pad - tx;
@@ -988,7 +1149,7 @@ export default class TheBill extends React.Component {
         ctx.fillStyle = '#F7F5F0'; ctx.font = '700 22px "Barlow Condensed", sans-serif';
         wrap('ABOUT ' + perDay + ' BARS A DAY, EVERY DAY, FOR ' + this.words(N).toUpperCase() + ' MONTHS.', '700 22px "Barlow Condensed", sans-serif', tw).forEach(l => { ctx.fillText(l, tx, y + 6); y += 24; });
         y += 14; ctx.fillStyle = '#6C8CD5';
-        wrap('THE FED\u2019S ANSWER: GOLD IS DOWN A FIFTH FROM ITS JANUARY RECORD, AND THE DOLLAR IS UP SINCE THE WAR BEGAN.', '700 20px "Barlow Condensed", sans-serif', tw).forEach(l => { ctx.fillText(l, tx, y); y += 22; });
+        wrap('THE FED\u2019S ANSWER: NOT A FLIGHT FROM THE DOLLAR. GOLD IS DOWN A FIFTH FROM ITS JANUARY RECORD, AND THE DOLLAR IS UP SINCE THE WAR BEGAN.', '700 20px "Barlow Condensed", sans-serif', tw).forEach(l => { ctx.fillText(l, tx, y); y += 22; });
         ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(108,140,213,.85)';
         ctx.fillText('FEDS NOTES \u00b7 COLIN WEISS \u00b7 3 SEP 2026', tx, y + 6);
       }
@@ -1058,7 +1219,7 @@ export default class TheBill extends React.Component {
       out += GL[(GL.indexOf(fc) + k) % 10];
     }
     r.shown = out; r.flapOn = Math.floor(r.t / 0.045) % 2 === 0;
-    if (done) { r.phase = 'done'; r.shown = target; r.flapOn = false; }
+    if (done) { r.phase = 'done'; r.shown = target; r.flapOn = false; this.flipLanded = true; }
   }
   stepPrices(dt, P4) {
     if (!this.board) return;
@@ -1074,16 +1235,16 @@ export default class TheBill extends React.Component {
     if (P4 >= tAt && T.phase === 'start') { T.phase = 'flipping'; T.t = 0; changed = true; }
     if (P4 < tAt && T.phase !== 'start') { T.phase = 'start'; T.shown = '+$0.00'; changed = true; }
     if (T.phase === 'flipping') { this.flipStep(T, dt); changed = true; }
-    if (changed) { this.flipAcc = (this.flipAcc || 0) + dt; if (this.flipAcc >= 0.04) { this.flipAcc = 0; this.forceUpdate(); } }
+    if (changed) { this.flipAcc = (this.flipAcc || 0) + dt; if (this.flipAcc >= 0.04 || this.flipLanded) { this.flipAcc = 0; this.flipLanded = false; this.forceUpdate(); } }
     // the pump: roll through every published week, 20 Jan 2025 → 31 Aug 2026, over the first 70% of the scroll
     const pts = this.prices.diesel.points.filter(p => p[0] >= '2025-01-20');
     const u = Math.max(0, Math.min(1, (P4 - 0.02) / 0.7)) * (pts.length - 1);
     const i = Math.floor(u), f = u - i, a = pts[i], b = pts[Math.min(pts.length - 1, i + 1)];
     const v = a[1] + (b[1] - a[1]) * f;
     this.setOdometer(v);
-    const dstr = new Date(b[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+    const dstr = 'WEEK OF ' + this.fmtISO(b[0]);
     if (this.pWeekRef.current && this.pWeekRef.current.textContent !== dstr) this.pWeekRef.current.textContent = dstr;
-    const mon = P4 < 0.04 ? 'JANUARY 2025' : P4 > 0.7 ? 'NOW · ' + this.monthLong(this.prices.items.map(i => i.end_date).sort().at(-1)).toUpperCase() : new Date(b[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
+    const mon = P4 < 0.04 ? 'JANUARY 2025' : P4 > 0.7 ? 'NOW · ' + this.monShort(this.prices.items.map(i => i.end_date).sort().at(-1)).toUpperCase() + ' · DIESEL ' + this.fmtISO(this.prices.diesel.latest.date).replace(/ \d{4}$/, '') : new Date(b[0] + 'T00:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
     if (this.pDateRef.current && this.pDateRef.current.textContent !== mon) this.pDateRef.current.textContent = mon;
   }
   /* mechanical odometer: the cents wheel turns continuously, each higher wheel only as the one below passes 9 */
@@ -1181,7 +1342,7 @@ export default class TheBill extends React.Component {
       { d: this.dayOf('2026-02-28'), red: true, t: 'HE ORDERED THE STRIKE. THE STRAIT CLOSES.' },
       { d: this.dayOf('2026-04-07'), red: false, t: 'TWO-WEEK CEASEFIRE. THE STRAIT OPENS A LITTLE.' },
       { d: this.dayOf('2026-06-18'), red: false, t: '60-DAY CEASEFIRE. TRANSITS TRIPLE.' },
-      { d: this.dayOf('2026-07-08'), red: true, t: 'HE STRIKES AGAIN. THE CEASEFIRE IS OVER.' },
+      { d: this.dayOf('2026-07-08'), red: true, t: 'STRIKES RESUME. THE CEASEFIRE IS OVER.' },
       { d: this.dayOf('2026-08-18'), red: true, t: 'HE SAYS THE STRAIT IS "OPEN AND OPERATING".' },
     ];
     // Routes: [lon,lat] waypoints; choke index marks the strait itself.
@@ -1270,9 +1431,7 @@ export default class TheBill extends React.Component {
     const first = r.obs[0][0] + 6, fm = this.mean7(r, first);
     return r.base + (fm - r.base) * Math.min(1, (day - this.STRIKE) / (first - this.STRIKE));
   }
-  fmtDay(day) {
-    return new Date(this.day0 + day * 86400000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' }).toUpperCase();
-  }
+  fmtDay(day) { return this.fmtISO(new Date(this.day0 + Math.round(day) * 86400000).toISOString().slice(0, 10)); }
 
   /* ---------- scroll → progress ---------- */
   progress() {
@@ -1309,11 +1468,11 @@ export default class TheBill extends React.Component {
     run(secOf(this.boardRef), 'prices', 6, P => this.stepPrices(dt, P));
     run(secOf(this.crowdRef), 'crowd', 9, P => this.stepCrowd(dt, P, t));
     run(secOf(this.warRef), 'war', 9, P => this.stepWar(dt, P, t));
-    // The loop runs five 4.7s beats then a finale. Two beats -- the F-35A and
-    // the first of the four comparisons -- is where the argument has landed, and
-    // it matches the 9s the neighbouring blocks take. The loop still runs for
-    // anyone who stays; this only stops the cue being withheld for 30.3s.
-    run(secOf(this.buyRef), 'buy', this.buyDur || 30, P => this.stepBuy(dt, P, t), true,
+    // Five 4.7s beats then the finale, played once: it ends on the whole war, and a
+    // looping pile left readers on whichever beat they happened to stop at. Two beats
+    // -- the F-35A and the first comparison -- is where the argument has landed and
+    // matches the 9s the neighbouring blocks take, so the SCROLL cue shows from there.
+    run(secOf(this.buyRef), 'buy', this.buyDur || 30, P => this.stepBuy(dt, P, t), false,
         9.4 / (this.buyDur || 30));
     run(secOf(this.vaultRef), 'vault', 8, P => this.stepVault(dt, P, t));
     run(secOf(this.cardRef), 'card', 3, P => this.stepCard(P));
@@ -1499,19 +1658,26 @@ export default class TheBill extends React.Component {
         if (x < -20 || x > W + 20 || y < -20 || y > H + 20) continue;
         const off = r.key === 'suez' || r.key === 'bab_el_mandeb' ? -1 : 1;
         const gap = 12 + ez * 60;
-        const lx = Math.max(8, Math.min(W - 140, x + gap * off - (off < 0 ? 96 : 0))), ly = Math.max(90, Math.min(H * 0.58, y - 6 - ez * 40));
-        ctx.font = (closed ? '700 14px' : '500 13px') + ' "IBM Plex Mono", monospace'; ctx.fillStyle = closed ? '#E04B5C' : 'rgba(247,245,240,.7)';
-        ctx.fillText(closed ? r.name + ' · CLOSED' : r.name, lx, ly);
-        ctx.font = '700 ' + (24 + ez * 10) + 'px "Barlow Condensed", sans-serif'; ctx.fillStyle = '#D4A017';
-        ctx.fillText(Math.round(day < this.STRIKE ? r.base : r.flow) + ' / DAY', lx, ly + 18 + ez * 8);
+        const nameT = closed ? r.name + ' · ' + Math.round(100 * r.flow / r.base) + '% OF PRE-WAR' : r.name, numT = Math.round(day < this.STRIKE ? r.base : r.flow) + ' / DAY', numF = 24 + ez * 10;
+        const nameF = (closed ? '700 14px' : '500 13px') + ' "IBM Plex Mono", monospace', numFont = '700 ' + numF + 'px "Barlow Condensed", sans-serif';
+        ctx.font = nameF; const w1 = ctx.measureText(nameT).width; ctx.font = numFont; const lw = Math.max(w1, ctx.measureText(numT).width);
+        const lx = Math.max(8, Math.min(W - lw - 12, x + gap * off - (off < 0 ? 96 : 0))), ly = Math.max(90, Math.min(H * 0.58, y - 6 - ez * 40));
+        const lyy = mobile && ez > 0.5 && r.key === 'hormuz' ? y + 40 : ly;
+        if (ez > 0.3 && r.key === 'hormuz') { ctx.fillStyle = 'rgba(11,30,63,.8)'; ctx.fillRect(lx - 6, lyy - 16, lw + 12, numF * 0.78 + 30); }
+        ctx.font = nameF; ctx.fillStyle = closed ? '#E04B5C' : 'rgba(247,245,240,.7)';
+        ctx.fillText(nameT, lx, lyy);
+        ctx.font = numFont; ctx.fillStyle = '#D4A017';
+        ctx.fillText(numT, lx, lyy + 8 + numF * 0.78);
       }
       if (ez > 0.6 && visible(this.gate.top)) {
         ctx.globalAlpha = (ez - 0.6) / 0.4;
         ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(247,245,240,.6)';
         const [gx, gy] = proj(this.gate.top); ctx.textAlign = 'center'; ctx.fillText('33 KM', gx, gy - 8); ctx.textAlign = 'left';
         const [mx, my] = proj([56.2, 25.95]); ctx.fillText('MUSANDAM · OMAN', mx - 40, my);
-        const [ix, iy] = proj([56.1, 27.05]); ctx.fillText('IRAN', ix, iy);
-        const [qx, qy] = proj([55.9, 26.8]); ctx.fillText('QESHM', qx, qy);
+        if (!mobile) {
+          const [ix, iy] = proj([56.1, 27.05]); ctx.fillText('IRAN', ix, iy);
+          const [qx, qy] = proj([55.9, 26.8]); ctx.fillText('QESHM', qx, qy);
+        }
         ctx.globalAlpha = 1;
       }
     }
@@ -1527,9 +1693,12 @@ export default class TheBill extends React.Component {
   readout(P, day) {
     const h = this.routes.hormuz, m = this.flowAt(h, day);
     const set = (ref, v) => { const el = ref.current; if (el && el.textContent !== v) el.textContent = v; };
-    set(this.numRef, day < this.STRIKE ? String(Math.round(h.base)) : String(Math.round(m)));
-    set(this.wasRef, day < this.STRIKE ? 'before his war' : 'was 83');
-    set(this.dateRef, day < this.STRIKE ? 'BEFORE THE WAR · 1 JAN 2025 – 27 FEB 2026' : this.fmtDay(Math.round(day)));
+    const pre = day < this.STRIKE;
+    set(this.numRef, pre ? String(Math.round(h.base)) : String(Math.round(m)));
+    if (this.numRef.current) this.numRef.current.style.color = pre ? 'rgba(247,245,240,.7)' : '#D4A017';
+    set(this.kickRef, pre ? 'THE STRAIT OF HORMUZ BEFORE THE WAR' : 'THE WAR ALL BUT SHUT THE STRAIT OF HORMUZ');
+    set(this.wasRef, pre ? 'before the war' : 'was ' + Math.round(h.base) + ' before the war');
+    set(this.dateRef, day < this.STRIKE ? (innerWidth < 640 ? 'BEFORE THE WAR · 2025 TO FEB 2026' : 'BEFORE THE WAR · 1 JAN 2025 – 27 FEB 2026') : (day >= this.LAST - 0.5 ? 'SHIPS COUNTED TO ' : '') + this.fmtDay(Math.round(day)));
     let ev = null; for (const e of this.events) if (day >= e.d && day < e.d + 22) ev = e;
     const er = this.eventRef.current;
     if (er) { const txt = ev ? ev.t : ''; if (er.textContent !== txt) { er.textContent = txt; er.style.color = ev && ev.red ? MARK_RED : '#6C8CD5'; } }
@@ -1537,21 +1706,19 @@ export default class TheBill extends React.Component {
     const lg = this.legendRef.current;
     if (lg && (this.lastLegend === undefined || Math.abs(this.lastLegend - day) > 2)) {
       this.lastLegend = day;
-      lg.innerHTML = Object.values(this.routes).filter(r => r.key !== 'hormuz').map(r =>
+      lg.innerHTML = '<div style="color:rgba(247,245,240,.5);font-size:11px;letter-spacing:.14em">SHIPS A DAY · <span style="color:#D4A017">NOW</span> / BEFORE THE WAR</div>' + Object.values(this.routes).filter(r => r.key !== 'hormuz').map(r =>
         '<div><span style="color:rgba(247,245,240,.55)">' + r.name + '</span> &nbsp;<span style="color:#D4A017;font-weight:500">' + Math.round(r.flow) + '</span> <span style="color:rgba(247,245,240,.45)">/ ' + Math.round(r.base) + '</span></div>').join('');
     }
   }
 
   render() {
     const V = this.renderVals();
-    const { aheYoy, aircraftList, vaultBars, vaultScaleNote, vaultSub, vaultFrom, vaultTo, warMonthsCaps, receiptMonths, aircraftWord, crudeNow, dieselVerdict, lossBn, pricesDown, suppBn, warMonths, jobsSentence, loadError, freshNote, updatedCaps, aircraftN, casN, crudeLastText, hormuzMean, patriotPct, straitRange, suppText, vaultMonths, casAlt, casDate, casHead, warAsOf, warCite, warHead, warNote, warSpent, warWho, babPct, capePct, dieselFrom, dieselThrough, elecThrough, gasThrough, globeThrough, pricesMonth, treasSentence, againstRows, claimsNote, jobsLatest, jobsNeg, layoffs, ltuWhen, payMonth, unempDir, strNowWord, dieselHead, dieselHeadPolicy, dieselNote, hormuzNow, asOf, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, cueRef, cumulativeText, dateRef, digits, eventRef, hires, jobsCurr, jobsMed, jobsN, jobsPrev, jobsPrevMed, legendRef, ltu0, ltu1, numRef, odo, onState, pDateRef, pWeekRef, placeName, quits, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNumRef, strSubRef, strTanker, straitRef, totalCells, unemp0, unemp1, vaultDateRef, vaultEnd, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultStart, warRef, wasRef, workPrices, workRows } = V;
+    const { africaNote, africaSentence, againstRows, aheYoy, aircraftList, aircraftN, asOf, babPct, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyKickRef, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, casAlt, casDate, casHead, casN, cboNote, claimsNote, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, crudeLastText, cueRef, cumulativeText, dateRef, dieselFrom, dieselHead, dieselHeadPolicy, dieselNote, dieselThrough, dieselVerdict, digits, elecThrough, eventRef, freshNote, gasThrough, globeThrough, hires, hormuzMean, hormuzNow, jobsBaseLabel, jobsCurr, jobsKicker, jobsLatest, jobsMed, jobsN, jobsNeg, jobsPrev, jobsPrevMed, jobsSentence, jobsTermMean, jobsWas, kickRef, layoffs, legendRef, loadError, lossBn, ltu0, ltu1, ltuWhen, numRef, odo, oilKicker, oilSentence, onState, pDateRef, pWeekRef, patriotPct, payMonth, placeName, pricesDown, pricesMonth, quits, quoteNote, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, receiptMonths, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNowWord, strNumRef, strSentence, strSubRef, strTanker, straitRange, straitRef, suppText, tariffNote, tariffSentence, totalCells, treasSentence, unemp0, unemp1, unempDir, updatedCaps, vaultBars, vaultDateRef, vaultEnd, vaultFrom, vaultMonths, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultScaleNote, vaultSentence, vaultStart, vaultSub, vaultTo, warAsOf, warCite, warHead, warMonthsCaps, warNote, warRef, warSpent, warWho, wasRef, workPrices, workRows } = V;
     return (
-<div className="v5-bill-root" role="main" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
-
+      <div className="v5-bill-root" role="main" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
   <h1 className="v5-sr">The Bill: what Trump’s war and tariffs cost you</h1>
-  {(loadError) ? (<>
-    <div role="alert" style={{position: "fixed", top: "12px", left: "50%", transform: "translateX(-50%)", zIndex: "50", background: "#F7F5F0", color: "#0B1E3F", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".04em", lineHeight: "1.5", padding: "10px 16px", border: "1px solid #0B1E3F", maxWidth: "calc(100% - 32px)"}}>Part of this page's data did not load ({loadError}). The blocks that need it are blank. Reload to try again.</div>
-  </>) : null}
+  {(loadError) ? (<><div role="alert" style={{position: "fixed", top: "12px", left: "50%", transform: "translateX(-50%)", zIndex: "50", background: "#F7F5F0", color: "#0B1E3F", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".04em", lineHeight: "1.5", padding: "10px 16px", border: "1px solid #0B1E3F", maxWidth: "calc(100% - 32px)"}}>Part of this page's data did not load ({loadError}). The blocks that need it are blank. Reload to try again.</div></>) : null}
+
   <section data-screen-label="00 The globe" style={{position: "relative", height: "160vh", scrollSnapAlign: "start"}}>
     <h2 className="v5-sr">The globe</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
@@ -1559,6 +1726,11 @@ export default class TheBill extends React.Component {
 
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div style={{display: "flex", flexDirection: "column", gap: "6px"}}>
+          <div className="g-mast" style={{display: "flex", flexDirection: "column", gap: "6px", marginBottom: "clamp(8px,2vh,18px)", maxWidth: "500px"}}>
+            <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(30px,5vh,48px)", lineHeight: ".95", letterSpacing: ".02em", textTransform: "uppercase", color: "#F7F5F0"}}>The Bill</div>
+            <div className="g-dek" style={{fontFamily: "'Source Serif 4',Georgia,serif", fontSize: "clamp(16px,2.3vh,20px)", lineHeight: "1.35", color: "#F7F5F0", textWrap: "pretty", textShadow: "0 1px 6px rgba(11,30,63,.9)"}}>What Trump’s war with Iran and his tariffs have cost Americans, in the government’s own numbers.</div>
+            <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".12em", color: "rgba(247,245,240,.6)", lineHeight: "1.6"}}>EVERY FIGURE SOURCED · WHAT CUTS AGAINST IT IS AT THE END</div>
+          </div>
           <div ref={dateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}></div>
           <div ref={eventRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", fontWeight: "500", letterSpacing: ".06em", maxWidth: "460px", lineHeight: "1.5", textWrap: "pretty", textShadow: "0 1px 6px rgba(11,30,63,.9)"}}></div>
         </div>
@@ -1567,24 +1739,24 @@ export default class TheBill extends React.Component {
 
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "32px", pointerEvents: "none"}}>
         <div style={{display: "flex", flexDirection: "column", gap: "2px", minWidth: "0"}}>
-          <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>HIS WAR SHUT THE STRAIT OF HORMUZ</div>
+          <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span><span ref={kickRef}>THE WAR SHUT THE STRAIT OF HORMUZ</span></div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
             <div className="g-num" ref={numRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,240px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>83</div>
-            <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>ships a day<br />through Hormuz<br /><span ref={wasRef} style={{color: "rgba(247,245,240,.6)"}}>before his war</span></div>
+            <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>ships a day<br />through Hormuz<br /><span ref={wasRef} style={{color: "rgba(247,245,240,.6)"}}>was 83 before the war</span></div>
           </div>
-          <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>Before his war, eighty-three ships a day came through the Strait of Hormuz. {hormuzNow} The oil goes the long way round Africa.</p>
+          <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>Before the war, eighty-three ships a day came through the Strait of Hormuz. {hormuzNow} {africaSentence}</p>
         </div>
-        <div className="g-side" ref={legendRef} style={{display: "flex", flexDirection: "column", gap: "6px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".08em", color: "rgba(247,245,240,.75)", textAlign: "right", flex: "none"}}></div>
+        <div className="g-side" ref={legendRef} style={{display: "flex", flexDirection: "column", gap: "7px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".08em", color: "rgba(247,245,240,.8)", textAlign: "right", flex: "none"}}></div>
       </div>
 
-      <div ref={cueRef} style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", transition: "opacity .4s"}}>SCROLL</div>
+      <div ref={cueRef} style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", transition: "opacity .4s"}}>SCROLL · SHOW THE WORK BELOW</div>
     </div>
   </section>
 
   <section style={{background: "#F7F5F0", color: "#0B1E3F", padding: "56px 36px 72px"}}>
     <details style={{maxWidth: "820px", margin: "0 auto"}}>
       <summary style={{listStyle: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F"}}>
-        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · THE GLOBE
+        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · THE GLOBE<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
         <p style={{margin: "0", textWrap: "pretty"}}>Every moving dot on the globe is a share of a daily ship count. The IMF's PortWatch project estimates transit calls at each strait from satellite AIS positions. Ships transmitting no position are not counted, so each figure is a floor on traffic, not a census, and it is not a queue count. Recent days are revised as late AIS data arrives.</p>
@@ -1602,7 +1774,7 @@ export default class TheBill extends React.Component {
             </div>
           </React.Fragment>))}
         </div>
-        <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}>"Before the war" is the mean of daily counts from 1 January 2025 to 27 February 2026 (423 days). "Last 7 days" is the trailing mean ending {globeThrough}. Before the strike every strait is held at its pre-war mean. From 28 February, Hormuz follows its daily series day by day. For the other five straits the snapshot carries daily counts from 3 May 2026; between the strike and that date the globe draws a straight line from the pre-war mean to the first observed week, and says so here. The routes the dots follow are drawn schematically through each strait; ship positions are a model, the counts are not. "The long way round Africa" rests on Cape of Good Hope traffic at {capePct} of its pre-war mean while Bab el-Mandeb sits at {babPct}.</p>
+        <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}>"Before the war" is the mean of daily counts from 1 January 2025 to 27 February 2026 (423 days). "Last 7 days" is the trailing mean ending {globeThrough}. Before the strike every strait is held at its pre-war mean. From 28 February, Hormuz follows its daily series day by day. For the other five straits the snapshot carries daily counts from 3 May 2026; between the strike and that date the globe draws a straight line from the pre-war mean to the first observed week, and says so here. The routes the dots follow are drawn schematically through each strait; ship positions are a model, the counts are not. {africaNote} Bab el-Mandeb, the Red Sea route, sits at {babPct}.</p>
         <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Source: IMF PortWatch (IMF / University of Oxford), AIS-based estimates, as of {asOf} · <a href="https://portwatch.imf.org/" target="_blank" rel="noopener" style={{color: "#0B1E3F"}}>portwatch.imf.org</a><br />Coastlines: Natural Earth via world-atlas, 1:110m for the globe and 1:50m for the Gulf region. The lane through the strait is the real Traffic Separation Scheme; the 33 km gate runs between Musandam and Larak.
         </p>
       </div>
@@ -1611,39 +1783,39 @@ export default class TheBill extends React.Component {
 
   <section data-screen-label="01 Two dates" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <h2 className="v5-sr">Two dates</h2>
-    <div ref={stampStageRef} style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#6E1B27", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "clamp(16px,4vh,40px)", padding: "24px"}}>
-      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
+    <div ref={stampStageRef} style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#6E1B27", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "clamp(24px,6vh,56px)", padding: "24px"}}>
+      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
       <div ref={stamp1Ref} style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", padding: "clamp(12px,2.6vh,24px) clamp(20px,5vw,56px)", border: "4px double #F7F5F0", borderRadius: "6px", color: "#F7F5F0", transform: "rotate(-4deg) scale(1.8)", opacity: "0", willChange: "transform,opacity", maxWidth: "94vw", textAlign: "center"}}>
-        <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(11px,1.6vh,14px)", letterSpacing: ".3em"}}>ORDERED</div>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(64px,15vh,160px)", lineHeight: ".9", letterSpacing: "-.01em", whiteSpace: "nowrap"}}>28 FEB 2026</div>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3vh,30px)", lineHeight: "1.1", textTransform: "uppercase", letterSpacing: ".04em"}}>He ordered the strike</div>
+        <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(11px,1.6vh,14px)", letterSpacing: ".3em"}}>IMPOSED</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(44px,min(13vh,17vw),150px)", lineHeight: ".9", letterSpacing: "-.01em", whiteSpace: "nowrap"}}>24 FEB 2026</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3vh,30px)", lineHeight: "1.1", textTransform: "uppercase", letterSpacing: ".04em", textWrap: "balance"}}>Trump re-imposed the tariffs</div>
       </div>
       <div ref={stamp2Ref} style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", padding: "clamp(12px,2.6vh,24px) clamp(20px,5vw,56px)", border: "4px double #F7F5F0", borderRadius: "6px", color: "#F7F5F0", transform: "rotate(3deg) scale(1.8)", opacity: "0", willChange: "transform,opacity", maxWidth: "94vw", textAlign: "center"}}>
-        <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(11px,1.6vh,14px)", letterSpacing: ".3em"}}>IMPOSED</div>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(64px,15vh,160px)", lineHeight: ".9", letterSpacing: "-.01em", whiteSpace: "nowrap"}}>24 FEB 2026</div>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3vh,30px)", lineHeight: "1.1", textTransform: "uppercase", letterSpacing: ".04em", textWrap: "balance"}}>He re-imposed the tariffs a court had struck down</div>
+        <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(11px,1.6vh,14px)", letterSpacing: ".3em"}}>ORDERED</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(44px,min(13vh,17vw),150px)", lineHeight: ".9", letterSpacing: "-.01em", whiteSpace: "nowrap"}}>28 FEB 2026</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3vh,30px)", lineHeight: "1.1", textTransform: "uppercase", letterSpacing: ".04em", textWrap: "balance"}}>Trump ordered the strike on Iran</div>
       </div>
-      <div ref={stampNoteRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(11px,1.5vh,13px)", letterSpacing: ".14em", color: "rgba(247,245,240,.75)", opacity: "0", textAlign: "center", transition: "opacity .4s"}}>STRUCK DOWN · 20 FEB 2026 · SUPREME COURT, 6–3 · IMPOSED AGAIN FOUR DAYS LATER</div>
-      <p ref={stampSentenceRef} className="g-sentence" style={{margin: "0", fontSize: "24px", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0", textAlign: "center", opacity: "0", transition: "opacity .4s"}}>Every red mark on this page traces back to these two dates.</p>
+      <div ref={stampNoteRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(11px,1.5vh,13px)", letterSpacing: ".14em", lineHeight: "1.6", color: "rgba(247,245,240,.75)", opacity: "0", textAlign: "center", transition: "opacity .4s", maxWidth: "760px"}}>THE TARIFFS: STRUCK DOWN BY THE SUPREME COURT, 6–3, ON 20 FEB · IMPOSED AGAIN FOUR DAYS LATER</div>
+      <p ref={stampSentenceRef} className="g-sentence" style={{margin: "0", fontSize: "24px", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0", textAlign: "center", opacity: "0", transition: "opacity .4s"}}>Every red mark on this page traces back to the war and the tariffs. {tariffSentence}</p>
     </div>
   </section>
 
   <section data-screen-label="02 Oil doubled" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <h2 className="v5-sr">Oil doubled</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
-      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={seisRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A seismograph-style chart of the daily closing price of WTI crude through 2026. The trace runs from $57 a barrel in January to a peak of $115 five weeks after the 28 February strike, falls back under the ceasefires, and climbs again when strikes resume, to its last close of ${crudeLastText}. Red marks are his acts, blue are ceasefires.`}></canvas>
+      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
+      <canvas ref={seisRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A seismograph-style chart of the daily closing price of WTI crude through 2026. The trace runs from $57 a barrel in January to a peak of $115 five weeks after the 28 February strike, falls back under the ceasefires, and climbs again when strikes resume, to its last close of ${crudeLastText}. Red marks are the tariffs and the strikes, blue are ceasefires. It ends on the whole year with a price scale.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={seisDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>2 JAN 2026</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>CRUDE OIL · A BARREL · EVERY DAILY CLOSE<br />WTI CUSHING SPOT · FRED</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>OIL DOUBLED IN FIVE WEEKS</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>{oilKicker}</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={seisNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>$57</div>
           <div ref={seisSubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>a barrel<br /><span style={{color: "rgba(247,245,240,.6)"}}>in January</span></div>
         </div>
-        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>Crude was $57 in January. Five weeks after his strike it was $115. It fell to $70 when he agreed a ceasefire, and it is {crudeNow} now that he has broken it.</p>
+        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>{oilSentence}</p>
       </div>
     </div>
   </section>
@@ -1651,12 +1823,13 @@ export default class TheBill extends React.Component {
   <section style={{background: "#F7F5F0", color: "#0B1E3F", padding: "56px 36px 72px"}}>
     <details style={{maxWidth: "820px", margin: "0 auto"}}>
       <summary style={{listStyle: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F"}}>
-        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · TWO DATES AND OIL
+        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · TWO DATES AND OIL<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The dates.</strong> On 20 February 2026 the Supreme Court held in <em>Learning Resources v. Trump</em>, 6–3, that the International Emergency Economic Powers Act does not authorise tariffs; collection ended 24 February. The same day, Proclamation 11012 imposed a 10% surcharge under Section 122 on roughly $1 trillion of imports. On 28 February the United States and Israel struck Iran and the Strait of Hormuz closed. On 24 July the Section 122 surcharge expired by statute and Section 301 tariffs became the operative regime; the stamp marks the act, not the expiry.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The trace.</strong> {crudeCount} daily closes of WTI crude at Cushing, Oklahoma, 2 January to {crudeLast} 2026, from FRED series DCOILWTICO. This is the spot price, not the futures contract: press figures for 8 July quote $73.52 from the futures contract while spot closed $74.56. Both are correct and they are different instruments. The peak close is $114.58 on 7 April, the day the first ceasefire was announced. The last close before the strike was $66.96 on 27 February; the peak came 39 days later. Red ticks mark his acts, blue ticks the two ceasefires. Weekends and holidays have no close and the needle holds.</p>
-        <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: FRED DCOILWTICO (EIA) · Supreme Court, <em>Learning Resources v. Trump</em>, 20 Feb 2026 · Dallas Fed, June 2026, on the tariff ruling.</p>
+        {(tariffNote) ? (<><p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The customs duties.</strong> {tariffNote}</p></>) : null}
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The trace.</strong> {crudeCount} daily closes of WTI crude at Cushing, Oklahoma, 2 January to {crudeLast} 2026, from FRED series DCOILWTICO. This is the spot price, not the futures contract: press figures for 8 July quote $73.52 from the futures contract while spot closed $74.56. Both are correct and they are different instruments. The peak close is $114.58 on 7 April, the day the first ceasefire was announced. The last close before the strike was $66.96 on 27 February; the peak came 39 days later. Red ticks mark the tariffs and the strikes, blue ticks the two ceasefires. Weekends and holidays have no close and the needle holds. When the trace reaches the latest close the chart pulls back to show the whole year, with the price scale on the left.</p>
+        <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: FRED DCOILWTICO (EIA) · Monthly Treasury Statement, table 9 · US Census Bureau households · Supreme Court, <em>Learning Resources v. Trump</em>, 20 Feb 2026 · Dallas Fed, June 2026, on the tariff ruling.</p>
       </div>
     </details>
   </section>
@@ -1664,22 +1837,22 @@ export default class TheBill extends React.Component {
   <section data-screen-label="03 The strait" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <h2 className="v5-sr">The strait</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
-      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={straitRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A map of the Strait of Hormuz with the real Traffic Separation Scheme lane and the 33 kilometre gate between Musandam and Larak. The lane is full of ships at the pre-war 83 a day, then nearly empty at the latest seven-day count of ${strNowWord}, with one ship on screen for each ship a day. A side-by-side compares the President's claim of 30 ships a night against the count.`}></canvas>
+      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
+      <canvas ref={straitRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A map of the Strait of Hormuz with the real Traffic Separation Scheme lane and the 33 kilometre gate between Musandam and Larak. The lane is full of ships at the pre-war 83 a day, then nearly empty at the latest seven-day count of ${strNowWord}, with one ship on screen for each ship a day. A side-by-side compares the President's claim of 30 ships a night against the count, drawn to the same scale.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", bottom: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div style={{display: "flex", flexDirection: "column", gap: "6px"}}>
           <div ref={strDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>1 JAN 2026</div>
           <div ref={strEventRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", fontWeight: "500", letterSpacing: ".06em", maxWidth: "460px", lineHeight: "1.5", textWrap: "pretty", textShadow: "0 1px 6px rgba(11,30,63,.9)"}}></div>
         </div>
-        <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7", position: "absolute", right: "36px", bottom: "40px"}}>SHIPS COUNTED FROM SATELLITE · IMF PORTWATCH · POSITIONS ARE A MODEL</div>
+        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7", position: "absolute", right: "36px", bottom: "40px"}}>SHIPS COUNTED FROM SATELLITE · IMF PORTWATCH<br />SHIP POSITIONS ARE DRAWN, THE COUNTS ARE MEASURED</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
         <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>HE SAYS IT IS OPEN. THE SATELLITES SAY NO.</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={strNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,240px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>83</div>
-          <div ref={strSubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>ships a day<br /><span style={{color: "rgba(247,245,240,.6)"}}>before his war</span></div>
+          <div ref={strSubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>ships a day<br /><span style={{color: "rgba(247,245,240,.6)"}}>before the war</span></div>
         </div>
-        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>He says thirty ships a night. The satellites count {strNowWord}. Before his war it was eighty-three a day.</p>
+        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "640px", textWrap: "pretty", color: "#F7F5F0"}}>{strSentence}</p>
       </div>
     </div>
   </section>
@@ -1687,11 +1860,11 @@ export default class TheBill extends React.Component {
   <section style={{background: "#F7F5F0", color: "#0B1E3F", padding: "56px 36px 72px"}}>
     <details style={{maxWidth: "820px", margin: "0 auto"}}>
       <summary style={{listStyle: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F"}}>
-        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · THE STRAIT
+        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · THE STRAIT<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
         <p style={{margin: "0", textWrap: "pretty"}}>The coastline is Natural Earth at 1:10m, clipped to a box around the strait; the box is stretched to the screen, so shapes are real and the aspect is not. The lane is the real Traffic Separation Scheme, outbound one side and inbound the other; the gate is the 33 km between Musandam and Larak. The picture shows two states rather than a day-by-day replay: the pre-war mean (1 January 2025 to 27 February 2026) and the latest trailing seven-day mean, with one ship on the screen for each ship a day. The counts are the IMF PortWatch estimate of transit calls from satellite AIS positions. Ships transmitting no position are not counted, so the figure is a floor, not a census, and it is not a queue count. Ship positions are a model; the counts are not.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>"Thirty a night."</strong> On 18 August 2026 the President said the strait was "open and operating." That day the MV Minoan Dignity was struck and one crew member was killed; Lloyd's List counted about 14 transits, PortWatch {strAug18}. The hatched fleet on the screen is his figure drawn to the same scale as the counted one. The pre-war figure is the mean of 423 days, 1 January 2025 to 27 February 2026: {strBase} a day, of which {strTanker} were tankers. Thirteen merchant ships were struck in August; on 25 August the US Navy said it had cleared the mines and PortWatch counted four vessels that day.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>"Thirty a night."</strong> On 18 August 2026 the President said the strait was "open and operating." That day the MV Minoan Dignity was struck and one crew member was killed; Lloyd's List counted about 14 transits, PortWatch {strAug18}. The dashed fleet on the screen is his figure drawn to the same scale as the counted one. The pre-war figure is the mean of 423 days, 1 January 2025 to 27 February 2026: {strBase} a day, of which {strTanker} were tankers. Thirteen merchant ships were struck in August; on 25 August the US Navy said it had cleared the mines and PortWatch counted four vessels that day.</p>
         <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: IMF PortWatch (IMF / University of Oxford) chokepoint6, as of {asOf} · Natural Earth 1:10m coastlines · Lloyd's List for the 18 August transit count.</p>
       </div>
     </details>
@@ -1700,7 +1873,7 @@ export default class TheBill extends React.Component {
   <section data-screen-label="04 Your prices" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <h2 className="v5-sr">Your prices</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F", display: "flex", flexDirection: "column"}}>
-      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
+      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
       <div className="g-top" style={{display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px 0", pointerEvents: "none"}}>
         <div ref={pDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>JANUARY 2025</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>WHAT YOU PAY · JANUARY 2025 AGAINST NOW<br />BLS AVERAGE PRICES · EIA WEEKLY DIESEL</div>
@@ -1716,7 +1889,7 @@ export default class TheBill extends React.Component {
               <div style={{display: "grid", gridTemplateColumns: "minmax(0,1fr) auto auto auto", gap: "0 18px", alignItems: "center", padding: "0 0 0 8px", borderBottom: "1px solid rgba(247,245,240,.07)", minHeight: "0"}}>
                 <div style={{minWidth: "0", display: "flex", flexDirection: "column", gap: "1px"}}>
                   <div className="p-row" style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(13px,2.4vh,22px)", lineHeight: "1", letterSpacing: ".02em", textTransform: "uppercase", color: "#F7F5F0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{r.name}</div>
-                  <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(8px,1.1vh,10px)", letterSpacing: ".06em", color: "rgba(247,245,240,.45)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{r.unit} <span style={{color: "#6C8CD5"}}>{r.note}</span></div>
+                  <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(9px,1.35vh,12px)", letterSpacing: ".04em", color: "rgba(247,245,240,.55)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"}}>{r.unit} <span style={{color: "#6C8CD5"}}>{r.note}</span></div>
                 </div>
                 <div className="p-row" style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(14px,2.6vh,24px)", lineHeight: "1", color: "rgba(247,245,240,.55)", fontVariantNumeric: "tabular-nums", textAlign: "right"}}>{r.start}</div>
                 <div className="p-cell" style={{display: "flex", gap: "2px", justifyContent: "flex-end", fontSize: "clamp(15px,3vh,28px)"}}>
@@ -1757,12 +1930,12 @@ export default class TheBill extends React.Component {
             </div>
             <div style={{display: "flex", justifyContent: "space-between", gap: "24px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".1em", color: "rgba(247,245,240,.55)"}}><span>WAS $3.72 WHEN HE TOOK OFFICE</span><span ref={pWeekRef} style={{color: "#F7F5F0"}}>20 JAN 2025</span></div>
           </div>
-          <p className="g-sentence p-sentence" style={{margin: "0", fontSize: "24px", lineHeight: "1.35", maxWidth: "520px", textWrap: "pretty", color: "#F7F5F0"}}>Fourteen things you buy, January 2025 against now. {dieselVerdict} {pricesDown} Eggs fell because the avian flu outbreak ended, not because of anything his administration did.</p>
+          <p className="g-sentence p-sentence" style={{margin: "0", fontSize: "24px", lineHeight: "1.35", maxWidth: "520px", textWrap: "pretty", color: "#F7F5F0"}}>Fourteen things you buy, January 2025 against now. Diesel comes first because it hauls nearly everything else on the list. {dieselVerdict} {pricesDown} Eggs fell because the avian flu outbreak ended, not because of policy.</p>
         </div>
       </div>
 
       <div className="p-cum" style={{display: "none"}}>{cumulativeText} since 20 Jan 2025</div>
-      <div className="p-bottom" style={{padding: "14px 36px 28px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "32px", flexWrap: "wrap", flex: "none"}}>
+      <div className="p-bottom" style={{padding: "14px 36px 44px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "32px", flexWrap: "wrap", flex: "none"}}>
         <div style={{display: "flex", alignItems: "center", gap: "14px", minWidth: "0"}}>
           <div className="p-total" style={{display: "flex", gap: "3px", fontSize: "clamp(40px,9vh,86px)"}}>
             {(totalCells || []).map((c, _i6) => (<React.Fragment key={_i6}>
@@ -1790,11 +1963,11 @@ export default class TheBill extends React.Component {
   <section style={{background: "#F7F5F0", color: "#0B1E3F", padding: "56px 36px 72px"}}>
     <details style={{maxWidth: "820px", margin: "0 auto"}}>
       <summary style={{listStyle: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F"}}>
-        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · YOUR PRICES
+        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · YOUR PRICES<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
         <p style={{margin: "0", textWrap: "pretty"}}>Thirteen of the fourteen prices are the Bureau of Labor Statistics' average prices for US cities, January 2025 against the latest month, {pricesMonth}. Diesel is the Energy Information Administration's weekly national average, {dieselFrom} (the week he took office) against {dieselThrough}. Each board row flips from the first price to the second; nothing in between is shown. The pump rolls through every published week.</p>
-        <div style={{display: "grid", gridTemplateColumns: "minmax(0,1.5fr) repeat(3,minmax(0,1fr)) minmax(0,1.3fr)", gap: "8px 14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".02em"}}>
+        <div style={{display: "grid", gridTemplateColumns: "minmax(0,1.4fr) repeat(3,minmax(0,.7fr)) minmax(0,2.1fr)", gap: "8px 14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".02em"}}>
           <div style={{color: "rgba(11,30,63,.6)", paddingBottom: "6px", borderBottom: "1px solid rgba(11,30,63,.25)"}}>ITEM</div>
           <div style={{color: "rgba(11,30,63,.6)", paddingBottom: "6px", borderBottom: "1px solid rgba(11,30,63,.25)", textAlign: "right"}}>JAN 2025</div>
           <div style={{color: "rgba(11,30,63,.6)", paddingBottom: "6px", borderBottom: "1px solid rgba(11,30,63,.25)", textAlign: "right"}}>LATEST</div>
@@ -1812,27 +1985,27 @@ export default class TheBill extends React.Component {
         </div>
         <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The total.</strong> {receiptMethod} Fuel: {receiptFuel}. Groceries: {receiptGroceries}. Electricity: {receiptElectricity}. The grocery line uses the median move across ten tracked staples, which ignores the largest increases on purpose. Household consumption varies enormously; these are national averages.</p>
         <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Your state.</strong> The running total under the monthly figure multiplies that month by the {receiptMonths} months elapsed, as the published receipt does; prices moved through that window, notably falling back during the June ceasefire, so it is an approximation. Picking a state swaps the fuel and electricity rows and re-totals: gasoline from EIA's weekly state or PADD-region series ({gasThrough} against 20 January 2025), electricity from EIA's monthly state residential price ({elecThrough} against January 2025). The grocery line stays national. The US row uses the published receipt, which is built on the BLS national series, so the two fuel figures differ by a few cents.</p>
-        <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{dieselHead}</strong> {dieselNote} <strong style={{fontWeight: "600"}}>Eggs.</strong> The fall is real and it is not policy: the 2022–25 spike was avian influenza, and prices came back down as the outbreak ended.</p>
+        <p style={{margin: "0", fontSize: "15px", lineHeight: "1.55", color: "rgba(11,30,63,.8)", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{dieselHead}</strong> {dieselNote} Diesel leads the board, rather than the gasoline most households buy, because it is the fuel of trucks, trains, farm machinery and ships, so its price reaches the cost of nearly everything else; gasoline is on the board too. <strong style={{fontWeight: "600"}}>Eggs.</strong> The fall is real and it is not policy: the 2022–25 spike was avian influenza, and prices came back down as the outbreak ended.</p>
         <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: BLS Average Price Data via FRED (series listed above) · EIA Weekly Retail Gasoline and Diesel Prices · EIA Electric Power Monthly · USDA Food Plans · EPA fleet fuel economy · EIA Residential Energy Consumption Survey.
         </p>
       </div>
     </details>
   </section>
 
-  <section data-screen-label="05 Nobody is hiring" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
-    <h2 className="v5-sr">Nobody is hiring</h2>
+  <section data-screen-label="05 Hiring" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
+    <h2 className="v5-sr">Hiring</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
-      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
-      <canvas ref={crowdRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`Two crowds of small human figures, one figure per 10,000 jobs. The left stand shows the 2021-25 average of 320,938 jobs a month; the right shows what has actually been added each month since January 2025, ${jobsCurr} a month on average. Below, 100 figures show the share of the unemployed out of work six months or more, ${ltu1} percent.`}></canvas>
+      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
+      <canvas ref={crowdRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`Two crowds of small human figures, one figure per 10,000 jobs. The left stand shows the ${jobsBaseLabel} average of ${jobsPrev} jobs a month; the right shows what has actually been added each month since January 2025, ${jobsCurr} a month on average, with a dashed line where it would stand at the earlier pace. Below, 100 figures show the share of the unemployed out of work six months or more, ${ltu1} percent.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={crowdDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>JANUARY 2025</div>
-        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>JOBS ADDED EACH MONTH · ONE FIGURE IS 10,000 PEOPLE<br />BLS PAYROLLS</div>
+        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>EACH CROWD IS THE TOTAL SINCE JAN 2025 · ONE FIGURE IS 10,000 JOBS<br />BLS PAYROLLS</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>HIRING HAS NEARLY STOPPED</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>{jobsKicker}</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={crowdNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>42,000</div>
-          <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>new jobs a month<br />since he took office<br /><span style={{color: "rgba(247,245,240,.6)"}}>was 321,000</span></div>
+          <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>new jobs a month<br />since he took office<br /><span style={{color: "rgba(247,245,240,.6)"}}>{jobsWas}</span></div>
         </div>
         <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "680px", textWrap: "pretty", color: "#F7F5F0"}}>{jobsSentence}</p>
       </div>
@@ -1842,10 +2015,11 @@ export default class TheBill extends React.Component {
   <section style={{background: "#F7F5F0", color: "#0B1E3F", padding: "56px 36px 72px"}}>
     <details style={{maxWidth: "820px", margin: "0 auto"}}>
       <summary style={{listStyle: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F"}}>
-        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · HIRING
+        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · HIRING<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
-        <p style={{margin: "0", textWrap: "pretty"}}>Each figure is 10,000 jobs from the BLS monthly change in nonfarm payrolls. The left crowd adds the previous term's average, {jobsPrev} a month over 48 months, for each of the {jobsN} months since 20 January 2025. The right crowd adds what actually happened each month: {jobsCurr} a month on average, {jobsNeg} negative months (figures leave in red), and {jobsLatest}. Median rather than mean would read {jobsMed} against {jobsPrevMed}.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}>Each figure is 10,000 jobs from the BLS monthly change in nonfarm payrolls. The left crowd adds the {jobsBaseLabel} average, {jobsPrev} a month, for each of the {jobsN} months since 20 January 2025. The right crowd adds what actually happened each month: {jobsCurr} a month on average, {jobsNeg} negative months (figures leave in red), and {jobsLatest}. Median rather than mean would read {jobsMed} against {jobsPrevMed}.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Why {jobsBaseLabel}.</strong> The whole previous term averaged {jobsTermMean} a month over 48 months, but it began with the rebound from the 2020 lockdowns, when millions returned to jobs they had lost, so that figure would flatter the comparison. The last two full calendar years before he took office are used instead. The dashed line in the right-hand box marks where the figures would stand at that pace.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The frozen row.</strong> One hundred figures stand for the unemployed; the lit ones are the share out of work 27 weeks or more: {ltu0}% in January 2025, {ltu1}% in {ltuWhen}. Unemployment itself is {unemp1}%, {unempDir} {unemp0}%: few are being laid off (layoffs rate {layoffs}%), but hiring has all but stopped (hires rate {hires}%, quits {quits}%), so those who lose a job stay out longer.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Why jobless claims are low.</strong> {claimsNote}</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The paycheck.</strong> Average hourly earnings rose {aheYoy}% in the year to {payMonth}; consumer prices rose {cpiYoy}%. The difference, {realYoy}%, is derived from average hourly earnings for all private employees (CES0500000003) and CPI-U, not seasonally adjusted.</p>
@@ -1857,15 +2031,15 @@ export default class TheBill extends React.Component {
   <section data-screen-label="06 What the war cost" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <h2 className="v5-sr">What the war cost</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#6E1B27"}}>
-      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
+      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
       <canvas ref={warRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A four-row ledger of what the war has cost: ${casN} cream stars for US service members killed, ${aircraftN} aircraft silhouettes for those lost or damaged, a bar for ${warSpent} spent against a dashed outline for the ${suppText} more requested, and 100 triangles showing about ${patriotPct} percent of Patriot interceptors left, an estimate the Secretary of Defense disputes.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>28 FEB 2026 → NOW · SEVEN MONTHS</div>
-        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>HE SAID FOUR TO FIVE WEEKS<br />PENTAGON · CRS · NBC NEWS · CSIS</div>
+        <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>SINCE 28 FEB 2026</div>
+        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>WHAT THE WAR HAS COST SO FAR<br />PENTAGON · CBO · CRS · NBC NEWS · CSIS</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#F7F5F0", flex: "none"}}></span>{warMonthsCaps} IN. HE SAID FIVE WEEKS.</div>
-        <p className="g-sentence" style={{margin: "0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "760px", textWrap: "pretty", color: "#F7F5F0"}}>He said four to five weeks. {warMonths} on, the Navy resupplies from 2,200 miles away, and by one estimate a third of the missile interceptors are left. His Secretary of Defense disputes that number. His own budget request asks for $21 billion to replace them.</p>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#F7F5F0", flex: "none"}}></span>{warMonthsCaps} IN. HE SAID FOUR TO FIVE WEEKS.</div>
+        <p className="g-sentence" style={{margin: "0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "760px", textWrap: "pretty", color: "#F7F5F0"}}>The Navy now resupplies from 2,200 miles away, and by one estimate a third of the Patriot interceptors are left. The Secretary of Defense disputes that estimate; the administration's own budget request asks for $21 billion to rebuild munitions stocks.</p>
       </div>
     </div>
   </section>
@@ -1873,14 +2047,15 @@ export default class TheBill extends React.Component {
   <section style={{background: "#F7F5F0", color: "#0B1E3F", padding: "56px 36px 72px"}}>
     <details style={{maxWidth: "820px", margin: "0 auto"}}>
       <summary style={{listStyle: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F"}}>
-        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · WHAT THE WAR COST
+        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · WHAT THE WAR COST<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{casHead}</strong> US service members killed, NBC News data desk count as of {casDate}. A Wikipedia tally of contemporaneous reporting gives 20 killed and 762 injured; the lower, sourced figure is used.{casAlt} Injured: "hundreds."</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Forty-two aircraft.</strong> Congressional Research Service IN12692, "U.S. Aircraft Combat Losses in Operation Epic Fury," as of 13 May 2026: {aircraftList}. Seventeen were manned aircraft and twenty-five were drones, drawn in outline. Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. DoD's loss estimate is $2.6bn.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{warHead}</strong> {warNote} The bar then extends by $67.1bn, the FY2026 supplemental request, of which $21bn is munitions to rebuild stockpiles. Iran struck the Navy's Bahrain logistics hub on the first day; 228 structures were damaged and the fleet resupplies at sea from Diego Garcia, 2,200 miles away.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{warHead}</strong> {warNote} The bar then extends by $67.1bn, the FY2026 supplemental request, of which $21bn is munitions to rebuild stockpiles. {quoteNote} Iran struck the Navy's Bahrain logistics hub on the first day; 228 structures were damaged and the fleet resupplies at sea from Diego Garcia, 2,200 miles away.</p>
+        {(cboNote) ? (<><p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>A second, lower estimate.</strong> {cboNote}</p></>) : null}
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The interceptors, and the denial.</strong> CSIS estimated roughly a third of Patriot interceptors remained as of 27 July and that rebuilding would take at least three years; CNN reported about 80% of THAAD and half of Patriot stocks used. Secretary Hegseth disputed the reports on 5 August. The President demanded answers on the shortages on 3 September. The $21bn munitions line is consistent with the estimates the Secretary disputes. Both are printed on the screen.</p>
-        <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: {warCite} · CRS IN12692 · NBC News data desk · Washington Post, Stars and Stripes on Bahrain · CSIS, CNN on munitions.</p>
+        <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: {warCite} · Congressional Budget Office · CRS IN12692 · NBC News data desk · Washington Post, Stars and Stripes on Bahrain · CSIS, CNN on munitions.</p>
       </div>
     </details>
   </section>
@@ -1888,19 +2063,19 @@ export default class TheBill extends React.Component {
   <section data-screen-label="07 What it buys" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
     <h2 className="v5-sr">What it buys</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
-      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
+      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
       <canvas ref={buyRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`The ${aircraftN} lost or damaged aircraft beside a large equals sign, and a pile of gold squares showing what the same money buys: PlayStation 5s, gallons of diesel, years of in-state tuition, Costco hot dogs. The sequence ends with the whole war's ${warSpent} as a pile roughly ${buyRatio} times larger, running off the top of the frame.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={buyDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>42 AIRCRAFT LOST OR DAMAGED · PENTAGON ESTIMATE $2.6 BILLION</div>
-        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>WHAT HE LOST, PRICED IN THINGS YOU BUY<br />CRS · SONY · EIA · COLLEGE BOARD · COSTCO</div>
+        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>THE LOSSES, PRICED IN THINGS YOU BUY<br />CRS · SONY · EIA · COLLEGE BOARD · COSTCO</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>WHAT THE LOST AIRCRAFT COST</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span><span ref={buyKickRef}>WHAT THE LOST AIRCRAFT COST</span></div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={buyNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>0</div>
           <div ref={buySubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>PlayStation 5s<br /><span style={{color: "rgba(247,245,240,.6)"}}>for one F-35A</span></div>
         </div>
-        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "760px", textWrap: "pretty", color: "#F7F5F0"}}>{aircraftWord} aircraft lost or damaged, at the Pentagon's own estimate of {lossBn}: that is {buyPS5} million PlayStation 5s, or {buyDays} days of every gallon of diesel the country burns, or {buyDogs} Costco hot dogs for every American. The war itself has cost {buyRatio} times that, and he has asked Congress for {suppBn} more.</p>
+        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "760px", textWrap: "pretty", color: "#F7F5F0"}}>The Pentagon puts the {aircraftN} aircraft lost or damaged at {lossBn}: {buyPS5} million PlayStation 5s, {buyDays} days of all the diesel America burns, or {buyDogs} Costco hot dogs for every American. The whole war has cost {buyRatio} times that.</p>
       </div>
     </div>
   </section>
@@ -1908,10 +2083,10 @@ export default class TheBill extends React.Component {
   <section style={{background: "#F7F5F0", color: "#0B1E3F", padding: "56px 36px 72px"}}>
     <details style={{maxWidth: "820px", margin: "0 auto"}}>
       <summary style={{listStyle: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F"}}>
-        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · WHAT IT BUYS
+        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · WHAT IT BUYS<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
-        <p style={{margin: "0", textWrap: "pretty"}}>Every comparison divides one figure, the Department of Defense's $2.6 billion estimate for the 42 aircraft lost or damaged (Congressional Research Service, 13 May 2026), by one published price. The prices are list or national-average prices at the dates given, not what any particular buyer paid, and none is adjusted for what buying millions of anything would do to its price. Each square on the screen stands for a stated quantity; to the left of the equals sign are the aircraft themselves, manned aircraft filled and drones in outline. The squares drawn in red at the end are the war's {warSpent} cost to {warAsOf} at the same scale; they run off the top of the screen because at that scale they do.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}>Every comparison divides one figure, the Department of Defense's {lossBn} estimate for the 42 aircraft lost or damaged (Congressional Research Service, 13 May 2026), by one published price. The prices are list or national-average prices at the dates given, not what any particular buyer paid, and none is adjusted for what buying millions of anything would do to its price. Each square on the screen stands for a stated quantity; to the left of the equals sign are the aircraft themselves, manned aircraft filled and drones in outline. The squares drawn in red at the end are the war's {warSpent} cost to {warAsOf} at the same scale; they run off the top of the screen because at that scale they do.</p>
         <div style={{display: "grid", gridTemplateColumns: "minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr)", gap: "8px 16px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".02em"}}>
           <div style={{color: "rgba(11,30,63,.6)", paddingBottom: "6px", borderBottom: "1px solid rgba(11,30,63,.25)"}}>THING</div>
           <div style={{color: "rgba(11,30,63,.6)", paddingBottom: "6px", borderBottom: "1px solid rgba(11,30,63,.25)", textAlign: "right"}}>PRICE</div>
@@ -1928,22 +2103,22 @@ export default class TheBill extends React.Component {
     </details>
   </section>
 
-  <section data-screen-label="08 The world backs away" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
-    <h2 className="v5-sr">The world backs away</h2>
+  <section data-screen-label="08 Gold leaves New York" style={{position: "relative", height: "100vh", scrollSnapAlign: "start"}}>
+    <h2 className="v5-sr">Gold leaves New York</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
-      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL</div>
+      <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
       <canvas ref={vaultRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A pile of gold bars that grows month by month: only the gold taken out of the New York Fed, one icon for every ten 400-ounce bars, ${vaultBars} bars or ${vaultOut} tonnes over ${vaultMonths} months with none coming in. Beside it, who moved theirs and why, including Germany's gold still there, and the Fed's own answer: gold is down a fifth from its January record, and the dollar is up since the war began.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={vaultDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>AUGUST 2025</div>
-        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>ONE ICON IS TEN 400-OUNCE BARS · FEDERAL RESERVE TABLE 3.13</div>
+        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>GOLD HELD FOR FOREIGN CENTRAL BANKS AT THE NEW YORK FED<br />FEDERAL RESERVE TABLE 3.13</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
-        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>THE WORLD IS TAKING ITS GOLD HOME</div>
+        <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: MARK_RED, flex: "none"}}></span>CENTRAL BANKS ARE TAKING THEIR GOLD OUT OF NEW YORK</div>
         <div style={{display: "flex", alignItems: "baseline", gap: "18px", flexWrap: "wrap"}}>
           <div className="g-num" ref={vaultNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>0</div>
           <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>gold bars<br />taken out of New York<br /><span style={{color: "rgba(247,245,240,.6)"}}>{vaultSub}</span></div>
         </div>
-        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "720px", textWrap: "pretty", color: "#F7F5F0"}}>Ships go the long way round Africa now. Central banks are taking their gold out of the New York Fed, month after month, and the ones that say why say "geopolitical unrest."</p>
+        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "720px", textWrap: "pretty", color: "#F7F5F0"}}>{vaultSentence}</p>
       </div>
     </div>
   </section>
@@ -1951,7 +2126,7 @@ export default class TheBill extends React.Component {
   <section style={{background: "#F7F5F0", color: "#0B1E3F", padding: "56px 36px 72px"}}>
     <details style={{maxWidth: "820px", margin: "0 auto"}}>
       <summary style={{listStyle: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: "14px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F"}}>
-        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · THE VAULT
+        <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · THE VAULT<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
         <p style={{margin: "0", textWrap: "pretty"}}>The Federal Reserve publishes gold held under earmark for foreign and international accounts, valued at the statutory $42.22 an ounce, unchanged since 1973. Because the price is fixed, a change in that row is a change in ounces, not in value: tonnes = millions of dollars ÷ 42.22 × 31.1035. That gives {vaultStart} tonnes in {vaultFrom} and {vaultEnd} tonnes in {vaultTo}, the latest provisional release: {vaultOut} tonnes out, no month with an inflow.</p>
@@ -1983,7 +2158,7 @@ export default class TheBill extends React.Component {
           {(cardItems || []).map((it, _i5) => (<React.Fragment key={_i5}>
             <div ref={it.ref} style={{display: "flex", flexDirection: "column", justifyContent: "center", gap: "4px", borderTop: "1px solid rgba(247,245,240,.2)", paddingTop: "clamp(4px,1cqw,10px)", minHeight: "0", opacity: "0", transform: "translateY(24px)", willChange: "transform,opacity"}}>
               <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(22px,4.6cqw,60px)", lineHeight: ".95", letterSpacing: "-.02em", color: it.color, fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap"}}>{it.num}</div>
-              <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(7px,1cqw,12px)", letterSpacing: ".1em", color: "rgba(247,245,240,.7)", lineHeight: "1.4", textTransform: "uppercase"}}>{it.label}</div>
+              <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "clamp(7px,1cqw,12px)", letterSpacing: ".1em", color: "rgba(247,245,240,.7)", lineHeight: "1.4", textTransform: "uppercase", minHeight: "2.8em"}}>{it.label}</div>
             </div>
           </React.Fragment>))}
         </div>
@@ -1999,18 +2174,16 @@ export default class TheBill extends React.Component {
     <h2 className="v5-sr">Check our work</h2>
     <div style={{maxWidth: "820px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "28px", fontSize: "17px", lineHeight: "1.5"}}>
       <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", padding: "14px 0", borderTop: "1px solid #0B1E3F", borderBottom: "1px solid #0B1E3F", display: "flex", alignItems: "center", gap: "14px"}}><span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>CHECK OUR WORK</div>
-      <p style={{margin: "0", textWrap: "pretty", fontSize: "20px"}}>Every number on this page comes from the government's own tables or a named source, and every block has a "Show the work" panel above with the series, the dates and the method. What follows is what the numbers can and cannot say.</p>
+      <p style={{margin: "0", textWrap: "pretty", fontSize: "20px"}}>Every number on this page comes from the government's own tables or a named source. Under every block is a "Show the work" panel, marked OPEN +, with the series, the dates and the method. What follows is what the numbers can and cannot say, starting with the ones that cut against this page.</p>
       <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".16em", color: "rgba(11,30,63,.7)"}}>WHAT CUTS AGAINST THIS PAGE</div>
       <div style={{display: "flex", flexDirection: "column", gap: "18px"}}>
-        {(againstRows || []).map((r, _i9) => (<React.Fragment key={_i9}>
-          <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{r.head}</strong> {r.text}</p>
-        </React.Fragment>))}
+        {(againstRows || []).map((r, _i4) => (<React.Fragment key={_i4}><p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{r.head}</strong> {r.text}</p></React.Fragment>))}
       </div>
       <div style={{display: "flex", flexDirection: "column", gap: "18px"}}>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>How fresh this is.</strong> {freshNote}</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The missing month.</strong> The October 2025 Consumer Price Index was never collected. Every twelve-month comparison on this page runs month to month across that gap rather than by counting observations.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{dieselHeadPolicy}</strong> {dieselNote} Eggs cost half what they did in January 2025 because the 2022–25 avian influenza outbreak ended; that fall is real and it is not policy. The oil peak is the daily spot close, $114.58 on 7 April, the day the first ceasefire was announced.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What the counts are, and are not.</strong> PortWatch ship counts come from satellite AIS positions; ships transmitting no position are not counted, so every figure is a floor and none is a queue count. Ship and particle positions on the globe and the strait are a model; the counts driving them are not. Household costs are national averages built from stated quantities, and the running total assumes the current monthly gap applied evenly since 20 January 2025. The war-cost casualty figure is a news organisation's count, and a higher tally exists. Gold tonnage is derived from the Fed's statutory valuation, which fixes the price and so isolates the ounces. The "what the lost aircraft cost" comparisons divide one Pentagon figure by one list price each; they are scale, not a proposal for how the money should have been spent.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What the counts are, and are not.</strong> PortWatch ship counts come from satellite AIS positions; ships transmitting no position are not counted, so every figure is a floor and none is a queue count. Ship and particle positions on the globe and the strait are a model; the counts driving them are not. Household costs are national averages built from stated quantities, and the running total assumes the current monthly gap applied evenly since 20 January 2025. The war-cost casualty figure is a news organisation's count, and a higher tally exists. The jobs comparison uses 2023 and 2024, not the whole previous term, because that term began with the pandemic rebound. Gold tonnage is derived from the Fed's statutory valuation, which fixes the price and so isolates the ounces. The "what the lost aircraft cost" comparisons divide one Pentagon figure by one list price each; they are scale, not a proposal for how the money should have been spent.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What we will not do.</strong> War and tariff effects are never summed. Odds are odds. No queue count is published because none exists at any tier. The word "cover-up" does not appear; where an estimate is disputed, the denial is printed beside it.</p>
       </div>
       <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.75)", lineHeight: "1.8", borderTop: "1px solid rgba(11,30,63,.25)", paddingTop: "18px"}}>

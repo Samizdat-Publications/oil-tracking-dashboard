@@ -49,3 +49,12 @@ def test_against_reads_the_snapshot():
 def test_against_crude_compares_with_a_month_earlier_by_date():
     a = V.against(_snapshot())
     assert a["crude"]["month_ago"]["date"] == "2026-08-21"
+
+
+def test_tariffs_are_closed_fiscal_years_only():
+    pt = lambda d, f, p: {"date": d, "value": 1, "fytd": f, "prior_fytd": p}  # noqa: E731
+    sn = {"fiscal": {"customs": {"url": "u", "points": [
+        pt("2025-08-01", 165e9, 70e9), pt("2025-09-01", 194.9e9, 77.0e9), pt("2026-08-01", 167e9, 165e9)]}}}
+    t = V.tariffs(sn)
+    assert t["fy"] == [[2024, 77_000_000_000], [2025, 194_900_000_000]]
+    assert V.tariffs({}) is None

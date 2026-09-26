@@ -11,6 +11,8 @@ import { readFileSync } from 'node:fs'
 function ogFigures(): Plugin {
   const read = (f: string) => JSON.parse(readFileSync(new URL(`./public/v5/${f}`, import.meta.url), 'utf-8'))
   const thousands = (n: number) => (Math.round(n / 1000) * 1000).toLocaleString('en-US')
+  const base23 = (m: [string, number][]) => { const v = m.filter(x => x[0] >= '2023-01-01' && x[0] <= '2024-12-01').map(x => x[1]); return v.reduce((a, b) => a + b, 0) / v.length }
+  const words = (n: number) => ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'][n] ?? String(n)
   return {
     name: 'og-figures',
     transformIndexHtml(html) {
@@ -19,20 +21,23 @@ function ogFigures(): Plugin {
       const hormuz = globe.items.hormuz, war = bill.war_cost
       const fig: Record<string, string> = {
         diesel: '$' + prices.diesel.latest.value.toFixed(2),
-        diesel_record: prices.diesel.record?.is_record ? ', a record' : '',
+        diesel_record: prices.diesel.record?.is_record ? ', a record before inflation' : '',
         hormuz_now: String(Math.round(hormuz.recent.mean7_total)),
         hormuz_base: String(Math.round(hormuz.baseline.total_per_day)),
         jobs_now: thousands(bill.jobs.curr.mean_monthly),
-        jobs_prev: thousands(bill.jobs.prev.mean_monthly),
+        // the page's baseline: 2023 and 2024, not the whole previous term (jobsBase() in TheBill.jsx)
+        jobs_prev: thousands(base23(bill.jobs.monthly)),
         // The rest mirror the block 09 share card (cardItems() in TheBill.jsx).
         crude_start: '$' + Math.round(crude.observations[0][1]),
         crude_peak: '$' + Math.round(crude.peak.value),
+        crude_now: '$' + Math.round(crude.observations.at(-1)[1]),
         receipt_month: '$' + Math.round(prices.receipt.monthly_usd),
         receipt_total: '$' + Math.round(prices.receipt.cumulative_usd).toLocaleString('en-US'),
         us_killed: String(war.casualties.us_killed),
         aircraft: String(war.aircraft.total_lost_or_damaged),
         dod_bn: '$' + war.dod_cost.usd_bn + 'bn',
         gold_out: bill.gold.tonnes_out.toFixed(0),
+        gold_months: words(bill.gold.earmarked.length - 1),
         // The refresh date; the page's own card reads the same field.
         date_modified: globe.as_of,
       }

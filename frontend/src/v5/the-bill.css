@@ -6,6 +6,7 @@ a{color:#F7F5F0} a:hover{color:#D4A017}
 details summary::-webkit-details-marker{display:none}
 @media (max-width:640px){ .g-num{font-size:104px !important} .g-side{display:none !important} .g-sentence{font-size:19px !important} .g-bottom{padding:0 20px 28px !important} .g-top{padding:20px !important} .p-grid{grid-template-columns:minmax(0,1fr) !important;grid-template-rows:auto minmax(0,1fr);padding:8px 16px 0 !important;gap:10px 0 !important} .p-pump{order:-1;gap:6px !important;flex:none} .p-pump > div{width:100%;gap:2px !important} .p-pump > div > div:nth-child(2){font-size:64px !important;padding:4px 8px !important;justify-content:center;border-radius:6px !important} .p-pump > div > div:nth-child(1){font-size:9px !important} .p-pump > div > div:nth-child(3){font-size:9px !important} .p-sentence{font-size:14px !important;line-height:1.3 !important;max-width:none !important} .p-cell{font-size:clamp(11px,2vh,28px) !important} .p-row{font-size:12px !important} .p-bottom{padding:8px 16px 14px !important;gap:8px 16px !important;align-items:center !important;flex-wrap:nowrap !important} .p-total{font-size:34px !important} .p-total-label{display:none !important} .a-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;padding:8px 16px !important} .p-cum{display:block !important;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;color:#D4A017;padding:0 16px 6px} .p-bottom > label{flex:0 1 auto !important;min-width:0} .p-state{min-width:0 !important;width:100%;font-size:12px !important;padding:8px 28px 8px 10px !important;max-width:140px} .p-state-label{display:none !important} }
 select option{background:#061530;color:#F7F5F0}
+.sw-open::after{content:'OPEN +'} details[open] .sw-open::after{content:'CLOSE −'} details summary:hover .sw-open{color:#0B1E3F}
 
 /* Source Serif 4, variable, optical-size axis 8..60 -- the face the prototype
    loads from Google. Declared under the plain family name because every ported
@@ -81,6 +82,7 @@ select option{background:#061530;color:#F7F5F0}
   .v5-bill-root [data-screen-label^="09"] div[style*="repeat(4"] > div > div:nth-child(2) {
     font-size: 11px !important;
     line-height: 1.45 !important;
+    min-height: 4.35em !important;   /* three lines, so the numbers in a row share a baseline */
   }
   .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] div[style*="letter-spacing"] {
     font-size: 11px !important;
@@ -108,9 +110,50 @@ select option{background:#061530;color:#F7F5F0}
     line-height: 1.25 !important;
     margin-top: 2px;
   }
-  .v5-bill-root .p-total-label span:nth-last-child(-n + 2) { display: none !important; }
+  /* The cumulative belongs with the monthly figure, so it stays in this label and the
+     separate .p-cum line (which printed under the eggs row, detached) is hidden. */
+  .v5-bill-root .p-cum { display: none !important; }
 }
 
 /* Headings for screen readers: the page has eleven blocks and no visible
    headings, so without these there is nothing to jump between. */
 .v5-sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+@media (max-width: 640px) {
+  /* 4. The share card on a phone. The 11px rule above matched every element with a
+        letter-spacing, which includes the tile numbers, the title and the sign-off:
+        the numbers came out smaller than their captions. The hierarchy is restored
+        here, and the captions lose most of their tracking so they wrap less. */
+  .v5-bill-root [data-screen-label^="09"] div[style*="repeat(4"] > div > div:nth-child(1) {
+    font-size: 32px !important;
+    letter-spacing: -.01em !important;
+  }
+  .v5-bill-root [data-screen-label^="09"] div[style*="repeat(4"] > div > div:nth-child(2) {
+    letter-spacing: .03em !important;
+  }
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] > div:nth-child(2) > div:first-child {
+    font-size: 28px !important;
+  }
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] > div:last-child > div:first-child {
+    font-size: 20px !important;
+    letter-spacing: .02em !important;
+  }
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] > div:nth-child(2) > div:last-child,
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] > div:last-child > div:last-child {
+    letter-spacing: .06em !important;
+  }
+
+  /* Tile numbers may wrap ("24 Feb · 28 Feb" is wider than a column); the title
+     and the sign-off get their own line rather than squeezing beside the fine print. */
+  .v5-bill-root [data-screen-label^="09"] div[style*="repeat(4"] > div > div:nth-child(1) { white-space: normal !important; }
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] > div:nth-child(2) > div:first-child { white-space: nowrap; }
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] > div:last-child { flex-wrap: wrap !important; }
+  .v5-bill-root [data-screen-label^="09"] div[style*="aspect-ratio"] > div:last-child > div { flex: 1 1 100%; text-align: left !important; }
+
+  /* 5. The masthead on the first screen: smaller, so the date and event lines under
+        it stay in the top band. */
+  .v5-bill-root .g-mast { max-width: none !important; }
+  .v5-bill-root .g-dek { font-size: 15px !important; }
+  /* the state picker: "United States" ran under its chevron at 140px */
+  .v5-bill-root .p-state { max-width: 190px !important; }
+}
