@@ -208,6 +208,18 @@ or the `refresh-and-deploy` workflow from the Actions tab (`workflow_dispatch` o
 Both need FRED_API_KEY and EIA_API_KEY; the workflow also needs CLOUDFLARE_API_TOKEN
 and CLOUDFLARE_ACCOUNT_ID.
 
+**The weekly refresh (from 2026-10-13): `/weekly-refresh`.** Stewart refreshes about once a
+week. The series refresh themselves; the figures typed in from named sources
+(`context_figures.json`: war cost, casualties, the CRS aircraft tally, the CBO estimate,
+interceptors, the Fed's gold table, the gold price, the latest FOMC decision) do not.
+`backend/scripts/check_curated.py` lists which of those are due (an interval per figure,
+counted from the later of its `as_of` and its `checked` date), and `refresh.ps1` prints it on
+every run. `--mark <path>` stamps `checked` when nothing newer exists, editing the JSON as text
+so the hand formatting survives. The Claude Code command
+`.claude/commands/weekly-refresh.md` (versioned here, with a pointer copy in the parent folder)
+runs the whole loop: check the due figures against sourced reporting, dry build, screenshot,
+publish, report. og:image carries `?v=<refresh date>` so Facebook fetches the new card.
+
 **Every refresh is recorded.** `backend/scripts/record_refresh.py` appends a row to
 `docs/refresh-history.csv`: crude, the Hormuz seven-day mean, diesel, the staples,
 jobs a month, long-term unemployment, the household receipt, the US-specific

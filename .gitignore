@@ -13,7 +13,9 @@ frontend/dist/
 frontend/dist-ssr/
 
 # Claude Code
-.claude/
+# Local Claude Code state stays out; the project's commands are versioned.
+.claude/*
+!.claude/commands/
 
 # Brainstorm mockups
 .superpowers/

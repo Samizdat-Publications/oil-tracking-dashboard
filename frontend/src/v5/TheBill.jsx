@@ -116,7 +116,7 @@ export default class TheBill extends React.Component {
       vaultRef: this.vaultRef, vaultDateRef: this.vaultDateRef, vaultNumRef: this.vaultNumRef,
       buyRef: this.buyRef, buyDateRef: this.buyDateRef, buyNumRef: this.buyNumRef, buySubRef: this.buySubRef, ...this.buyVals(),
       ...this.billVals(),
-      ...this.storyVals(), ...this.jobsVals(), ...this.dateVals(), ...this.warVals(), ...this.labelVals(), ...this.headVals(), ...this.goldVals(), ...this.freshVals(), againstRows: this.againstRows(),
+      ...this.storyVals(), ...this.aircraftVals(), ...this.jobsVals(), ...this.dateVals(), goldFedNote: this.goldFed().note, goldFedLabel: this.goldFed().label, ...this.warVals(), ...this.labelVals(), ...this.headVals(), ...this.goldVals(), ...this.freshVals(), againstRows: this.againstRows(),
       cardRef: this.cardRef, cardItems: this.cardItems(),
       cardDate: 'IN THE GOVERNMENT\u2019S OWN NUMBERS' + (this.data ? ' · ' + this.fmtISO(this.data.as_of) : ''),
       hormuzNow: this.data ? this.hormuzNow(this.data.items.hormuz.recent.mean7_total) : '',
@@ -498,6 +498,37 @@ export default class TheBill extends React.Component {
     }
     return out;
   }
+  // Block 08's counter-argument: how far gold is off its record, in words, and whether
+  // the dollar is up since the war began. Typed as "a fifth" it went false by October.
+  goldFed() {
+    const B = this.bill, G = B && B.gold.gold_price, A = B && B.against && B.against.dollar;
+    if (!G || !G.record || !G.latest) return { caps: '', note: '', label: '' };
+    const r = 1 - G.latest.usd_oz / G.record.usd_oz, F = [[0.1, 'a tenth'], [0.125, 'an eighth'], [0.2, 'a fifth'], [0.25, 'a quarter'], [1 / 3, 'a third'], [0.5, 'half']];
+    const f = F.reduce((a, x) => (Math.abs(x[0] - r) < Math.abs(a[0] - r) ? x : a));
+    const up = A && A.latest && A.prewar && A.latest.value > A.prewar.value, $ = v => '$' + Math.round(v).toLocaleString();
+    const s = r > 0.05 ? 'gold is down about ' + f[1] + ' from its January record' + (up ? ', and the dollar is up since the war began' : '') : (up ? 'the dollar is up since the war began' : '');
+    return {
+      caps: s ? s.toUpperCase() + '.' : '', label: s,
+      note: r > 0.05 ? 'Gold itself is down about ' + f[1] + ' from its January record (' + $(G.record.usd_oz) + ' to ' + $(G.latest.usd_oz) + ' an ounce, ' + this.dayLong(G.latest.date) + ')' + (up ? ', and the dollar index is up since the war began.' : '.') : '',
+    };
+  }
+  // The aircraft tally and what the Pentagon's loss estimate covers. CRS revised its
+  // count from 42 to 81 on 5 Oct 2026; the $2.6bn estimate still covers the first 42.
+  aircraftVals() {
+    const A = this.bill && this.bill.war_cost.aircraft, keys = 'aircraftHead aircraftAsOf aircraftMix aircraftEst buyLead buyScope buyAC'.split(' ');
+    if (!A) return Object.fromEntries(keys.map(k => [k, '']));
+    const cap = s => s[0].toUpperCase() + s.slice(1), day = iso => this.dayLong(iso), T = A.by_type;
+    const drones = Object.entries(T).filter(([k]) => /^MQ/.test(k)).reduce((s, [, v]) => s + v, 0), manned = A.total_lost_or_damaged - drones, CV = A.dod_loss_estimate_covers;
+    const first = CV && CV.aircraft < A.total_lost_or_damaged, n = first ? CV.aircraft : A.total_lost_or_damaged, bn = '$' + A.dod_loss_estimate_usd_bn + ' billion';
+    return {
+      aircraftHead: cap(this.words(A.total_lost_or_damaged)) + ' aircraft.', aircraftAsOf: day(A.as_of),
+      aircraftMix: cap(this.words(manned)) + ' were manned aircraft and ' + this.words(drones) + ' were drones, drawn in outline.' + (A.previous ? ' The tally was ' + A.previous.total_lost_or_damaged + ' on ' + day(A.previous.as_of) + '.' : '') + ' Damaged aircraft are counted with lost ones; CRS notes some may have returned to service.',
+      aircraftEst: first ? 'The Pentagon’s loss estimate, ' + bn + ', covers the first ' + n + ', counted to ' + day(CV.as_of) + '; there is no official estimate for the rest.' : 'DoD’s loss estimate is ' + bn + '.',
+      buyLead: first ? 'The Pentagon priced the first ' + n + ' aircraft lost or damaged, to ' + day(CV.as_of) + ', at ' + bn : 'The Pentagon puts the ' + n + ' aircraft lost or damaged at ' + bn,
+      buyScope: 'the Department of Defense’s ' + bn + ' estimate for the ' + (first ? 'first ' : '') + n + ' aircraft lost or damaged (Congressional Research Service, ' + day(first ? CV.as_of : A.as_of) + ')' + (first ? '; the latest CRS tally, ' + day(A.as_of) + ', is ' + A.total_lost_or_damaged + ' aircraft and has no official price' : ''),
+      buyAC: String(n),
+    };
+  }
   // The headline sentences under each block's big number. Design typed their
   // figures; "Diesel has not cost this much since 2022" outlived diesel's record
   // and "it is $91 now" outlived the price.
@@ -656,7 +687,7 @@ export default class TheBill extends React.Component {
   // billion ... 21 July 2026" in five places; the Pentagon's own estimate moved
   // to $43.6bn and the copy would have disagreed with the bar beside it.
   warVals() {
-    const W = this.bill && this.bill.war_cost, keys = 'warHead warNote warCite warSpent warAsOf warWho casHead casDate casAlt quoteNote'.split(' ');
+    const W = this.bill && this.bill.war_cost, keys = 'warHead warNote warCite warSpent warAsOf warWho casHead casDate casAlt casNote casCite quoteNote'.split(' ');
     if (!W) return Object.fromEntries(keys.map(k => [k, '']));
     const d = W.dod_cost, p = d.prior, p2 = d.prior_2, c = W.casualties, wp = c.wapo_count, day = iso => this.dayLong(iso);
     const cap = s => s[0].toUpperCase() + s.slice(1);
@@ -666,9 +697,15 @@ export default class TheBill extends React.Component {
       warCite: (d.cite || d.source) + (p && p.cite ? ' · earlier: ' + p.cite : ''),
       warSpent: '$' + d.usd_bn + ' billion', warAsOf: day(d.as_of), warWho: d.who || 'the latest official estimate',
       casHead: cap(this.words(c.us_killed)) + ' stars.', casDate: day(c.as_of),
+      // who counted, as of when, and how the count has moved: it is the Pentagon's own
+      // database now, which it has revised upward, so the revision is printed with it
+      casNote: 'US service members killed, by ' + (c.who || c.source) + ', as of ' + day(c.as_of)
+        + (typeof c.us_injured === 'number' ? ', with ' + c.us_injured.toLocaleString() + ' wounded' : '') + '.'
+        + (c.previous ? ' It stood at ' + c.previous.us_killed + ' on ' + day(c.previous.as_of) + '.' : '') + (c.revision ? ' ' + c.revision : ''),
+      casCite: (c.short ? c.short.replace(/^PENTAGON /, 'Pentagon ') : 'Casualty count') + ', ' + day(c.as_of),
       // the one time the page quotes his forecast, with its date and source
       quoteNote: W.trump_quote ? 'The President said "' + W.trump_quote.text + '" on ' + day(W.trump_quote.date) + ' (' + W.trump_quote.source + ').' : '',
-      casAlt: wp ? ' The Washington Post reported on ' + day(wp.reported) + ', citing ' + this.words(wp.officials_cited) + ' US officials, at least ' + wp.killed_at_least + ' deaths; the Defense Secretary called the report false. The official count is drawn, and both are printed here.' : '',
+      casAlt: wp ? ' The Washington Post reported on ' + day(wp.reported) + ', citing ' + this.words(wp.officials_cited) + ' US officials, at least ' + wp.killed_at_least + ' deaths; the Defense Secretary called the report false' + (c.us_killed < wp.killed_at_least ? '' : ', and the official count has since reached it') + '. The official count is drawn, and both are printed here.' : '',
     };
   }
   jobsVals() {
@@ -746,7 +783,7 @@ export default class TheBill extends React.Component {
     const h = D.items.hormuz;
     return [
       { num: '+$' + Math.round(P.receipt.monthly_usd), label: 'a month for a household · $' + Math.round(P.receipt.cumulative_usd).toLocaleString() + ' since 20 Jan 2025', color: '#D4A017' },
-      { num: '$' + Math.round(C.observations[0][1]) + ' → $' + Math.round(C.observations.at(-1)[1]), label: 'crude oil · January to now · $' + Math.round(C.peak.value) + ' at the peak, ' + this.storyVals().oilWeeks + ' weeks into the war', color: '#D4A017' },
+      { num: '$' + Math.round(C.observations[0][1]) + ' → $' + Math.round(C.observations.at(-1)[1]), label: 'crude oil · January to now · peak $' + Math.round(C.peak.value), color: '#D4A017' },
       { num: Math.round(h.recent.mean7_total) + ' / day', label: 'ships through Hormuz · was ' + Math.round(h.baseline.total_per_day), color: '#D4A017' },
       { num: '$' + P.diesel.latest.value.toFixed(2), label: this.dieselVals().dieselLabel, color: '#D4A017' },
       { num: Math.round(B.jobs.curr.mean_monthly / 1000) + ',000', label: 'new jobs a month · was ' + Math.round(this.jobsBase().mean / 1000) + ',000 in ' + this.jobsBase().label, color: '#D4A017' },
@@ -936,15 +973,17 @@ export default class TheBill extends React.Component {
     };
     // 1 · the dead: eighteen stars
     const killed = WC.casualties.us_killed, lit = pStars * killed;
-    let bx = row(0, String(Math.round(lit)), 'DEAD', 'US SERVICE MEMBERS KILLED', 'NBC NEWS · ' + this.fmtISO(B.war_cost.casualties.as_of) + ' · INJURED: ' + String(B.war_cost.casualties.us_injured).toUpperCase(), pStars);
-    const perRow = 9, sR = Math.min(bx.h * 0.2, bx.w / (perRow * 2.5)), sStep = sR * 2.5;
+    const CS = B.war_cost.casualties;
+    let bx = row(0, String(Math.round(lit)), 'DEAD', 'US SERVICE MEMBERS KILLED', (CS.short || 'NBC NEWS') + ' · ' + this.fmtISO(CS.as_of) + ' · WOUNDED: ' + (typeof CS.us_injured === 'number' ? CS.us_injured.toLocaleString() : String(CS.us_injured).toUpperCase()), pStars);
+    const perRow = Math.max(9, Math.ceil(killed / 2)),   // two rows, however many there are
+    sR = Math.min(bx.h * 0.2, bx.w / (perRow * 2.5)), sStep = sR * 2.5;
     const sx0 = bx.x + sR * 1.2, sy0 = bx.y + bx.h / 2 - sStep / 2;
     for (let i = 0; i < killed; i++) { const a = Math.max(0, Math.min(1, lit - i)); if (a <= 0) continue; this.drawStar(ctx, sx0 + (i % perRow) * sStep, sy0 + Math.floor(i / perRow) * sStep, sR * (0.7 + 0.3 * a), a); }
     // 2 · the aircraft: manned filled, drones in outline
     const types = Object.entries(WC.aircraft.by_type), total = WC.aircraft.total_lost_or_damaged, shown = pPlanes * total;
     const manned = types.filter(([k]) => !/^MQ/.test(k)).reduce((s, [, v]) => s + v, 0), drones = total - manned;
     bx = row(1, String(Math.round(shown)), 'AIRCRAFT', 'LOST OR DAMAGED · ' + manned + ' MANNED · ' + drones + ' DRONES', 'CRS · ' + this.fmtISO(B.war_cost.aircraft.as_of), pPlanes);
-    const pRow = mobile ? 14 : 21, pRows = Math.ceil(total / pRow), ps = Math.min(bx.h * 0.36 / pRows, bx.w / (pRow * 2.3)), pStep = ps * 2.3;
+    const pRow = mobile ? 18 : 27, pRows = Math.ceil(total / pRow), ps = Math.min(bx.h * 0.36 / pRows, bx.w / (pRow * 2.3)), pStep = ps * 2.3;
     const px0 = bx.x + ps, py0 = bx.y + bx.h / 2 - (pRows - 1) * pStep / 2;
     for (let i = 0; i < total; i++) { const a = Math.max(0, Math.min(1, shown - i)); if (a <= 0) continue; this.drawPlane(ctx, px0 + (i % pRow) * pStep, py0 + Math.floor(i / pRow) * pStep, ps, a, i >= manned); }
     // 3 · the money: spent in gold; what he has asked for on top, dashed; the munitions slice in red
@@ -984,10 +1023,13 @@ export default class TheBill extends React.Component {
   /* ---------- block 7: what it buys ---------- */
   setupBuy() {
     const WC = this.bill.war_cost, spent = WC.dod_cost.usd_bn * 1e9, loss = WC.aircraft.dod_loss_estimate_usd_bn * 1e9, diesel = this.prices.diesel.latest.value;
-    const PS5 = 549.99, TUITION = 11610, HOTDOG = 1.5, JET = 82.5e6, HH = 132.2e6, DAY = 3.9e6 * 42, USPOP = 340e6, AC = WC.aircraft.total_lost_or_damaged;
+    const PS5 = 549.99, TUITION = 11610, HOTDOG = 1.5, JET = 82.5e6, HH = 132.2e6, DAY = 3.9e6 * 42, USPOP = 340e6, CV = WC.aircraft.dod_loss_estimate_covers, AC = CV ? CV.aircraft : WC.aircraft.total_lost_or_damaged;
     const days = Math.round(loss / diesel / DAY), dogs = Math.round(loss / HOTDOG / USPOP), hh = Math.round(HH / (loss / PS5)), S = '$' + WC.aircraft.dod_loss_estimate_usd_bn + 'BN';
     this.buyR = { PS5, TUITION, HOTDOG, JET, HH, DAY, USPOP, days, dogs, hh, spent, loss, diesel, AC, lossBn: WC.aircraft.dod_loss_estimate_usd_bn, ratio: Math.round(spent / loss) };
-    const date = AC + ' AIRCRAFT LOST OR DAMAGED · PENTAGON ESTIMATE $' + WC.aircraft.dod_loss_estimate_usd_bn + ' BILLION';
+    // the estimate covers the aircraft counted to its date; a later CRS tally can be larger
+    const first = AC < WC.aircraft.total_lost_or_damaged;
+    this.buyFirst = first ? { n: AC, of: WC.aircraft.total_lost_or_damaged, asOf: CV.as_of, manned: CV.manned, drones: CV.drones } : null;
+    const date = (first ? 'THE FIRST ' : '') + AC + ' AIRCRAFT LOST OR DAMAGED · PENTAGON ESTIMATE $' + WC.aircraft.dod_loss_estimate_usd_bn + ' BILLION';
     this.buyBeats = [
       { total: JET / PS5, per: 1000, label: 'PlayStation 5s', sub: 'for one F-35A · $82.5 million', each: 'EACH SQUARE IS 1,000 PLAYSTATION 5s AT $549.99', math: '$82.5M ÷ $549.99 A CONSOLE', jet: true, kick: 'WHAT ONE F-35A COSTS', date: 'ONE F-35A · $82.5 MILLION · ONE WAS LOST' },
       { total: loss / PS5, per: 1e4, label: 'PlayStation 5s', sub: 'one for every ' + hh + ' households in America', each: 'EACH SQUARE IS 10,000 PLAYSTATION 5s AT $549.99', math: S + ' ÷ $549.99 A CONSOLE', date },
@@ -995,7 +1037,7 @@ export default class TheBill extends React.Component {
       { total: loss / TUITION, per: 500, label: 'years of college tuition', sub: 'in-state, public four-year, at $11,610', each: 'EACH SQUARE IS 500 STUDENT-YEARS AT $11,610', math: S + ' ÷ $11,610 A YEAR', date },
       { total: loss / HOTDOG, per: 5e6, label: 'Costco hot dogs', sub: dogs + ' for every American', each: 'EACH SQUARE IS 5 MILLION HOT DOGS AT $1.50', math: S + ' ÷ $1.50 A HOT DOG AND SODA', date },
     ];
-    this.buyBeats.forEach(b => { b.N = Math.round(b.total / b.per); b.kick = b.kick || 'WHAT THE LOST AIRCRAFT COST'; });
+    this.buyBeats.forEach(b => { b.N = Math.round(b.total / b.per); b.kick = b.kick || (first ? 'WHAT THE FIRST ' + AC + ' AIRCRAFT COST' : 'WHAT THE LOST AIRCRAFT COST'); });
     this.BEAT = 4.7; this.SPAWN = 2.2; this.FALL = 0.5; this.FINALE = 6.8; this.buyDur = this.buyBeats.length * this.BEAT + this.FINALE;
   }
   buyVals() {
@@ -1055,7 +1097,7 @@ export default class TheBill extends React.Component {
         this.drawPlane(ctx, jx, jy, s, a, false);
         ctx.globalAlpha = a; ctx.fillStyle = 'rgba(247,245,240,.7)'; ctx.fillText('ONE F-35A · $82.5 MILLION', jx, L.y - 10);
       } else {
-        const T = B.war_cost.aircraft.by_type, n = R.AC, manned = Object.entries(T).filter(([k]) => !/^MQ/.test(k)).reduce((s, [, v]) => s + v, 0);
+        const T = B.war_cost.aircraft.by_type, n = R.AC, manned = this.buyFirst ? this.buyFirst.manned : Object.entries(T).filter(([k]) => !/^MQ/.test(k)).reduce((s, [, v]) => s + v, 0);
         const cols = 7, rows = Math.ceil(n / cols), cell = Math.min(jw / cols, L.h / rows) * 0.92, s = cell * 0.4;
         const x0 = pad + (jw - cols * cell) / 2 + cell / 2, y0 = L.y + L.h / 2 - rows * cell / 2 + cell / 2;
         for (let i = 0; i < n; i++) this.drawPlane(ctx, x0 + (i % cols) * cell, y0 + Math.floor(i / cols) * cell, s, a, i >= manned);
@@ -1152,7 +1194,7 @@ export default class TheBill extends React.Component {
         ctx.fillStyle = '#F7F5F0'; ctx.font = '700 22px "Barlow Condensed", sans-serif';
         wrap('ABOUT ' + perDay + ' BARS A DAY, EVERY DAY, FOR ' + this.words(N).toUpperCase() + ' MONTHS.', '700 22px "Barlow Condensed", sans-serif', tw).forEach(l => { ctx.fillText(l, tx, y + 6); y += 24; });
         y += 14; ctx.fillStyle = '#6C8CD5';
-        wrap('THE FED\u2019S ANSWER: NOT A FLIGHT FROM THE DOLLAR. GOLD IS DOWN A FIFTH FROM ITS JANUARY RECORD, AND THE DOLLAR IS UP SINCE THE WAR BEGAN.', '700 20px "Barlow Condensed", sans-serif', tw).forEach(l => { ctx.fillText(l, tx, y); y += 22; });
+        wrap('THE FED\u2019S ANSWER: NOT A FLIGHT FROM THE DOLLAR. ' + this.goldFed().caps, '700 20px "Barlow Condensed", sans-serif', tw).forEach(l => { ctx.fillText(l, tx, y); y += 22; });
         ctx.font = '500 13px "IBM Plex Mono", monospace'; ctx.fillStyle = 'rgba(108,140,213,.85)';
         ctx.fillText('FEDS NOTES \u00b7 COLIN WEISS \u00b7 3 SEP 2026', tx, y + 6);
       }
@@ -1715,7 +1757,7 @@ export default class TheBill extends React.Component {
 
   render() {
     const V = this.renderVals();
-    const { africaNote, africaSentence, againstRows, aheYoy, aircraftList, aircraftN, asOf, babPct, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyKickRef, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, casAlt, casDate, casHead, casN, cboNote, claimsNote, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, crudeLastText, cueRef, cumulativeText, dateRef, dieselFrom, dieselHead, dieselHeadPolicy, dieselNote, dieselThrough, dieselVerdict, digits, elecThrough, eventRef, freshNote, gasThrough, globeThrough, hires, hormuzMean, hormuzNow, jobsBaseLabel, jobsCurr, jobsKicker, jobsLatest, jobsMed, jobsN, jobsNeg, jobsPrev, jobsPrevMed, jobsSentence, jobsTermMean, jobsWas, kickRef, layoffs, legendRef, loadError, lossBn, ltu0, ltu1, ltuWhen, numRef, odo, oilKicker, oilSentence, onMore, onState, pDateRef, pWeekRef, patriotPct, payMonth, placeName, pricesDown, pricesMonth, quits, quoteNote, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, receiptMonths, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNowWord, strNumRef, strSentence, strSubRef, strTanker, straitRange, straitRef, suppText, tariffNote, tariffSentence, totalCells, treasSentence, unemp0, unemp1, unempDir, updatedCaps, vaultBars, vaultDateRef, vaultEnd, vaultFrom, vaultMonths, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultScaleNote, vaultSentence, vaultStart, vaultSub, vaultTo, warAsOf, warCite, warHead, warMonthsCaps, warNote, warRef, warSpent, warWho, wasRef, workPrices, workRows } = V;
+    const { africaNote, africaSentence, againstRows, aheYoy, aircraftAsOf, aircraftEst, aircraftHead, aircraftList, aircraftMix, aircraftN, asOf, babPct, boardRef, buyAC, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyKickRef, buyLead, buyNumRef, buyPS5, buyRatio, buyRef, buyScope, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, casAlt, casCite, casHead, casN, casNote, cboNote, claimsNote, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, crudeLastText, cueRef, cumulativeText, dateRef, dieselFrom, dieselHead, dieselHeadPolicy, dieselNote, dieselThrough, dieselVerdict, digits, elecThrough, eventRef, freshNote, gasThrough, globeThrough, goldFedLabel, goldFedNote, hires, hormuzMean, hormuzNow, jobsBaseLabel, jobsCurr, jobsKicker, jobsLatest, jobsMed, jobsN, jobsNeg, jobsPrev, jobsPrevMed, jobsSentence, jobsTermMean, jobsWas, kickRef, layoffs, legendRef, loadError, ltu0, ltu1, ltuWhen, numRef, odo, oilKicker, oilSentence, onMore, onState, pDateRef, pWeekRef, patriotPct, payMonth, placeName, pricesDown, pricesMonth, quits, quoteNote, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, receiptMonths, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNowWord, strNumRef, strSentence, strSubRef, strTanker, straitRange, straitRef, suppText, tariffNote, tariffSentence, totalCells, treasSentence, unemp0, unemp1, unempDir, updatedCaps, vaultBars, vaultDateRef, vaultEnd, vaultFrom, vaultMonths, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultScaleNote, vaultSentence, vaultStart, vaultSub, vaultTo, warAsOf, warCite, warHead, warMonthsCaps, warNote, warRef, warSpent, warWho, wasRef, workPrices, workRows } = V;
     return (
       <div className="v5-bill-root" role="main" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
   <h1 className="v5-sr">The Bill: what Trump’s war and tariffs cost you</h1>
@@ -2037,7 +2079,7 @@ export default class TheBill extends React.Component {
       <canvas ref={warRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A four-row ledger of what the war has cost: ${casN} cream stars for US service members killed, ${aircraftN} aircraft silhouettes for those lost or damaged, a bar for ${warSpent} spent against a dashed outline for the ${suppText} more requested, and 100 triangles showing about ${patriotPct} percent of Patriot interceptors left, an estimate the Secretary of Defense disputes.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>SINCE 28 FEB 2026</div>
-        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>WHAT THE WAR HAS COST SO FAR<br />PENTAGON · CBO · CRS · NBC NEWS · CSIS</div>
+        <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>WHAT THE WAR HAS COST SO FAR<br />PENTAGON · CBO · CRS · CSIS</div>
       </div>
       <div className="g-bottom" style={{position: "absolute", left: "0", right: "0", bottom: "0", padding: "0 36px 36px", display: "flex", flexDirection: "column", gap: "2px", pointerEvents: "none"}}>
         <div style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(15px,2.2vh,21px)", letterSpacing: ".12em", textTransform: "uppercase", color: "#F7F5F0", marginBottom: "clamp(4px,1vh,10px)", display: "flex", alignItems: "center", gap: "10px"}}><span style={{display: "inline-block", width: "9px", height: "9px", background: "#F7F5F0", flex: "none"}}></span>{warMonthsCaps} IN. HE SAID FOUR TO FIVE WEEKS.</div>
@@ -2052,12 +2094,12 @@ export default class TheBill extends React.Component {
         <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · WHAT THE WAR COST<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{casHead}</strong> US service members killed, NBC News data desk count as of {casDate}. A Wikipedia tally of contemporaneous reporting gives 20 killed and 762 injured; the lower, sourced figure is used.{casAlt} Injured: "hundreds."</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Forty-two aircraft.</strong> Congressional Research Service IN12692, "U.S. Aircraft Combat Losses in Operation Epic Fury," as of 13 May 2026: {aircraftList}. Seventeen were manned aircraft and twenty-five were drones, drawn in outline. Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. DoD's loss estimate is $2.6bn.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{casHead}</strong> {casNote}{casAlt}</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{aircraftHead}</strong> Congressional Research Service IN12692, "U.S. Aircraft Combat Losses in Operation Epic Fury," revised {aircraftAsOf}: {aircraftList}. {aircraftMix} Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. {aircraftEst}</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{warHead}</strong> {warNote} The bar then extends by $67.1bn, the FY2026 supplemental request, of which $21bn is munitions to rebuild stockpiles. {quoteNote} Iran struck the Navy's Bahrain logistics hub on the first day; 228 structures were damaged and the fleet resupplies at sea from Diego Garcia, 2,200 miles away.</p>
         {(cboNote) ? (<><p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>A second, lower estimate.</strong> {cboNote}</p></>) : null}
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The interceptors, and the denial.</strong> CSIS estimated roughly a third of Patriot interceptors remained as of 27 July and that rebuilding would take at least three years; CNN reported about 80% of THAAD and half of Patriot stocks used. Secretary Hegseth disputed the reports on 5 August. The President demanded answers on the shortages on 3 September. The $21bn munitions line is consistent with the estimates the Secretary disputes. Both are printed on the screen.</p>
-        <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: {warCite} · Congressional Budget Office · CRS IN12692 · NBC News data desk · Washington Post, Stars and Stripes on Bahrain · CSIS, CNN on munitions.</p>
+        <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: {warCite} · Congressional Budget Office · CRS IN12692 · {casCite} · Washington Post, Stars and Stripes on Bahrain · CSIS, CNN on munitions.</p>
       </div>
     </details>
   </section>
@@ -2066,7 +2108,7 @@ export default class TheBill extends React.Component {
     <h2 className="v5-sr">What it buys</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
-      <canvas ref={buyRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`The ${aircraftN} lost or damaged aircraft beside a large equals sign, and a pile of gold squares showing what the same money buys: PlayStation 5s, gallons of diesel, years of in-state tuition, Costco hot dogs. The sequence ends with the whole war's ${warSpent} as a pile roughly ${buyRatio} times larger, running off the top of the frame.`}></canvas>
+      <canvas ref={buyRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`The ${buyAC} aircraft the Pentagon has priced, lost or damaged, beside a large equals sign, and a pile of gold squares showing what the same money buys: PlayStation 5s, gallons of diesel, years of in-state tuition, Costco hot dogs. The sequence ends with the whole war's ${warSpent} as a pile roughly ${buyRatio} times larger, running off the top of the frame.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={buyDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>42 AIRCRAFT LOST OR DAMAGED · PENTAGON ESTIMATE $2.6 BILLION</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>THE LOSSES, PRICED IN THINGS YOU BUY<br />CRS · SONY · EIA · COLLEGE BOARD · COSTCO</div>
@@ -2077,7 +2119,7 @@ export default class TheBill extends React.Component {
           <div className="g-num" ref={buyNumRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "700", fontSize: "clamp(88px,22vh,200px)", lineHeight: ".86", letterSpacing: "-.02em", color: "#D4A017", fontVariantNumeric: "tabular-nums", textShadow: "0 0 40px rgba(212,160,23,.35)"}}>0</div>
           <div ref={buySubRef} style={{fontFamily: "'Barlow Condensed',sans-serif", fontWeight: "600", fontSize: "clamp(18px,3.6vh,34px)", lineHeight: "1.05", textTransform: "uppercase", letterSpacing: ".02em", color: "#F7F5F0", textWrap: "balance"}}>PlayStation 5s<br /><span style={{color: "rgba(247,245,240,.6)"}}>for one F-35A</span></div>
         </div>
-        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "760px", textWrap: "pretty", color: "#F7F5F0"}}>The Pentagon puts the {aircraftN} aircraft lost or damaged at {lossBn}: {buyPS5} million PlayStation 5s, {buyDays} days of all the diesel America burns, or {buyDogs} Costco hot dogs for every American. The whole war has cost {buyRatio} times that.</p>
+        <p className="g-sentence" style={{margin: "clamp(8px,2vh,18px) 0 0", fontSize: "clamp(16px,2.7vh,24px)", lineHeight: "1.35", maxWidth: "760px", textWrap: "pretty", color: "#F7F5F0"}}>{buyLead}: {buyPS5} million PlayStation 5s, {buyDays} days of all the diesel America burns, or {buyDogs} Costco hot dogs for every American. The whole war has cost {buyRatio} times that.</p>
       </div>
     </div>
   </section>
@@ -2088,7 +2130,7 @@ export default class TheBill extends React.Component {
         <span style={{display: "inline-block", width: "10px", height: "10px", background: "#D4A017"}}></span>SHOW THE WORK · WHAT IT BUYS<span className="sw-open" style={{marginLeft: "auto", color: "#8a6a0c", fontWeight: "500", letterSpacing: ".12em"}}></span>
       </summary>
       <div style={{paddingTop: "28px", display: "flex", flexDirection: "column", gap: "22px", fontSize: "17px", lineHeight: "1.5"}}>
-        <p style={{margin: "0", textWrap: "pretty"}}>Every comparison divides one figure, the Department of Defense's {lossBn} estimate for the 42 aircraft lost or damaged (Congressional Research Service, 13 May 2026), by one published price. The prices are list or national-average prices at the dates given, not what any particular buyer paid, and none is adjusted for what buying millions of anything would do to its price. Each square on the screen stands for a stated quantity; to the left of the equals sign are the aircraft themselves, manned aircraft filled and drones in outline. The squares drawn in red at the end are the war's {warSpent} cost to {warAsOf} at the same scale; they run off the top of the screen because at that scale they do.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}>Every comparison divides one figure, {buyScope}, by one published price. The prices are list or national-average prices at the dates given, not what any particular buyer paid, and none is adjusted for what buying millions of anything would do to its price. Each square on the screen stands for a stated quantity; to the left of the equals sign are the aircraft themselves, manned aircraft filled and drones in outline. The squares drawn in red at the end are the war's {warSpent} cost to {warAsOf} at the same scale; they run off the top of the screen because at that scale they do.</p>
         <div style={{display: "grid", gridTemplateColumns: "minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr)", gap: "8px 16px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".02em"}}>
           <div style={{color: "rgba(11,30,63,.6)", paddingBottom: "6px", borderBottom: "1px solid rgba(11,30,63,.25)"}}>THING</div>
           <div style={{color: "rgba(11,30,63,.6)", paddingBottom: "6px", borderBottom: "1px solid rgba(11,30,63,.25)", textAlign: "right"}}>PRICE</div>
@@ -2109,7 +2151,7 @@ export default class TheBill extends React.Component {
     <h2 className="v5-sr">Gold leaves New York</h2>
     <div style={{position: "sticky", top: "0", height: "100vh", overflow: "hidden", background: "#0B1E3F"}}>
       <div data-cue="1" style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", opacity: "0", transition: "opacity .5s", zIndex: "2"}}>SCROLL · SHOW THE WORK BELOW</div>
-      <canvas ref={vaultRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A pile of gold bars that grows month by month: only the gold taken out of the New York Fed, one icon for every ten 400-ounce bars, ${vaultBars} bars or ${vaultOut} tonnes over ${vaultMonths} months with none coming in. Beside it, who moved theirs and why, including Germany's gold still there, and the Fed's own answer: gold is down a fifth from its January record, and the dollar is up since the war began.`}></canvas>
+      <canvas ref={vaultRef} style={{position: "absolute", inset: "0", width: "100%", height: "100%", display: "block"}} role="img" aria-label={`A pile of gold bars that grows month by month: only the gold taken out of the New York Fed, one icon for every ten 400-ounce bars, ${vaultBars} bars or ${vaultOut} tonnes over ${vaultMonths} months with none coming in. Beside it, who moved theirs and why, including Germany's gold still there, and the Fed's own answer: ${goldFedLabel}.`}></canvas>
       <div className="g-top" style={{position: "absolute", top: "0", left: "0", right: "0", display: "flex", justifyContent: "space-between", alignItems: "flex-start", padding: "28px 36px", pointerEvents: "none"}}>
         <div ref={vaultDateRef} style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "14px", letterSpacing: ".14em", color: "#F7F5F0", opacity: ".85"}}>AUGUST 2025</div>
         <div className="g-side" style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".14em", color: "rgba(247,245,240,.55)", textAlign: "right", lineHeight: "1.7"}}>GOLD HELD FOR FOREIGN CENTRAL BANKS AT THE NEW YORK FED<br />FEDERAL RESERVE TABLE 3.13</div>
@@ -2139,7 +2181,7 @@ export default class TheBill extends React.Component {
         </div>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The scale.</strong> {vaultScaleNote}</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>Who, and why.</strong> De Nederlandsche Bank moved 86 tonnes out of New York and Ottawa to London between March and August 2026, "in view of increasing geopolitical unrest," cutting New York's share of Dutch reserves from 31.3% to 18.5% (announced 2 September). The Banque de France moved 129 tonnes' worth from New York to Paris between July 2025 and January 2026 by selling older bars in New York and buying in Paris; no bar was shipped. The Reserve Bank of India brought its share held abroad from 55% to 22%, though from London and Basel rather than New York. Germany, with 1,236 tonnes in New York, is under pressure to repatriate and has no formal plan.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The Fed's counter-argument, at full size.</strong> Colin Weiss (Federal Reserve Board, FEDS Notes, 3 September 2026): gold's apparent overtaking of Treasuries as a reserve asset is a valuation effect from private ETF demand, not central-bank buying; five legacy holders own 52% of official gold and have not added since the 1970s; foreign officials bought about $200bn of Treasuries net from 2022 to April 2026. Gold itself is down about a fifth from its January record ($5,589 to $4,471 an ounce), and the dollar index is up since the war began. {treasSentence} total foreign Treasury holdings (TIC) were $9.3tn in June, the largest on record bar February.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The Fed's counter-argument, at full size.</strong> Colin Weiss (Federal Reserve Board, FEDS Notes, 3 September 2026): gold's apparent overtaking of Treasuries as a reserve asset is a valuation effect from private ETF demand, not central-bank buying; five legacy holders own 52% of official gold and have not added since the 1970s; foreign officials bought about $200bn of Treasuries net from 2022 to April 2026. {goldFedNote} {treasSentence} total foreign Treasury holdings (TIC) were $9.3tn in June, the largest on record bar February.</p>
         <p style={{margin: "0", fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.7)", lineHeight: "1.7"}}>Sources: Federal Reserve International Summary Statistics, Table 3.13 (latest release, provisional) · DNB press release 2 Sep 2026 · Bloomberg / Yahoo Finance 17 Jun 2026 · RBI half-yearly report · FEDS Notes 3 Sep 2026 · US Treasury TIC · Trading Economics for the gold price.
         </p>
       </div>
@@ -2185,12 +2227,12 @@ export default class TheBill extends React.Component {
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>How fresh this is.</strong> {freshNote}</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>The missing month.</strong> The October 2025 Consumer Price Index was never collected. Every twelve-month comparison on this page runs month to month across that gap rather than by counting observations.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>{dieselHeadPolicy}</strong> {dieselNote} Eggs cost half what they did in January 2025 because the 2022–25 avian influenza outbreak ended; that fall is real and it is not policy. The oil peak is the daily spot close, $114.58 on 7 April, the day the first ceasefire was announced.</p>
-        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What the counts are, and are not.</strong> PortWatch ship counts come from satellite AIS positions; ships transmitting no position are not counted, so every figure is a floor and none is a queue count. Ship and particle positions on the globe and the strait are a model; the counts driving them are not. Household costs are national averages built from stated quantities, and the running total assumes the current monthly gap applied evenly since 20 January 2025. The war-cost casualty figure is a news organisation's count, and a higher tally exists. The jobs comparison uses 2023 and 2024, not the whole previous term, because that term began with the pandemic rebound. Gold tonnage is derived from the Fed's statutory valuation, which fixes the price and so isolates the ounces. The "what the lost aircraft cost" comparisons divide one Pentagon figure by one list price each; they are scale, not a proposal for how the money should have been spent.</p>
+        <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What the counts are, and are not.</strong> PortWatch ship counts come from satellite AIS positions; ships transmitting no position are not counted, so every figure is a floor and none is a queue count. Ship and particle positions on the globe and the strait are a model; the counts driving them are not. Household costs are national averages built from stated quantities, and the running total assumes the current monthly gap applied evenly since 20 January 2025. The casualty figure is the Pentagon's own count, which it has revised upward, and a higher reported tally exists. The jobs comparison uses 2023 and 2024, not the whole previous term, because that term began with the pandemic rebound. Gold tonnage is derived from the Fed's statutory valuation, which fixes the price and so isolates the ounces. The "what the lost aircraft cost" comparisons divide one Pentagon figure by one list price each; they are scale, not a proposal for how the money should have been spent.</p>
         <p style={{margin: "0", textWrap: "pretty"}}><strong style={{fontWeight: "600"}}>What we will not do.</strong> War and tariff effects are never summed. Odds are odds. No queue count is published because none exists at any tier. The word "cover-up" does not appear; where an estimate is disputed, the denial is printed beside it.</p>
       </div>
       <div style={{fontFamily: "'IBM Plex Mono',monospace", fontSize: "12px", letterSpacing: ".04em", color: "rgba(11,30,63,.75)", lineHeight: "1.8", borderTop: "1px solid rgba(11,30,63,.25)", paddingTop: "18px"}}>
         <div style={{letterSpacing: ".16em", color: "rgba(11,30,63,.55)", marginBottom: "6px"}}>SOURCES</div>
-        IMF PortWatch (IMF / University of Oxford), chokepoint transit estimates, as of {asOf} · FRED: DCOILWTICO, GASDESW, PAYEMS, CPIAUCNS, CES0500000003, LNS13025703, U6RATE, JTSHIR, JTSQUR, SP500, MORTGAGE30US, DTWEXBGS, and the BLS average-price series listed on the board · EIA weekly retail gasoline and diesel, Electric Power Monthly, Weekly Petroleum Status Report · Federal Reserve International Summary Statistics Table 3.13; FEDS Notes, 3 Sep 2026 · De Nederlandsche Bank press release, 2 Sep 2026 · Banque de France via Bloomberg, 17 Jun 2026 · Reserve Bank of India half-yearly report · Congressional Research Service IN12692 · {warCite}; DoD FY2026 supplemental request · NBC News data desk, {casDate} · CSIS; CNN on munitions · Washington Post; Stars and Stripes on Bahrain · Supreme Court, <em>Learning Resources v. Trump</em>, 20 Feb 2026; Dallas Fed, Jun 2026 · Natural Earth coastlines via world-atlas · USDA Food Plans; EPA fleet fuel economy; EIA RECS · Sony Interactive Entertainment US list price, 21 Aug 2025; College Board Trends in College Pricing 2024–25; Costco; US Census Bureau households and population; F-35 Joint Program Office unit cost.
+        IMF PortWatch (IMF / University of Oxford), chokepoint transit estimates, as of {asOf} · FRED: DCOILWTICO, GASDESW, PAYEMS, CPIAUCNS, CES0500000003, LNS13025703, U6RATE, JTSHIR, JTSQUR, SP500, MORTGAGE30US, DTWEXBGS, and the BLS average-price series listed on the board · EIA weekly retail gasoline and diesel, Electric Power Monthly, Weekly Petroleum Status Report · Federal Reserve International Summary Statistics Table 3.13; FEDS Notes, 3 Sep 2026 · De Nederlandsche Bank press release, 2 Sep 2026 · Banque de France via Bloomberg, 17 Jun 2026 · Reserve Bank of India half-yearly report · Congressional Research Service IN12692 · {warCite}; DoD FY2026 supplemental request · {casCite} · CSIS; CNN on munitions · Washington Post; Stars and Stripes on Bahrain · Supreme Court, <em>Learning Resources v. Trump</em>, 20 Feb 2026; Dallas Fed, Jun 2026 · Natural Earth coastlines via world-atlas · USDA Food Plans; EPA fleet fuel economy; EIA RECS · Sony Interactive Entertainment US list price, 21 Aug 2025; College Board Trends in College Pricing 2024–25; Costco; US Census Bureau households and population; F-35 Joint Program Office unit cost.
       </div>
     </div>
   </section>

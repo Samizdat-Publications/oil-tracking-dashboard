@@ -30,6 +30,7 @@ step "Rebuilding the snapshot from FRED, EIA, Treasury and IMF PortWatch"
 # publish a page full of dashes.
 step "Validating"
 (cd backend && py scripts/validate_snapshot.py ../frontend/public/data-snapshot.json)
+(cd backend && py scripts/check_curated.py --due)   # reminder only, never fails
 
 step "Cutting the V5 data files"
 (cd backend && py scripts/build_v5_data.py)

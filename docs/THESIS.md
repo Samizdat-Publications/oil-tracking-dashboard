@@ -747,10 +747,15 @@ Drones §232 (3 Sep). Polysilicon §232 (Dec). China crane tariffs delayed to 10
 - **Dollars:** DoD **$37.5bn** to 21 Jul (Hegseth, Senate Appropriations); $29bn at 12 May
   (Comptroller Hurst); **$67.1bn** supplemental requested, **$21bn munitions**. Moody's Analytics:
   domestic cost up to $150bn including energy (T2). Trump, 28 Feb: "four to five weeks".
-- **Lives:** **18 US service members killed**, hundreds injured (NBC data desk, 28 Aug). An
-  unofficial tally says 20 killed / 762 injured (T3; cite as alternative only).
-- **Airframes:** **CRS IN12692** — 42 aircraft lost or damaged to 13 May: 4 F-15E, 1 F-35A,
-  1 A-10, 7 KC-135, 1 E-3, 2 MC-130J, 1 HH-60W, 24 MQ-9, 1 MQ-4C; **DoD loss estimate $2.6bn**.
+- **Lives:** **21 US service members killed**, 865 wounded (Pentagon DCAS, through 9 Oct; AP
+  10 Oct, TIER 1). The count was 18 on 28 Aug (NBC data desk); on 9 Oct the Pentagon added two
+  noncombat deaths it had not counted. The Washington Post (18 Sep, six officials) reported at
+  least 22; Hegseth called it false. Both are printed; the official count is drawn.
+- **Airframes:** **CRS IN12692**, revised 5 Oct (Military Times, 7 Oct): **81 aircraft lost or
+  damaged**, 32 manned and 49 drones: 12 F-15E, 1 F-35A, 2 A-10, 7 KC-135, 1 E-3, 2 MC-130J,
+  4 AH-6, 1 AH-64, 1 MH-60S, 1 HH-60W, 45 MQ-9, 3 MQ-1, 1 MQ-4C. Some damaged aircraft may have
+  returned to service. The May version counted 42; the **DoD loss estimate of $2.6bn covers those
+  42 only**, and no official price exists for the rest.
   Three F-15Es were friendly fire (2 Mar); five KC-135s were hit on the ground at Prince
   Sultan (14 Mar). Per-type pricing only from DoD unit costs where CRS gives them.
 - **Bases and logistics:** the Navy's Bahrain hub struck on 28 Feb; ≥228 structures or

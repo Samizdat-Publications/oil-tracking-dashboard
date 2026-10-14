@@ -7,14 +7,16 @@
   },
 
   "gold": {
+    "moves_checked": "2026-10-13",
     "fed_earmarked_gold": {
       "name": "Gold held under earmark at the New York Fed for foreign and international accounts",
-      "source": "Federal Reserve, International Summary Statistics, Table 3.13 'Selected Foreign Official Assets Held at Federal Reserve Banks' (August 2026 release; July 2026 point provisional)",
-      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260831.htm",
+      "source": "Federal Reserve, International Summary Statistics, Table 3.13 'Selected Foreign Official Assets Held at Federal Reserve Banks' (September 2026 release, updated 25 September; August 2026 point provisional)",
+      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260930.htm",
       "tier": 1,
-      "as_of": "2026-07",
+      "as_of": "2026-08",
+      "checked": "2026-10-13",
       "unit": "millions of US dollars at the statutory $42.22 per fine troy ounce",
-      "note": "The statutory valuation has not changed since 1973, so a change in this row is a change in OUNCES, not in price. Tonnes = usd_m / 42.22 * 31.1034768 / 1000. July 2026 ($7,812m, about 5,755 t) is marked provisional by the Fed. Aug 2025 to Jul 2026: about 164 t out; the row fell or held flat in every month and rose in none.",
+      "note": "The statutory valuation has not changed since 1973, so a change in this row is a change in OUNCES, not in price. Tonnes = usd_m / 42.22 * 31.1034768 / 1000. August 2026 ($7,772m, about 5726 t) is marked provisional by the Fed; July was confirmed at $7,812m. Aug 2025 to Aug 2026: about 193 t out; the row fell or held flat in every month and rose in none.",
       "points": [
         { "date": "2025-08-01", "usd_m": 8034 },
         { "date": "2025-09-01", "usd_m": 7986 },
@@ -27,17 +29,19 @@
         { "date": "2026-04-01", "usd_m": 7852 },
         { "date": "2026-05-01", "usd_m": 7839 },
         { "date": "2026-06-01", "usd_m": 7818 },
-        { "date": "2026-07-01", "usd_m": 7812 }
+        { "date": "2026-07-01", "usd_m": 7812 },
+        { "date": "2026-08-01", "usd_m": 7772 }
       ]
     },
     "fed_custody_treasuries": {
       "name": "US Treasury securities held in custody at the Federal Reserve for foreign official and international accounts",
-      "source": "Federal Reserve, Table 3.13 (August 2026 release; July 2026 point provisional)",
-      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260831.htm",
+      "source": "Federal Reserve, Table 3.13 (September 2026 release, updated 25 September; August 2026 point provisional)",
+      "url": "https://www.federalreserve.gov/data/intlsumm/forassets20260930.htm",
       "tier": 1,
-      "as_of": "2026-07",
+      "as_of": "2026-08",
+      "checked": "2026-10-13",
       "unit": "millions of US dollars, face value",
-      "note": "CUTS AGAINST the custody-flight reading: July rose $18.1bn on the month to $2,634,150m, the first monthly rise since April. Still $148bn below the January 2026 high.",
+      "note": "July rose $18.1bn to $2,634,150m, the only monthly rise since April; August (provisional) fell $39.3bn to $2,594,865m, $188bn below the January 2026 high.",
       "points": [
         { "date": "2025-12-01", "usd_m": 2713888 },
         { "date": "2026-01-01", "usd_m": 2782557 },
@@ -46,7 +50,8 @@
         { "date": "2026-04-01", "usd_m": 2725241 },
         { "date": "2026-05-01", "usd_m": 2665990 },
         { "date": "2026-06-01", "usd_m": 2616059 },
-        { "date": "2026-07-01", "usd_m": 2634150 }
+        { "date": "2026-07-01", "usd_m": 2634150 },
+        { "date": "2026-08-01", "usd_m": 2594865 }
       ]
     },
     "historical_custody": {
@@ -136,10 +141,11 @@
     },
     "gold_price": {
       "record": { "date": "2026-01-28", "usd_oz": 5589.38 },
-      "latest": { "date": "2026-09-04", "usd_oz": 4470.66 },
-      "note": "No FRED series carries the LBMA price after 2022, so this is Tier 2. Gold is DOWN about a fifth from its January record; the custody story is about where gold sits, not what it costs.",
-      "source": "Trading Economics; CBS News, September 2026",
+      "latest": { "date": "2026-10-13", "usd_oz": 4155.34 },
+      "note": "No FRED series carries the LBMA price after 2022, so this is Tier 2. Gold is DOWN about a quarter from its January record (the page computes the share from these two prices); the custody story is about where gold sits, not what it costs.",
+      "source": "Trading Economics, close of 13 October 2026; record close from CBS News",
       "url": "https://tradingeconomics.com/commodity/gold",
+      "checked": "2026-10-13",
       "tier": 2
     },
     "tic_foreign_holdings": {
@@ -689,6 +695,7 @@
 
   "war_cost": {
     "dod_cost": {
+      "checked": "2026-10-13",
       "usd_bn": 43.6,
       "as_of": "2026-09-03",
       "reported": "2026-09-18",
@@ -717,6 +724,7 @@
       "cite": "Roll Call, 18 Sep 2026"
     },
     "cbo_estimate": {
+      "checked": "2026-10-13",
       "release": "2026-09-15",
       "usd_bn": 38,
       "through": "2026-08-01",
@@ -737,6 +745,7 @@
       "tier": 2
     },
     "supplemental_request": {
+      "checked": "2026-10-13",
       "usd_bn": 67.1,
       "munitions_usd_bn": 21,
       "note": "Single biggest item is $21bn for munitions to rebuild stockpiles expended in the opening months.",
@@ -745,10 +754,14 @@
       "tier": 1
     },
     "casualties": {
-      "us_killed": 18,
-      "us_injured": "hundreds",
-      "as_of": "2026-08-28",
-      "alt_count": { "killed": 20, "injured": 762, "source": "Wikipedia tally of contemporaneous reporting", "tier": 3 },
+      "checked": "2026-10-13",
+      "us_killed": 21,
+      "us_injured": 865,
+      "as_of": "2026-10-09",
+      "who": "the Pentagon's own casualty database (DCAS)",
+      "short": "PENTAGON DCAS",
+      "previous": { "us_killed": 18, "as_of": "2026-08-28", "source": "NBC News data desk, from the Pentagon's public database" },
+      "revision": "On 9 October the Pentagon added two noncombat deaths it had not counted: an Army National Guard major who died in Kuwait on 6 March, and a Navy suicide in September.",
       "wapo_count": {
         "killed_at_least": 22,
         "reported": "2026-09-18",
@@ -758,28 +771,35 @@
         "url": "https://www.washingtonpost.com/national-security/2026/09/18/more-us-troops-have-died-amid-iran-war-than-pentagon-has-disclosed-publicly/",
         "tier": 2
       },
-      "source": "NBC News data desk, updated 28 August 2026",
-      "url": "https://www.nbcnews.com/data-graphics/iran-war-data-cost-death-toll-oil-gas-prices-strikes-trump-rcna588554",
-      "tier": 2
+      "source": "Pentagon Defense Casualty Analysis System, current through 9 October 2026, as reported by the Associated Press on 10 October",
+      "url": "https://www.adn.com/nation-world/2026/10/10/pentagon-raises-official-toll-of-troops-who-died-during-war-with-iran-to-21/",
+      "tier": 1
     },
     "aircraft": {
-      "as_of": "2026-05-13",
-      "total_lost_or_damaged": 42,
+      "as_of": "2026-10-05",
+      "checked": "2026-10-13",
+      "total_lost_or_damaged": 81,
       "dod_loss_estimate_usd_bn": 2.6,
+      "dod_loss_estimate_covers": { "aircraft": 42, "manned": 17, "drones": 25, "as_of": "2026-05-13" },
       "by_type": {
-        "F-15E": 4,
+        "F-15E": 12,
         "F-35A": 1,
-        "A-10": 1,
+        "A-10": 2,
         "KC-135": 7,
         "E-3": 1,
         "MC-130J": 2,
+        "AH-6": 4,
+        "AH-64": 1,
+        "MH-60S": 1,
         "HH-60W": 1,
-        "MQ-9": 24,
+        "MQ-9": 45,
+        "MQ-1": 3,
         "MQ-4C": 1
       },
-      "note": "Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. Count is as of the CRS report and will be updated from any later official tally. UPDATE 23 Sep 2026: CBO (15 Sep) also counts 42 planes plus one radar system lost through 1 August, so the headline 42 stands. The DoD Lead Inspector General's quarterly report on Operation Epic Fury (released 9 Sep, covering to 30 Jun) gives 'as many as 30' MQ-9s destroyed (CRS: 24) and adds four AH-6s, an AH-64 and an MH-60S not in the CRS list; its counts are 'at least' / 'as many as' ranges, so by_type is NOT changed to mix the two sources (Al Jazeera, 15 Sep, summarising the IG report; IG report https://media.defense.gov/2026/Sep/09/2003993626/-1/-1/1/OEF_Q3_JUN2026_FINAL_508%20SECURE.PDF).",
-      "source": "Congressional Research Service, IN12692, 'U.S. Aircraft Combat Losses in Operation Epic Fury'",
-      "url": "https://www.congress.gov/crs-product/IN12692",
+      "previous": { "total_lost_or_damaged": 42, "as_of": "2026-05-13" },
+      "note": "Three F-15Es were lost to friendly fire over Kuwait on 2 March; five KC-135s were damaged on the ground at Prince Sultan Air Base on 14 March; two MC-130Js were destroyed in Iran during the 5 April rescue. The 5 October revision adds jets damaged in a September Iranian strike on a base in Jordan, helicopter losses from a Pentagon inspector general report, and more MQ-9s. CRS: some damaged aircraft may have been returned to active service, so this is not a count of destroyed aircraft. The DoD loss estimate of $2.6bn covers the 42 counted to 13 May; there is no official estimate for the rest.",
+      "source": "Congressional Research Service, IN12692, 'U.S. Aircraft Combat Losses in Operation Epic Fury', revised 5 October 2026 (type counts as reported by Military Times, 7 October 2026)",
+      "url": "https://www.militarytimes.com/news/your-military/2026/10/07/us-aircraft-lost-or-damaged-in-iran-war-nearly-doubles-in-latest-congressional-report/",
       "tier": 1
     },
     "bases": {
@@ -792,6 +812,7 @@
       "tier": 2
     },
     "munitions": {
+      "checked": "2026-10-13",
       "patriot_remaining_share": 0.33,
       "thaad_used_share": 0.8,
       "patriot_used_share": 0.5,

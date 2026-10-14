@@ -69,6 +69,12 @@ Invoke-Step $Backend 'py' @('scripts/build_snapshot.py')
 Write-Step 'Validating'
 Invoke-Step $Backend 'py' @('scripts/validate_snapshot.py', '../frontend/public/data-snapshot.json')
 
+# The figures typed in from named sources (war cost, casualties, aircraft, the Fed's
+# gold table) do not refresh themselves. This lists which are due for a look; it
+# never stops the run. /weekly-refresh in Claude Code does the looking.
+Write-Step 'Hand-checked figures'
+Invoke-Step $Backend 'py' @('scripts/check_curated.py', '--due')
+
 Write-Step 'Cutting the V5 data files'
 Invoke-Step $Backend 'py' @('scripts/build_v5_data.py')
 

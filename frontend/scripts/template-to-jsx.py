@@ -62,7 +62,7 @@ CANVAS_LABELS = [
     "requested, and 100 triangles showing about ${patriotPct} percent of Patriot "
     "interceptors left, an estimate the Secretary of Defense disputes.",
 
-    "The ${aircraftN} lost or damaged aircraft beside a large equals sign, and a pile of "
+    "The ${buyAC} aircraft the Pentagon has priced, lost or damaged, beside a large equals sign, and a pile of "
     "gold squares showing what the same money buys: PlayStation 5s, gallons of diesel, "
     "years of in-state tuition, Costco hot dogs. The sequence ends with the whole "
     "war's ${warSpent} as a pile roughly ${buyRatio} times larger, running off the top "
@@ -72,8 +72,7 @@ CANVAS_LABELS = [
     "New York Fed, one icon for every ten 400-ounce bars, ${vaultBars} bars or "
     "${vaultOut} tonnes over ${vaultMonths} months with none coming in. Beside it, who "
     "moved theirs and why, including Germany's gold still there, and the Fed's own "
-    "answer: gold is down a fifth from its January record, and the dollar is up "
-    "since the war began.",
+    "answer: ${goldFedLabel}.",
 ]
 
 
