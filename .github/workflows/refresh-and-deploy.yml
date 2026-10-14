@@ -58,6 +58,9 @@ jobs:
       - name: Cut the V5 data files
         working-directory: backend
         run: python scripts/build_v5_data.py
+      - name: Landing page figures
+        working-directory: backend
+        run: python scripts/build_landing.py
 
       # The sites show only the latest numbers; this file is the only history.
       - name: Record the figures
@@ -105,7 +108,7 @@ jobs:
         run: |
           git config user.name "snapshot-bot"
           git config user.email "snapshot-bot@users.noreply.github.com"
-          git add frontend/public/data-snapshot.json frontend/public/og.png frontend/public/og.html frontend/public/v5 docs/refresh-history.csv
+          git add frontend/public/data-snapshot.json frontend/public/og.png frontend/public/og.html frontend/public/v5 docs/refresh-history.csv docs/index.html
           if git diff --cached --quiet; then
             echo "snapshot unchanged"
           else

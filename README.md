@@ -29,13 +29,13 @@ series IDs, the dates and the method.
 | | |
 |---|---|
 | ![Two dates](docs/screens/01-two-dates.jpg) | ![Oil doubled](docs/screens/oil.gif) |
-| **01 · Two dates.** 24 February, the tariffs re-imposed. 28 February, the strike. Every red mark on the page traces back to one of them. | **02 · Oil doubled.** Every daily WTI close of 2026 on a moving seismograph: $57 in January, $114.58 on 7 April, and back up when the strikes resumed. |
+| **01 · Two dates.** 24 February, the tariffs re-imposed. 28 February, the strike. Every red mark on the page traces back to one of them. | **02 · Oil.** Every daily WTI close of 2026 on a moving seismograph, ending on the whole year with a price scale: January, the April peak, and now. |
 | ![The strait](docs/screens/strait.gif) | ![Your prices](docs/screens/prices.gif) |
 | **03 · The strait.** The real Traffic Separation Scheme on a Natural Earth coastline. One ship on screen for each ship a day: 83 before the war, 3 now, beside the President's "30 a night". | **04 · Your prices.** A split-flap board of fourteen prices, January 2025 against the latest month. Pick your state and the fuel and electricity rows re-total. |
 | ![Nobody is hiring](docs/screens/jobs.gif) | ![What the war cost](docs/screens/war-cost.gif) |
-| **05 · Nobody is hiring.** One figure per 10,000 jobs: 320,938 a month in 2021-25 against 42,474 since. It also explains why jobless claims are low while hiring is frozen. | **06 · What the war cost.** US service members killed, 42 aircraft lost or damaged, $43.6 billion spent, and the interceptor count the Defense Secretary disputes, printed beside the dispute. |
+| **05 · Hiring.** One figure per 10,000 jobs: the 2023-24 pace against what has happened since January 2025. It also explains why jobless claims are low while hiring is frozen. | **06 · What the war cost.** US service members killed (the Pentagon's own count), aircraft lost or damaged (CRS), what the Pentagon says it has spent beside the CBO's lower estimate, and the interceptor count the Defense Secretary disputes, printed beside the dispute. |
 | ![What it buys](docs/screens/07-what-it-buys.jpg) | ![The gold leaves New York](docs/screens/gold.gif) |
-| **07 · What it buys.** The lost aircraft priced in PlayStations, gallons of diesel, years of tuition and hot dogs, then the whole war at the same scale. | **08 · The world backs away.** 13,142 gold bars (164 tonnes, about 39 a day) taken out of the New York Fed in eleven months, who moved theirs and why, and the Fed's own rebuttal at full size. |
+| **07 · What it buys.** The aircraft the Pentagon has priced, in PlayStations, gallons of diesel, years of tuition and hot dogs, then the whole war at the same scale. | **08 · Gold leaves New York.** Foreign central banks' gold taken out of the New York Fed, month by month in 400-ounce bars, who moved theirs and why, and the Fed's own rebuttal at full size. |
 | ![Your bill](docs/screens/bill.gif) | ![Check our work](docs/screens/10-check-our-work.jpg) |
 | **09 · Your bill.** The share card, rendered from the real block, so the card and the page can never disagree. | **10 · Check our work.** What cuts against this page, how fresh each figure is, and what the numbers can and cannot say. |
 

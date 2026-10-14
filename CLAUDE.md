@@ -219,6 +219,9 @@ so the hand formatting survives. The Claude Code command
 `.claude/commands/weekly-refresh.md` (versioned here, with a pointer copy in the parent folder)
 runs the whole loop: check the due figures against sourced reporting, dry build, screenshot,
 publish, report. og:image carries `?v=<refresh date>` so Facebook fetches the new card.
+The landing page's figures (`docs/index.html`, between `<!--fig:name-->` markers) are rewritten
+from the V5 data by `backend/scripts/build_landing.py` on every refresh and committed with the
+data; the README describes the blocks without moving figures, so it does not go stale.
 
 **Every refresh is recorded.** `backend/scripts/record_refresh.py` appends a row to
 `docs/refresh-history.csv`: crude, the Hormuz seven-day mean, diesel, the staples,

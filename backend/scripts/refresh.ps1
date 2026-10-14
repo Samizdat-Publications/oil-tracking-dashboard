@@ -77,6 +77,8 @@ Invoke-Step $Backend 'py' @('scripts/check_curated.py', '--due')
 
 Write-Step 'Cutting the V5 data files'
 Invoke-Step $Backend 'py' @('scripts/build_v5_data.py')
+# The landing page on GitHub Pages carries the same headline figures.
+Invoke-Step $Backend 'py' @('scripts/build_landing.py')
 
 # The site only ever shows the latest numbers. This is the only place the
 # history is kept, so it goes in before anything is published.
@@ -112,7 +114,7 @@ Write-Step 'Committing the refreshed data'
 Push-Location $Root
 try {
     git add frontend/public/data-snapshot.json frontend/public/v5 `
-            frontend/public/og.png frontend/public/og.html docs/refresh-history.csv
+            frontend/public/og.png frontend/public/og.html docs/refresh-history.csv docs/index.html
     git diff --cached --quiet
     if ($LASTEXITCODE -eq 0) {
         Write-Host 'data unchanged, nothing to commit'

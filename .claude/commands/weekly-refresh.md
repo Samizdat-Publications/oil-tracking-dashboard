@@ -56,8 +56,10 @@ being true; numbers typed into copy do not.
 ## 4. Publish
 
 Commit any code or data you changed. Then run `powershell -File backend\scripts\refresh.ps1`.
-It rebuilds the data, deploys both V5 sites and V4, records the figures, and commits and
-pushes the data. Confirm that https://trumps-economy-the-bill.pages.dev/ serves the new date
+It rebuilds the data, rewrites the landing page's figures (`build_landing.py`), deploys both
+V5 sites and V4, records the figures, and commits and pushes the data. Run it in a terminal
+without redirecting its output: under Windows PowerShell 5.1, `*> file` turns git's progress
+messages into errors and stops the script after the V5 deploy, before the V4 pass. Confirm that https://trumps-economy-the-bill.pages.dev/ serves the new date
 and that the `og:image` URL in its HTML carries the new `?v=` date.
 
 ## 5. Report to Stewart
