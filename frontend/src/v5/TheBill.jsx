@@ -102,6 +102,9 @@ export default class TheBill extends React.Component {
     return {
       canvasRef: this.canvasRef, dateRef: this.dateRef, eventRef: this.eventRef, numRef: this.numRef, kickRef: this.kickRef, buyKickRef: this.buyKickRef,
       wasRef: this.wasRef, legendRef: this.legendRef, cueRef: this.cueRef,
+      // the first screen's button pages down one screen: inside block 00 that plays the
+      // globe-to-strait zoom rather than skipping it, and after it reaches the next block
+      onMore: () => { try { scrollBy({ top: innerHeight * 0.9, behavior: this.reduced ? 'auto' : 'smooth' }); } catch (e) { scrollBy(0, innerHeight * 0.9); } },
       workRows: this.state.rows, asOf: this.state.asOf,
       boardRef: this.boardRef, pDateRef: this.pDateRef, pWeekRef: this.pWeekRef,
       stampStageRef: this.stampStageRef, stamp1Ref: this.stamp1Ref, stamp2Ref: this.stamp2Ref, stampNoteRef: this.stampNoteRef, stampSentenceRef: this.stampSentenceRef,
@@ -1702,7 +1705,6 @@ export default class TheBill extends React.Component {
     let ev = null; for (const e of this.events) if (day >= e.d && day < e.d + 22) ev = e;
     const er = this.eventRef.current;
     if (er) { const txt = ev ? ev.t : ''; if (er.textContent !== txt) { er.textContent = txt; er.style.color = ev && ev.red ? MARK_RED : '#6C8CD5'; } }
-    if (this.cueRef.current) this.cueRef.current.style.opacity = P > 0.03 ? '0' : '1';
     const lg = this.legendRef.current;
     if (lg && (this.lastLegend === undefined || Math.abs(this.lastLegend - day) > 2)) {
       this.lastLegend = day;
@@ -1713,7 +1715,7 @@ export default class TheBill extends React.Component {
 
   render() {
     const V = this.renderVals();
-    const { africaNote, africaSentence, againstRows, aheYoy, aircraftList, aircraftN, asOf, babPct, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyKickRef, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, casAlt, casDate, casHead, casN, cboNote, claimsNote, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, crudeLastText, cueRef, cumulativeText, dateRef, dieselFrom, dieselHead, dieselHeadPolicy, dieselNote, dieselThrough, dieselVerdict, digits, elecThrough, eventRef, freshNote, gasThrough, globeThrough, hires, hormuzMean, hormuzNow, jobsBaseLabel, jobsCurr, jobsKicker, jobsLatest, jobsMed, jobsN, jobsNeg, jobsPrev, jobsPrevMed, jobsSentence, jobsTermMean, jobsWas, kickRef, layoffs, legendRef, loadError, lossBn, ltu0, ltu1, ltuWhen, numRef, odo, oilKicker, oilSentence, onState, pDateRef, pWeekRef, patriotPct, payMonth, placeName, pricesDown, pricesMonth, quits, quoteNote, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, receiptMonths, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNowWord, strNumRef, strSentence, strSubRef, strTanker, straitRange, straitRef, suppText, tariffNote, tariffSentence, totalCells, treasSentence, unemp0, unemp1, unempDir, updatedCaps, vaultBars, vaultDateRef, vaultEnd, vaultFrom, vaultMonths, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultScaleNote, vaultSentence, vaultStart, vaultSub, vaultTo, warAsOf, warCite, warHead, warMonthsCaps, warNote, warRef, warSpent, warWho, wasRef, workPrices, workRows } = V;
+    const { africaNote, africaSentence, againstRows, aheYoy, aircraftList, aircraftN, asOf, babPct, boardRef, buyDateRef, buyDays, buyDiesel, buyDogs, buyDogsTotal, buyGallons, buyHH, buyJet, buyKickRef, buyNumRef, buyPS5, buyRatio, buyRef, buySubRef, buyTuition, canvasRef, cardDate, cardItems, cardRef, casAlt, casDate, casHead, casN, cboNote, claimsNote, cpiYoy, crowdDateRef, crowdNumRef, crowdRef, crudeCount, crudeLast, crudeLastText, cueRef, cumulativeText, dateRef, dieselFrom, dieselHead, dieselHeadPolicy, dieselNote, dieselThrough, dieselVerdict, digits, elecThrough, eventRef, freshNote, gasThrough, globeThrough, hires, hormuzMean, hormuzNow, jobsBaseLabel, jobsCurr, jobsKicker, jobsLatest, jobsMed, jobsN, jobsNeg, jobsPrev, jobsPrevMed, jobsSentence, jobsTermMean, jobsWas, kickRef, layoffs, legendRef, loadError, lossBn, ltu0, ltu1, ltuWhen, numRef, odo, oilKicker, oilSentence, onMore, onState, pDateRef, pWeekRef, patriotPct, payMonth, placeName, pricesDown, pricesMonth, quits, quoteNote, realYoy, receiptElectricity, receiptFuel, receiptGroceries, receiptMethod, receiptMonths, rows, seisDateRef, seisNumRef, seisRef, seisSubRef, stamp1Ref, stamp2Ref, stampNoteRef, stampSentenceRef, stampStageRef, state, stateOptions, strAug18, strBase, strDateRef, strEventRef, strNowWord, strNumRef, strSentence, strSubRef, strTanker, straitRange, straitRef, suppText, tariffNote, tariffSentence, totalCells, treasSentence, unemp0, unemp1, unempDir, updatedCaps, vaultBars, vaultDateRef, vaultEnd, vaultFrom, vaultMonths, vaultNumRef, vaultOut, vaultRef, vaultRows, vaultScaleNote, vaultSentence, vaultStart, vaultSub, vaultTo, warAsOf, warCite, warHead, warMonthsCaps, warNote, warRef, warSpent, warWho, wasRef, workPrices, workRows } = V;
     return (
       <div className="v5-bill-root" role="main" style={{fontFamily: "'Source Serif 4',Georgia,serif", background: "#0B1E3F", color: "#F7F5F0", overflow: "clip"}}>
   <h1 className="v5-sr">The Bill: what Trump’s war and tariffs cost you</h1>
@@ -1749,7 +1751,7 @@ export default class TheBill extends React.Component {
         <div className="g-side" ref={legendRef} style={{display: "flex", flexDirection: "column", gap: "7px", fontFamily: "'IBM Plex Mono',monospace", fontSize: "13px", letterSpacing: ".08em", color: "rgba(247,245,240,.8)", textAlign: "right", flex: "none"}}></div>
       </div>
 
-      <div ref={cueRef} style={{position: "absolute", left: "50%", bottom: "14px", transform: "translateX(-50%)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", letterSpacing: ".2em", color: "rgba(247,245,240,.5)", pointerEvents: "none", whiteSpace: "nowrap", transition: "opacity .4s"}}>SCROLL · SHOW THE WORK BELOW</div>
+      <button ref={cueRef} className="g-more" type="button" onClick={onMore} aria-label="Scroll down: the page continues below the globe" style={{position: "absolute", left: "50%", bottom: "10px", transform: "translateX(-50%)", zIndex: "3", display: "flex", alignItems: "center", gap: "10px", padding: "9px 16px 9px 18px", background: "rgba(11,30,63,.88)", color: "#F7F5F0", border: "1px solid rgba(212,160,23,.7)", borderRadius: "999px", boxShadow: "0 6px 24px rgba(0,0,0,.35)", fontFamily: "'IBM Plex Mono',monospace", fontSize: "11px", fontWeight: "500", letterSpacing: ".16em", whiteSpace: "nowrap", cursor: "pointer", transition: "opacity .4s"}}>THE BILL CONTINUES BELOW<span className="g-chev" aria-hidden="true" style={{display: "inline-block", color: "#D4A017", fontSize: "15px", lineHeight: "1"}}>↓</span></button>
     </div>
   </section>
 
