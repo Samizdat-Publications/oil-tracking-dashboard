@@ -1,5 +1,7 @@
 # The Bill
 
+![Status: v1.0](https://img.shields.io/badge/status-v1.0-2ea043)
+
 **What the 2026 Iran war and the tariffs cost an American household, told in eleven
 animated blocks and measured only in the government's own numbers.**
 
