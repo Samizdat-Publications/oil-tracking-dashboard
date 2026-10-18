@@ -6,6 +6,7 @@
 animated blocks and measured only in the government's own numbers.**
 
 **Live: [trumps-economy-the-bill.pages.dev](https://trumps-economy-the-bill.pages.dev)** ·
+[Landing page](https://the-bill-cy1.pages.dev/) ·
 [about the project](https://samizdat-publications.github.io/oil-tracking-dashboard/) ·
 [the thesis and every source](docs/THESIS.md)
 

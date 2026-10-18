@@ -1,27 +1,49 @@
 {
   "name": "The Bill",
   "repo": "oil-tracking-dashboard",
-  "pitch": "A scroll-driven data story on what the 2026 Iran war and the tariffs cost a US household, in government numbers only.",
+  "pitch": "Live tracking of what the tariffs and the Iran war are doing to prices, followed downstream to a US household's bill.",
   "status": "v1",
   "version": "1.0.0",
   "kind": "dashboard",
   "started": "2026-04-02",
-  "updated": "2026-10-13",
-  "tech": ["TypeScript", "React", "D3", "FastAPI", "Cloudflare Pages"],
+  "updated": "2026-10-18",
+  "tech": [
+    "TypeScript",
+    "React",
+    "D3",
+    "FastAPI",
+    "Cloudflare Pages"
+  ],
   "links": {
-    "landing": "https://samizdat-publications.github.io/oil-tracking-dashboard/",
-    "play": "",
+    "landing": "https://the-bill-cy1.pages.dev/",
+    "play": "https://trumps-economy-the-bill.pages.dev",
     "devlog": ""
   },
   "hero": {
     "gif": "docs/screens/globe.gif",
-    "poster": "docs/screens/00-globe.jpg",
-    "clip": ""
+    "poster": "site/media/hero.jpg",
+    "clip": "site/media/hero.mp4"
   },
   "credits": [
-    { "what": "Daily ship counts through six straits", "who": "IMF PortWatch", "licence": "Per IMF terms" },
-    { "what": "Crude, fuel, jobs, CPI and fiscal series", "who": "EIA, FRED, BLS, Treasury, CBO", "licence": "US government data, public domain" },
-    { "what": "Euro-area comparison series", "who": "Eurostat / ECB", "licence": "Free reuse per agency terms" },
-    { "what": "Coastlines", "who": "Natural Earth", "licence": "Public domain" }
+    {
+      "what": "Daily ship counts through six straits",
+      "who": "IMF PortWatch",
+      "licence": "Per IMF terms"
+    },
+    {
+      "what": "Crude, fuel, jobs, CPI and fiscal series",
+      "who": "EIA, FRED, BLS, Treasury, CBO",
+      "licence": "US government data, public domain"
+    },
+    {
+      "what": "Euro-area comparison series",
+      "who": "Eurostat / ECB",
+      "licence": "Free reuse per agency terms"
+    },
+    {
+      "what": "Coastlines",
+      "who": "Natural Earth",
+      "licence": "Public domain"
+    }
   ]
 }

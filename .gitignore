@@ -34,3 +34,6 @@ Oil Dashboard New Design/
 # Wrangler local cache. Holds the resolved account id and name (derived from the
 # account email) -- not a credential, but local state rather than source.
 .wrangler/
+
+# Landing page build output
+site-dist/

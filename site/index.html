@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Bill</title>
+<meta name="description" content="Live tracking of what the tariffs and the Iran war are doing to prices, followed downstream to a US household's bill. Government numbers only, every source shown.">
+<meta name="theme-color" content="#0B1E3F">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Bill">
+<meta property="og:description" content="Live tracking of what the tariffs and the Iran war are doing to prices, followed downstream to a US household's bill.">
+<meta property="og:url" content="https://the-bill-cy1.pages.dev/">
+<meta property="og:image" content="https://the-bill-cy1.pages.dev/media/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230B1E3F'/%3E%3Ctext x='16' y='25' font-family='Arial Narrow,Arial' font-weight='700' font-size='20' text-anchor='middle' fill='%23D4A017'%3E$%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="hero">
+  <video id="hero-video" class="hero-video" autoplay muted loop playsinline poster="media/hero.jpg" aria-hidden="true">
+    <source src="media/hero.mp4" type="video/mp4">
+  </video>
+  <div class="hero-shade"></div>
+  <div class="wrap hero-copy">
+    <p class="pill"><span class="dot"></span>v1.0 &middot; live data story</p>
+    <h1>The Bill</h1>
+    <p class="pitch">Live tracking of what the tariffs and the Iran war are doing to prices, followed downstream to a US household's bill.</p>
+    <p class="btns">
+      <a class="btn primary" href="https://trumps-economy-the-bill.pages.dev">Open the live dashboard</a>
+      <a class="btn" href="https://github.com/Samizdat-Publications/oil-tracking-dashboard">Source on GitHub</a>
+    </p>
+    <p class="note">Government numbers only. Every figure is sourced and every block has a "Show the work" panel.</p>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="wrap intro">
+  <p class="kicker">What it is</p>
+  <p class="lede">A scroll-driven data story in eleven blocks. It traces costs to two dated decisions, the tariffs re-imposed on 24 February 2026 and the strike on Iran on 28 February, and never adds war effects and tariff effects together. Each block plays once as it comes into view, then holds still.</p>
+</section>
+
+<section class="wrap feature">
+  <div class="feature-text">
+    <p class="kicker">03 &middot; The strait</p>
+    <h2>One ship on screen for each ship a day</h2>
+    <p>The real traffic separation scheme on a Natural Earth coastline. Eighty-three ships a day crossed the Strait of Hormuz before the war; the satellite count to 4 October 2026 is three. The President's "thirty a night" is drawn beside it and labelled as a claim.</p>
+  </div>
+  <video class="clip" data-inview muted loop playsinline preload="none" poster="media/strait.jpg" aria-label="The Strait of Hormuz block: ships a day falling from 83 to 3">
+    <source src="media/strait.mp4" type="video/mp4">
+  </video>
+</section>
+
+<section class="wrap feature flip">
+  <div class="feature-text">
+    <p class="kicker">02 &middot; Oil</p>
+    <h2>Every daily close of 2026, on a seismograph</h2>
+    <p>Every daily WTI close of the year drawn as it moves: January, the April peak, and now. The page draws WTI spot only, because Brent spot and Brent futures are different instruments, and says so.</p>
+  </div>
+  <video class="clip" data-inview muted loop playsinline preload="none" poster="media/oil.jpg" aria-label="The oil block: the 2026 WTI price drawn as a moving seismograph">
+    <source src="media/oil.mp4" type="video/mp4">
+  </video>
+</section>
+
+<section class="wrap feature">
+  <div class="feature-text">
+    <p class="kicker">04 &middot; Your prices</p>
+    <h2>Fourteen prices on a split-flap board</h2>
+    <p>January 2025 against the latest month. Pick your state and the fuel and electricity rows re-total. The prices that fell are on the board too.</p>
+  </div>
+  <video class="clip" data-inview muted loop playsinline preload="none" poster="media/prices.jpg" aria-label="The prices block: a split-flap board of fourteen household prices">
+    <source src="media/prices.mp4" type="video/mp4">
+  </video>
+</section>
+
+<section class="wrap feature flip">
+  <div class="feature-text">
+    <p class="kicker">06 &middot; What the war cost</p>
+    <h2>Costs, with the disputes printed beside them</h2>
+    <p>US service members killed by the Pentagon's own count, aircraft lost or damaged by the CRS count, what the Pentagon says it has spent beside the CBO's lower estimate, and an interceptor count the Defense Secretary disputes, shown next to the dispute.</p>
+  </div>
+  <video class="clip" data-inview muted loop playsinline preload="none" poster="media/war-cost.jpg" aria-label="The war cost block: service members, aircraft and spending">
+    <source src="media/war-cost.mp4" type="video/mp4">
+  </video>
+</section>
+
+<section class="wrap stills">
+  <p class="kicker">The rest of the page</p>
+  <div class="grid">
+    <figure><img loading="lazy" src="media/globe.jpg" width="1280" height="720" alt="The opening globe: ships a day through six straits"><figcaption><b>00 &middot; The globe</b>Every particle is a share of a real daily count from IMF PortWatch satellite data.</figcaption></figure>
+    <figure><img loading="lazy" src="media/two-dates.jpg" width="1280" height="720" alt="Two dates: 24 February 2026 and 28 February 2026"><figcaption><b>01 &middot; Two dates</b>Every red mark on the page traces back to one of them.</figcaption></figure>
+    <figure><img loading="lazy" src="media/hiring.jpg" width="1280" height="720" alt="Hiring: one figure per 10,000 jobs, the 2023-24 pace against now"><figcaption><b>05 &middot; Hiring</b>One figure per 10,000 jobs, and why jobless claims are low while hiring is slow.</figcaption></figure>
+    <figure><img loading="lazy" src="media/what-it-buys.jpg" width="1280" height="720" alt="What it buys: aircraft priced in PlayStations, diesel, tuition and hot dogs"><figcaption><b>07 &middot; What it buys</b>The aircraft the Pentagon has priced, in PlayStations, gallons of diesel and hot dogs.</figcaption></figure>
+    <figure><img loading="lazy" src="media/gold.jpg" width="1280" height="720" alt="Gold leaving the New York Fed in 400-ounce bars"><figcaption><b>08 &middot; Gold leaves New York</b>Foreign central banks' gold taken out, in 400-ounce bars, with the Fed's rebuttal at full size.</figcaption></figure>
+    <figure><img loading="lazy" src="media/bill.jpg" width="1280" height="720" alt="Your bill: the share card"><figcaption><b>09 &middot; Your bill</b>The share card is rendered from the real block, so card and page cannot disagree.</figcaption></figure>
+  </div>
+</section>
+
+<section class="wrap rules">
+  <p class="kicker">Rules it follows</p>
+  <div class="cols">
+    <div><h3>Zero fabrication</h3><p>Every number comes from a government series or from a curated entry with a source, a URL, a tier and a date. Missing data says so, and gaps render as gaps.</p></div>
+    <div><h3>No moving figure is typed</h3><p>Any sentence that states a verdict about a number the next release can change is built from the data at render time, along with each "as of" date.</p></div>
+    <div><h3>What cuts against it is shown</h3><p>Stocks are up, almost nobody is being laid off, core CPI runs below the headline. A row drops out only when it stops being true.</p></div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <p class="kicker">How it was made</p>
+    <div class="how-body">
+      <p>A Python backend pulls the public data (FRED, EIA, Treasury Fiscal Data, IMF PortWatch) and freezes it into one snapshot. A validation gate stops the deploy if any block is missing, errored or stale. The front end is React 19 and Vite, fully static, with no server at runtime.</p>
+      <p>The page is a port of a design prototype made in Claude Design. A script converts the prototype's markup to JSX mechanically, so copy and styling never drift by hand. The share card is rendered from the real block 09, and the screenshots and clips in the repo are stepped on a fake clock so every frame is evenly spaced.</p>
+      <p>The clips on this page were recorded by script against the live site. Refresh is on demand, after something that moves the numbers, and every refresh appends the headline figures to a history file in the repo.</p>
+      <p class="chips"><span>Python</span><span>FastAPI</span><span>React 19</span><span>D3</span><span>Vite</span><span>Cloudflare Pages</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap credits" id="credits">
+  <p class="kicker">Data and credits</p>
+  <table>
+    <thead><tr><th>What</th><th>Source</th><th>Licence</th></tr></thead>
+    <tbody>
+      <tr><td>Daily ship counts through six straits</td><td>IMF PortWatch</td><td>Per IMF terms</td></tr>
+      <tr><td>Crude, fuel, jobs, CPI and fiscal series</td><td>EIA, FRED, BLS, BEA, Treasury, CBO</td><td>US government data, public domain</td></tr>
+      <tr><td>Military costs and aircraft counts</td><td>Congressional Research Service, CBO</td><td>US government publications, public domain</td></tr>
+      <tr><td>Euro-area comparison series</td><td>Eurostat / ECB</td><td>Free reuse per agency terms</td></tr>
+      <tr><td>Energy figures cited on the page</td><td>IEA</td><td>Cited with attribution, per IEA terms</td></tr>
+      <tr><td>Coastlines</td><td>Natural Earth</td><td>Public domain</td></tr>
+      <tr><td>Reported figures marked Tier 2 in the repo</td><td>Roll Call, Lloyd's List Intelligence, Axios, CNBC and others</td><td>Cited with attribution, not redistributed</td></tr>
+      <tr><td>Type: Barlow Condensed, IBM Plex Mono, Source Serif 4</td><td>Google Fonts</td><td>SIL Open Font Licence</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Code is MIT. Known limits are listed in the <a href="https://github.com/Samizdat-Publications/oil-tracking-dashboard#known-limits">README</a>; the thesis and every source are in <a href="https://github.com/Samizdat-Publications/oil-tracking-dashboard/blob/main/docs/THESIS.md">docs/THESIS.md</a>.</p>
+</section>
+</main>
+
+<footer class="wrap foot">
+  <p><a class="btn primary" href="https://trumps-economy-the-bill.pages.dev">Open the live dashboard</a> <a class="btn" href="https://github.com/Samizdat-Publications/oil-tracking-dashboard">Source on GitHub</a></p>
+  <p class="small">A Samizdat Publications project by Stewart Gregerson.</p>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>
