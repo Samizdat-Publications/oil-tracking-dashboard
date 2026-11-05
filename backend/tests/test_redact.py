@@ -27,3 +27,35 @@ def test_a_bare_configured_key_is_caught(monkeypatch):
     text = "error: token zzzz9999yyyy8888 rejected"
     assert redact.leaks(text)
     assert "zzzz9999" not in redact.scrub(text)
+
+
+
+def test_fred_errors_are_scrubbed_at_the_source(monkeypatch):
+    """A failed FRED request raises with the key already gone, and without the
+    original httpx exception chained (its traceback would print the URL)."""
+    import asyncio
+
+    import httpx
+    import pytest
+
+    from services import fred_client
+
+    class Client:
+        def __init__(self, *a, **k):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *a):
+            return False
+
+        async def get(self, url, params=None):
+            req = httpx.Request("GET", url, params=params)
+            return httpx.Response(400, request=req)   # not transient: raises at once
+
+    monkeypatch.setattr(fred_client.httpx, "AsyncClient", Client)
+    with pytest.raises(RuntimeError) as err:
+        asyncio.run(fred_client._fetch({"series_id": "X", "api_key": "abcd1234ef567890", "file_type": "json"}))
+    assert "abcd1234" not in str(err.value) and "api_key=REDACTED" in str(err.value)
+    assert err.value.__cause__ is None and err.value.__suppress_context__

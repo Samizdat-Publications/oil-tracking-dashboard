@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 
 from services.cache import init_cache, clear_cache, close_cache
 from services.fred_client import SERIES_IDS, get_series
+from services.redact import scrub
 from routers import (
     prices, simulation, correlations, milestones, polymarket, crisis, attribution,
 )
@@ -61,7 +62,7 @@ async def _prewarm_cache():
         try:
             await get_series(SERIES_IDS[key], start, end)
         except Exception as e:
-            logger.warning(f"Cache warm failed for {key}: {e}")
+            logger.warning(scrub(f"Cache warm failed for {key}: {e}"))
 
     await asyncio.gather(*[_warm_one(k) for k in keys_to_warm])
 

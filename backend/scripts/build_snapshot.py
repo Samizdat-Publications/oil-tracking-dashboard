@@ -135,7 +135,7 @@ async def build() -> dict:
         try:
             snap[name] = await coro
         except Exception as exc:
-            print(f"    unavailable: {exc}", flush=True)
+            print(scrub(f"    unavailable: {exc}"), flush=True)   # CI logs are public
             snap[name] = None
 
     snap["administrations"] = {}
@@ -171,7 +171,7 @@ async def build() -> dict:
         try:
             dw["record"] = series_record(await get_series("GASDESW", "1994-01-01"), "2025-01-01")
         except Exception as exc:
-            print(f"    diesel history unavailable: {exc}", flush=True)
+            print(scrub(f"    diesel history unavailable: {exc}"), flush=True)
 
     # IMF PortWatch: measured daily transits. This is what turns the vessel layer
     # from illustrative into a real series. Failure here is loud, not silent --
@@ -180,7 +180,7 @@ async def build() -> dict:
     try:
         snap["hormuz_transits"] = await get_hormuz_transits("2025-01-01")
     except Exception as exc:
-        print(f"    PortWatch unavailable: {exc}", flush=True)
+        print(scrub(f"    PortWatch unavailable: {exc}"), flush=True)
         snap["hormuz_transits"] = None
 
     snap["war_milestones"] = _load_json("war_milestones.json")

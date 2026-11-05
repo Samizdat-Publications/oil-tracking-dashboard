@@ -17,6 +17,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from services import attribution as attr
 from services.cache import get_cached, set_cached
+from services.redact import scrub
 
 router = APIRouter(prefix="/api/attribution", tags=["attribution"])
 log = logging.getLogger(__name__)
@@ -164,7 +165,7 @@ async def receipt(
             assumptions=overrides or None,
         )
     except ValueError as exc:  # missing provenance on an assumption
-        raise HTTPException(status_code=500, detail=str(exc))
+        raise HTTPException(status_code=500, detail=scrub(str(exc)))
 
 
 @router.get("/methodology")

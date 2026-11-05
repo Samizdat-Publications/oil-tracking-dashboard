@@ -10,6 +10,7 @@ import httpx
 from dotenv import load_dotenv
 
 from services.cache import get_cached, set_cached
+from services.redact import scrub
 
 # ---------------------------------------------------------------------------
 # Series ID constants
@@ -95,7 +96,9 @@ async def _fetch(params: dict) -> dict:
             except (httpx.TransportError, httpx.HTTPStatusError) as exc:
                 transient = not isinstance(exc, httpx.HTTPStatusError) or exc.response.status_code == 429                     or exc.response.status_code >= 500
                 if wait is None or not transient:
-                    raise RuntimeError(f"FRED {params.get('series_id')}: {type(exc).__name__} {exc}") from exc
+                    # The request URL carries the key, and so does the exception's text and
+                    # its traceback: scrub the message and do not chain the original.
+                    raise RuntimeError(scrub(f"FRED {params.get('series_id')}: {type(exc).__name__} {exc}")) from None
                 await asyncio.sleep(wait)
     raise AssertionError("unreachable")
 

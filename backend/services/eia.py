@@ -33,6 +33,7 @@ from dotenv import load_dotenv
 
 from services.attribution import _envelope
 from services.cache import get_cached, set_cached
+from services.redact import scrub
 from services.macro import nearest_on_or_before
 from services.series_catalog import HANDOVER_DATE
 from services.timeseries import WAR_BASELINE_DATE
@@ -109,8 +110,12 @@ async def _get(route: str, params: dict[str, Any], cache_id: str) -> list[dict]:
     async with httpx.AsyncClient(timeout=60) as client:
         while True:
             p = {"api_key": _key(), "offset": offset, "length": 5000, **params}
-            r = await client.get(f"{BASE}/{route}/data/", params=p)
-            r.raise_for_status()
+            try:
+                r = await client.get(f"{BASE}/{route}/data/", params=p)
+                r.raise_for_status()
+            except httpx.HTTPError as exc:
+                # httpx puts the full URL, key included, in the message: never pass it on
+                raise RuntimeError(scrub(f"EIA {route}: {type(exc).__name__} {exc}")) from None
             body = r.json()
             if "error" in body:
                 raise RuntimeError(f"EIA {route}: {body['error']}")
@@ -217,7 +222,7 @@ async def eia_snapshot() -> dict:
     try:
         _key()
     except RuntimeError as exc:
-        return {"error": str(exc), "as_of": date.today().isoformat()}
+        return {"error": scrub(str(exc)), "as_of": date.today().isoformat()}
 
     results = await asyncio.gather(
         *(weekly(k) for k in WEEKLY_SERIES),

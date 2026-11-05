@@ -26,6 +26,7 @@ import numpy as np
 from services import econometrics as ec
 from services import timeseries as tsmod
 from services.fred_client import get_series
+from services.redact import scrub
 from services.series_catalog import (
     BY_KEY,
     HANDOVER_DATE,
@@ -1161,7 +1162,7 @@ async def placebo_battery(*, n_boot: int = 1000) -> dict:
             cf = await counterfactual(spec.key, n_boot=n_boot)
         except Exception as exc:
             results.append({"key": spec.key, "name": spec.name, "group": spec.group,
-                            "verdict": "UNAVAILABLE", "reason": str(exc)[:120]})
+                            "verdict": "UNAVAILABLE", "reason": scrub(str(exc))[:120]})
             continue
         if cf.get("insufficient_data"):
             results.append({"key": spec.key, "name": spec.name, "group": spec.group,

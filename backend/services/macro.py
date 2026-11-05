@@ -16,6 +16,7 @@ from typing import Any
 
 from services.attribution import _envelope
 from services.fred_client import get_series
+from services.redact import scrub
 from services.series_catalog import HANDOVER_DATE
 from services.timeseries import WAR_BASELINE_DATE
 
@@ -149,7 +150,7 @@ async def macro_snapshot() -> dict:
             obs = await get_series(fred_id, start)
         except Exception as exc:  # one bad series must not sink the block
             return key, {"fred_id": fred_id, "name": name, "unit": unit,
-                         "error": str(exc), "points": []}
+                         "error": scrub(str(exc)), "points": []}
         pts = [{"date": o["date"], "value": o["value"]} for o in obs
                if o.get("value") is not None]
         return key, {
