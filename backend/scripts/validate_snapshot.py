@@ -18,8 +18,12 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import sys
 from datetime import date, datetime
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from services.redact import leaks  # noqa: E402
 
 # Blocks the page reads and cannot render without. Version 1 is the August 2026
 # page; version 2 adds the September data modules.
@@ -159,8 +163,11 @@ def validate(snap: dict, *, today: date | None = None) -> list[str]:
 def main(argv: list[str]) -> int:
     path = argv[1] if len(argv) > 1 else "../frontend/public/data-snapshot.json"
     with open(path, encoding="utf-8") as fh:
-        snap = json.load(fh)
+        text = fh.read()
+    snap = json.loads(text)
     violations = validate(snap)
+    # The snapshot is published as-is: a key in it is a leak (services/redact.py).
+    violations += ["contains an API key: %s" % x for x in leaks(text)]
     if violations:
         print("SNAPSHOT REJECTED:")
         for x in violations:

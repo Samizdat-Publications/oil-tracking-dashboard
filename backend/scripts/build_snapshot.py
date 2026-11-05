@@ -36,6 +36,7 @@ os.environ.setdefault("CACHE_DB_PATH", os.path.join(tempfile.mkdtemp(prefix="sna
 import numpy as np  # noqa: E402
 
 from services import attribution as A  # noqa: E402
+from services.redact import scrub  # noqa: E402
 from services.cache import close_cache, init_cache  # noqa: E402
 from services.chain import chain_snapshot  # noqa: E402
 from services.eia import eia_snapshot  # noqa: E402
@@ -217,6 +218,9 @@ async def main() -> None:
     # freshly-built temp file on the way out, losing the good data.
     payload = json.dumps(to_json_safe(snap), separators=(",", ":"),
                          allow_nan=False)
+    # Error messages carry request URLs, and FRED and EIA take the key in the URL.
+    # This file is published, so no key may reach it (services/redact.py).
+    payload = scrub(payload)
     json.loads(payload)  # fail here, not in the browser
 
     last: Exception | None = None
